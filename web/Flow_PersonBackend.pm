@@ -13,7 +13,6 @@ use PersonUtils;
 use ConfigOptions;
 use InstanceOf;
 use Countries;
-#use PersonRegisterWhat;
 use Reg_common;
 use FieldCaseRule;
 use WorkFlow;
@@ -37,6 +36,7 @@ use JSON;
 use IncompleteRegistrations;
 use RegoProducts;
 use Entity;
+use PersonRegisterWhat;
 
 sub setProcessOrder {
     my $self = shift;
@@ -156,7 +156,6 @@ sub setupValues    {
 
     if ($self->{'RunParams'}{'dnat'} eq 'RENEWAL')  {
         my $lang = $self->{'Data'}->{'lang'};
-        my $rawDetails;
         my ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
 
         if(!$content or !$rawDetails) {
@@ -759,6 +758,36 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
+       ## CHECKING REGO OK
+        {
+            my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
+                $self->{'Data'},
+                $self->{'Data'}->{'Realm'},
+                $self->{'Data'}->{'RealmSubType'},
+                $originLevel,
+                $registrationNature,
+                $personType || '',
+                '',
+                $personEntityRole || '',
+                '',
+                $personLevel || '',
+                '',
+                $sport || '',
+                '',
+                $ageLevel || '',
+                $personID,
+                $entityID,
+                '',
+                '',
+                'nature',
+                0
+            );
+            if ($errorMsgRego)  {
+                push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
         if(!$existingReg or $changeExistingReg)    {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
@@ -778,6 +807,7 @@ sub process_registration {
                 $MAComment,
             );
         }
+ 
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }

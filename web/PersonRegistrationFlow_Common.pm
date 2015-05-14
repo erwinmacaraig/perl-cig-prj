@@ -115,7 +115,6 @@ sub displayRegoFlowSummaryBulk  {
     my @People=();
     my $txnCount = 0;
     my $amountDue = 0;
-    my $logIDs;
     for my $pID (@IDs)   {
         my $personObj = getInstanceOf($Data, 'person', $pID);
         my %personData = ();

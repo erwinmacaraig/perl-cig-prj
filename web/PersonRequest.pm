@@ -1870,7 +1870,7 @@ sub setRequestStatus {
 
         #send to previous club
         $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
     elsif($requestStatus eq $Defs::PERSON_REQUEST_STATUS_COMPLETED) {
@@ -1883,7 +1883,7 @@ sub setRequestStatus {
 
         #send to previous club
         $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
@@ -2268,7 +2268,7 @@ sub loanRequiredFields {
             strTMSReference
         )],
         sections => [
-            [ 'loanfields', 'Additional Fields' ],
+            [ 'loanfields', 'Loan Information' ],
         ],
         client => $Data->{'client'},
 			

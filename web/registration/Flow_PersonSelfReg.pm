@@ -580,6 +580,37 @@ sub process_registration {
             $self->deleteExistingReg($existingReg, $personID);
         }
 print STDERR "ENTITY IS $entityID\n";
+        
+        ## CHECKING REGO OK
+        {
+            my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
+                $self->{'Data'},
+                $self->{'Data'}->{'Realm'},
+                $self->{'Data'}->{'RealmSubType'},
+                $originLevel,
+                $registrationNature,
+                $personType || '',
+                '',
+                $personEntityRole || '',
+                '',
+                $personLevel || '',
+                '',
+                $sport || '',
+                '',
+                $ageLevel || '',
+                $personID,
+                $entityID,
+                '',
+                '',
+                'nature',
+                0
+            );
+            if ($errorMsgRego)  {
+                push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
+                $self->setCurrentProcessIndex('r');
+                return ('',2);
+            }
+        }
         if(!$existingReg or $changeExistingReg)    {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 

@@ -156,7 +156,6 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
- my $q=new CGI;
     #$registrationNature='TRANSFER' if ($transfer==1);
 	my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
@@ -204,7 +203,7 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
-    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS' and !$registrationNature) {
         my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'NEW'});
         push @retdata, {
             name => $label,
@@ -381,7 +380,8 @@ sub optionsPersonRegisterWhat {
     }
 
     if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
-        return (\@retdata, '');
+    #    return (\@retdata, '');
+        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not available.'));
     }
 
     #if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {
