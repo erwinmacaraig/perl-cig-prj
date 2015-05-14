@@ -203,7 +203,7 @@ sub optionsPersonRegisterWhat {
         };
         return (\@retdata, '');
     }
-    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS')  {
+    if (!$bulk and $step==6 and $pref->{'strStatus'} eq 'INPROGRESS' and !$registrationNature) {
         my $label = $Data->{'lang'}->txt($lfLabelTable{$lookingFor}{'NEW'});
         push @retdata, {
             name => $label,
@@ -406,6 +406,7 @@ sub optionsPersonRegisterWhat {
     }
 
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
+print STDERR "DDDDD";
         #FC-181 - now check for allowed Sport and Gender
         #FC-181 - remove query to tblEntityRegistrationAllowed for now
         if($lookingForField eq 'strSport') {
