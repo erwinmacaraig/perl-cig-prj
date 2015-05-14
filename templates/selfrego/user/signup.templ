@@ -15,21 +15,21 @@
 </div>
 [% ELSE %]
 
- <form id = "signup-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
+ <form id = "signup-form self-reg" class="self-reg-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
     <div class = "signup_prompt">[% Lang.txt('') %]</div>
-    <div id = "signup-email-div" class = "formfield form-group">
+    <div id = "signup-email-div form-group" class = "formfield form-group">
 		<label class="col-md-4 " for="email"><span class="compulsory">*</span>[% Lang.txt('Email') %]</label>
 		<div class="col-md-6 control-fields">
 			<input type = "text" name = "email" value = "[% email%]" id = "signup-email" class="fields required col-md-6 control-fields" title="[% Lang.txt('Email Address') %]">
 		</div>
 	</div>
-    <div id = "signup-fname-div" class = "formfield form-group">
+    <div id = "signup-fname-div form-group" class = "formfield form-group">
 			<label class="col-md-4" for="firstname"><span class="compulsory">*</span>[% Lang.txt('First Name') %]</label>
 			<div class="col-md-6 control-fields">
 				<input type = "text" name = "firstname" value = "[% strFirstName %]" size = "50" id = "signup-fname" class="fields required" title="[% Lang.txt('First name') %]">
 			</div>
 		</div>
-    <div id = "signup-sname-div" class = "formfield form-group">
+    <div id = "signup-sname-div form-group" class = "formfield form-group">
 			<label class="col-md-4" for="familyname"><span class="compulsory">*</span>[% Lang.txt('Family Name') %]</label>
 			<div class="col-md-6 control-fields">
 				<input type = "text" name = "familyname" value = "[% strFamilyName %]" size = "50" id = "signup-sname" class="fields required" title="[% Lang.txt('Family name') %]">
@@ -37,7 +37,7 @@
 			</div>
 	</div>
 
-	<div id = "signup-password-div" class = "formfield form-group">	
+	<div id = "signup-password-div form-group" class = "formfield form-group">	
 
 		<label class="col-md-4" for="password"><span class="compulsory">*</span>[% Lang.txt('Password') %]</label>
 		<div class="col-md-6 control-fields">
@@ -45,7 +45,7 @@
 		</div>
 	</div>
 
-	<div id = "signup-password2-div" class = "formfield form-group">  
+	<div id = "signup-password2-div form-group" class = "formfield form-group">  
 		<label class="col-md-4" for="password2"><span class="compulsory">*</span>[% Lang.txt('Re-enter Password') %]</label>
 		<div class="col-md-6 control-fields">
 	  		<input type = "password" name = "password2" value = "" size = "50"  id = "signup-password2" class="fields required" title="[% Lang.txt('re-enter password') %]">

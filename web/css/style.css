@@ -129,11 +129,7 @@ div#navbar div.navicons	a {
 	vertical-align:middle;
 	height:32px;
 	line-height:32px;
-    text-overflow:ellipsis;
-    overflow:hidden;
-    white-space: nowrap;
 }
-
 
 table.listTable	{
 	width:99%;
@@ -241,14 +237,19 @@ body.report h1	{
 }
 
 .report-wrapper	{
-    width: 100%;
 }
 
 
-table.shrink-table td,
-table.shrink-table th   {
-	font-size:10px !important;
-    padding:6px !important;
+.report-table,
+	 .report-wrapper table.listTable {
+	font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
+	vertical-align:bottom;
+	border-collapse:collapse;
+	font-size:10px;
+	margin-top:10px;
+	margin-bottom:10px;
+	margin-left:auto;
+	margin-right:auto;
 }
 
 .report-table thead,
@@ -259,12 +260,32 @@ table.shrink-table th   {
 }
 
 .report-numrows	{
-	font-size:10px;
+	font-size:8px;
 	color: #000;
 	vertical-align: bottom;
 	float:right;
 }
 
+.report-table th,
+	 .report-wrapper table.listTable th {
+	font-size:9px;
+	color: #000;
+	padding:5px;
+}
+.report-table td,
+ .report-wrapper table.listTable td {
+	padding:3px;
+	border:1px solid #eeeeee;
+}
+
+.report-table tr.odd,
+ .report-wrapper table.listTable tr.odd {
+	background-color:#FFF;
+}
+.report-table tr.even,
+ .report-wrapper table.listTable tr.even {
+	background-color:#EEEEEE;
+}
 .report-daterun	{
 	font-style:italic;
 }
@@ -273,25 +294,25 @@ TD.total {
 	border-top:solid #000000 1px;
 }
 
-TR.ROgroupheader td{
-    background-color:#BBBBBB !important;
+TR.ROgroupheader {
+    background-color:#BBBBBB;
     vertical-align:top;
     font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
     font-weight:bold;
     padding:3px;
 }
                                                                                                         
-TR.ROgroupfooter td {
+TR.ROgroupfooter {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:solid #000000 1px !important;
+  border-top:solid #000000 1px;
   font-style:italic;
 }
 
-TR.ROtotalfooter td {
+TR.ROtotalfooter {
   vertical-align:top;
   font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;
-  border-top:double #000000 3px !important;
+  border-top:double #000000 3px;
   font-style:italic;
 }
 
@@ -1156,6 +1177,13 @@ span.move a {
 .reporttab-data	{
 	margin-left: 138px;
 }
+.reporttab-datacontent	{
+	padding:20px;
+	border: 1px solid #99bbe9;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	clear:right;
+}
 
 .reporttab-button {
 	width: 128px;
@@ -1176,6 +1204,16 @@ span.move a {
 
 .reporttabs input:hover {
 	cursor:pointer;
+}
+
+.reportgroup {
+	clear:right;
+}
+
+.reportgroup-title	{
+	color: #0d2680;
+	font-size:1.3em;	
+	margin-bottom:1em;
 }
 
 .fieldconfig-header	{
@@ -3022,7 +3060,8 @@ body.report h1 {
 }
 
 .report-wrapper {
-    overflow:scroll;
+	float:left;
+	width:100%;
 }
 */
 .reporttabs {
@@ -3030,9 +3069,7 @@ body.report h1 {
 	position: relative;
 	text-align: center;
 }
-.report-wrapper {
-    overflow-x:scroll;
-}
+
 .reporttab-button {
 	font-family: sans-serif;
 	color: #6A6A6A;
@@ -4380,7 +4417,7 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 
 /* User Signup styles */
 #signup-email-div {
-    /*margin: 14px 0 0 12px;*/
+    margin: 14px 0 0 12px;
     clear: both;
     color: #0065A4;
     font-size: 18px;
@@ -4388,23 +4425,19 @@ ul.new_tabs li a.active, .new_tabs_wrap  a.active {
 
 #signup-fname-div {
     float: left;
-    /*margin: 0 20px 0 0;*/
+    margin: 0 20px 0 0;
 }
 
 #signup-password-div {
     float: left;
-    /*margin: 0 20px 0 0;*/
+    margin: 0 20px 0 0;
 }
 
 #signup-page-wrap #signup-email-div {
     color: #464646;
-    /*margin: 0;*/
+    margin: 0;
 }
-div.control-fields input[type="password"] {
-  border: 1px solid #cccccc;
-  padding: 5px;
-  width: 100%;
-}
+
 .edit-account .privacy-text, #register-form .privacy-text {
     width:80%;
     margin:0;

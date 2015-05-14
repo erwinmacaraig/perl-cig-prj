@@ -14,16 +14,22 @@
 <h3>[% Lang.txt('Update your details') %]</h3>
  <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
-        <label for="email">[% Lang.txt('Email') %]</label>
-        <input type = "text" name = "email" value = "[% Email %]" id = "signup-email"  class="form-control fields required" title="[% Lang.txt('Email Address') %]">
+        <label class="col-md-2" for="email">[% Lang.txt('Email') %]</label>
+        <div class="col-md-6 control-fields">
+        	<input type = "text" name = "email" value = "[% Email %]" id = "signup-email"  class="form-control fields required" title="[% Lang.txt('Email Address') %]">
+    	</div>
     </div>
     <div class = "form-group">
-			<label for="firstname">[% Lang.txt('First Name') %]</label>
+		<label class="col-md-2" for="firstname">[% Lang.txt('First Name') %]</label>
+		<div class="col-md-6 control-fields">
 			<input type = "text" name = "firstname" value = "[% FirstName %]" size = "50" id = "signup-fname"  class="form-control fields required" title="[% Lang.txt('First name') %]">
 		</div>
+		</div>
     <div class = "form-group">
-			<label for="familyname">[% Lang.txt('Family Name') %]</label>
+		<label class="col-md-2" for="familyname">[% Lang.txt('Family Name') %]</label>
+		<div class="col-md-6 control-fields">
 			<input type = "text" name = "familyname" value = "[% FamilyName %]" size = "50" id = "signup-sname"  class="form-control fields required" title="[% Lang.txt('Family name') %]">
+		</div>
 	</div>
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update') %] ">
     <input type = "hidden" name = "a" value = "P_u">
@@ -36,12 +42,16 @@
     <h3>[% Lang.txt('Change your password') %]</h3>
     <form id = "updatepw-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
-        <label for="password">[% Lang.txt('Password') %]</label>
-       <input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('password') %]" class="form-control" id = "password1">
+        <label class="col-md-2" for="password">[% Lang.txt('Password') %]</label>
+        <div class="col-md-6 control-fields">
+       		<input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('password') %]" class="form-control" id = "password1">
+       	</div>
     </div>
     <div class = "form-group">  
-        <label for="password2">[% Lang.txt('Re-enter Password') %]</label>
-	  <input type = "password" name = "password2" value = "" size = "15" maxsize = "50" id = "password2" class="form-control" title="[% Lang.txt('re-enter password') %]">
+        <label class="col-md-2" for="password2">[% Lang.txt('Re-enter Password') %]</label>
+        <div class="col-md-6 control-fields">
+	  		<input type = "password" name = "password2" value = "" size = "15" maxsize = "50" id = "password2" class="form-control" title="[% Lang.txt('re-enter password') %]">
+	  	</div>
     </div>
 
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update Password') %] ">
