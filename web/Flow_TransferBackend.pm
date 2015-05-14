@@ -844,6 +844,7 @@ print STDERR "DISPLAY_PRODUCTS FOR $personID $regoID\n";
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
 
+        cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 
