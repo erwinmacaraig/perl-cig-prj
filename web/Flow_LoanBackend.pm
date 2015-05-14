@@ -542,8 +542,6 @@ sub display_registration {
         $content = "Person Request Details not found.";
     }
     else {
-print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDD";
-print STDERR Dumper($self->{'RunParams'});
         $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
         $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
         #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
@@ -625,11 +623,11 @@ sub process_registration {
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
     my $personLevel = $self->{'RunParams'}{'d_level'};
     $personLevel =~ s/,.*$//;
-    #$self->{'RunParams'}{'d_nature'} = '';
-    #$self->{'RunParams'}{'d_type'} = '';
-    #$self->{'RunParams'}{'d_level'} = '';
-    #$self->{'RunParams'}{'d_sport'} = '';
-    #$self->{'RunParams'}{'d_age'} = '';
+    $self->{'RunParams'}{'d_nature'} = '';
+    $self->{'RunParams'}{'d_type'} = '';
+    $self->{'RunParams'}{'d_level'} = '';
+    $self->{'RunParams'}{'d_sport'} = '';
+    $self->{'RunParams'}{'d_age'} = '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
 
     if ($self->{'RunParams'}{'prid'})   {
@@ -661,11 +659,11 @@ sub process_registration {
         $content = "Person Request Details not found.";
     }
     else {
-        #$self->addCarryField('d_nature', $self->getCarryFields('dnat'));
-        #$self->addCarryField('d_type', $request->{'strPersonType'});
-        #$self->addCarryField('d_level', $request->{'strNewPersonLevel'});
-        #$self->addCarryField('d_sport', $request->{'strSport'});
-        #$self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+        $self->addCarryField('d_nature', $self->getCarryFields('dnat'));
+        $self->addCarryField('d_type', $request->{'strPersonType'});
+        $self->addCarryField('d_level', $request->{'strNewPersonLevel'});
+        $self->addCarryField('d_sport', $request->{'strSport'});
+        $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
     }
 
 #print STDERR "PR: " . Dumper($self->{'RunParams'});
@@ -678,8 +676,8 @@ sub process_registration {
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
     my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
-    $existingReg = $regoID ? 1 : 0;
-    $changeExistingReg= $regoID ? 1 : 0;
+    #$existingReg = $regoID ? 1 : 0;
+    #$changeExistingReg= $regoID ? 1 : 0;
     
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
@@ -692,7 +690,7 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
                 $self->{'Data'},
                 $self->{'Data'}->{'Realm'},
@@ -723,7 +721,8 @@ sub process_registration {
             }
         }
 
-        if(! $regoID) {#!$existingReg or $changeExistingReg)    {
+        #if(! $regoID) {#!$existingReg or $changeExistingReg)    {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -773,7 +772,9 @@ sub process_registration {
             }
         
             
-            #$self->moveDocuments($existingReg, $regoID, $personID);
+            if($changeExistingReg)  {
+                $self->moveDocuments($existingReg, $regoID, $personID);
+            }
         }
     }
 

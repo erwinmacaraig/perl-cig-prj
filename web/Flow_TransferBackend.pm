@@ -678,8 +678,8 @@ sub process_registration {
     my $ageLevel = $self->{'RunParams'}{'d_age'} || '';
     my $existingReg = $self->{'RunParams'}{'existingReg'} || 0;
     my $changeExistingReg = $self->{'RunParams'}{'changeExisting'} || 0;
-    $existingReg = $regoID ? 1 : 0;
-    $changeExistingReg= $regoID ? 1 : 0;
+    #$existingReg = $regoID ? 1 : 0;
+    #$changeExistingReg= $regoID ? 1 : 0;
     
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
     my $personRequestID = $self->{'RunParams'}{'prid'} || '';
@@ -692,7 +692,7 @@ sub process_registration {
         if($changeExistingReg)    {
             $self->deleteExistingReg($existingReg, $personID);
         }
-        {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
                 $self->{'Data'},
                 $self->{'Data'}->{'Realm'},
@@ -721,7 +721,7 @@ sub process_registration {
                 return ('',2);
             }
         }
-        if(! $regoID) {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -775,7 +775,9 @@ sub process_registration {
                     $personRequestID
                 );
         }
-        #$self->moveDocuments($existingReg, $regoID, $personID);
+        if ($changeExistingReg) {
+            $self->moveDocuments($existingReg, $regoID, $personID);
+        }
         
     }
 

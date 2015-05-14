@@ -759,7 +759,8 @@ sub process_registration {
             $self->deleteExistingReg($existingReg, $personID);
         }
        ## CHECKING REGO OK
-        {
+#print STDERR "$existingReg $regoID $changeExistingReg";
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
                 $self->{'Data'},
                 $self->{'Data'}->{'Realm'},
@@ -788,7 +789,7 @@ sub process_registration {
                 return ('',2);
             }
         }
-        if(!$existingReg or $changeExistingReg)    {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -807,6 +808,9 @@ sub process_registration {
                 $MAComment,
             );
         }
+        #if (! $regoID and $existingReg) {
+        #    $regoID = $existingReg;
+        #}
  
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);

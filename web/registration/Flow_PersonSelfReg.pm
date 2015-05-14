@@ -582,7 +582,7 @@ sub process_registration {
 print STDERR "ENTITY IS $entityID\n";
         
         ## CHECKING REGO OK
-        {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             my (undef, $errorMsgRego) = PersonRegisterWhat::optionsPersonRegisterWhat(
                 $self->{'Data'},
                 $self->{'Data'}->{'Realm'},
@@ -611,7 +611,7 @@ print STDERR "ENTITY IS $entityID\n";
                 return ('',2);
             }
         }
-        if(!$existingReg or $changeExistingReg)    {
+        if ((! $existingReg and ! $regoID) or $changeExistingReg)  {
             ($regoID, undef, $msg) = add_rego_record(
                 $self->{'Data'}, 
                 $personID, 
@@ -629,6 +629,7 @@ print STDERR "ENTITY IS $entityID\n";
                 $personRequestID,
             );
         }
+        
         if($changeExistingReg)  {
             $self->moveDocuments($existingReg, $regoID, $personID);
         }
