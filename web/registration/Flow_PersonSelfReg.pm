@@ -873,7 +873,7 @@ sub display_products {
     if ($self->{'SystemConfig'}{'AllowTXNs_Manual_roleFlow'}) {
         $content = $pay_body . $content;
     }
-	$content = $pay_body . $content;
+
 
 
     my %PageData = (
