@@ -406,7 +406,6 @@ sub optionsPersonRegisterWhat {
     }
 
     elsif ($entityID and $lookingForField ne 'strRegistrationNature')   {
-print STDERR "DDDDD";
         #FC-181 - now check for allowed Sport and Gender
         #FC-181 - remove query to tblEntityRegistrationAllowed for now
         if($lookingForField eq 'strSport') {
