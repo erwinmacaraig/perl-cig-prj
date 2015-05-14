@@ -146,7 +146,7 @@ header .utilities ul li:last-child {
 header .utilities ul li a {
 	color: #fff;
 	text-decoration: underline;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 header .utilities ul li a:hover {
@@ -1476,7 +1476,8 @@ header nav ul li a {
 	font-size: 13px;
 }
 
-.nav_session_levels {
+.nav_session_levels,
+.nav_session_levelsmobile {
 	-webkit-box-shadow:none;
 	box-shadow:none;
 }
@@ -2320,10 +2321,12 @@ header .navbar-brand {
 /*  #searchResult { width: 722px!important; }*/
   div.dashboard-tasklist table th { font-size: 12px; }
   div.dashboard-tasklist table td { font-size: 12px; }
+  .responsiveTablesDropDown button{margin: 6px!important;}
 }
+
+
 @media (min-width: 250px) and (max-width: 480px) {
-	.responsiveTablesDropDown button{margin-bottom: -43px!important;}
- 
+   .responsiveTablesDropDown button{margin-bottom: -43px!important;}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
@@ -2470,7 +2473,85 @@ header .navbar-brand {
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 18px; margin-top: 0px; }
   table#worktasks.dataTable { margin-top: 0px !important; }
-  table#grid { margin-top: 0px !important; }}
+  table#grid { margin-top: 0px !important; }
+  div.dataTables_filter label { color: #fff; font-size: 11px; }
+  div.dataTables_filter label input { color: #000; }
+  #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
+  .fieldSectionGroupWrapper-DisplayOnly label.txtright { text-align:left;}
+  #pageholder #contentholder { margin-top:0px; }
+  .access-level { 
+    float:initial;
+  }
+  .access-level p.viewAs { float:initial; text-align:left; margin: 0 0 0 3px;}
+  .nav_session_menu_wrap {
+    width: 100%;
+    float:initial;
+    text-align:left;
+  }
+  .nav_session_placement {
+        width: 100%;
+        background-position: 250px center;
+  } 
+  .access-level .nav-bar-name {  
+    text-align:left; 
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
+  }
+  .access-level .level-name {  
+    width:30%;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
+    text-align:right;
+  }
+  .nav_session_levelsmobile {
+    width:100%;
+  }
+  .dropdown-menu { font-size: 13px; }
+  .useroptions-mobile {
+    background-color:#000;
+    color:#fff;
+    padding:7px;
+
+  }
+
+  .useroptions-mobile ul {
+      padding: 0;
+  }
+
+  .useroptions-mobile ul li {
+      float: left;
+      list-style-type: none;
+      color: #fff;
+      margin: 0 10px 0 0;
+      font-size:13px;
+      width: auto;
+      border:none !important;
+  }
+
+  .smartphonenav .useroptions-mobile ul li:last-child {
+      margin: 0;
+  }
+  header nav ul li:last-child a { border:none; }
+  .smartphonenav .navbar-nav {
+    margin-bottom: 0;
+  }
+  .lang-select select { border: 0px; box-shadow: none;} 
+
+  .useroptions-mobile ul li a {
+      color: #fff;
+      text-decoration: underline;
+      font-size: 13px;
+      padding: 3px;
+      border: none;
+  }
+
+  .useroptions-mobile ul li a:hover {
+      text-decoration: none;
+      background-color:#000;
+  }
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
   table th { font-size: 13px; }
   div.dataTables_filter label { color: #000; }
   .sidebar-box:nth-child(0) { display: none; }
@@ -2498,9 +2579,8 @@ header .navbar-brand {
    		padding: 20px 10px;
    		width: 100%;
    }
-
-   
    .smartphoneheader img.header-logo { max-width: 125px; }
+   .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
    .navbar-nav { margin-left: -1px; }
    /*.progressFlow .col-md-2.previous.step.step-3 { width: 100%; }*/
@@ -2528,6 +2608,7 @@ header .navbar-brand {
    #secmain #l_row_strNotes .col-md-9 textarea { width: 100%; }
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
+}
 
 /*** payment ***/
 .paymentwrapper { float: left; width: 100%; padding-bottom: 5px; }
@@ -2539,6 +2620,11 @@ header .navbar-brand {
 }
 .paymentwrapperoption { float: left; padding-right: 10px; }
 .paymentwrapper label { font-size: 12px; }
+.lang-select-wrapper {
+    float:right;
+    margin-left:15px;
+
+}
 .lang-select {
     color:#000;
     font-size: 13px;

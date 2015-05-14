@@ -79,9 +79,26 @@
           <div class="navmenu navmenu-default navmenu-fixed-left offcanvas">
           <div class="smartphoneheader">
               <a title="" href="#"><img alt="" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" class="header-logo"></a>
-            <div class = "smartphonename">[% NavTree.last.name %]</div>
+            <!--div class = "smartphonename">[% NavTree.last.name %]</div-->
+            [% IF NavTree %]
+                [% INCLUDE 'user/levelNavigation.templ' seq = 'mobile'%]
+            [% END %]
           </div>
+
           [% NavBar %]
+            <div class = "useroptions-mobile clearfix">
+                [% IF LanguageChooser %]
+                <div class = "lang-select-wrapper">[% LanguageChooser %]</div>
+                [% END %]
+                <ul>
+                    <li><a href ="#">[% Lang.txt('Help') %]</a></li>
+                    [% IF Data.UserName %]
+                    <li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+                    [% END %]
+                </ul>
+
+            </div>
+
       </div>
 
       <div class="navbar navbar-default navbar-fixed-top">
@@ -152,5 +169,6 @@
 		[% IF Wizard %]
 			[% Wizard %]
 		[% END %]
+        <input type = "hidden" id  = "label_columns" value = "[% Lang.txt('Columns') %]">
   </body>
 </html>

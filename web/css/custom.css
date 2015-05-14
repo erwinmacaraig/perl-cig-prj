@@ -258,6 +258,10 @@ select::-ms-expand {
 }
 select#languageChooser {
   overflow: hidden;
+<<<<<<< HEAD
+=======
+  /*background: url(https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-08-32.png) no-repeat right #FFFFFF;*/
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
   border: 1px solid #FFF;
 }
 /*.transitions {
@@ -308,8 +312,12 @@ ul#menu li.hover, ul#menu li:hover > a {
   display: none;
 }
 .responsiveTablesDropDown{
+<<<<<<< HEAD
   height: 47px;
   float: left;
+=======
+    float:right;
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
 }
 .responsiveTablesDropDown button{
   position: relative;
@@ -317,14 +325,22 @@ ul#menu li.hover, ul#menu li:hover > a {
   height: 42px;
   box-sizing: border-box;
   font-weight: bold;
-  background-color: rgb(0, 78, 126);
-  color: white;
+  color: #666;
   border-radius: 5px;
+<<<<<<< HEAD
   margin: -25px 4px;
+=======
+  margin: 0 5px;
+  padding:3px 8px;
+}
+.res-items-group.dropdown-menu {
+    left: auto;
+    right:0;
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
 }
 
 .responsiveTablesDropDown .dropdown-menu {
-  font-size: 20px;
+  font-size: 16px;
   margin: 10px;
   width: 26%;
 }

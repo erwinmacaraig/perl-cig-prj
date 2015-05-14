@@ -290,6 +290,7 @@ sub pageMain {
         HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
         NavTree => $navTree,
+        LanguageChooser => genLanguageChooser($Data,2),
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 

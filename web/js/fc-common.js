@@ -490,7 +490,7 @@ jQuery(document).ready(function(){
             });
              // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
-                      <button type="button" class="btn btn-default btn-sm dropdown-toggle fa fa-caret-down fa-2x" data-toggle="dropdown"></button>\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">' + $('#label_columns').val() + ' <i class = "fa fa-caret-down"></i></button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
                           '+ headers +'\
                           </ul>\
@@ -503,7 +503,9 @@ jQuery(document).ready(function(){
                 // flash headers Variable first
                 headers = "";
                 // generate a drop down
-                $(".res-table:eq("+i+") ").before(dropdownGenerator(i))
+                if($(".res-table:eq("+i+") tbody tr").length > 0)   {
+                    $(".res-table:eq("+i+") ").before(dropdownGenerator(i))
+                }
             }
             // click on all dropdown for initializating purposes
             $(".res-items-group li a").trigger("click");

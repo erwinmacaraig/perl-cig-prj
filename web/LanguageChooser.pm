@@ -12,7 +12,7 @@ use PersonLanguages;
 
 
 sub genLanguageChooser  {
-    my ($Data) = @_;
+    my ($Data, $seq) = @_;
 
     my $currentLanguage = $Data->{'lang'}->generateLocale($Data->{'SystemConfig'});
 
@@ -26,6 +26,7 @@ sub genLanguageChooser  {
             currentLanguage => $currentLanguage,
             Languages => $languageOptions,
             cookieName => $Defs::COOKIE_LANG,
+            seq => $seq || '',
         },
         'page_wrapper/language_chooser.templ',
     );
