@@ -1688,7 +1688,8 @@ span.fa-user{
 }
 
 .document-upload.summary .details-left{
-	/*float: none;*/
+	/*changing this may affect self -reg summary*/
+	float: none; 
 }
 
 span.circleBg {
@@ -2271,6 +2272,12 @@ header .navbar-brand {
 }
 .navbar-nav {
 	margin-top: -1px;
+}
+.product-row td:nth-child(2), .product-row td:nth-child(3) {
+  display: none;
+}
+.products-table .product-row:last-child {
+    background: rgb(214, 214, 214);
 }
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }

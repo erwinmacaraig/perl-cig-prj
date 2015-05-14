@@ -390,7 +390,7 @@ ul.total-view li {
 }
 /*readonly corrections*/
 .read-only-text ul li{
-  width: 100%;
+  /*width: 100%;*/
 }
 /* make headers more meaningful*/
 th {
