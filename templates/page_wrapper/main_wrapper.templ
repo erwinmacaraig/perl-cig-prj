@@ -86,6 +86,19 @@
           </div>
 
           [% NavBar %]
+            <div class = "useroptions-mobile clearfix">
+                [% IF LanguageChooser %]
+                <div class = "lang-select-wrapper">[% LanguageChooser %]</div>
+                [% END %]
+                <ul>
+                    <li><a href ="#">[% Lang.txt('Help') %]</a></li>
+                    [% IF Data.UserName %]
+                    <li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
+                    [% END %]
+                </ul>
+
+            </div>
+
       </div>
 
       <div class="navbar navbar-default navbar-fixed-top">

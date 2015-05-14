@@ -257,7 +257,7 @@ select::-ms-expand {
 }
 select#languageChooser {
   overflow: hidden;
-  background: url(https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-08-32.png) no-repeat right #FFFFFF;
+  /*background: url(https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-08-32.png) no-repeat right #FFFFFF;*/
   border: 1px solid #FFF;
 }
 .transitions {

@@ -146,7 +146,7 @@ header .utilities ul li:last-child {
 header .utilities ul li a {
 	color: #fff;
 	text-decoration: underline;
-	font-size: 14px;
+	font-size: 13px;
 }
 
 header .utilities ul li a:hover {
@@ -2484,7 +2484,49 @@ header .navbar-brand {
   .nav_session_levelsmobile {
     width:100%;
   }
-}
+  .dropdown-menu { font-size: 13px; }
+  .useroptions-mobile {
+    background-color:#000;
+    color:#fff;
+    padding:7px;
+
+  }
+
+  .useroptions-mobile ul {
+      padding: 0;
+  }
+
+  .useroptions-mobile ul li {
+      float: left;
+      list-style-type: none;
+      color: #fff;
+      margin: 0 10px 0 0;
+      font-size:13px;
+      width: auto;
+      border:none !important;
+  }
+
+  .smartphonenav .useroptions-mobile ul li:last-child {
+      margin: 0;
+  }
+  header nav ul li:last-child a { border:none; }
+  .smartphonenav .navbar-nav {
+    margin-bottom: 0;
+  }
+  .lang-select select { border: 0px; box-shadow: none;} 
+
+  .useroptions-mobile ul li a {
+      color: #fff;
+      text-decoration: underline;
+      font-size: 13px;
+      padding: 3px;
+      border: none;
+  }
+
+  .useroptions-mobile ul li a:hover {
+      text-decoration: none;
+      background-color:#000;
+  }
   table th { font-size: 13px; }
   .sidebar-box:nth-child(0) { display: none; }
   .sidebar-box:nth-child(1) { display: none; }
@@ -2512,7 +2554,6 @@ header .navbar-brand {
    		width: 100%;
    }
 
-   
    .smartphoneheader img.header-logo { max-width: 100px; }
    .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
@@ -2542,6 +2583,7 @@ header .navbar-brand {
    #secmain #l_row_strNotes .col-md-9 textarea { width: 100%; }
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
+}
 
 /*** payment ***/
 .paymentwrapper { float: left; width: 100%; padding-bottom: 5px; }
@@ -2553,6 +2595,11 @@ header .navbar-brand {
 }
 .paymentwrapperoption { float: left; padding-right: 10px; }
 .paymentwrapper label { font-size: 12px; }
+.lang-select-wrapper {
+    float:right;
+    margin-left:15px;
+
+}
 .lang-select {
     color:#000;
     font-size: 13px;
