@@ -656,7 +656,7 @@ print STDERR "ENTITY IS $entityID\n";
         if(!$existingReg or $changeExistingReg)   {
             $self->addCarryField('rID',$regoID);
             $self->addCarryField('pType',$personType);
-            $self->addCarryField('d_nature',$registrationNature);
+            #$self->addCarryField('d_nature',$registrationNature); 
         }
     }
 
@@ -876,6 +876,7 @@ sub display_products {
     }
 
 
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -905,6 +906,7 @@ sub process_products {
                 push @productsselected, $prod;
             }
         }
+		
         if($k=~/prodQTY_/) {
             if($self->{'RunParams'}{$k})  {
                 my $prod=$k;
@@ -1034,6 +1036,9 @@ sub display_documents {
         #    $self->incrementCurrentProcessIndex();
         #    return ('',2);
         #}
+		
+		
+		
 
 	
 	my %PageData = (
@@ -1058,6 +1063,7 @@ sub display_documents {
 sub process_documents { 
     my $self = shift;
     
+
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);

@@ -1,0 +1,33 @@
+<div class="">
+<div class = "selfreg-details col-md-12">
+        <!--<div class = "sectionheader">[% Lang.txt('License and Payment Details') %]&nbsp;&nbsp;</div>-->
+        <div class="member-details">
+                <table class="table" style="width: 100%">
+                    <thead>
+                        <tr>
+                            <th>[% Lang.txt('Transaction Number') %]</th>
+							<th>[% Lang.txt('Invoice Number') %] </th>
+                            <th>[% Lang.txt('Qty') %]</th>
+                            <th>[% Lang.txt('Product') %]</th>
+                            <th>[% Lang.txt('Product Type') %]</th>
+                            <th>[% Lang.txt('Total Cost') %]</th>
+                            <th>[% Lang.txt('Payment Status') %]</th>
+                            <th>[% Lang.txt('Payment Type') %]</th>
+                        </tr>
+                    </thead>
+                <!-- loop here; -->
+                [% FOREACH row IN txn %]
+                <tr>
+                    <td><div class="member-data"> [% row.TransactionNumber %] </div></td>
+					<td><div class="member-data"> [% row.InvoiceNumber %] </div></td>
+                    <td><div class="member-data"> [% row.Qty %] </div></td>
+                    <td><div class="member-data"> [% row.ProductName %] </div></td>
+                    <td><div class="member-data"> [% row.ProductType %] </div></td>
+                    <td><div class="member-data"> [% CurrencyFormat.format(row.Amount) %] </div></td>
+                    <td><div class="member-data"> [% row.TXNStatus %] </div></td>
+                    <td><div class="member-data"> [% row.PaymentType %] </div></td>
+                [% END %]
+            </table>
+        </div>
+    </div>
+</div>
