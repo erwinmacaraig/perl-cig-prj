@@ -622,6 +622,7 @@ sub process_registration {
 
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
 
+#print STDERR Dumper($self->{'RunParams'});
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
 
     if ($self->{'RunParams'}{'prid'})   {
@@ -706,6 +707,7 @@ sub process_registration {
                 'nature',
                 0
             );
+#print STDERR "OL: $originLevel |$registrationNature|PT$personType|$personEntityRole|PL$personLevel|SP$sport|$ageLevel|$personID|$entityID\n";
             if ($errorMsgRego)  {
                 push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
                 $self->setCurrentProcessIndex('r');
