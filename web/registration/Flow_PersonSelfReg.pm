@@ -904,6 +904,7 @@ sub process_products {
                 push @productsselected, $prod;
             }
         }
+		
         if($k=~/prodQTY_/) {
             if($self->{'RunParams'}{$k})  {
                 my $prod=$k;
@@ -977,8 +978,7 @@ print STDERR "TXNID: $txnIds\n";
 
 sub display_documents { 
     my $self = shift;
-	open FH, ">test.txt";
-	print FH "\n\n Run Params: \n" . Dumper($self->{'RunParams'});
+	
     my $personID = $self->ID();
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
@@ -1035,14 +1035,7 @@ sub display_documents {
         #    return ('',2);
         #}
 		
-		print FH " 
-				$regoID, 
-                $entityLevel, 
-            	$originLevel,             
-            $entityID, 
-            $personID, 
-		   \n"; 
-			print FH Dumper($rego_ref);
+		
 		
 
 	

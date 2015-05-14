@@ -31,37 +31,30 @@ sub showHome {
         $found,
     ) = getPreviousRegos($Data, $user->id());
 
-	#		
-	my $transactions = getSelfRegoTransactionHistory($Data, $previousRegos);
-	#
-	my $documents = getUploadedSelfRegoDocuments($Data,$people);
-	my $registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos);
 	my $count = 0;
 	my $accordion = '';
-	open FH, ">test.txt";
-	use Data::Dumper;
-	my $documentsTwo = '';
-	my $registrationHistTwo = '';
-	my $transactionsTwo = '';
+	
+	my $documents = '';
+	my $registrationHist = '';
+	my $transactions = '';
 	#
 	foreach my $person (@{$people}){
 		$count++;
-		$documentsTwo = getUploadedSelfRegoDocumentsTwo($Data,$person->{'intPersonID'});
-		$registrationHistTwo = getSelfRegoHistoryRegistrationsTwo($Data, $previousRegos->{$person->{'intPersonID'}});
-		$transactionsTwo = getSelfRegoTransactionHistoryTwo($Data, $previousRegos->{$person->{'intPersonID'}});
+		$documents = getUploadedSelfRegoDocuments($Data,$person->{'intPersonID'});
+		$registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos->{$person->{'intPersonID'}});
+		$transactions = getSelfRegoTransactionHistory($Data, $previousRegos->{$person->{'intPersonID'}});
 		$accordion .= runTemplate($Data, {
 			person => $person,
 			PreviousRegistrations => $previousRegos->{$person->{'intPersonID'}},
 			count => $count,
-			Documents => $documentsTwo,
-			History => $registrationHistTwo,
-			Transactions => $transactionsTwo,
+			Documents => $documents,
+			History => $registrationHist,
+			Transactions => $transactions,
 		},
 		'selfrego/accordion.templ',		
 		 );
 	}
-	print FH "\n====================== \n $accordion \n===============\n";
-	#
+	
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -70,9 +63,6 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,	
-			Documents => $documents,	
-			History => 	$registrationHist,
-			Transactions => $transactions,
 			Accordion => $accordion,
         },
         'selfrego/home.templ',
@@ -80,116 +70,8 @@ sub showHome {
 
     return $resultHTML;
 }
-sub getSelfRegoTransactionHistory{
-	my ($Data, $previousRegos) = @_; 
-	my $txns = '';
-	my %transactions = ();
-	my $sth; 
-	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
-		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
-			my $query = qq[ SELECT
-            T.intQty,
-            T.curAmount,
-            P.strName as ProductName,
-            P.strDisplayName as ProductDisplayName,
-            P.strProductType as ProductType,
-            T.intStatus,
-            T.intTransactionID,
-            TL.intPaymentType,
-			I.strInvoiceNumber
-        FROM
-            tblTransactions as T
-            INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
-			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
-            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
-        WHERE
-           
-             T.intTableType = $Defs::LEVEL_PERSON
-            AND T.intPersonRegistrationID = ?];			
-			$sth = $Data->{'db'}->prepare($query);
-			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
-			while(my $dref = $sth->fetchrow_hashref()){
-				push @{$transactions{'txn'}},{
-					TransactionNumber => $dref->{'intTransactionID'},
-					InvoiceNumber => $dref->{'strInvoiceNumber'},
-           			PaymentLogID=> $dref->{'intTransLogID'},
-                    ProductName=> $dref->{'ProductName'},
-                    ProductType=> $dref->{'ProductType'},
-                    Amount=> $dref->{'curAmount'},
-                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
-                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
-                    Qty=> $dref->{'intQty'},				
-				}
-			}
 
-		}
-	}
-	
-
-	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
-	$txns = runTemplate(
-				$Data,
-				\%transactions,
-				'selfrego/selfregotxnbody.templ'			
-			);
-	return $txns;
-	
-}
-
-sub getSelfRegoHistoryRegistrations{
-	my ($Data, $previousRegos) = @_;
-	my %history = ();
-	my $registrationhistory = '';
-	foreach my $personIdKeyArr (keys %{$previousRegos}){ 
-		foreach my $regoDetail (@{$previousRegos->{$personIdKeyArr}}){
-			push @{$history{'regohist'}}, {
-				NationalPeriodName => $regoDetail->{'strNationalPeriodName'},
-				RegistrationType => $Defs::registrationNature{$regoDetail->{'strRegistrationNature'}},
-				Status => $Defs::entityStatus{$regoDetail->{'strStatus'}},
-				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
-				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
-				PersonEntityRole => $regoDetail->{'strPersonEntityRole'},
-				PersonLevel => $Defs::personLevel{$regoDetail->{'strPersonLevel'}},
-				AgeLevel => $Defs::ageLevel{$regoDetail->{'strAgeLevel'}},
-				NPdtFrom => $regoDetail->{'NPdtFrom'},
-				NPdtTo => $regoDetail->{'NPdtTo'},
-				Certifications => $regoDetail->{'regCertifications'},
-			};
-		}
-	}	
-	$registrationhistory = runTemplate(
-							$Data,
-							\%history,
-							'selfrego/selfregohistorybody.templ'			
-							);
-	return $registrationhistory;
-}
 sub getUploadedSelfRegoDocuments {
-	my($Data, $people) = @_;
-	my %TemplateData = ();
-	my $docTable = '';
-	my $lang = $Data->{'lang'};
-	my $query = qq[SELECT intFileID, strDocumentName, strApprovalStatus FROM tblUploadedFiles INNER JOIN tblDocuments ON      tblUploadedFiles.intFileID = tblDocuments.intUploadFileID INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID WHERE tblDocuments.intPersonID = ? ORDER BY tblDocuments.intPersonRegistrationID];
-	my $q = $Data->{'db'}->prepare($query);
-	foreach my $person (@{$people}){		
-		$q->execute($person->{'intPersonID'});
-		while(my $dref = $q->fetchrow_hashref()){
-			next if(!$dref->{'intFileID'});	
-			push @{$TemplateData{'alldocs'}},{
-				strDocumentName => $lang->txt($dref->{'strDocumentName'}),									
-			};		
-		}
-		$docTable .= runTemplate(
-			$Data,
-			\%TemplateData,
-			'selfrego/selfregodocsbody.templ',
-		);		
-	}
-	return $docTable;
-}
-
-
-sub getUploadedSelfRegoDocumentsTwo {
 my($Data, $personID) = @_;
 	my %TemplateData = ();
 	my $docTable = '';
@@ -212,7 +94,7 @@ my($Data, $personID) = @_;
 	return $docTable;
 }
 
-sub getSelfRegoHistoryRegistrationsTwo{
+sub getSelfRegoHistoryRegistrations{
 my ($Data, $previousRegos) = @_;
 	my %history = ();
 	my $registrationhistory = '';
@@ -241,7 +123,7 @@ my ($Data, $previousRegos) = @_;
 	return $registrationhistory;
 }
 
-sub getSelfRegoTransactionHistoryTwo{
+sub getSelfRegoTransactionHistory{
 	my ($Data, $previousRegos) = @_; 
 	my $txns = '';
 	my %transactions = ();
