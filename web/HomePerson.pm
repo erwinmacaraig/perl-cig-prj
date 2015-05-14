@@ -301,25 +301,22 @@ sub showPersonHome	{
             $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
         my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, $rego->{'personType'}, 'RENEWAL');
-        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
-        #$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
-        #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rsp=$rego->{'strSport'}&amp;rpl=$rego->{'strPersonLevel'}&amp;rper=$rego->{'strPersonEntityRole'}&amp;rag=$newAgeLevel&amp;rpt=$rego->{'strPersonType'}";
         $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&amp;nat=RENEWAL"; ## TO default the PersonLevel dlevel=$rego->{'strPersonLevel'}
         if ($rego->{'intOnLoan'})   {
             $renew .= "&amp;dlevel=$rego->{'strPersonLevel'}";
         }
 
-        #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}";
         if (! $rego->{'intOnLoan'} && $Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
-            #$changelevel= $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&amp;nat=RENEWAL";
             $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
         }
-        $rego->{'renew_link'} = $renew;
         $rego->{'changelevel_link'} = $changelevel;
         my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
         $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
+        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
+        $rego->{'renew_link'} = $renew;
+
     }
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
