@@ -1458,7 +1458,8 @@ header nav ul li a {
 	font-size: 13px;
 }
 
-.nav_session_levels {
+.nav_session_levels,
+.nav_session_levelsmobile {
 	-webkit-box-shadow:none;
 	box-shadow:none;
 }
@@ -2454,6 +2455,35 @@ header .navbar-brand {
   #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
   .fieldSectionGroupWrapper-DisplayOnly label.txtright { text-align:left;}
   #pageholder #contentholder { margin-top:0px; }
+  .access-level { 
+    float:initial;
+  }
+  .access-level p.viewAs { float:initial; text-align:left; margin: 0 0 0 3px;}
+  .nav_session_menu_wrap {
+    width: 100%;
+    float:initial;
+    text-align:left;
+  }
+  .nav_session_placement {
+        width: 100%;
+        background-position: 250px center;
+  } 
+  .access-level .nav-bar-name {  
+    text-align:left; 
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
+  }
+  .access-level .level-name {  
+    width:30%;
+    text-overflow:ellipsis;
+    overflow:hidden;
+    white-space: nowrap;
+    text-align:right;
+  }
+  .nav_session_levelsmobile {
+    width:100%;
+  }
 }
   table th { font-size: 13px; }
   .sidebar-box:nth-child(0) { display: none; }

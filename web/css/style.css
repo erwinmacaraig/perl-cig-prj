@@ -2180,7 +2180,7 @@ body {
 
 /* Regs: Navbar re-write August 2012 */
 
-.nav_session_levels {
+.nav_session_levels,  .nav_session_levelsmobile {
   display: none;
 }
 
@@ -2261,7 +2261,7 @@ body {
   font-family: 'noto_sansregular';
 }
 
-.nav_session_levels {
+.nav_session_levels, .nav_session_levelsmobile {
 	list-style-type: none;
 	margin: 30px 0 0 0;
 	position:relative;
@@ -2276,7 +2276,8 @@ body {
   z-index: 2147483647;
 }
 
-.nav_session_levels li a {
+.nav_session_levels li a,
+.nav_session_levelsmobile li a {
   display: inline-block;
   width: 100%;
   padding: 5px 10px 0;
@@ -2286,15 +2287,18 @@ body {
   border-top: 1px solid #CECECE;
 }
 
-.nav_session_levels li a:hover {
+.nav_session_levels li a:hover,
+.nav_session_levelsmobile li a:hover {
   background:#EFEFEF;
 }
 
-.nav_session_levels li:first-child a {
+.nav_session_levels li:first-child a,
+.nav_session_levelsmobile li:first-child a {
   border-top: 0px;
 }
 
-.nav_session_levels li:last-child {
+.nav_session_levels li:last-child,
+.nav_session_levelsmbile li:last-child {
   display:none;
 }
 

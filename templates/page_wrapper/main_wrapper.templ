@@ -79,8 +79,12 @@
           <div class="navmenu navmenu-default navmenu-fixed-left offcanvas">
           <div class="smartphoneheader">
               <a title="" href="#"><img alt="" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" class="header-logo"></a>
-            <div class = "smartphonename">[% NavTree.last.name %]</div>
+            <!--div class = "smartphonename">[% NavTree.last.name %]</div-->
+            [% IF NavTree %]
+                [% INCLUDE 'user/levelNavigation.templ' seq = 'mobile'%]
+            [% END %]
           </div>
+
           [% NavBar %]
       </div>
 
