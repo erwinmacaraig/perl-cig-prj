@@ -1093,6 +1093,7 @@ sub display_products {
 
 
 	$rego_ref->{'payMethod'} = $self->{'RunParams'}{'payMethod'} || '';
+        cleanRegoTransactions($self->{'Data'},$regoID, $personID, $Defs::LEVEL_PERSON);
         $content = displayRegoFlowProducts(
             $self->{'Data'}, 
             $regoID, 
