@@ -625,11 +625,11 @@ sub process_registration {
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
     my $personLevel = $self->{'RunParams'}{'d_level'};
     $personLevel =~ s/,.*$//;
-    $self->{'RunParams'}{'d_nature'} = '';
-    $self->{'RunParams'}{'d_type'} = '';
-    $self->{'RunParams'}{'d_level'} = '';
-    $self->{'RunParams'}{'d_sport'} = '';
-    $self->{'RunParams'}{'d_age'} = '';
+    #$self->{'RunParams'}{'d_nature'} = '';
+    #$self->{'RunParams'}{'d_type'} = '';
+    #$self->{'RunParams'}{'d_level'} = '';
+    #$self->{'RunParams'}{'d_sport'} = '';
+    #$self->{'RunParams'}{'d_age'} = '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
 
     if ($self->{'RunParams'}{'prid'})   {
@@ -661,11 +661,11 @@ sub process_registration {
         $content = "Person Request Details not found.";
     }
     else {
-        $self->addCarryField('d_nature', $self->getCarryFields('dnat'));
-        $self->addCarryField('d_type', $request->{'strPersonType'});
-        $self->addCarryField('d_level', $request->{'strNewPersonLevel'});
-        $self->addCarryField('d_sport', $request->{'strSport'});
-        $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
+        #$self->addCarryField('d_nature', $self->getCarryFields('dnat'));
+        #$self->addCarryField('d_type', $request->{'strPersonType'});
+        #$self->addCarryField('d_level', $request->{'strNewPersonLevel'});
+        #$self->addCarryField('d_sport', $request->{'strSport'});
+        #$self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
     }
 
 #print STDERR "PR: " . Dumper($self->{'RunParams'});

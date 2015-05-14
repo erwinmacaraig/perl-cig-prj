@@ -622,13 +622,13 @@ sub process_registration {
 
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
 
-    my $personLevel = $self->{'RunParams'}{'d_level'};
-    $personLevel =~ s/,.*$//;
-    $self->{'RunParams'}{'d_nature'} = '';
-    $self->{'RunParams'}{'d_type'} = '';
-    $self->{'RunParams'}{'d_level'} = '';
-    $self->{'RunParams'}{'d_sport'} = '';
-    $self->{'RunParams'}{'d_age'} = '';
+    #my $personLevel = $self->{'RunParams'}{'d_level'};
+    #$personLevel =~ s/,.*$//;
+    #$self->{'RunParams'}{'d_nature'} = '';
+    #$self->{'RunParams'}{'d_type'} = '';
+    #$self->{'RunParams'}{'d_level'} = '';
+    #$self->{'RunParams'}{'d_sport'} = '';
+    #$self->{'RunParams'}{'d_age'} = '';
 
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
 
