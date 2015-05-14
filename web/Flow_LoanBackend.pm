@@ -542,6 +542,8 @@ sub display_registration {
         $content = "Person Request Details not found.";
     }
     else {
+print STDERR "DDDDDDDDDDDDDDDDDDDDDDDDDDD";
+print STDERR Dumper($self->{'RunParams'});
         $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
         $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
         #$request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
@@ -621,7 +623,13 @@ sub process_registration {
     my $noContinueButton = 1;
 
     $self->{'Data'}->{'AddToPage'}->add('js_bottom','file','js/regwhat.js');
-
+    my $personLevel = $self->{'RunParams'}{'d_level'};
+    $personLevel =~ s/,.*$//;
+    $self->{'RunParams'}{'d_nature'} = '';
+    $self->{'RunParams'}{'d_type'} = '';
+    $self->{'RunParams'}{'d_level'} = '';
+    $self->{'RunParams'}{'d_sport'} = '';
+    $self->{'RunParams'}{'d_age'} = '';
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
 
     if ($self->{'RunParams'}{'prid'})   {
@@ -636,7 +644,7 @@ sub process_registration {
         ];
         my $q = $self->{'Data'}->{'db'}->prepare($st) or query_error($st);
         $q->execute(
-            $self->{'RunParams'}{'d_level'},
+            $personLevel,
             $self->{'RunParams'}{'prid'}
         );
     }
@@ -660,6 +668,7 @@ sub process_registration {
         $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
     }
 
+#print STDERR "PR: " . Dumper($self->{'RunParams'});
     ## NORMAL process_registration code
  
     my $personType = $self->{'RunParams'}{'d_type'} || '';
@@ -706,6 +715,7 @@ sub process_registration {
                 'nature',
                 0
             );
+#print STDERR "OL: $originLevel |$registrationNature|PT$personType|$personEntityRole|PL$personLevel|SP$sport|$ageLevel|$personID|$entityID\n";
             if ($errorMsgRego)  {
                 push @{$self->{'RunDetails'}{'Errors'}}, $errorMsgRego;
                 $self->setCurrentProcessIndex('r');
