@@ -18,6 +18,8 @@ use TTTemplate;
 use GridDisplay;
 use Reg_common;
 use Utils;
+use L10n::DateFormat;
+use L10n::CurrencyFormat;
 sub showHome {
 	my (
 		$Data,
@@ -30,7 +32,11 @@ sub showHome {
         $people,
         $found,
     ) = getPreviousRegos($Data, $user->id());
+	my $currencyFormat = new L10n::CurrencyFormat($Data);
+	my $dateFormat = new L10n::DateFormat($Data);
 
+	$Data->{'l10n'}{'currency'} = $currencyFormat;
+	$Data->{'l10n'}{'date'} = $dateFormat;
 	my $count = 0;
 	my $accordion = '';
 	
