@@ -188,11 +188,12 @@ sub pageMain {
         });
     ];
     $Data->{'AddToPage'}->add('js_bottom','file','js/jscookie.js');
-    #$Data->{'AddToPage'}->add(
-        #'js_bottom',
-        #'inline',
-        #$search_js,
-    #);
+    $Data->{'AddToPage'}->add('js_bottom','file','js/bootstrap-tabcollapse/bootstrap-tabcollapse.js');
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        "jQuery('.nav.nav-tabs').tabCollapse({accordionClass: 'autoAccordian'})",
+    );
 
    if($Defs::DisableResponsiveLayout)    {
         #$Data->{'AddToPage'}->add( 
