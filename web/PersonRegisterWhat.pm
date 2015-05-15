@@ -594,9 +594,9 @@ sub optionsPersonRegisterWhat {
         if ($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'DOMESTIC_LOAN'];
         }
-        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
-            $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
-        }
+        #if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
+        #    $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
+        #}
 
 
         $st = qq[

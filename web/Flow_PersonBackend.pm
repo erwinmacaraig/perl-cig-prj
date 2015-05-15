@@ -174,7 +174,8 @@ sub setupValues    {
     }
     elsif ($self->{'RunParams'}{'itc'} and $self->{'RunParams'}{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) {
         #setting dnat to $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN to be used in PersonRegisterWhat
-        $self->addCarryField('dnat', $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
+        #$self->addCarryField('dnat', $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
+        $self->addCarryField('d_nature', "NEW");
         $self->addCarryField('dnature', 'NEW');
         $self->addCarryField('nat', 'NEW');
     }
