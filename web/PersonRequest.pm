@@ -169,6 +169,11 @@ sub handlePersonRequest {
         case 'PRA_F' {
             ($body, $title) = displayCompletedRequest($Data);
         }
+        case 'PRA_CL' {
+            cancelPlayerLoan($Data);
+            my $query = new CGI;
+            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+        }
         else {
         }
     }
@@ -319,7 +324,6 @@ sub listPersonRecord {
             my @levels= split /\|/, $allowedLevels;
             $level_list = join(',',@levels);
         }
- 
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
         $orderBy = qq[
@@ -2317,6 +2321,8 @@ sub finalisePlayerLoan {
                     intPersonRequestID = ?
                     AND strStatus IN ('ACTIVE', 'PENDING')
             ];
+            #called when dtLoanFrom/dtLoanTo is in the future
+            setPlayerLoanValidDate($Data, $requestID, $personRequest->{'intPersonID'}, undef);
 
             my $db = $Data->{'db'};
             my $query = $db->prepare($st) or query_error($st);
@@ -2353,7 +2359,7 @@ sub activatePlayerLoan {
         SET
             PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
             PR.dtFrom = PRQ.dtLoanFrom,
-            PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, NULL)),
+            PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
             PR.intNationalPeriodID = NP.intNationalPeriodID
         WHERE
             PR.intPersonRequestID = ?
@@ -2381,7 +2387,8 @@ sub activatePlayerLoan {
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
             PR.strStatus = 'PASSIVE',
-            PR.dtTo = NOW()
+            PR.dtTo = NOW(),
+            PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
@@ -2409,7 +2416,8 @@ sub deactivatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
         SET
-            strStatus = 'PASSIVE'
+            strStatus = 'PASSIVE',
+            dtTo = IF(NOW() < dtTo, NOW(), dtTo)
         WHERE
             intPersonRequestID IN ($idset)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
@@ -2429,13 +2437,91 @@ sub deactivatePlayerLoan {
     $query = $db->prepare($st) or query_error($st);
     $query->execute() or query_error($st);
 
-    
+    #update records for lending club
+    #my $lst = qq [
+    #    UPDATE
+    #        tblPersonRegistration_$Data->{'Realm'} PR
+    #    INNER JOIN
+    #        tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+    #    SET
+    #        PR.intIsLoanedOut = 0
+    #    WHERE
+    #        PRQ.intPersonRequestID IN ($idset)
+    #        AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+    #];
+
+    #my $query = $db->prepare($lst) or query_error($lst);
+    #$query->execute() or query_error($lst);
 
     for my $personID (@{$personIDs}) {
         savePlayerPassport($Data, $personID);
         my $personObject = getInstanceOf($Data, 'person',$personID);
         updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
     }
+}
+
+sub setPlayerLoanValidDate () {
+    my ($Data, $requestID, $personID, $personRegistrationID) = @_;
+    #this function is used by both domestic and international loan
+    #where dtLoanTo and dtLoanFrom are in future
+    my $db = $Data->{'db'};
+
+    if($requestID) {
+        my $bst = qq [
+            UPDATE
+                tblPersonRegistration_$Data->{'Realm'} PR
+            INNER JOIN
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            INNER JOIN
+                tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
+            SET
+                PR.dtFrom = PRQ.dtLoanFrom,
+                PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
+                PR.intNationalPeriodID = NP.intNationalPeriodID
+            WHERE
+                PR.intPersonRequestID = ?
+                AND PR.intPersonID = ?
+                AND PRQ.strRequestStatus = 'COMPLETED'
+                AND PR.strStatus IN ('PENDING', 'ACTIVE')
+                AND NP.intDontUseForLoans = 0
+        ];
+
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport ];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($requestID, $personID) or query_error($st);
+
+        if (!$query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($requestID, $personID) or query_error($st);
+        }
+    }
+    elsif($personRegistrationID) {
+    
+    
+    }
+}
+
+sub cancelPlayerLoan {
+    my ($Data) = @_;
+
+    my $query = new CGI;
+    my $preqid = safe_param('prqid', 'number') || '';
+
+    my %reqFilters = (
+        'requestID' => $preqid
+    );
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my @requestIDs;
+    my @personIDs;
+
+    push @requestIDs, $preqid;
+    push @personIDs, $personRequest->{'intPersonID'};
+
+    deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
 }
 
 1;

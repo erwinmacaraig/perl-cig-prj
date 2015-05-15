@@ -79,6 +79,7 @@ sub showPersonHome	{
     #print STDERR Dumper $personObj;
     my $enableRenew = 1;
     my $enableAdd = 1;
+    my $enableCancelLoan = 1;
 
     $enableRenew = $enableAdd = 0 if $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_REGISTERED;
 
@@ -289,6 +290,7 @@ sub showPersonHome	{
 		my $changelevel= '';
         $rego->{'renew_link'} = '';
         $rego->{'changelevel_link'} = '';
+        $rego->{'cancel_loan_link'} = '';
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
@@ -306,6 +308,11 @@ sub showPersonHome	{
             $renew .= "&amp;dlevel=$rego->{'strPersonLevel'}";
         }
 
+        #enable early deactivation of a player loan
+        if($rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
+            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}";
+        }
+
         if (! $rego->{'intOnLoan'} && $Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
             $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
         }
@@ -315,7 +322,13 @@ sub showPersonHome	{
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
-        $rego->{'renew_link'} = $renew;
+
+
+        #FC-1105 - disable renewal from lending club if loan isn't completed yet
+        #check PersonRequest::deactivatePlayerLoan
+        if(($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0) or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
+            $rego->{'renew_link'} = $renew;
+        }
 
     }
 	
