@@ -74,23 +74,23 @@ sub getRegistrationItems    {
             $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
         }
     }
-    $sysConfigCheck = "RegistrationItems_InternationalLoanUsesNew";
-    if ($itemType eq 'PRODUCT' and $regNature eq "INTERNATIONAL_LOAN" and $Data->{'SystemConfig'}{"RegistrationItems_InternationalLoanUsesNew"} == 1)  {
-        $regNature2 = 'NEW';
-        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_INTERNATIONAL_LOAN_' . $personType;
-        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
-            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
-        }
-    }
+    #$sysConfigCheck = "RegistrationItems_InternationalLoanUsesNew";
+    #if ($itemType eq 'PRODUCT' and $regNature eq "INTERNATIONAL_LOAN" and $Data->{'SystemConfig'}{"RegistrationItems_InternationalLoanUsesNew"} == 1)  {
+    #    $regNature2 = 'NEW';
+    #    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_INTERNATIONAL_LOAN_' . $personType;
+    #    if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+    #        $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+    #    }
+    #}
      
-    $sysConfigCheck = "RegistrationItems_InternationalTransferUsesNew";
-    if ($itemType eq 'PRODUCT' and $regNature eq "INTERNATIONAL_TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_InternationalTransferUsesNew"} == 1)  {
-        $regNature2 = 'NEW';
-        my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_INTERNATIONAL_TRANSFER_' . $personType;
-        if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
-            $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
-        }
-    }
+    #$sysConfigCheck = "RegistrationItems_InternationalTransferUsesNew";
+    #if ($itemType eq 'PRODUCT' and $regNature eq "INTERNATIONAL_TRANSFER" and $Data->{'SystemConfig'}{"RegistrationItems_InternationalTransferUsesNew"} == 1)  {
+    #    $regNature2 = 'NEW';
+    #    my $sysConfigActiveProductsFilter = 'ACTIVEPRODUCTS_' . $itemType . '_INTERNATIONAL_TRANSFER_' . $personType;
+    #    if ($Data->{'SystemConfig'}{$sysConfigActiveProductsFilter} && $Rego_ref->{'intPersonID'})    {
+    #        $ActiveProductsFilter_ref = registrationItemActiveProducts($Data, $Rego_ref->{'intPersonID'}, $regNature2, $personType);
+    #    }
+    #}
  
     my $locale = $Data->{'lang'}->getLocale();
     my $st = qq[
