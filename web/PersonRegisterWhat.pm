@@ -811,8 +811,8 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
-print STDERR $st;
-print STDERR Dumper($values_ref);
+#print STDERR $st;
+#print STDERR Dumper($values_ref);
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
