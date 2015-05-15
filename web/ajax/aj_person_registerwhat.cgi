@@ -39,6 +39,8 @@ sub main	{
     my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
 
+    $etype= '' if (! defined $etype or $etype eq 'null');
+    $entityID= '' if (! defined $entityID or $entityID eq 'null');
     $registrationNature = '' if (! defined $registrationNature or $registrationNature eq 'null');
     $personType = '' if (! defined $personType or $personType eq 'null');
     $personEntityRole= '' if (! defined $personEntityRole or $personEntityRole eq 'null');
@@ -73,6 +75,7 @@ sub main	{
     my $options = undef;
     my $error = '';
 	if($db)	{
+
         ($options, $error) = optionsPersonRegisterWhat(
             \%Data,
             $Data{'Realm'} || $realmIN,
