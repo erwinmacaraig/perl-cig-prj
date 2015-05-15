@@ -1282,6 +1282,14 @@ sub display_complete {
     my $gateways= '';
     if($regoID) {
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
+        my $valid =0;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'},
+            $personID,
+            $regoID,
+            $entityID
+        );
+        $regoID = 0 if !$valid;
         $regoID = 0 if !$entityID;
     }
 
