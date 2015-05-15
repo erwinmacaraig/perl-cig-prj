@@ -257,7 +257,14 @@ select::-ms-expand {
 }
 select#languageChooser {
   overflow: hidden;
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
   /*background: url(https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-08-32.png) no-repeat right #FFFFFF;*/
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
+=======
+  /*background: url(https://cdn0.iconfinder.com/data/icons/slim-square-icons-basics/100/basics-08-32.png) no-repeat right #FFFFFF;*/
+>>>>>>> 17de338f5506073a04879ab9929690b8f4af11be
   border: 1px solid #FFF;
 }
 .transitions {
@@ -308,7 +315,16 @@ ul#menu li.hover, ul#menu li:hover > a {
   display: none;
 }
 .responsiveTablesDropDown{
+<<<<<<< HEAD
+<<<<<<< HEAD
+  height: 47px;
+  float: left;
+=======
     float:right;
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
+=======
+    float:right;
+>>>>>>> 17de338f5506073a04879ab9929690b8f4af11be
 }
 .responsiveTablesDropDown button{
   position: relative;
@@ -316,12 +332,22 @@ ul#menu li.hover, ul#menu li:hover > a {
   font-weight: bold;
   color: #666;
   border-radius: 5px;
+<<<<<<< HEAD
+<<<<<<< HEAD
+  margin: -25px 4px;
+=======
+=======
+>>>>>>> 17de338f5506073a04879ab9929690b8f4af11be
   margin: 0 5px;
   padding:3px 8px;
 }
 .res-items-group.dropdown-menu {
     left: auto;
     right:0;
+<<<<<<< HEAD
+>>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
+=======
+>>>>>>> 17de338f5506073a04879ab9929690b8f4af11be
 }
 
 .responsiveTablesDropDown .dropdown-menu {
@@ -375,7 +401,7 @@ ul.total-view li {
 }
 /*readonly corrections*/
 .read-only-text ul li{
-  width: 100%;
+  /*width: 100%;*/
 }
 /* make headers more meaningful*/
 th {
@@ -623,4 +649,3 @@ th {
   .logo-area{
     display: none;
   }
-}
