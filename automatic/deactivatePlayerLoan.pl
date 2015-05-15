@@ -55,7 +55,7 @@ use strict;
     }
 
     if(scalar(@personRequestIDs) and scalar(@personIDs)) {
-        #deactivatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
+        deactivatePlayerLoan(\%Data, \@personRequestIDs, \@personIDs);
     }
 
 }
