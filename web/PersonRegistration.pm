@@ -171,7 +171,6 @@ sub checkIsSuspended    {
 sub checkNewRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
-print STDERR "CHECKING NEW\n";
     my %Reg = (
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
@@ -226,7 +225,6 @@ sub checkRenewalRegoOK  {
     $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
-print STDERR Dumper($rego_ref);
 
     $rego_ref->{'ruleFor'} = 'REGO';
     my ($personRegisterWhat, $errorMsg) = PersonRegisterWhat::optionsPersonRegisterWhat(
@@ -278,7 +276,6 @@ print STDERR Dumper($rego_ref);
         $personID,
         \%Reg
     );
-print STDERR "COUNT $count\n";
     my @statusNOTIN = ();
     @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED);
 
@@ -1019,8 +1016,8 @@ sub submitPersonRegistration    {
     if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
         my $personStatus = $pr_ref->{'personStatus'};
         $pr_ref->{'strStatus'} = 'PENDING';
-        $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
-        $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'intPaymentRequired'} = 0 if ($pr_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'paymentRequired'} = 0 if ($pr_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
         WorkFlow::cleanTasks(
