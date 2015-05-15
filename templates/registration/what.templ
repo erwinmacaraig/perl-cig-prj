@@ -105,6 +105,9 @@ jQuery(document).ready(function()  {
         jQuery('#flow-btn-continue').hide();
         jQuery('#replacedflow-btn-continue').hide();
         update_options('type', '[% dtype %]');
+        [% IF dsport %]
+            update_options('sport', '[% dsport %]');
+        [% END %]
         e.preventDefault();
     });
 });

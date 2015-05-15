@@ -180,7 +180,11 @@ sub setupValues    {
         $self->addCarryField('nat', 'NEW');
     }
     else    {
-        $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
+        if ($self->{'RunParams'}{'oldlevel'})   {
+            # Its a level change so save SPORT and oldlevel
+            $self->addCarryField('oldlevel', $self->{'RunParams'}{'oldlevel'});
+            $self->addCarryField('dsport', $self->{'RunParams'}{'dsport'}) if ($self->{'RunParams'}{'dsport'});
+        }
         $self->addCarryField('d_nature', 'NEW');
         $self->addCarryField('dnature', 'NEW');
         $self->addCarryField('nat', 'NEW');
@@ -615,74 +619,21 @@ sub display_registration {
     )   {
         $entitySelection = 0;
     }
-    if($defaultRegistrationNature eq 'TRANSFER')   {
-        $noContinueButton = 0;
-        my %regFilter = (
-            'entityID' => $entityID,
-            'requestID' => $self->{'RunParams'}{'prid'},
-            #'requestID' => 12213,
-        );
-        my $request = getRequests($self->{'Data'}, \%regFilter);
-        $request = $request->[0];
-
-        if(!$request) {
-            push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid Person Request';
-            $noContinueButton = 1;
-            $content = "Person Request Details not found.";
-        }
-        else {
-            $request->{'personType'} = $Defs::personType{$request->{'strPersonType'}};
-            $request->{'sport'} = $Defs::sportType{$request->{'strSport'}};
-            $request->{'personLevel'} = $Defs::personLevel{$request->{'strPersonLevel'}};
-
-            $self->addCarryField('d_nature', 'TRANSFER');
-            $self->addCarryField('d_type', $request->{'strPersonType'});
-            $self->addCarryField('d_level', $request->{'strPersonLevel'});
-            $self->addCarryField('d_sport', $request->{'strSport'});
-            $self->addCarryField('d_age', $request->{'personCurrentAgeLevel'});
-
-            $content = runTemplate(
-                $self->{'Data'},
-                {
-                    requestSummary => $request,
-                },
-                'personrequest/generic/reg_summary.templ'
-            );
-        }
-    }
-    elsif(1==2 and $defaultRegistrationNature eq 'RENEWAL') {
-        my $rawDetails;
-        ($content, $rawDetails) = getRenewalDetails($self->{'Data'}, $self->{'RunParams'}{'rtargetid'});
-
-        if(!$content or !$rawDetails) {
-            push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt('Invalid Renewal Details');
-            $content = $lang->txt("No record found.");
-        }
-
-        $self->addCarryField('dnat', 'RENEWAL');
-        $self->addCarryField('d_type', $rawDetails->{'strPersonType'});
-        $self->addCarryField('d_level', $rawDetails->{'strPersonLevel'});
-        $self->addCarryField('d_sport', $rawDetails->{'strSport'});
-        $self->addCarryField('d_age', $rawDetails->{'newAgeLevel'}); # if $rawDetails->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER;
-        $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
-    }
-    else {
-        $self->addCarryField('dnat', $defaultRegistrationNature) if ($defaultRegistrationNature);
+    $self->addCarryField('dnat', $defaultRegistrationNature) if ($defaultRegistrationNature);
 		
-         $content = PersonRegisterWhat::displayPersonRegisterWhat(
-            $self->{'Data'},
-            $personID,
-            $entityID,
-            $dob || '',
-            $gender || 0,
-            $originLevel,
-            $url,
-            0,
-            $regoID,
-            $entitySelection, #display entity Selection
-            0,
-        );
-    }
+     $content = PersonRegisterWhat::displayPersonRegisterWhat(
+        $self->{'Data'},
+        $personID,
+        $entityID,
+        $dob || '',
+        $gender || 0,
+        $originLevel,
+        $url,
+        0,
+        $regoID,
+        $entitySelection, #display entity Selection
+        0,
+    );
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
