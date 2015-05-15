@@ -2277,7 +2277,6 @@ header .navbar-brand {
 .navbar-nav {
 	margin-top: -1px;
 }
-<<<<<<< HEAD
 .product-row td:nth-child(2), .product-row td:nth-child(3) {
   display: none;
 }
@@ -2287,8 +2286,6 @@ header .navbar-brand {
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }
 }
-=======
->>>>>>> 17de338f5506073a04879ab9929690b8f4af11be
 @media (min-width: 480px) and (max-width: 768px) {
   header .logo-area ul { float: right; margin-top: 10px }
   header .logo-area ul li { margin: 0px 15px 0px 0px; float: none;text-align: center}
