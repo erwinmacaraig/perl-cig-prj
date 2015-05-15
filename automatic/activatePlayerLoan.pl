@@ -6,6 +6,7 @@ use Utils;
 use DBI;
 use PersonRequest;
 use SystemConfig;
+use AssocTime;
 use Data::Dumper;
 use strict;
 
@@ -15,6 +16,9 @@ use strict;
 	$Data{'db'} = $db;
     $Data{'Realm'} = 1; #default to 1
     $Data{'SystemConfig'} = getSystemConfig(\%Data);
+
+    my $timezone = $Data{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
 
     my $st = qq [
         SELECT
@@ -28,14 +32,14 @@ use strict;
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
-            AND DATE_FORMAT(prq.dtLoanFrom, '%Y-%m-%d') <= DATE_FORMAT(NOW(), '%Y-%m-%d') 
+            AND DATE_FORMAT(prq.dtLoanFrom, '%Y-%m-%d') <= ?
     ];
 
     my @personRequestIDs;
     my @personIDs;
 
     my $q = $db->prepare($st);
-    $q->execute() or query_error($st);
+    $q->execute($today) or query_error($st);
 
     while(my $personRequest = $q->fetchrow_hashref()) {
         push @personRequestIDs, $personRequest->{'intPersonRequestID'};
