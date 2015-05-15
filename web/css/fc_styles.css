@@ -421,7 +421,7 @@ fieldset .txtleft {
 	font-size: 13px;
 } 
 .df_date_month, .df_date_day, .df_date_year {
-	width: 100px;
+	width: 28%;
 }
 input[type="text"] {
     border: 1px solid #cccccc;
@@ -628,27 +628,16 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 	font-size: 12px;
 }
 
-/* Table styles */
-table.table thead {
-	background: #d8d8d8;
-	border: 1px solid #ccc;
-	font-size: 16px;
-}
-
-table.table tr td {
-	padding: 10px 5px;
-	border-bottom: 1px solid #ccc;
-	vertical-align: middle;
-}
 .selfreg-details table tr td:nth-child(1) {
   float: right;
 }
 .selfreg-details table tr td{
-	border:0;
+    border:0;
 }
 .selfreg-details table tr td:nth-child(2) {
   font-weight: bold;
 }
+
 /*convert any fieldset to a readyonly type*/
 fieldset.read-only-field {
   border: 1px solid silver;
@@ -660,6 +649,20 @@ fieldset.read-only-field legend {
   padding: 1px 9px;
   font-size: 15px;
 }
+
+/* Table styles */
+table.table thead {
+	background: #d8d8d8;
+	/*border: 1px solid #ccc;*/
+	font-size: 16px;
+}
+
+table.table tr td {
+	padding: 10px 5px;
+	border-bottom: 1px solid #ccc;
+	vertical-align: middle;
+}
+
 table.table.tableboxheader tr td {
 	padding: 8px 20px;
 	border-bottom: 1px solid #ccc;
@@ -887,6 +890,7 @@ table tr.new-task {
 .regoType_CLUBOFFICIAL, .regoType_MAOFFICIAL, .regoType_TEAMOFFICIAL {
     background-color: #33a7f2;
 }
+div.dataTables_filter label { color: #000; }
 /*----Temporary Styles-----*/
 
 
@@ -1223,7 +1227,7 @@ i.indicator {
 }
 
 .tab-content > .active {
-	background-color:#e3e3e3;
+	background-color:#fff;
 	border-left: solid 1px  #ddd;
 	border-right: solid 1px  #ddd;
 	border-bottom: solid 1px  #ddd;
@@ -2272,9 +2276,6 @@ header .navbar-brand {
 .navbar-nav {
 	margin-top: -1px;
 }
-@media (min-width: 768px) and (max-width: 992px){
-	header .logo-area ul { margin: 0; }
-}
 @media (min-width: 480px) and (max-width: 768px) {
   header .logo-area ul { float: right; margin-top: 10px }
   header .logo-area ul li { margin: 0px 15px 0px 0px; float: none;text-align: center}
@@ -2321,12 +2322,10 @@ header .navbar-brand {
 /*  #searchResult { width: 722px!important; }*/
   div.dashboard-tasklist table th { font-size: 12px; }
   div.dashboard-tasklist table td { font-size: 12px; }
-  .responsiveTablesDropDown button{margin: 6px!important;}
+  #grid_wrapper #grid_filter { text-align:right;padding-right:5px;}
 }
-
-
+.responsiveTablesDropDown button{margin: 6px!important;}
 @media (min-width: 250px) and (max-width: 480px) {
-   .responsiveTablesDropDown button{margin-bottom: -43px!important;}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
@@ -2360,6 +2359,7 @@ header .navbar-brand {
   div.dashboard-tasklist table td { font-size: 10px; }
 
 
+  header .logo-area { display:none; }
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
@@ -2382,8 +2382,7 @@ header .navbar-brand {
   .dataTables_info, .dataTables_length, .order-override { display: none; }
 	div#worktasks_filter {
 	    background-color: #1870a5;
-	    margin-top: 5px;
-    	padding: 10px 0;
+    	padding: 6px 0;
 	}
 	div#worktasks_filter label input {
     padding: 5px;
@@ -2392,12 +2391,12 @@ header .navbar-brand {
 	}
 	div#grid_filter {
 	    background-color: #1870a5;
-	    padding: 16px 0;
+	    padding: 5px 0;
 	}
 	div#grid_filter label input {
     padding: 5px;
     text-align: left;
-    width: 90%;
+    max-width: 90%;
 	}
 
   .fa-user, .fa-clock-o { display: none; }
@@ -2409,14 +2408,12 @@ header .navbar-brand {
   */
   table.listTable label { font-size: 12px; }
   #flowFormID table.table thead tr th { font-size: 13px; }
-  /*#content .row { margin-left: -30px; margin-right: -30px; }*/
+  #content .row { margin-left: -30px; margin-right: -30px; }
   #content .container .row .tasklist-content {
-    margin-top: -20px;
     padding-left: 0;
     padding-right: 0;
   }
   .dataTables_wrapper {
-    margin-top: -20px;
     padding-left: 0;
     padding-right: 0;
   }
@@ -2430,6 +2427,7 @@ header .navbar-brand {
     top: 10px;
     width: 65%;
     z-index: 10000;
+    font-weight:bold;
   }
   header nav.navbar-default .navbar-header .navbar-toggle {
   	z-index: 1;
@@ -2551,9 +2549,7 @@ header .navbar-brand {
       text-decoration: none;
       background-color:#000;
   }
->>>>>>> daf7adcc5f5c4bbdd57a946cbfed26aacc9d21cc
   table th { font-size: 13px; }
-  div.dataTables_filter label { color: #000; }
   .sidebar-box:nth-child(0) { display: none; }
   .sidebar-box:nth-child(1) { display: none; }
   .sidebar-box:nth-child(3) { display: none; }
@@ -2579,7 +2575,8 @@ header .navbar-brand {
    		padding: 20px 10px;
    		width: 100%;
    }
-   .smartphoneheader img.header-logo { max-width: 125px; }
+
+   .smartphoneheader img.header-logo { max-width: 100px; }
    .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
    .navbar-nav { margin-left: -1px; }
@@ -2647,10 +2644,9 @@ header .navbar-brand {
     margin:4px;
 }
 .self-reg-form input[type="password"]{
-	border: 1px solid #cccccc;
-	padding: 5px;
-	width: 100%;
+    border: 1px solid #cccccc;
+    padding: 5px;
+    width: 100%;
 }
-
 
 #selfreg-myselfoptions { display:none; }
