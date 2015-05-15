@@ -644,6 +644,9 @@ sub getRegistrationData	{
             prq.dtLoanFrom,
             prq.dtLoanTo,
             prq.strRequestNotes,
+            prq.intOpenLoan,
+            existprq.intPersonRequestID as existPersonRequestID,
+            existprq.intOpenLoan as existOpenLoan,
             eprq.strLocalName as requestToEntityName,
 			np.strNationalPeriodName,
 			np.dtFrom as npdtFrom,
@@ -697,6 +700,9 @@ sub getRegistrationData	{
             LEFT JOIN tblPersonRequest prq ON (
                 prq.intPersonRequestID = pr.intPersonRequestID
             )
+            LEFT JOIN tblPersonRequest existprq ON (
+                existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
+            )
             LEFT JOIN tblEntity eprq ON (
                 eprq.intEntityID = prq.intRequestToEntityID
             )
@@ -721,6 +727,11 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
+        print STDERR Dumper "--------------------------------------------------";
+        print STDERR Dumper "CURRENT PERSON REQUEST " . $dref->{"intPersonRequestID"};
+        print STDERR Dumper "EXIST   PERSON REQUEST " . $dref->{"existPersonRequestID"};
+        print STDERR Dumper "--------------------------------------------------";
+        print STDERR Dumper $dref;
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
         $dref->{'personType'} = $dref->{'strPersonType'} || '';

@@ -206,6 +206,9 @@
                                 [% IF entity.renew_link and enableRenew %]
                                     <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
                                 [% END %]
+                                [% IF entity.cancel_loan_link and enableRenew %]
+                                    <span class=""><a class="btn-inside-panels" href="[% entity.cancel_loan_link %]">[% Lang.txt('Cancel Player Loan') %]</a></span>
+                                [% END %]
                                 </div>
                             [% END %]
                         </div>

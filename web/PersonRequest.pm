@@ -169,6 +169,11 @@ sub handlePersonRequest {
         case 'PRA_F' {
             ($body, $title) = displayCompletedRequest($Data);
         }
+        case 'PRA_CL' {
+            cancelPlayerLoan($Data);
+            my $query = new CGI;
+            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+        }
         else {
         }
     }
@@ -2382,7 +2387,8 @@ sub activatePlayerLoan {
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
             PR.strStatus = 'PASSIVE',
-            PR.dtTo = NOW()
+            PR.dtTo = NOW(),
+            PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
@@ -2410,7 +2416,8 @@ sub deactivatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
         SET
-            strStatus = 'PASSIVE'
+            strStatus = 'PASSIVE',
+            dtTo = IF(NOW() < dtTo, NOW(), dtTo)
         WHERE
             intPersonRequestID IN ($idset)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
@@ -2430,7 +2437,21 @@ sub deactivatePlayerLoan {
     $query = $db->prepare($st) or query_error($st);
     $query->execute() or query_error($st);
 
-    
+    #update records for lending club
+    #my $lst = qq [
+    #    UPDATE
+    #        tblPersonRegistration_$Data->{'Realm'} PR
+    #    INNER JOIN
+    #        tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+    #    SET
+    #        PR.intIsLoanedOut = 0
+    #    WHERE
+    #        PRQ.intPersonRequestID IN ($idset)
+    #        AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+    #];
+
+    #my $query = $db->prepare($lst) or query_error($lst);
+    #$query->execute() or query_error($lst);
 
     for my $personID (@{$personIDs}) {
         savePlayerPassport($Data, $personID);
@@ -2479,6 +2500,28 @@ sub setPlayerLoanValidDate () {
     
     
     }
+}
+
+sub cancelPlayerLoan {
+    my ($Data) = @_;
+
+    my $query = new CGI;
+    my $preqid = safe_param('prqid', 'number') || '';
+
+    my %reqFilters = (
+        'requestID' => $preqid
+    );
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my @requestIDs;
+    my @personIDs;
+
+    push @requestIDs, $preqid;
+    push @personIDs, $personRequest->{'intPersonID'};
+
+    deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
 }
 
 1;
