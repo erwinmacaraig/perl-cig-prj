@@ -156,6 +156,8 @@ sub optionsPersonRegisterWhat {
     my $pref= undef;
     $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
 
+    #$registrationNature ||= '';
+    #$registrationNature = '' if (! defined $registrationNature or $registrationNature eq 'null');
     #$registrationNature='TRANSFER' if ($transfer==1);
 	my $bulkWHERE= qq[ AND strWFRuleFor='REGO'];
     $bulkWHERE = qq[ AND strWFRuleFor='BULKREGO'] if ($bulk);
@@ -445,7 +447,7 @@ sub optionsPersonRegisterWhat {
             #TODO
             #handle for other steps (person role, level, age group)
 
-            if(defined $registrationNature) {
+            if(defined $registrationNature and $registrationNature) {
                 $MATRIXwhere .= qq[ AND strRegistrationNature = ? ];
                 push @MATRIXvalues, $registrationNature;
             }
@@ -809,6 +811,8 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
+print STDERR $st;
+print STDERR Dumper($values_ref);
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});

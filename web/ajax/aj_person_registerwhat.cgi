@@ -39,10 +39,23 @@ sub main	{
     my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
 
+    $registrationNature = '' if (! defined $registrationNature or $registrationNature eq 'null');
+    $personType = '' if (! defined $personType or $personType eq 'null');
+    $personEntityRole= '' if (! defined $personEntityRole or $personEntityRole eq 'null');
+    $personLevel = '' if (! defined $personLevel or $personLevel eq 'null');
+    $sport = '' if (! defined $sport or $sport eq 'null');
+    $ageLevel = '' if (! defined $ageLevel or $ageLevel eq 'null');
+    $defaultType = '' if (! defined $defaultType or $defaultType eq 'null');
+    $defaultSport = '' if (! defined $defaultSport or $defaultSport eq 'null');
+    $defaultLevel = '' if (! defined $defaultLevel or $defaultLevel eq 'null');
+    $defaultEntityRole = '' if (! defined $defaultEntityRole or $defaultEntityRole eq 'null');
+    $defaultNature = '' if (! defined $defaultNature or $defaultNature eq 'null');
+
     $registrationNature = 'TRANSFER' if ($defaultNature eq 'TRANSFER');
     $registrationNature = 'RENEWAL' if ($defaultNature eq 'RENEWAL' or $bulk);
     $registrationNature = $defaultNature if ($defaultNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN or $defaultNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN);
     $registrationNature = 'NEW' if (!$defaultNature and ! $bulk);
+    $registrationNature ||= $defaultNature;
 
     my %Data=();
     my $target='aj_person_registerwhat.cgi';
@@ -56,7 +69,6 @@ sub main	{
 
     ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
     $Data{'Realm'} ||= 1;
-
 
     my $options = undef;
     my $error = '';

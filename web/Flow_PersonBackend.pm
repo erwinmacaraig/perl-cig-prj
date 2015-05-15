@@ -666,6 +666,7 @@ sub display_registration {
         $self->addCarryField('d_role', $rawDetails->{'strPersonEntityRole'});
     }
     else {
+        $self->addCarryField('dnat', $defaultRegistrationNature) if ($defaultRegistrationNature);
 		
          $content = PersonRegisterWhat::displayPersonRegisterWhat(
             $self->{'Data'},
