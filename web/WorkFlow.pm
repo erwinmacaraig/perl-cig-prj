@@ -475,11 +475,20 @@ sub listTasks {
 		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
                   t.intRealmID = $Data->{'Realm'}
-                AND tblWFRule.intLockTaskUntilPaid <> 1 
+                AND (
+                    tblWFRule.intLockTaskUntilPaid <> 1 
+                    OR pr.intPersonRegistrationID IS NULL
+                    OR (
+                        tblWFRule.intLockTaskUntilPaid= 1
+                        AND tblWFRule.intAutoActivateOnPayment <> 1
+                        AND pr.intPaymentRequired = 0 
+                    )
+                )
                 AND (
                     tblWFRule.intLockTaskUntilGatewayResponse <> 1
                     OR (
-                        tblWFRule.intLockTaskUntilGatewayResponse = 1 AND t.intPaymentGatewayResponded=1
+                        tblWFRule.intLockTaskUntilGatewayResponse = 1 
+                        AND t.intPaymentGatewayResponded=1
                     )
                 )
 		    AND (
