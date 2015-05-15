@@ -727,11 +727,6 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
-        print STDERR Dumper "--------------------------------------------------";
-        print STDERR Dumper "CURRENT PERSON REQUEST " . $dref->{"intPersonRequestID"};
-        print STDERR Dumper "EXIST   PERSON REQUEST " . $dref->{"existPersonRequestID"};
-        print STDERR Dumper "--------------------------------------------------";
-        print STDERR Dumper $dref;
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
         $dref->{'personType'} = $dref->{'strPersonType'} || '';
