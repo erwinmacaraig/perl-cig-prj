@@ -536,11 +536,12 @@ th {
     margin-left:-15px;
     margin-right:-15px;
   }
-  .member-home-page .nav-tabs span.circleBg,
+  /*.member-home-page .nav-tabs span.circleBg,
   .member-home-page .panel-title span.circleBg{
-    float:right;
+    float:left;
     line-height:1.4em;
-  }
+    margin-right:20px;
+  }*/
   .member-home-page .autoAccordian {
     margin-left:-15px;
     margin-right:-15px;
@@ -548,15 +549,17 @@ th {
   .autoAccordian .panel-heading a{
     display:block;
   }
-/* .js-tabcollapse-panel-heading:after {
-    content: '<span class = "fa fa-chevron"></span>';
+* .js-tabcollapse-panel-heading:after {
+    font-family: FontAwesome;
+    content: "\f078";
     float: right;
     color: #fff;
 }
 .js-tabcollapse-panel-heading.collapsed:after {
-    content: '<span class = "fa fa-chevron"></span>';
+    font-family: FontAwesome;
+    content: "\f054";
 }
-*/
+
   .autoAccordian .panel-heading{
     border-radius:0px;
     border:none;
