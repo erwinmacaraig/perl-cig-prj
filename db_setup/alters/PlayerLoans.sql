@@ -28,3 +28,5 @@ ADD COLUMN `intHonourOpenDates` TINYINT NULL DEFAULT 0 AFTER `dtOpenTo`;
 
 
 ALTER TABLE tblNationalPeriod ADD COLUMN intDontUseForLoans TINYINT DEFAULT 0;
+
+ALTER TABLE tblPersonRegistration_1 ADD COLUMN `intIsLoanedOut` TINYINT NULL DEFAULT 0 COMMENT 'Flag to identify that the person registration record is loaned out' AFTER `intOnLoan`;
