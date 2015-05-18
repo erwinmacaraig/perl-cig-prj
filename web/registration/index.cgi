@@ -75,7 +75,7 @@ sub main {
     $Data{'Permissions'} = GetPermissions(
         \%Data,
         $Defs::LEVEL_NATIONAL,
-        1,
+        getNationalID($db),
         $Data{'Realm'},
         $Data{'RealmSubType'},
         'regoform',
@@ -141,3 +141,24 @@ sub main {
     disconnectDB($db);
 }
 
+
+sub getNationalID {
+    my ($db) = @_;
+    my $st = qq[
+        SELECT 
+            intEntityID
+        FROM
+            tblEntity
+        WHERE
+            intEntityLevel = $Defs::LEVEL_NATIONAL
+            AND strStatus = 'ACTIVE'
+        ORDER BY
+            intEntityID
+        LIMIT 1
+    ];
+    my $q = $db->prepare($st);
+    $q->execute();
+    my ($id) = $q->fetchrow_array();
+    $q->finish();
+    return $id || 0;
+}
