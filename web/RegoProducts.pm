@@ -120,8 +120,8 @@ sub getRegoProducts {
         AllowedCountText => $AllowedCountText || '',
         UnPaidItems => \@unpaid_items,
         HideTotal => $hideTotal,
-        CurrencySymbol => $currencySymbol,
-		client => $cl,
+        client => $cl,
+		URLBaseFormatter => $Defs::base_url,
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
