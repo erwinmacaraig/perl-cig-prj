@@ -765,7 +765,7 @@ sub process_registration {
                     WHERE
                         Req.strPersonLevel <> ''
                         AND Req.strNewPersonLevel <> ''
-                        #AND Req.strPersonLevel <> Req.strNewPersonLevel
+                        AND Req.strPersonLevel <> Req.strNewPersonLevel
                         AND PR.intPersonRegistrationID = ?
                         AND Req.intPersonRequestID = ?
                 ];
