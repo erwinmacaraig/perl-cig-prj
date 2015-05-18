@@ -46,13 +46,13 @@
 						<input type="hidden" name="prod_[% p.ProductID %]" value="1">[% Lang.txt('Yes') %]
 					[% ELSE %]
 					<!-- <input type="checkbox" CHECKED onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]');" name="txn_[% p.TransactionID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">(already in cart) --> 
-					<input type="checkbox" CHECKED onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]');" name="prod_[% p.ProductID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">(already in cart)
+					<input type="checkbox" CHECKED onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]', '[% URLBaseFormatter %]');" name="prod_[% p.ProductID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">(already in cart)
 					[% END %]
 				[% ELSIF p.DefaultProduct or p.Mandatory %]
 					<input type="hidden" name="prod_[% p.ProductID %]" value="1">Yes
 					
 				[% ELSE %]
-					<input type="checkbox" name="prod_[% p.ProductID %]" onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]');" value="1" class="nc" id = "up_prod_[% p.ProductID %]">
+					<input type="checkbox" name="prod_[% p.ProductID %]" onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]', '[% URLBaseFormatter %]');" value="1" class="nc" id = "up_prod_[% p.ProductID %]">
 				[% END %]
 
 				[% IF p.Mandatory %]

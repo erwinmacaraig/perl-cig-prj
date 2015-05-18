@@ -133,7 +133,7 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
-function updateRegoProductsTotal(chkb,id_cost,id_total,client){	
+function updateRegoProductsTotal(chkb,id_cost,id_total,client,formatter){	
 	var total = parseFloat($("#"+id_total).val());
    
 	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
@@ -156,7 +156,7 @@ function updateRegoProductsTotal(chkb,id_cost,id_total,client){
 	$.ajax(
 		{
 			method: "POST",
-			url:"formatcurrencyamount.cgi",
+			url:formatter + "/formatcurrencyamount.cgi",
 			data:"amount=" + total + "&client="+ client 			
 		}).done(
 			function(formattedamount){
