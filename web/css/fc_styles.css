@@ -2615,6 +2615,7 @@ header .navbar-brand {
    #secmain #l_row_strNotes .col-md-9 textarea { width: 100%; }
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
+   .repbutton-col { width:auto; }
 }
 
 /*** payment ***/

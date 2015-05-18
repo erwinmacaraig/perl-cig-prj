@@ -627,3 +627,14 @@ th {
   .logo-area{
     display: none;
   }
+  #ROallfields-wrapper, #ROreportselect-wrapper  {
+    width:100%;
+    height:auto;
+    float:none;
+  }
+  #ROreportselect-wrapper{
+    margin:5px 0;
+  }
+  #ROallfields {
+    width:100%;
+  }

@@ -290,6 +290,10 @@ body.report h1	{
 	font-style:italic;
 }
 
+.repbutton-col {
+    width:250px;
+}
+
 TD.total {
 	border-top:solid #000000 1px;
 }
