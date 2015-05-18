@@ -1,4 +1,4 @@
-﻿/*FOR CUSTOMIZE CSS*/
+/*FOR CUSTOMIZE CSS*/
 
 /***** CUSTOM STYLES *****/
 .welcomelogin { margin-bottom: -20px; }
@@ -528,7 +528,8 @@ th {
   .dateselection-group .chosen-container{
     width: auto !important;
   }
-  .selfreg-regwho a.btn-main{
+  .selfreg-regwho a.btn-main,
+  .selfreg-actions a.btn-inside-panels{
     width: 100%;
   }
   .member-home-page .nav-tabs,

@@ -629,7 +629,7 @@ a.btn-inside-panels:hover , input.btn-inside-panels:hover, span.btn-inside-panel
 }
 
 .selfreg-details table tr td:nth-child(1) {
-  float: right;
+  /*float: right;*/
 }
 .selfreg-details table tr td{
     border:0;
@@ -2418,7 +2418,7 @@ header .navbar-brand {
   */
   table.listTable label { font-size: 12px; }
   #flowFormID table.table thead tr th { font-size: 13px; }
-  #content .row { margin-left: -30px; margin-right: -30px; }
+  #content .row { margin-left: -30px; /* margin-right: -30px;*/ }
   #content .container .row .tasklist-content {
     padding-left: 0;
     padding-right: 0;
