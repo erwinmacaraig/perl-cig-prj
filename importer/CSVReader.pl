@@ -114,10 +114,13 @@ sub readCSVFile{
     #print STDERR Dumper $inserts;
     insertBatch($db,$tbl,$inserts,$importId, $realmID);
     my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
-	say Dumper($links);
-	say Dumper($entstruct);
+    #say Dumper($links);
+    #say Dumper($entstruct);
     insertBatch($db,"tblEntityLinks",$links,$importId);
-	insertBatch($db,"tblTempEntityStructure",$entstruct,0,0);
+
+    #removing call to insertBatch for tblTempEntityStructure; automatic/tempEntityStructure.pl shall handle this
+    #insertBatch($db,"tblTempEntityStructure",$entstruct,0,0);
+
     close $fh;
 }
 
@@ -185,6 +188,8 @@ sub ApplyPostRules{
            ($links, $entstruct) = insertLink($links,$records,$rule);
         } elsif($rule->{"rule"} eq "entityLink") {
 			($links, $entstruct) = entityLink($links,$records,$rule);
+        } elsif($rule->{"rule"} eq "entityLink2") {
+			($links, $entstruct) = entityLink2($links,$records,$rule);
 		}
     }
     return $links, $entstruct;

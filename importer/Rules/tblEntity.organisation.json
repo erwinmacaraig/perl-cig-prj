@@ -1,0 +1,111 @@
+{
+	"rules" : {
+		"strStateLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strStateLocalName",
+			"reference" : "strLocalName"
+		},
+		"strRegionLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strRegionLocalName",
+			"reference" : "strLocalName"
+		},
+		"strZoneLocalName" : {
+			"rule" : "removeLinkField",
+			"field" : "strZoneLocalName",
+			"reference" : "strImportEntityCode"
+		},
+		"strImportEntityCode" : {
+			"rule" : "entityLink2"
+		},
+		"strImportEntityParentCode" : {
+			"rule" : "entityLink2"
+		},
+		"strEntityType" : {
+			"rule" : "insertField",
+			"field" : "intEntityLevel",
+			"values" : {
+                "ACADEMY" : "3",
+                "CLUB" : "3",
+                "MA ACADEMY": "3",
+                "SCHOOL": "3",
+                "GRASSROOT PROGRAM": "3",
+                "PRIVATE ACADEMY": "3",
+                "COLLEGE": "3",
+                "UNIVERSITY": "3",
+                "OTHER": "3",
+                "REGION" : "20",
+                "DISTRICT" : "20",
+                "STATE" : "30"
+            }
+		},
+		"intLocalLanguage" : {
+			"rule" : "insertField",
+			"field" : "intEntityLevel",
+			"values" : {
+                "FI" : "3",
+                "1" : "1",
+                "2" : "2",
+                "3" : "3",
+                "4" : "4"
+            }
+		},
+		"dtAdded" : {
+			"rule" : "defaultValue",
+			"field" : "dtAdded",
+			"value" : "NOW()"
+		},
+		"strStatus" : {
+			"rule" : "insertField",
+			"field" : "strStatus",
+			"values" : {
+                "PENDING" : "PENDING",
+                "ACTIVE" : "ACTIVE",
+                "INACTIVE" : "INACTIVE",
+                "DE-REGISTERED" : "DE-REGISTERED",
+                "INPROGRESS" : "INPROGRESS",
+                "SUSPENDED" : "SUSPENDED",
+                "DISSOLVED" : "DE-REGISTERED"
+            }
+		}
+	},
+	"mapping" : {
+		"EntityCode" : "strImportEntityCode",
+		"ParentEntityCode" : "strImportEntityParentCode",
+		"StateName" : "strStateLocalName",
+		"RegionName" : "strRegionLocalName",
+		"ZoneName" : "strZoneLocalName",
+		"SubType" : "strEntityType",
+		"Status" : "strStatus",
+		"LocalName" : "strLocalName",
+		"LocalShortName" : "strLocalShortName",
+		"LocalLanguageCode" : "intLocalLanguage",
+		"LatinName" : "strLatinName",
+		"LatinShortName" : "strLatinShortName",
+		"FoundationDate" : "dtFrom",
+		"DissolutionDate" : "dtTo",
+		"Country" : "strISOCountry",
+		"Region" : "strRegion",
+		"PostalCode" : "strPostalCode",
+		"State" : "strTown",
+		"Address1" : "strAddress",
+		"Address2" : "strAddress2",
+		"WebURL" : "strWebURL",
+		"Email" : "strEmail",
+		"Phone" : "strPhone",
+		"Fax" : "strFax",
+		"Discipline" : "strDiscipline",
+		"Gender" : "strGender",
+		"MAID" : "strMAID",
+		"RealmApproved" : "intRealmApproved",
+		"ContactCountry" : "strContactISOCountry",
+		"OrganisationLevel" : "strOrganisationLevel",
+		"LegalID" : "strLegalID",
+		"NationalCustomString1" : "strNatCustomStr1",
+		"NationalCustomString2" : "strNatCustomStr2",
+		"NationalCustomString3" : "strNatCustomStr3",
+		"NationalCustomString4" : "strNatCustomStr4",
+		"NationalCustomString5" : "strNatCustomStr5",
+		"Added" : "dtAdded"
+	}
+}
