@@ -192,7 +192,11 @@ sub pageMain {
     $Data->{'AddToPage'}->add(
         'js_bottom',
         'inline',
-        "jQuery('.nav.nav-tabs').tabCollapse({accordionClass: 'autoAccordian'})",
+        "jQuery('.nav.nav-tabs').tabCollapse({
+            tabsClass: 'hidden-xs',
+            accordionClass: 'visible-xs autoAccordian'
+        })",
+
     );
 
    if($Defs::DisableResponsiveLayout)    {
