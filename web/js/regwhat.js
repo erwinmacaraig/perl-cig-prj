@@ -44,7 +44,7 @@ function update_options(optionType, dtype)   {
         jQuery.getJSON('ajax/aj_person_registerwhat.cgi?otype=' + optionType + qstring, function(data)    {
           var items = [];
           if(data.results == 1) {
-            jQuery('#l_' + optionType ).html('<option SELECTED value = "' + data.options[0].value + '">' + data.options[0].name + '</option>');
+            jQuery('#l_' + optionType ).html('<option selected = "selected" value = "' + data.options[0].value + '">' + data.options[0].name + '</option>');
             jQuery('#l_' + optionType ).fcToggle('rebuild');
             chooseOption(data.options[0].value,optionType, data.options[0].name); 
           }
@@ -64,12 +64,12 @@ function update_options(optionType, dtype)   {
               jQuery('.notavailable').show();           
              //(jQuery('#regopt_title_nooptions').html() + ": " + "<br/>" + error);
           }
-          if(optionType == 'etype' && jQuery('#clientLevel').val())   {
+          if(optionType == 'etype' && jQuery('#clientLevel').val() && data.results != 1) {
               jQuery('#l_' + optionType ).val(jQuery('#clientLevel').val()); 
               jQuery('#l_' + optionType ).fcToggle('rebuild');
               jQuery('#l_' + optionType).trigger('change');
           }
-          if(optionType == 'eId' && jQuery('#clientID').val())   {
+          if(optionType == 'eId' && jQuery('#clientID').val() && data.results != 1)   {
               jQuery('#l_' + optionType ).val(jQuery('#clientID').val()); 
               jQuery('#l_' + optionType ).fcToggle('rebuild');
               jQuery('#l_' + optionType).trigger('change');
