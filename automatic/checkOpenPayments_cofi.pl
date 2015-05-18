@@ -78,11 +78,11 @@ print STDERR "IN checkOpenPayments\n";
         WHERE
         TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
-            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
 		AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
+            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
     ];
-            #TL.intStatus IN (0,3)
+            #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
     $query->execute();
