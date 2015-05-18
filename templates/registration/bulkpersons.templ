@@ -5,6 +5,7 @@ jQuery().ready(function() {
 	var table;	
 	jQuery("#flow-btn-continue").hide();	
 	
+[% IF rowcount %]
 	if(jQuery.fn.dataTable.isDataTable('#renewalsid')){
 		table = jQuery('#grid').DataTable();
 	}
@@ -41,6 +42,7 @@ jQuery().ready(function() {
 			jQuery("#flow-btn-continue").show();
 		}
     }
+[% END %]
 });
 </script>
 <input type="hidden" name="roIds" value="" id = "rolloverIDs">
@@ -48,7 +50,6 @@ jQuery().ready(function() {
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">
 [% END %]
-<br>
 [% grid %]
 
 
