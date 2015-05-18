@@ -184,6 +184,7 @@ sub bulkPersonRollover {
         target => $Data->{'target'},
         Lang => $lang,
         client => $client,
+        rowcount => scalar(@rowdata),
     );
     $body = runTemplate($Data, \%PageData, 'registration/bulkpersons.templ') || '';
 
