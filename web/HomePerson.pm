@@ -326,7 +326,10 @@ sub showPersonHome	{
 
         #FC-1105 - disable renewal from lending club if loan isn't completed yet
         #check PersonRequest::deactivatePlayerLoan
-        if(($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0) or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
+        if(
+            ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
+            or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
+            or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
             $rego->{'renew_link'} = $renew;
         }
 
