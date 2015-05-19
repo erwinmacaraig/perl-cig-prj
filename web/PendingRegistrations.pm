@@ -191,15 +191,20 @@ sub listPendingRegistrations    {
             name  => $Data->{'lang'}->txt('Type'),
             field => 'RegistrationNature',
             width  => 60,
+      defaultShow => 1,
+
         },
         {
             name  => $Data->{'lang'}->txt('Person'),
             field => 'LocalLatinName',
+              defaultShow => 1,
+
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
             field  => 'PersonType',
             width  => 30,
+              defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Role'),

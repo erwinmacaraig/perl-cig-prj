@@ -452,10 +452,11 @@ sub showGrid {
     }
 
     my $coloredtop = $coloredTopClass eq 'yes' ? 'tableboxheader' : '';
+    my $initialCols = $headerInfo->{'initialColumns'} || '1';
 	return qq[
-		<table id = "$gridID" class = "table $coloredtop zebra" style = "$width">
+		<table id = "$gridID" initial-cols="$initialCols" class = "res-table table $coloredtop zebra" style = "$width">
 			<thead>
-				<tr class = "">$headers</tr>
+				<tr class = " res-headers ">$headers</tr>
 			</thead>
 			<tbody>
 			$tabledata
@@ -471,10 +472,15 @@ sub processFieldHeaders	{
 
 	my @output_headers = ();
 	my %headerInfo = ();
+    my @initialColumns = ();
+    my $cnt = 0;
+    my $gotSelector = 0;
 	for my $field (@{$headers})	{
 		my $name = $field->{'name'};	
+        my $selector = 0;
 		if($field->{'type'} and $field->{'type'} eq 'Selector')	{
 			$name = ' ';
+            $selector = 1;
 		}
 		next if !$name;
 		next if $field->{'hide'};
@@ -500,15 +506,25 @@ sub processFieldHeaders	{
 			if($field->{'type'} eq 'Selector')	{
 				$row{'sortable'} = 'false';
 				$row{'searchable'} = 'false';
+                push @initialColumns, $cnt;
+                $selector = 1;
 			}
 		}
+        if($field->{'defaultShow'} and !$selector) {
+                push @initialColumns, $cnt;
+        }
+        $gotSelector = 1 if $selector;
 		$row{'className'} = $field->{'class'} if $field->{'class'};
 		$field->{'sorttype'} ||= '';
 		$row{'type'} = 'num' if $field->{'sorttype'} eq 'number';
 		$headerInfo{$fieldname} = \%row;
 		push @output_headers, \%row;
+        $cnt++;
 	}
-
+    if(scalar(@initialColumns) == 1 and $gotSelector)   {
+        unshift @initialColumns, 0;
+    }
+    $headerInfo{'initialColumns'} = join('-',@initialColumns);
 	return (\@output_headers, \%headerInfo);
 }
 

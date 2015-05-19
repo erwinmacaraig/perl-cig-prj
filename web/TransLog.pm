@@ -637,7 +637,7 @@ sub getTransList {
         name => 'Check', 
         name => $lang->txt('Invoice Number'), 
         field => 'strInvoiceNumber', 
-        width => 20
+        width => 20,
     },  
    
     {
@@ -647,8 +647,7 @@ sub getTransList {
     },
 	{
 		name => $Data->{'lang'}->txt('Person'),
-		field => 'strPerson'
-
+		field => 'strPerson',
 	},
 	{
 		name => $Data->{'lang'}->txt('Type'),
@@ -657,11 +656,12 @@ sub getTransList {
     {
         name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
-        width => 20
+        width => 20,
     },
     {
         name => $lang->txt('Item'), 
-        field => 'strName'
+        field => 'strName',
+        defaultShow => 1,
     },
     {
         name => $lang->txt('Quantity'), 
@@ -673,7 +673,8 @@ sub getTransList {
         name => $lang->txt('Amount'), 
         #field => 'curAmount', 
 		field => 'curAmountFormatted',
-        width => 20
+        width => 20,
+        defaultShow => 1,
     },
     {
         name => $lang->txt('Date Paid'), 
@@ -685,7 +686,7 @@ sub getTransList {
         field => 'stuff', 
         type => 'HTML', 
         hide => $displayonly, 
-        sortable => 0
+        sortable => 0,
     },
     {
         name => '', 

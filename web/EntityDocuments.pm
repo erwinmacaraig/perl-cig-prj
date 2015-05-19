@@ -111,6 +111,7 @@ sub list_entity_docs{
         {
             name => $lang->txt('Type'),
             field => 'strDocumentName',
+            defaultShow => 1,
         }, 
         {
             name => $lang->txt('Status'),
@@ -124,6 +125,7 @@ sub list_entity_docs{
             name => $lang->txt('View'),
             field => 'ViewDoc',
             type => 'HTML', 
+            defaultShow => 1,
         },
         {
         	name => $lang->txt('Replace'),
@@ -215,10 +217,13 @@ sub list_entity_docs{
 		{
 			name => $lang->txt('Title'),
 			field => 'Title',
+          defaultShow => 1,
+
 		},
 		{
 			name => $lang->txt('Document Type'),
 			field => 'Name',
+          defaultShow => 1,
 		},
        {
             name => $lang->txt('Size (MB)'),
@@ -236,6 +241,7 @@ sub list_entity_docs{
             name => $lang->txt('View'),
             field => 'View',
             type => 'HTML',
+          defaultShow => 1,
         },
          {
             name => $lang->txt('Delete'),

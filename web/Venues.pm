@@ -768,7 +768,6 @@ sub listVenues  {
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
     ];
-print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID, $Defs::LEVEL_VENUE);
     my $results=0;
@@ -810,6 +809,7 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),

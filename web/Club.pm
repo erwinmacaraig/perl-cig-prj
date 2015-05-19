@@ -877,6 +877,7 @@ sub listClubs   {
     {
       name =>   $Data->{'lang'}->txt('Name'),
       field =>  'strName',
+      defaultShow => 1,
     },
     {
       name =>   $Data->{'lang'}->txt('Contact'),
