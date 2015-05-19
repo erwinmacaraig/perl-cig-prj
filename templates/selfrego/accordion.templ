@@ -25,7 +25,16 @@
                                   <dd>[% IF person.intGender  == 1 %][% Lang.txt('Male') %][% ELSIF person.intGender == 2 %][% Lang.txt('Female') %][% END %]</dd>
                                 </dl>
 
-                                <table class = "table ">
+                                <table  class = "table res-table" initial-cols="1-2-3">
+                                    <thead>
+                                        <tr class="res-headers">
+                                            <th>[% Lang.txt('Person Type/Level') %]</th>
+                                            <th>[% Lang.txt('Organization') %]</th>
+                                            <th>[% Lang.txt('Period') %]</th>
+                                            <th>[% Lang.txt('Status') %]</th>
+                                            <th>[% Lang.txt('Actions') %]</th>
+                                        </tr>
+                                    </thead>
                                 [% FOREACH rego IN  PreviousRegistrations %]
                                     <tr>
                                         <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]</td>
