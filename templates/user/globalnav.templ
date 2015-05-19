@@ -30,7 +30,7 @@
     <div class="row">
       <div class="col-md-12">
       [% IF Data.ELevel != 3 %]
-        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a><h1>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]</h1>
+        <a href="#" title=""><img class="header-logo" src="[% DirPrefix %][% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a><h1>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]</h1>
       [% END %]  
         <ul>
           <li>

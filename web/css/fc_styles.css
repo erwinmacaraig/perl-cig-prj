@@ -2620,6 +2620,33 @@ header .navbar-brand {
    form#searchForm .btn-inside-panels { margin-left: 0; }
    /*#fsg-core label.col-md-4 { text-align: left; }*/
    .repbutton-col { width:auto; }
+   .membership-login .utilities {
+        display:block;
+   }
+   .membership-login .logo-area{
+        display:block;
+        padding:5px;
+   }
+   .membership-login .logo-area ul{
+        display:none;
+   }
+   .membership-login header .logo-area .logo-container {
+     float:left;
+     width:auto;
+   }
+
+   .membership-login header .logo-area img.header-logo {
+     max-width:50px; 
+     margin-left:10px;
+     position: inherit;
+   }
+   .membership-login header .logo-area h1 {
+     font-size: 16px;
+     margin:5px;
+     width:auto;
+     float:left;
+     line-height:40px;
+   }
 }
 
 /*** payment ***/

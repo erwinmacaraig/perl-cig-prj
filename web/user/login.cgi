@@ -14,6 +14,8 @@ use Lang;
 use Login;
 use TTTemplate;
 use SystemConfig;
+use Localisation;
+use LanguageChooser;
 
 main();
 
@@ -95,19 +97,56 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
+        {'returnURL'=>"../index.cgi",'errors' => $errors},
+        #{'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
     }
 
     my $title = 'Login';
 
-    pageForm(
-              $title,
-              $body,
-              {},
-              '',
-              \%Data,
+
+    my $title=$lang->txt('APPNAME') || 'FIFA Connect';
+    initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
+    my %TemplateData = (
+        Lang => $lang,
+        SystemConfig => $Data{'SystemConfig'},
+        DirPrefix => '../',
     );
+
+    my $nav = runTemplate(\%Data, \%TemplateData, 'user/globalnav.templ',);
+
+    %TemplateData = (
+        Lang => $lang,
+        title => $title,
+        globalnav=> $nav,
+        pagebody=> $body,
+        SystemConfig => $Data{'SystemConfig'},
+        LanguageChooser => genLanguageChooser(\%Data),
+        DirPrefix => '../',
+    );
+
+
+    if($Data{'RedirectTo'}) {
+        pageForm(
+                  $title,
+                  $body,
+                  {},
+                  '',
+                  \%Data,
+                  'user/index.templ',
+        );
+
+    }
+    else    {
+        print "Content-type: text/html\n\n";
+        print runTemplate(
+            \%Data,
+            \%TemplateData,
+            'user/index.templ',
+        );
+    }
+
 }
 
