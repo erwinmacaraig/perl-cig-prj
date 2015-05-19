@@ -50,7 +50,9 @@ sub sendConfirmationEmail {
         MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
         LoginURL => $Defs::base_url . "/registration",
     );
-
+    open FH, ">dumpfile.txt";
+    print FH $activationURL;
+    print STDERR $activationURL;
     my ($emailsentOK, $message)  = sendTemplateEmail(
         $Data,
         $templateWrapper,

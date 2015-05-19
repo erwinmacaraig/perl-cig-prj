@@ -1417,6 +1417,7 @@ qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0
     $field_html .= $daysfield;
     $field_html .= $monthsfield;
     $field_html .= $yearsfield;
+    $field_html = qq[ <div class = "dateselection-group">$field_html</div> ];
 
     return $field_html;
 }

@@ -422,14 +422,17 @@ sub clearanceHistory {
 		{
 			name  => $lang->txt('Date'),
 			field => 'dtApplied',
+            defaultShow => 1,
 		},
 		{
 			name  => $lang->txt('From Club'),
 			field => 'sourceDetails',
+            defaultShow => 1,
 		},
 		{
 			name  => $lang->txt('To Club'),
 			field => 'destinationDetails',
+            defaultShow => 1,
 		},
 		{
 			name  => $lang->txt('Status'),

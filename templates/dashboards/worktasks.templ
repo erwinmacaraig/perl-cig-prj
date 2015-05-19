@@ -231,22 +231,22 @@
         <div class="sidebar-box">
             <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus fa-lg"></span>[% Lang.txt('Start a New Player Registration') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
-                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
+                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus fa-lg"></span><label>[% Lang.txt('Start a New Player Registration') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span><label>[% Lang.txt('Request or Start a Transfer') %]</label></a></li>-->
+                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span><label>[% Lang.txt('List Pending Registrations') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span><label>[% Lang.txt('Reports') %]</label></a></li>-->
             </ul>
         </div>
     [% ELSE %]
         <div class="sidebar-box">
             <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus fa-lg"></span>[% Lang.txt('Start a New Registration') %]</a></li>
+                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus fa-lg"></span><label>[% Lang.txt('Start a New Registration') %]</label></a></li>
                 [% IF MA_allowTransfer %]
-                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
+                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span><label>[% Lang.txt('Request or Start a Transfer') %]</label></a></li>-->
                 [% END %]
-                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
+                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span><label>[% Lang.txt('List Pending Registrations') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span><label>[% Lang.txt('Reports') %]</label></a></li>-->
             </ul>
         </div>
     [% END %]
