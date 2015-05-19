@@ -763,7 +763,7 @@ sub getClubMenuData {
         };
     }
 
-    if ($SystemConfig->{'allowPersonRequestDomesticLoan'}) {
+    if ($SystemConfig->{'allowPersonLoans'}) {
         $menuoptions{'requestloan'} = {
             name => $lang->txt('Request a Player loan'),
             url => $baseurl."a=PRA_LOAN",
