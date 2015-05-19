@@ -1764,6 +1764,9 @@ body.membership-login #footer {
   margin: 10px 0 5px 0;
   line-height: 32px;
 }
+.membership-login .form-signin {
+    margin-top:30px;
+}
 
 body.membership-login .spp_loggedin {
   display: none;
@@ -4599,5 +4602,8 @@ div#content div.member-home-page div.task-actions {
 }
 .white  {
     color:#fff;
+}
+body.membership-login .login-error-page p { 
+    color:#000;
 }
 

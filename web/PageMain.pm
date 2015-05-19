@@ -415,8 +415,9 @@ $BottomJSInline
 
 
 sub pageForm    {
-    my($title, $body, $clientValues_ref,$client, $Data) = @_;
+    my($title, $body, $clientValues_ref,$client, $Data, $templatefile) = @_;
     $title ||= '';
+    $templatefile ||= 'main.templ';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
 
@@ -474,7 +475,7 @@ my $h3eader = $o->header();
         $header = "Content-type: text/html\n\n";
     }
     print $header;
-    print runTemplate($Data, $meta, 'main.templ');
+    print runTemplate($Data, $meta, $templatefile);
 }
 
 sub regoPageForm {
