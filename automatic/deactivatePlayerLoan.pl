@@ -34,9 +34,10 @@ use strict;
             AND prq.strRequestResponse = 'ACCEPTED'
             AND prq.intOpenLoan= 1
             AND (
-                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') = ?
+                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') < ?
                 )
     ];
+# Changed to < so its "yesterday"
 #        LEFT JOIN
 #            tblNationalPeriod np ON (np.intNationalPeriodID = pr.intNationalPeriodID)
 
