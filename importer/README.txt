@@ -20,7 +20,6 @@ SELECT DISTINCT strISOCountryOfBirth FROM tblPerson;
 SELECT DISTINCT strISOCountry FROM tblPerson;
 
 
-UPDATE tblPerson SET strOtherPersonIdentifier=strPassportNo, intOtherPersonIdentifierTypeID=558019 WHERE (strOtherPersonIdentifier IS NULL or strOtherPersonIdentifier="") and (strPassportNo <> "" and strPassportNo IS NOT NULL) AND intRealmID=1;
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
 UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
