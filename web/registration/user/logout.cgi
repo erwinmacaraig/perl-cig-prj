@@ -43,7 +43,7 @@ sub main {
       #-path     => "/"
     #);
 
-    my $url = "$Defs::base_url/";
+    my $url = "$Defs::base_url/registration";
     my $p3p = q[policyref="/w3c/p3p.xml", CP="ALL DSP COR CURa ADMa DEVa TAIi PSAa PSDa IVAi IVDi CONi OTPi OUR BUS IND PHY ONL UNI COM NAV DEM STA"];
     my $header = $cgi->redirect(
      -uri    => $url,

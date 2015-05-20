@@ -70,6 +70,10 @@ package LangBase::en_us;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
+package LangBase::en_bsw;
+use base qw(Locale::Maketext::Gettext);
+return 1;
+
 package LangBase::fi_fi;
 use base qw(Locale::Maketext::Gettext);
 return 1;
