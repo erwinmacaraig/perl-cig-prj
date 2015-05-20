@@ -255,7 +255,7 @@ sub displayReportList	{
                             <b>].$l->txt($report->{'strName'}).qq[</b><br>
                             ].$l->txt($report->{'strDescription'}).qq[
                         </td>
-                        <td style = "width:250px;">
+                        <td class = "repbutton-col">
                             <a href = "$Data->{'target'}?client=$clientValues->{unesc_client}&amp;a=$newaction&amp;rID=$report->{'intReportID'}&amp;repID=$repID" class = "btn-inside-panels">].$l->txt($buttoncaption).qq[</a>
                             $delete
                             $run

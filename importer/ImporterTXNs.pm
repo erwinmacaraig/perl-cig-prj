@@ -22,8 +22,12 @@ use Data::Dumper;
 
 sub importTXN   {
 
-    my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $status) = @_;
+    my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $dtPaid, $payRef, $status, $paymentType) = @_;
 
+    my $responseText = 'PAYMENT_SUCCESSFUL';
+
+    $payRef ||= '';
+    $paymentType ||= 2;
     $personID || return;
     $personRegistrationID || return;
     $entityID || return;
@@ -68,20 +72,22 @@ sub importTXN   {
             intTransLogID,
             intPersonRegistrationID,
             dtStart,
-            dtEnd
+            dtEnd,
+            curPerItem
         )
         VALUES (
             ?,
             ?,
             1,
-            NOW(),
-            NOW(),
+            ?,
+            ?,
             ?,
             ?,
             1,
             ?,
             ?,
             0,
+            ?,
             ?,
             ?,
             ?
@@ -95,12 +101,20 @@ sub importTXN   {
             intAmount,
             intRealmID,
             intStatus,
+            strResponseText,
+            intPaymentType,
+            strTXN,
+            strOtherRef2
         )
         VALUES (
-            NOW(),
             ?,
             ?,
-            ?
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            'Imported'
         )
     ];
     my $qryTL= $db->prepare($stTL);
@@ -130,6 +144,8 @@ sub importTXN   {
     $qryTXN->execute(
         $status,
         $amountPaid,
+        $dtPaid,
+        $dtPaid,
         1,
         $personID,
         $entityID,
@@ -137,13 +153,18 @@ sub importTXN   {
         $personRegistrationID,
         $dref->{'NPFrom'},
         $dref->{'NPTo'},
+        $amountPaid
     );
     my $txnID = $qryTXN->{mysql_insertid} || 0;
     next if ! $txnID;
     $qryTL->execute(
+        $dtPaid,
         $amountPaid,
         1,
-        $status
+        $status,
+        $responseText,
+        $paymentType,
+        $payRef
     );
     my $TLogID= $qryTL->{mysql_insertid} || 0;
     next if ! $TLogID;

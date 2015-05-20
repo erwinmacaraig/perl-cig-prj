@@ -2269,7 +2269,6 @@ sub loanRequiredFields {
         'order' => [qw(
             dtLoanStartDate
             dtLoanEndDate
-            strTMSReference
         )],
         sections => [
             [ 'loanfields', 'Loan Information' ],

@@ -1,4 +1,6 @@
 <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+    <div class="fieldSectionGroupWrapper " id="">
+    <h3 class="panel-header sectionheader">Personal Details</h3><div class="panel-body fieldSectionGroup"><fieldset>
 <div id="signup-page-wrap">
 
 <div id="register-wrap">
@@ -13,25 +15,42 @@
 </div>
 [% ELSE %]
 
- <form id = "signup-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
+ <form id = "signup-form self-reg" class="self-reg-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
     <div class = "signup_prompt">[% Lang.txt('') %]</div>
-    <div id = "signup-email-div" class = "formfield">
-<label for="email">[% Lang.txt('Email') %]</label>
-<input type = "text" name = "email" value = "[% email%]" id = "signup-email" class="fields required" title="[% Lang.txt('Email Address') %]">
-</div>
-    <div id = "signup-fname-div" class = "formfield">
-			<label for="firstname">[% Lang.txt('First Name') %]</label>
-			<input type = "text" name = "firstname" value = "[% strFirstName %]" size = "50" id = "signup-fname" class="fields required" title="[% Lang.txt('First name') %]">
+    <div id = "signup-email-div form-group" class = "formfield form-group">
+		<label class="col-md-4 " for="email"><span class="compulsory">*</span>[% Lang.txt('Email') %]</label>
+		<div class="col-md-6 control-fields">
+			<input type = "text" name = "email" value = "[% email%]" id = "signup-email" class="fields required col-md-6 control-fields" title="[% Lang.txt('Email Address') %]">
 		</div>
-    <div id = "signup-sname-div" class = "formfield">
-			<label for="familyname">[% Lang.txt('Family Name') %]</label>
-			<input type = "text" name = "familyname" value = "[% strFamilyName %]" size = "50" id = "signup-sname" class="fields required" title="[% Lang.txt('Family name') %]">
 	</div>
-<div id = "signup-password-div" class = "formfield">	<label for="password">[% Lang.txt('Password') %]</label>
-   <input type = "password" name = "password" value = "" size = "15" maxsize = "50" id = "signup-password" class="fields required" title="[% Lang.txt('password') %]"></div>
-<div id = "signup-password2-div" class = "formfield">  
-<label for="password2">[% Lang.txt('Re-enter Password') %]</label>
-	  <input type = "password" name = "password2" value = "" size = "15" maxsize = "50" id = "signup-password2" class="fields required" title="[% Lang.txt('re-enter password') %]"></div>
+    <div id = "signup-fname-div form-group" class = "formfield form-group">
+			<label class="col-md-4" for="firstname"><span class="compulsory">*</span>[% Lang.txt('First Name') %]</label>
+			<div class="col-md-6 control-fields">
+				<input type = "text" name = "firstname" value = "[% strFirstName %]" size = "50" id = "signup-fname" class="fields required" title="[% Lang.txt('First name') %]">
+			</div>
+		</div>
+    <div id = "signup-sname-div form-group" class = "formfield form-group">
+			<label class="col-md-4" for="familyname"><span class="compulsory">*</span>[% Lang.txt('Family Name') %]</label>
+			<div class="col-md-6 control-fields">
+				<input type = "text" name = "familyname" value = "[% strFamilyName %]" size = "50" id = "signup-sname" class="fields required" title="[% Lang.txt('Family name') %]">
+
+			</div>
+	</div>
+
+	<div id = "signup-password-div form-group" class = "formfield form-group">	
+
+		<label class="col-md-4" for="password"><span class="compulsory">*</span>[% Lang.txt('Password') %]</label>
+		<div class="col-md-6 control-fields">
+			<input type = "password" name = "password" value = "" size = "50"  id = "signup-password" class="fields required" title="[% Lang.txt('password') %]">
+		</div>
+	</div>
+
+	<div id = "signup-password2-div form-group" class = "formfield form-group">  
+		<label class="col-md-4" for="password2"><span class="compulsory">*</span>[% Lang.txt('Re-enter Password') %]</label>
+		<div class="col-md-6 control-fields">
+	  		<input type = "password" name = "password2" value = "" size = "50"  id = "signup-password2" class="fields required" title="[% Lang.txt('re-enter password') %]">
+	  	</div>
+	</div>
 
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Signup') %] ">
     <input type = "hidden" name = "a" value = "SIGNUP">
@@ -85,3 +104,4 @@
 </script>
 [% END %]
 </div>
+</fieldset></div></div>

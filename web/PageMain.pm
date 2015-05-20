@@ -188,18 +188,23 @@ sub pageMain {
         });
     ];
     $Data->{'AddToPage'}->add('js_bottom','file','js/jscookie.js');
-    #$Data->{'AddToPage'}->add(
-        #'js_bottom',
-        #'inline',
-        #$search_js,
-    #);
+    $Data->{'AddToPage'}->add('js_bottom','file','js/bootstrap-tabcollapse/bootstrap-tabcollapse.js');
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        "jQuery('.nav.nav-tabs').tabCollapse({
+            tabsClass: 'hidden-xs',
+            accordionClass: 'visible-xs autoAccordian'
+        })",
+
+    );
 
    if($Defs::DisableResponsiveLayout)    {
-        $Data->{'AddToPage'}->add( 
-            'css',
-            'file',
-            'css/noresponsive.css',
-        );
+        #$Data->{'AddToPage'}->add( 
+            #'css',
+            #'file',
+            #'css/noresponsive.css',
+        #);
     }
  
     my $helpURL=$Data->{'SystemConfig'}{'HELP'} 
@@ -287,6 +292,10 @@ sub pageMain {
         BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
         BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
         DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        NavTree => $navTree,
+        LanguageChooser => genLanguageChooser($Data,2),
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
@@ -406,8 +415,9 @@ $BottomJSInline
 
 
 sub pageForm    {
-    my($title, $body, $clientValues_ref,$client, $Data) = @_;
+    my($title, $body, $clientValues_ref,$client, $Data, $templatefile) = @_;
     $title ||= '';
+    $templatefile ||= 'main.templ';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
 
@@ -465,7 +475,7 @@ my $h3eader = $o->header();
         $header = "Content-type: text/html\n\n";
     }
     print $header;
-    print runTemplate($Data, $meta, 'main.templ');
+    print runTemplate($Data, $meta, $templatefile);
 }
 
 sub regoPageForm {

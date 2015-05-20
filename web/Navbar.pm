@@ -29,6 +29,7 @@ sub navBar {
         $DataAccess_ref, 
         $SystemConfig
     ) = @_;
+#develop
 
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
@@ -762,7 +763,7 @@ sub getClubMenuData {
         };
     }
 
-    if ($SystemConfig->{'allowPersonRequest'}) {
+    if ($SystemConfig->{'allowPersonLoans'}) {
         $menuoptions{'requestloan'} = {
             name => $lang->txt('Request a Player loan'),
             url => $baseurl."a=PRA_LOAN",

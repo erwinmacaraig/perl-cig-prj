@@ -129,10 +129,12 @@
 								        <span class="details-left">[% Lang.txt("Loan End") %]:</span>
                                         <span class="details-left detail-value">[% DateFormat.format(loanEndDate,'MEDIUM') or '-' %]</span>
 								    </span>
+                                    [% IF TMSReference %]
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("TMS Reference") %]:</span>
                                         <span class="details-left detail-value">[% TMSReference or '-' %]</span>
 								    </span>
+                                    [% END %]
 								    <span class="details-row">
 								        <span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
 								        <span class="details-left detail-value">[% requestNotes or '-' %]</span>

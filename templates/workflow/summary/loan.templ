@@ -31,10 +31,12 @@
 					  	<span class="">[% Lang.txt('Loan End Date') %]:</span>
 					  	<span class="detail-value"><strong>[% DateFormat.format(PlayerLoanDetails.LoanEndDate, 'MEDIUM') %]</strong></span>
 				    </div>
+                    [% IF PlayerLoanDetails.TMSReference %]
 					<div class="">
 					  	<span class="">[% Lang.txt('TMS Reference') %]:</span>
 					  	<span class="detail-value"><strong>[% PlayerLoanDetails.TMSReference %]</strong></span>
 				    </div>
+                    [% END %]
 
 					<div class="">
 					  	<span class="">[% Lang.txt('Summary') %]:</span>
