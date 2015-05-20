@@ -167,7 +167,7 @@ sub main	{
         $MAGateway{'logID'} = $logID;
         $MAGateway{'currentLang'} = $currentLang;
         
-        $MAGateway{''} = 
+        #$MAGateway{''} = 
 
         $gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
         $paymentURL = $gatewaySpecific->{'paymentURL'};
@@ -183,7 +183,7 @@ sub main	{
         $MAGateway{'logID'} = $logID;
         $MAGateway{'currentLang'} = $currentLang;
         
-        $MAGateway{''} = 
+        #$MAGateway{''} = 
 
         $gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
         $paymentURL = $gatewaySpecific->{'paymentURL'};
@@ -210,11 +210,19 @@ sub main	{
     my $gateway_body= qq[<a href="$paymentURL">Proceed to Payment</a>];
     my $cancel_body= qq[<a href="$cancelURL">Cancel Payment</a>];
 
+    my $manualPaymentURL = $paymentURL;
+	if (defined $gatewaySpecific && $gatewaySpecific)	{
+        foreach my $k (keys %{$gatewaySpecific}) {
+            my $val = $gatewaySpecific->{$k};
+            $manualPaymentURL .= qq[&amp;$k=$val];
+        } 
+	}
+    $manualPaymentURL .= qq[&amp;ci=$payRef&amp;logID=$logID&chkv=$chkvalue];
     my $proceed_body = qq[
     <html>
     <body onload="document.sform.submit()">
-        <h3>Please Wait - Processing</h3>
-        <p>If you are not automatically redirected to the payment page within 30 seconds then you can <a href = "$paymentURL">proceed manually by pressing this link</a>.</p>
+        <h3>] . $lang->txt("Please Wait - Processing") . qq[</h3>
+        <p>] . $lang->txt("If you are not automatically redirected to the payment page within 30 seconds then you can click the Continue to Payment button below") . qq[</p>
         <form action = "$paymentURL" method = "POST" name = "sform" id = "sform">
             <input type = "hidden" name = "a" value = "P">
             <input type = "hidden" name = "ci" value = "$payRef">
@@ -222,6 +230,7 @@ sub main	{
             <input type = "hidden" name = "chkv" value = "$chkvalue">
             <input type = "hidden" name = "sessions" value = "$session">
     ];
+#<a href = "$manualPaymentURL">proceed manually by pressing this link</a>.</p>
     if ($paymentSettings->{'gatewayCode'} eq 'NABExt1') {
         $proceed_body .= qq[ <input type = "hidden" name = "amount" value = "$amount"> ];
     }
@@ -231,6 +240,7 @@ sub main	{
     } 
 	}
     $proceed_body .= qq[
+            <input type="SUBMIT" name="Submit" value="].$lang->txt("Continue to Payment") . qq[">
         </form>
     </body>
     </html>
