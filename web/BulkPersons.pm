@@ -112,7 +112,7 @@ sub bulkPersonRollover {
             AND (
                 (PR.intIsLoanedOut = 0 and PR.intOnLoan = 0)
                 OR (PR.intIsLoanedOut = 1 AND existprq.intOpenLoan = 0)
-                OR (PR.intOnLoan = 1 AND existprq.intOpenLoan= 1)
+                OR (PR.intOnLoan = 1 AND prq.intOpenLoan= 1)
             )
                 
         ORDER BY strLocalSurname, strLocalFirstname
