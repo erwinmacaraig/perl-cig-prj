@@ -5,7 +5,7 @@
                 <table class="table res-table" initial-cols="1-2-3" style="width: 100%">
                     <thead>
                         <tr class="res-headers">
-                            <th>[% Lang.txt('Transaction Number') %]</th>
+                            <!--th>[% Lang.txt('Transaction Number') %]</th-->
 							<th>[% Lang.txt('Invoice Number') %] </th>
                             <th>[% Lang.txt('Qty') %]</th>
                             <th>[% Lang.txt('Product') %]</th>
@@ -18,7 +18,7 @@
                 <!-- loop here; -->
                 [% FOREACH row IN txn %]
                 <tr>
-                    <td><div class="member-data"> [% row.TransactionNumber %] </div></td>
+                    <!--td><div class="member-data"> [% row.TransactionNumber %] </div></td-->
 					<td><div class="member-data"> [% row.InvoiceNumber %] </div></td>
                     <td><div class="member-data"> [% row.Qty %] </div></td>
                     <td><div class="member-data"> [% row.ProductName %] </div></td>
