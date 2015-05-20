@@ -10,11 +10,12 @@ UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strPersonType='REFE
 
 from importer/
 ./FIFA_3to2_ISO.pl
-./importer_FixPRs.pl
+./importer_FixPRs.pl ##? Still needed Jervy ??
 ./runAllPlayerPassport.pl
 cd ../automatic -> ./tempEntityStructure.pl
 
 
+#Below are locations of ISO codes that may need adjusting to 2 (in FIFA_3to2_ISO.pl)
 SELECT DISTINCT strISONationaliy FROM tblPerson;
 SELECT DISTINCT strISOCountryOfBirth FROM tblPerson;
 SELECT DISTINCT strISOCountry FROM tblPerson;
