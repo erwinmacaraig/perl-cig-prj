@@ -34,6 +34,8 @@ sub main	{
             tblPersonRegistration_$Data{'Realm'}
         WHERE
             strPersonType='PLAYER'
+            AND intOnLoan = 0
+            AND intIsLoanedOut = 0
         ORDER BY
             dtFrom
     ];
