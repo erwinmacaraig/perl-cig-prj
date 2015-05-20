@@ -87,6 +87,8 @@ sub bulkPersonRollover {
                 AND PR.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE")
                 AND PR.intEntityID = ?
                 AND PR.intNationalPeriodID <> ?
+                AND PR.intIsLoanedOut = 0
+                AND PR.intOnLoan= 0
             )
             LEFT JOIN tblPersonRegistration_$realmID as PRto ON (
                 PRto.intPersonID = P.intPersonID
@@ -98,11 +100,23 @@ sub bulkPersonRollover {
                 AND PRto.intEntityID = PR.intEntityID
                 AND PRto.intNationalPeriodID = ?
             )
+            LEFT JOIN tblPersonRequest prq ON (
+                prq.intPersonRequestID = PR.intPersonRequestID
+            )
+            LEFT JOIN tblPersonRequest existprq ON (
+                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+            )
         WHERE 
             P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")
             AND P.strStatus IN ("$Defs::PERSON_STATUS_REGISTERED")
             AND P.intRealmID = ?
             AND PRto.intPersonRegistrationID IS NULL
+            AND (
+                (PR.intIsLoanedOut = 0 and PR.intOnLoan = 0)
+                OR (PR.intIsLoanedOut = 1 AND existprq.intOpenLoan = 0)
+                OR (PR.intOnLoan = 1 AND existprq.intOpenLoan= 1)
+            )
+                
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
