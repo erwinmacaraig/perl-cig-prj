@@ -9,7 +9,7 @@
                         <li class = "active"><a data-toggle="tab" href="#regtab[% count %]">[% Lang.txt('Registration details') %]</a></li>
                         <li><a data-toggle="tab" href="#doctab[% count %]">[% Lang.txt('Documents') %]</a></li>
                         <li><a data-toggle="tab" href="#histtab[% count %]">[% Lang.txt('Registration History') %]</a></li>
-                        <li><a data-toggle="tab" href="#txnstab[% count %]">[% Lang.txt('Transaction History') %]</a></li>
+                        <li><a data-toggle="tab" href="#txnstab[% count %]">[% Lang.txt('Transactions') %]</a></li>
                     </ul>
                     <div class="tab-content">
                         <div id="regtab[% count %]" class="tab-pane fade in active">
@@ -28,11 +28,11 @@
                                 <table  class = "table res-table" initial-cols="1-2-3">
                                     <thead>
                                         <tr class="res-headers">
-                                            <th>[% Lang.txt('Person Type/Level') %]</th>
-                                            <th>[% Lang.txt('Organization') %]</th>
+                                            <th>[% Lang.txt('Type/Level') %]</th>
+                                            <th>[% Lang.txt('Organisation') %]</th>
                                             <th>[% Lang.txt('Period') %]</th>
                                             <th>[% Lang.txt('Status') %]</th>
-                                            <th>[% Lang.txt('Actions') %]</th>
+                                            <th>&nbsp;</th>
                                         </tr>
                                     </thead>
                                 [% FOREACH rego IN  PreviousRegistrations %]

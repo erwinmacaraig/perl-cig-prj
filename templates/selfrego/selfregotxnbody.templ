@@ -1,33 +1,25 @@
 <div class="">
 <div class = "selfreg-details col-md-12">
-        <!--<div class = "sectionheader">[% Lang.txt('License and Payment Details') %]&nbsp;&nbsp;</div>-->
-        <div class="member-details">
-                <table class="table res-table" initial-cols="1-2-3" style="width: 100%">
-                    <thead>
-                        <tr class="res-headers">
-                            <th>[% Lang.txt('Transaction Number') %]</th>
-							<th>[% Lang.txt('Invoice Number') %] </th>
-                            <th>[% Lang.txt('Qty') %]</th>
-                            <th>[% Lang.txt('Product') %]</th>
-                            <th>[% Lang.txt('Product Type') %]</th>
-                            <th>[% Lang.txt('Total Cost') %]</th>
-                            <th>[% Lang.txt('Payment Status') %]</th>
-                            <th>[% Lang.txt('Payment Type') %]</th>
-                        </tr>
-                    </thead>
-                <!-- loop here; -->
+        <div class="selfreg-txnlist">
+[% SET lastInv = 0 %]
                 [% FOREACH row IN txn %]
-                <tr>
-                    <td><div class="member-data"> [% row.TransactionNumber %] </div></td>
-					<td><div class="member-data"> [% row.InvoiceNumber %] </div></td>
-                    <td><div class="member-data"> [% row.Qty %] </div></td>
-                    <td><div class="member-data"> [% row.ProductName %] </div></td>
-                    <td><div class="member-data"> [% row.ProductType %] </div></td>
-                    <td><div class="member-data"> [% CurrencyFormat.format(row.Amount) %] </div></td>
-                    <td><div class="member-data"> [% row.TXNStatus %] </div></td>
-                    <td><div class="member-data"> [% row.PaymentType %] </div></td>
-                [% END %]
-            </table>
+                    [% IF lastInv != row.InvoiceNumber %]
+                        [% IF lastInv != 0 %]</div>[% END %]
+                        [% SET lastInv = row.InvoiceNumber %]
+                <div class = "txnrow">
+                    <div class = "row">
+                        <div class ="col-md-3 pull-left">[% Lang.txt('Invoice Number') %]: <b> [% row.TransactionNumber %] </b></div>
+                        <div class="col-md-3 pull-right"> <b>[% row.TXNStatus %]</b>[% IF row.PaymentType %] - [% row.PaymentType %][% END %] </div>
+                    </div>
+                    [% END %]
+                    <div class = "row">
+                        <div class = "col-md-1">&nbsp;</div>
+                        <div class = "col-md-9">[% row.Qty %] x [% row.ProductType %] : [% row.ProductName %]</div>
+                        <div class = "col-md-2">[% CurrencyFormat.format(row.Amount) %]</div>
+                    </div>
+                    
+                    [% END %]
+                </div>
         </div>
     </div>
 </div>
