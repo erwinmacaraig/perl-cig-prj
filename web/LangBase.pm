@@ -2,6 +2,7 @@ package LangBase;
 
 @EXPORT= (qw/txt lexicon/);
 use Locale::Maketext::Gettext;
+use Encode;
 use base ('Locale::Maketext::Gettext');
 
 sub txt (@) { 
@@ -12,6 +13,9 @@ sub txt (@) {
   $temp[0] =~ s/^\n+//m;
   $temp[0] =~ s/\n+$//m;
   return $temp[0] if($temp[0] =~ /[^\0-\x7f]/); #return key if key is non-ascii
+  for my $b (@temp) {
+    $b = Encode::decode('UTF-8',$b);
+  }
 
   my $s = $self->maketext(@temp); 
   return $s;
