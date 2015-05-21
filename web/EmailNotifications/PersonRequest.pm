@@ -28,6 +28,9 @@ sub setNotificationType {
         case "$Defs::PERSON_REQUEST_LOAN" {
             $self->SUPER::setNotificationType('NOTIFICATION_REQUESTLOAN_' . $action);
         }
+		case "$Defs::PERSON_REQUEST_SELF_TRANSFER" {
+            $self->SUPER::setNotificationType('NOTIFICATION_REQUESTSELFTRANSFER_' . $action);
+		}
         else {
         }
     }
