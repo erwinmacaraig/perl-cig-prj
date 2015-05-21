@@ -25,7 +25,7 @@ my $db=connectDB();
 my $countOnly=0;
 my $infile='InsurancePayment.csv';
 ###########################
-#importFile($db, $countOnly, 'INSURANCE', $infile);
+importFile($db, $countOnly, 'INSURANCE', $infile);
 linkPeople($db);
 linkProducts($db);
 linkNationalPeriod($db);
@@ -56,6 +56,7 @@ sub createTXNRecords    {
     my $st = qq[
         SELECT * FROM tmpTXNs
         WHERE intPersonID>0 AND intProductID>0
+            AND strPaid = 'YES'
     ];
 
 	my $qry = $db->prepare($st) or query_error($st);

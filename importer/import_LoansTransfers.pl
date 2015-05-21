@@ -12,27 +12,259 @@ use Utils;
 use DBI;
 use CGI qw(unescape);
 use SystemConfig;
+use ImporterTXNs;
                                                                                                     
 main();
 1;
 
 sub main	{
 my $db=connectDB();
-#print STDERR "LIB, FILE NAME etc\n";
-#exit;
-#### SETTINGS #############
 my $countOnly=0;
 my $infileLoans='Loans.csv';
 my $infileTransfers='Transfers.csv';
-###########################
 importFile($db, $countOnly, 'LOAN', $infileLoans);
 #importFile($db, $countOnly, 'TRANSFER', $infileTransfers);
+
+
 linkPeople($db);
 linkClubs($db);
 linkProducts($db);
+linkLOANBorrowingPR($db);
+linkLOANLendingPR($db);
 
-#Need to link intFromPersonRegoID and intToPersonRegoID rego records to be able to close off loan
-# Need to set intOnLoan and intIsLoanedOut to appropriate records
+insertLOANPersonRequestRecord($db);
+insertTransactions($db);
+}
+
+sub insertTransactions  {
+    my ($db) = @_;
+
+    my $st = qq[
+        SELECT * FROM tmpLoansTransfers
+        WHERE       
+            intPersonID>0 
+            AND intProductID >0 
+            AND intEntityToID > 0
+            AND strRecordType = 'LOAN'
+            AND strPaid = 'YES'
+    ];
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute();
+    while (my $dref= $qry->fetchrow_hashref())    {
+        importTXN($db, $dref->{'intPersonID'}, $dref->{'intToPersonRegoID'}, $dref->{'intEntityToID'}, $dref->{'intProductID'}, $dref->{'curProductAmount'}, $dref->{'dtCommenced'}, $dref->{'strTransactionNo'}, 1, 0);
+    }
+    
+}
+sub insertLOANPersonRequestRecord   {
+    my ($db) = @_;
+
+    my $stINS = qq[
+        INSERT INTO tblPersonRequest (
+            strRequestType,
+            intPersonID,
+            intExistingPersonRegistrationID,
+            strSport,
+            strPersonType,
+            strPersonLevel,
+            strNewPersonLevel,
+            strPersonEntityRole,
+            intRealmID,
+            intRequestFromEntityID,
+            intRequestToEntityID,
+            intRequestToMAOverride,
+            intParentMAEntityID,
+            strRequestNotes,
+            dtDateRequest,
+            strRequestResponse,
+            strResponseNotes,
+            intResponseBy,
+            strRequestStatus,
+            dtLoanFrom,
+            dtLoanTo,
+            intOpenLoan,
+            strTMSReference,
+            NOW()    
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?,  
+            ?,
+            ?,
+            ?,
+            ?,
+            1,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,  
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+        )
+    ];
+    my $qryINS= $db->prepare($stINS) or query_error($stINS);
+
+    my $st = qq[
+        SELECT * FROM tmpLoansTransfers
+        WHERE       
+            intPersonID>0 
+            AND intEntityToID > 0
+            AND (
+                intToPersonRegoID > 0 OR intFromPersonRegoID > 0
+            )
+            AND strRecordType = 'LOAN'
+            AND strStatus = 'APPROVED' 
+    ];
+    ## We only bring in the OPEN "APPROVED" ie: NOT "FINISHED" loans
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute();
+    while (my $dref= $qry->fetchrow_hashref())    {
+        my $status = 'COMPLETED';
+        my $openLoan = 0;
+        if ($dref->{'strStatus'})   {
+            $status = 'ACTIVE';
+            $openLoan = 1;
+        }
+        
+        $qryINS->execute(
+            'LOAN',
+            $dref->{'intPersonID'},
+            $dref->{'intFromPersonRegoID'},
+            $dref->{'strSport'},
+            'PLAYER',
+            $dref->{'strPersonLevel'},
+            $dref->{'strPersonLevel'},
+            '',
+            $dref->{'intEntityToID'},  # The TO entity is the FROM in Request table
+            $dref->{'intEntityFromID'},
+            0,
+            0, #??
+            '',
+            '0000-00-00',
+            'COMPLETED',
+            '',
+            0,
+            $status,
+            $dref->{'dtCommenced'},
+            $dref->{'dtExpiry'},
+            $openLoan,
+        );
+    }
+}
+ 
+
+
+sub linkLOANBorrowingPR{
+    my ($db) = @_;
+
+    my $st = qq[
+        SELECT * FROM tmpLoansTransfers
+        WHERE intPersonID>0 and intEntityToID > 0
+    ];
+    my $stUPDtmp = qq[
+        UPDATE tmpLoansTransfers
+        SET intToPersonRegoID = ?
+        WHERE intID = ?
+    ];
+    my $qryUPDtmp = $db->prepare($stUPDtmp) or query_error($stUPDtmp);
+
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute();
+    while (my $dref= $qry->fetchrow_hashref())    {
+
+        my $stTO = qq[
+            SELECT *
+            TO tblPersonRegistration_1
+            WHERE
+                intPersonID = ?
+                AND intOnLoan=1
+                AND strPersonType='PLAYER'
+                AND strSport = ?
+                AND strPersonLevel = ?
+                AND dtFrom = ?
+                AND dtTo = ?
+                AND intEntityID = ?
+            LIMIT 1
+        ];
+        my $qryTO = $db->prepare($stTO) or query_error($stTO);
+        $qryTO->execute(
+            $dref->{'intPersonID'},
+            $dref->{'strSport'},
+            $dref->{'strPersonLevel'},
+            $dref->{'dtCommenced'},
+            $dref->{'dtExpiry'},
+            $dref->{'intEntityFromID'},
+        );
+        my $TOref= $qryTO->fetchrow_hashref();
+        if ($TOref->{'intPersonRegistrationID'})  {
+            $qryUPDtmp->execute($TOref->{'intPersonRegistrationID'}, $dref->{'intID'});
+        }
+    }
+
+}
+
+sub linkLOANLendingPR {
+    my ($db) = @_;
+
+     my $st = qq[
+        SELECT * FROM tmpLoansTransfers
+        WHERE intPersonID>0 and intEntityFromID > 0
+    ];
+    my $stUPDtmp = qq[
+        UPDATE tmpLoansTransfers
+        SET intFromPersonRegoID = ?
+        WHERE intID = ?
+    ];
+    my $qryUPDtmp = $db->prepare($stUPDtmp) or query_error($stUPDtmp);
+
+    my $stPRFROM= qq[
+        UPDATE tblPersonRegistration_1
+        SET intIsLoanedOut = 1
+        WHERE intPersonRegistrationID = ?
+    ];
+    my $qryPRFROM= $db->prepare($stPRFROM) or query_error($stPRFROM);
+
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute();
+    while (my $dref= $qry->fetchrow_hashref())    {
+
+        my $stFROM = qq[
+            SELECT *
+            FROM tblPersonRegistration_1
+            WHERE
+                intPersonID = ?
+                AND strPersonType='PLAYER'
+                AND strSport = ?
+                AND strPersonLevel = ?
+                AND intEntityID = ?
+                AND dtFrom < ?
+            ORDER BY dtFrom DESC
+            LIMIT 1
+        ];
+        my $qryFROM = $db->prepare($stFROM) or query_error($stFROM);
+        $qryFROM->execute(
+            $dref->{'intPersonID'},
+            $dref->{'strSport'},
+            $dref->{'strPersonLevel'},
+            $dref->{'intEntityFromID'},
+            $dref->{'dtCommenced'}
+        );
+        my $FROMref= $qryFROM->fetchrow_hashref();
+        if ($FROMref->{'intPersonRegistrationID'})  {
+            $qryUPDtmp->execute($FROMref->{'intPersonRegistrationID'}, $dref->{'intID'});
+            $qryPRFROM->execute($FROMref->{'intPersonRegistrationID'});
+        }
+    }
+
 }
 sub linkProducts {
     my ($db) = @_;
@@ -96,9 +328,6 @@ $db->do($st);
 while (<INFILE>)	{
 	my %parts = ();
 	$count ++;
-    if ($count==1)  {
-       print "HEADERS"; 
-    }
 	next if $count == 1;
 	chomp;
 	my $line=$_;
