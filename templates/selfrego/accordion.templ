@@ -47,8 +47,8 @@
                                         [% ELSE %]
                                             &nbsp;
                                         [% END %]
-                                        [% IF rego.allowTransfer %]
-                                            <a href = "#" class="btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
+                                        [% IF rego.allowTransfer %] 
+                                            <a href = "[% rego.transferlink %]" class="btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
                                         [% END %]
                                     </tr>
                                 [% END %]

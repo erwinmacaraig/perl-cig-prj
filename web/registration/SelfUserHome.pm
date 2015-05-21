@@ -201,9 +201,7 @@ sub getPreviousRegos {
             P.intGender,
             P.strStatus as PersonStatus,
             NP.strNationalPeriodName,
-            NP.dtTo as NPdtTo,
-            prq.intOpenLoan,
-            existprq.intOpenLoan as existOpenLoan
+            NP.dtTo as NPdtTo
         FROM
             tblSelfUserAuth AS A
             INNER JOIN tblPersonRegistration_$Data->{'Realm'} AS PR
@@ -213,12 +211,6 @@ sub getPreviousRegos {
                 )
             INNER JOIN tblNationalPeriod as NP ON (
                 NP.intNationalPeriodID = PR.intNationalPeriodID
-            )
-            LEFT JOIN tblPersonRequest prq ON (
-                prq.intPersonRequestID = PR.intPersonRequestID
-            )
-            LEFT JOIN tblPersonRequest existprq ON (
-                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
             )
             INNER JOIN tblEntity AS E
                 ON PR.intEntityID = E.intEntityID
@@ -259,6 +251,7 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         
         $dref->{'renewlink'} = '';
+        $dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
@@ -268,19 +261,16 @@ sub getPreviousRegos {
             and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
             $dref->{'allowTransfer'} =1;
             $allowTransferShown=1;
+
+            $dref->{'transferlink'} = "?a=TRANSFER_INIT&amp;pID=$pID&amp;rtargetid=$dref->{'intPersonRegistrationID'}";
         }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE) 
             and $dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_REGISTERED
         )   {
             my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $dref->{'strSport'}, $dref->{'strPersonType'}, 'RENEWAL');
-            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1) {
-                if (
-                    ($dref->{'intIsLoanedOut'} == 0 and $dref->{'intOnLoan'} == 0)
-                    or ($dref->{'intIsLoanedOut'} == 1 and $dref->{'existOpenLoan'} == 0)
-                    or ($dref->{'intOnLoan'} == 1 and $dref->{'intOpenLoan'} == 1)) {
-                        $dref->{'renewlink'} = "?a=REG_RENEWAL&amp;pID=$pID&amp;dnat=RENEWAL&amp;rtargetid=$dref->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$dref->{'strSport'}&amp;dtype=$dref->{'strPersonType'}&amp;dentityrole=$dref->{'strPersonEntityRole'}&amp;dlevel=$dref->{'strPersonLevel'}&amp;d_level=$dref->{'strPersonLevel'}&amp;de=$dref->{'intEntityID'}";
-                }
+            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID)    {
+                $dref->{'renewlink'} = "?a=REG_RENEWAL&amp;pID=$pID&amp;dnat=RENEWAL&amp;rtargetid=$dref->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$dref->{'strSport'}&amp;dtype=$dref->{'strPersonType'}&amp;dentityrole=$dref->{'strPersonEntityRole'}&amp;dlevel=$dref->{'strPersonLevel'}&amp;d_level=$dref->{'strPersonLevel'}&amp;de=$dref->{'intEntityID'}";
             }
         }
 
