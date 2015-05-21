@@ -223,7 +223,7 @@ sub submitRequest {
         $emailNotification->setWorkTaskDetails(\%notificationData);
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        $emailNotification->send($emailTemplate); #if $emailTemplate->getConfig('toEntityNotification') == 1;
         $dref->{'personRegoStatus'} = $dref->{'PersonStatus'};
 		my %PageData = (
 			registration => $dref,
