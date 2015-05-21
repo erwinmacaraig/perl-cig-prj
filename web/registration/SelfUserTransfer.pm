@@ -231,7 +231,7 @@ sub submitRequest {
 			url => $Defs::base_url,
 		);
 		
-		$body = runTemplate($Data, \%PageData, 'personrequest/transfer/selftransfercomplete.templ') || '';
+		my $body = runTemplate($Data, \%PageData, 'personrequest/transfer/selftransfercomplete.templ') || '';
 
 
 	return $body;
