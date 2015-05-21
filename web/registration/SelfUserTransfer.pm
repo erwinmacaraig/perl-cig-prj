@@ -73,7 +73,7 @@ sub initTransfer {
 		<div class="txtright">
        		 <a href="$Defs::base_url/registration/" class="btn-main">] . $Data->{'lang'}->txt("Return to your Dashboard") . qq[ </a>
 		</div>
-    </div>], '', ) if (!$dref);
+    </div>], '') if (!$dref);
 
     $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}};
     $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}};
@@ -125,10 +125,17 @@ sub submitRequest {
     else {
         my $dref = _getValidRegistration($Data, $user, $personID, $personRegistrationID);
 
-        return (
-            $Data->{'lang'}->txt("It's either the record does not exist or you have a pending request for the same person registration record."),
-            $Data->{'lang'}->txt("Error"),
-        ) if (!$dref);
+        return ( qq[<div class="alert"> <h1>Error</h1>
+               <div>				
+               <span class="fa fa-exclamation"></span>
+               <p> ] . $Data->{'lang'}->txt("It's either the record does not exist or you have a pending request for the same person registration record.") . qq[
+               </p>
+               </div>
+               </div> <div class = "button-row">
+		<div class="txtright">
+       		 <a href="$Defs::base_url/registration/" class="btn-main">] . $Data->{'lang'}->txt("Return to your Dashboard") . qq[ </a>
+		</div>
+    </div>], '' ) if (!$dref);
 
 
         my $st = qq[
