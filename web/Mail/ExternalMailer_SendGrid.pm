@@ -139,9 +139,17 @@ sub send {
         $outputparams{'cc'} = \@addresses;
     }
 
+    my $content = '';
+    for my $k (keys %outputparams) {
+        $content .= qq[------------------------------400f182a9360\r\nContent-Disposition: form-data; name="$k"\r\nContent-Type: text/html\r\n\r\n$outputparams{$k}\r\n];
+    }
     my $url = 'https://sendgrid.com/api/mail.send.json';
     my $ua = LWP::UserAgent->new();
-    my $req = POST $url, \%outputparams;
+    #my $req = POST $url, \%outputparams;
+    my $req = POST $url;
+    $req->content_type("multipart/form-data; boundary=----------------------------400f182a9360");
+    $req->content($content);
+    $req->content_length(length($content));
     my $res= $ua->request($req);
 	my $retvalue = $res->content() || '';
 	my $retvalues = from_json($retvalue);
