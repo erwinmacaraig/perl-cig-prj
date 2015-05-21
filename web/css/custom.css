@@ -368,35 +368,70 @@ th {
   background-size: 2%;
   background-position: center center;
 }
-  .member-home-page .autoAccordian {
-    margin-left:-15px;
-    margin-right:-15px;
-  }
-  .autoAccordian .panel-heading a{
-    display:block;
-  }
-  * .js-tabcollapse-panel-heading:after {
-    font-family: FontAwesome;
-    content: "\f078";
-    float: right;
-    color: #fff;
-  }
-  .js-tabcollapse-panel-heading.collapsed:after {
-    font-family: FontAwesome;
-    content: "\f054";
-  }
-  .autoAccordian .panel-heading{
-    border-radius:0px;
-    border:none;
-    border-bottom:1px solid #888;
-    padding:20px;
-  }
-  .autoAccordian .panel{
-    margin-top:0px !important;
-  }
-  .panel-body.js-tabcollapse-panel-body {
-    background-color:#fff; 
-  }
+.member-home-page .autoAccordian {
+  margin-left:-15px;
+  margin-right:-15px;
+}
+.autoAccordian .panel-heading a{
+  display:block;
+}
+* .js-tabcollapse-panel-heading:after {
+  font-family: FontAwesome;
+  content: "\f078";
+  float: right;
+  color: #fff;
+}
+.js-tabcollapse-panel-heading.collapsed:after {
+  font-family: FontAwesome;
+  content: "\f054";
+}
+.autoAccordian .panel-heading{
+  border-radius:0px;
+  border:none;
+  border-bottom:1px solid #888;
+  padding:20px;
+}
+.autoAccordian .panel{
+  margin-top:0px !important;
+}
+.panel-body.js-tabcollapse-panel-body {
+  background-color:#fff; 
+}
+/*Email notifications status types*/
+.status-common{
+  width: 100px;
+  border-radius: 3px;
+  background-position: 11px center;
+  background-repeat: no-repeat;
+  color: white;
+  padding: 5px 15px 5px 40px;
+
+}
+.status-approved{
+  background-color: #009046;
+  background-image: url(../images/status-check.png);
+}
+.status-cancelled{
+  background-color: black;
+  background-image: url(../images/status-x.png);
+}
+.status-itc-request{
+  background-color: #0000ff;
+}
+.status-pending{
+  background-color: #f26522;
+  background-image: url(../images/status-gear-white.png);
+}
+.status-reassigned{
+  background-image: url(../images/status-gear-black.png);
+  color:black;
+  background-color: #00ffff;
+}
+.status-rejected{
+  background-color: #9e0b0f;
+  background-image: url(../images/status-x.png);
+}
+/*End of Email notifications status types*/
 @media only screen and (min-width:275px) and (max-width:313px){
   body{
     top:0!important;
