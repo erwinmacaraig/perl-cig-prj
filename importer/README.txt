@@ -16,9 +16,9 @@ cd ../automatic -> ./tempEntityStructure.pl
 
 
 #Below are locations of ISO codes that may need adjusting to 2 (in FIFA_3to2_ISO.pl)
-SELECT DISTINCT strISONationaliy FROM tblPerson;
-SELECT DISTINCT strISOCountryOfBirth FROM tblPerson;
-SELECT DISTINCT strISOCountry FROM tblPerson;
+SELECT DISTINCT strISOCountryOfBirth FROM tblPerson WHERE LENGTH(strISOCountryOfBirth) >2;
+SELECT DISTINCT strISONationality FROM tblPerson WHERE LENGTH(strISONationality) >2;
+SELECT DISTINCT strISOCountry FROM tblPerson WHERE LENGTH(strISOCountry) >2;
 
 
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;

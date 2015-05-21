@@ -80,8 +80,9 @@ print STDERR "IN checkOpenPayments\n";
             AND PC.strGatewayCode = 'checkoutfi'
 		AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
-            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
+            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
     ];
+            #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
@@ -145,7 +146,7 @@ print STDERR "--- $retval\n";
         #print STDERR Dumper($dataIN);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
-print STDERR Dumper(\%APIResponse);
+#print STDERR Dumper(\%APIResponse);
 print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
         
