@@ -4051,7 +4051,7 @@ msgstr "搜尋結果"
 #: templates/personrequest/loan/search_result.templ
 #: templates/person/list.templ Line:106
 msgid "Show _MENU_ entries"
-msgstr "顯示選單記錄"
+msgstr "顯示選單記錄 _MENU_"
 
 #: web/GridDisplay.pm Line:432 templates/dashboards/worktasks.templ Line:391
 #: templates/personrequest/transfer/search_result.templ Line:67
