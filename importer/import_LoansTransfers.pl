@@ -130,7 +130,7 @@ sub insertLOANPersonRequestRecord   {
     while (my $dref= $qry->fetchrow_hashref())    {
         my $status = 'COMPLETED';
         my $openLoan = 0;
-        if ($dref->{'strStatus'})   {
+        if ($dref->{'strStatus'} eq 'APPROVED')   {
             $status = 'ACTIVE';
             $openLoan = 1;
         }
@@ -158,6 +158,16 @@ sub insertLOANPersonRequestRecord   {
             $dref->{'dtExpiry'},
             $openLoan,
         );
+        my $ID = $qryINS->{mysql_insertid} || 0;
+        if ($ID and $dref->{'intToPersonRegoID'})   {
+            my $stUPD = qq[
+                UPDATE tblPersonRegistration_1
+                SET intPersonRequestID = ?
+                WHERE intPersonRegistrationID = ?
+            ];
+            my $qryUPD = $db->prepare($stUPD) or query_error($stUPD);
+            $qryUPD->execute($dref->{'intToPersonRegoID'});
+        }
     }
 }
  

@@ -277,6 +277,8 @@ sub getPreviousRegos {
         )   {
             my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $dref->{'strSport'}, $dref->{'strPersonType'}, 'RENEWAL');
             if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1) {
+                $dref->{'existOpenLoan'} ||= 0;
+                $dref->{'intOpenLoan'} ||= 0;
                 if (
                     ($dref->{'intIsLoanedOut'} == 0 and $dref->{'intOnLoan'} == 0)
                     or ($dref->{'intIsLoanedOut'} == 1 and $dref->{'existOpenLoan'} == 0)

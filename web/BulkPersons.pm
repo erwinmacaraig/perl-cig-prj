@@ -111,7 +111,7 @@ sub bulkPersonRollover {
             AND PRto.intPersonRegistrationID IS NULL
             AND (
                 (PR.intIsLoanedOut = 0 and PR.intOnLoan = 0)
-                OR (PR.intIsLoanedOut = 1 AND existprq.intOpenLoan = 0)
+                OR (PR.intIsLoanedOut = 1 AND ((existprq.intPersonRquestID IS NULL OR existprq.intOpenLoan = 0))
                 OR (PR.intOnLoan = 1 AND prq.intOpenLoan= 1)
             )
                 
