@@ -33,6 +33,26 @@ use Data::Dumper;
 #
 ############
 
+sub insertCertification {
+    my ($db, $personID, $personRole) = @_;
+
+    ## From tblCertificationTypes
+
+    my %certs=();
+    $certs{'UEFAPRO'} = 1;
+    $certs{'UEFAA'} = 2;
+    $certs{'UEFAB'} = 3;
+
+    my $certID = $certs{$personRole} || return;
+    $personID || return;
+    my $st = qq[
+        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus)
+        VALUES (?,1,?,'ACTIVE')
+    ];
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute($personID, $certID);
+}
+    
 sub insertPersonRegoRecord {
     my ($db) = @_;
 
@@ -94,13 +114,13 @@ sub insertPersonRegoRecord {
 
     my $st = qq[
         SELECT * FROM tmpPersonRego
-        LIMIT 100
+        LIMIT 10
     ];
 print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     while (my $dref= $qry->fetchrow_hashref())    {
-        next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+        #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
         my $dtFrom = $dref->{'dtFrom'};
         my $dtTo   = $dref->{'dtTo'};
         my $onLoan = 0; 
@@ -113,10 +133,14 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             $dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
         }
+        if ($dref->{'dtTransferred'} and $dref->{'dtTransferred'} ne '0000-00-00')  {
+            $dtTo = $dref->{'dtTransferred'};
+        }
         my $personRole = $dref->{'strPersonRole'};
         if ($dref->{'strPersonType'} eq 'COACH')    {
             ## INSERT INTO tblPersonCertifications or whatever its called -- need an IMPROT CODE
-            #insertCertification($db, $dref->{'intPersonID'}, $personRole);
+print "INSER " . $personRole . "\n";
+            insertCertification($db, $dref->{'intPersonID'}, $personRole);
             $personRole = ''; ## NEEDS CONFIRMATION
         }
 
@@ -293,7 +317,8 @@ while (<INFILE>)	{
         
     $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
     $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
-    $parts{'PERSONROLE'} = 'MAREFOB' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER';
+    $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+    $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
 	if ($countOnly)	{
 		$insCount++;
 		next;
