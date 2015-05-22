@@ -162,7 +162,7 @@ sub insertLOANPersonRequestRecord   {
         if ($ID and $dref->{'intToPersonRegoID'})   {
             my $stUPD = qq[
                 UPDATE tblPersonRegistration_1
-                SET intPersonRequestID = ?
+                SET intPersonRequestID = ?, strStatus = IF(dtFrom < NOW() and dtTo>NOW(), 'ACTIVE', 'PASSIVE')
                 WHERE intPersonRegistrationID = ?
             ];
             my $qryUPD = $db->prepare($stUPD) or query_error($stUPD);

@@ -12,25 +12,17 @@ use Utils;
 use DBI;
 use CGI qw(unescape);
 use SystemConfig;
-use ImporterTXNs;
+use ImporterPersonRego;
                                                                                                     
-############
-#
-# COMMENTS:
-# - Waiting on your fixes of tblPerson.strImportPersonCode (ie: = SystemID)
-# - Some logic needed in insertPersonRegoRecord() for ONLOAN and dtFrom =  dtTransferred etc and intOnLoan 
-# - Full list of INSERT and VALUE columns needed in insertPersonRegoRecord()
-#
-############
 main();
 1;
 
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='PeopleRegistrationsCoaches.csv';
+    my $infile='PeopleRegistrationsCoaches.csv';
 
-    importPRFile($db, $countOnly, 'COACHES', $infile1);
+    importPRFile($db, $countOnly, 'COACHES', $infile);
 
 }
 

@@ -3,8 +3,8 @@ require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     insertPersonRegoRecord
-    linkPR_NationalPeriods
-    linkPR_Products
+    linkPRNationalPeriods
+    linkPRProducts
     linkPRPeople
     linkPRClubs
     importPRFile
@@ -38,11 +38,15 @@ sub insertPersonRegoRecord {
 
     my $stINS = qq[
         INSERT INTO tblPersonRegistration_1 (
+            strImportPersonCode,
             intPersonID,
             intEntityID,
-            intNationalPeriodID
+            intNationalPeriodID,
+            intOnLoan
         )
         VALUES (
+            ?,
+            ?,
             ?,
             ?,
             ?
@@ -66,11 +70,20 @@ print "LIMIT FOR TEST\n";
         #    $status = 'ACTIVE';
         #    $openLoan = 1;
         #}
-        
+        my $onLoan = 0; 
+        my $status = $dref->{'strStatus'};
+
+        if ($status eq 'ONLOAN')    {
+            $onLoan = 1;
+            $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
+        }
         $qryINS->execute(
+            $dref->{'intID'},
             $dref->{'intPersonID'},
             $dref->{'intEntityID'},
             $dref->{'intNationalPeriodID'},
+            $status,
+            $onLoan
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
     }
@@ -185,8 +198,8 @@ my $insCount=0;
 my $NOTinsCount = 0;
 
 my %cols = ();
-my $st = "DELETE FROM tmpPersonRego";
-$db->do($st);
+#my $st = "DELETE FROM tmpPersonRego";
+#$db->do($st);
 
 while (<INFILE>)	{
 	my %parts = ();
