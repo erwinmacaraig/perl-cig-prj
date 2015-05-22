@@ -38,13 +38,51 @@ sub insertPersonRegoRecord {
 
     my $stINS = qq[
         INSERT INTO tblPersonRegistration_1 (
+            intRealmID,
+            dtAdded,
+            dtApproved,
+            dtLastUpdated,
             strImportPersonCode,
             intPersonID,
             intEntityID,
             intNationalPeriodID,
-            intOnLoan
+            strPersonType,
+            strPersonLevel,
+            strPersonEntityRole,
+            strStatus,
+            strSport,
+            strAgeLevel,
+            strRegistrationNature,
+            dtFrom,
+            dtTo,
+            intIsLoanedOut,
+            intOnLoan,
+            tmpPaymentRef,
+            tmpProductCode,
+            tmpProductID,
+            tmpAmount,
+            tmpisPaid
         )
         VALUES (
+            1,
+            NOW(),
+            NOW(),
+            NOW(),
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -56,34 +94,52 @@ sub insertPersonRegoRecord {
 
     my $st = qq[
         SELECT * FROM tmpPersonRego
-        LIMIT 10
+        LIMIT 100
     ];
-print "LIMIT FOR TEST\n";
+print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     while (my $dref= $qry->fetchrow_hashref())    {
-        #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
-        next if (! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
-        #my $status = 'COMPLETED';
-        #my $openLoan = 0;
-        #if ($dref->{'strStatus'} eq 'APPROVED')   {
-        #    $status = 'ACTIVE';
-        #    $openLoan = 1;
-        #}
+        next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+        my $dtFrom = $dref->{'dtFrom'};
+        my $dtTo   = $dref->{'dtTo'};
         my $onLoan = 0; 
+        my $isLoanedOut= 0; 
         my $status = $dref->{'strStatus'};
 
-        if ($status eq 'ONLOAN')    {
+        if ($status eq 'ONLOAN' and $dref->{'isLoan'} eq 'YES')    {
             $onLoan = 1;
+            $dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
+        }
+        if ($dref->{'isLoan'} eq 'YES' and $status ne 'ONLOAN') {
+            $isLoanedOut =1 ; #### NEEDS CONFIRMATIONS !!
+        }
+        my $personRole = $dref->{'strPersonRole'};
+        if ($dref->{'strPersonType'} eq 'COACH')    {
+            $personRole = ''; ## NEEDS CONFIRMATION
         }
         $qryINS->execute(
             $dref->{'intID'},
             $dref->{'intPersonID'},
             $dref->{'intEntityID'},
             $dref->{'intNationalPeriodID'},
+            $dref->{'strPersonType'},
+            $dref->{'strPersonLevel'},
+            $personRole,
             $status,
-            $onLoan
+            $dref->{'strSport'},
+            $dref->{'strAgeLevel'},
+            $dref->{'strRegoNature'},
+            $dtFrom,
+            $dtTo,
+            $isLoanedOut, 
+            $onLoan,
+            $dref->{'strTransactionNo'},
+            $dref->{'strProductCode'},
+            $dref->{'intProductID'},
+            $dref->{'curProductAmount'},
+            $dref->{'strPaid'}
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
     }
