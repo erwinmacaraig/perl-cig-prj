@@ -12,17 +12,22 @@ use Utils;
 use DBI;
 use CGI qw(unescape);
 use SystemConfig;
-use ImporterExtraPayments;
+use ImporterPersonRego;
                                                                                                     
+############
+#
+# COMMENTS:
+# - Waiting on your fixes of tblPerson.strImportPersonCode (ie: = SystemID)
+# - Some logic needed in insertPersonRegoRecord() for ONLOAN and dtFrom =  dtTransferred etc and intOnLoan 
+# - Full list of INSERT and VALUE columns needed in insertPersonRegoRecord()
+#
+############
 main();
 1;
 
 sub main	{
     my $db=connectDB();
-    #print STDERR "LIB, FILE NAME etc\n";
-    #exit;
-    #### SETTINGS #############
-    my $countOnly=0;
-    my $infile='InsurancePayment.csv';
-    importEPFile($db, $countOnly, 'INSURANCE', $infile);
+
+    insertPersonRegoRecord($db);
 }
+
