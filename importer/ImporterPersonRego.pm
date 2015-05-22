@@ -107,18 +107,20 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
         my $isLoanedOut= 0; 
         my $status = $dref->{'strStatus'};
 
-        if ($status eq 'ONLOAN' and $dref->{'isLoan'} eq 'YES')    {
+        if ($dref->{'isLoan'} eq 'YES')    {
+        #$status eq 'ONLOAN' and 
             $onLoan = 1;
             $dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
         }
-        if ($dref->{'isLoan'} eq 'YES' and $status ne 'ONLOAN') {
-            $isLoanedOut =1 ; #### NEEDS CONFIRMATIONS !!
-        }
         my $personRole = $dref->{'strPersonRole'};
         if ($dref->{'strPersonType'} eq 'COACH')    {
+            ## INSERT INTO tblPersonCertifications or whatever its called -- need an IMPROT CODE
+            #insertCertification($db, $dref->{'intPersonID'}, $personRole);
             $personRole = ''; ## NEEDS CONFIRMATION
         }
+
+        
         $qryINS->execute(
             $dref->{'intID'},
             $dref->{'intPersonID'},
