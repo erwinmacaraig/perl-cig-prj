@@ -259,6 +259,7 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         
         $dref->{'renewlink'} = '';
+		$dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
@@ -268,6 +269,7 @@ sub getPreviousRegos {
             and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
             $dref->{'allowTransfer'} =1;
             $allowTransferShown=1;
+			$dref->{'transferlink'} = "?a=TRANSFER_INIT&amp;pID=$pID&amp;rtargetid=$dref->{'intPersonRegistrationID'}";
         }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE) 
@@ -275,6 +277,8 @@ sub getPreviousRegos {
         )   {
             my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $dref->{'strSport'}, $dref->{'strPersonType'}, 'RENEWAL');
             if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1) {
+                $dref->{'existOpenLoan'} ||= 0;
+                $dref->{'intOpenLoan'} ||= 0;
                 if (
                     ($dref->{'intIsLoanedOut'} == 0 and $dref->{'intOnLoan'} == 0)
                     or ($dref->{'intIsLoanedOut'} == 1 and $dref->{'existOpenLoan'} == 0)
@@ -293,4 +297,5 @@ sub getPreviousRegos {
         \%found,
     );
 }
+1;
 1;

@@ -157,6 +157,7 @@ sub importTXN   {
     );
     my $txnID = $qryTXN->{mysql_insertid} || 0;
     next if ! $txnID;
+    next if ! $status;
     $qryTL->execute(
         $dtPaid,
         $amountPaid,

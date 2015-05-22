@@ -215,6 +215,7 @@ sub build {
 
             #Person Request below
             CurrentClub => $self->{_notificationObj}->getWorkTaskDetails()->{'CurrentClub'},
+			Requestor => $self->{_notificationObj}->getWorkTaskDetails()->{'Requestor'},
             RequestingClub => $self->{_notificationObj}->getWorkTaskDetails()->{'RequestingClub'} || $config->{'fromEntityName'},
             MA => $self->{_notificationObj}->getWorkTaskDetails()->{'MA'} || '',
         );
