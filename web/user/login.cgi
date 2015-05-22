@@ -97,7 +97,7 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'returnURL'=>"$Defs::base_url",'errors' => $errors},
+        {'returnURL'=>"../index.cgi",'errors' => $errors},
         #{'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
