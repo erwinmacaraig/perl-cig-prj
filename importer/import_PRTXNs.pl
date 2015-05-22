@@ -21,8 +21,6 @@ sub main	{
 my $db=connectDB();
 my $countOnly=0;
 
-    linkProducts($db);
-    
     insertTransactions($db);
 }
 
