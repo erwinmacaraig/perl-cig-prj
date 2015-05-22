@@ -254,8 +254,9 @@ my $insCount=0;
 my $NOTinsCount = 0;
 
 my %cols = ();
-#my $st = "DELETE FROM tmpPersonRego";
-#$db->do($st);
+my $stDEL = "DELETE FROM tmpPersonRego WHERE strFileType = ?";
+my $qDEL= $db->prepare($stDEL) or query_error($stDEL);
+$qDEL->execute($type);
 
 while (<INFILE>)	{
 	my %parts = ();

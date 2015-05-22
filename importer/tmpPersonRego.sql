@@ -29,6 +29,7 @@ CREATE TABLE tmpPersonRego (
     strTransactionNo varchar(30) default '',
     
     PRIMARY KEY (intID),
+    INDEX index_strFileType (strFileType),
     INDEX index_personCode (strPersonCode),
     INDEX index_entityCode (strEntityCode),
     INDEX index_nationalPeriodCode (strNationalPeriodCode),

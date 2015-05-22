@@ -19,10 +19,9 @@ main();
 
 sub main	{
     my $db=connectDB();
-    #print STDERR "LIB, FILE NAME etc\n";
-    #exit;
-    #### SETTINGS #############
-    my $countOnly=0;
-    my $infile='InsurancePayment.csv';
-    importEPFile($db, $countOnly, 'INSURANCE', $infile);
+    linkEPPeople($db);
+    linkEPProducts($db);
+    linkEPNationalPeriod($db);
+    linkEPPersonRego($db);
 }
+
