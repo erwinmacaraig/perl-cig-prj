@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-05-20 14:56+1000\n"
+"POT-Creation-Date: 2015-05-22 10:30+1000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
 "Language-Team: \n"
@@ -697,6 +697,7 @@ msgstr "法定團體號碼"
 #: Club Field Labels web/Person.pm Line:310 web/PendingRegistrations.pm
 #: Line:220 Line:325 web/IncompleteRegistrations.pm Line:181
 #: templates/dashboards/personregistration.templ Line:149
+#: templates/selfrego/transfer_init.templ Line:56
 #: templates/selfrego/selfregohistorybody.templ Line:54
 #: templates/registration/what.templ Line:69
 #: templates/registration/summary.templ
@@ -1107,6 +1108,7 @@ msgstr "處理中"
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
@@ -1315,6 +1317,7 @@ msgstr "簡短名稱 (國際)"
 #: web/IncompleteRegistrations.pm Line:176
 #: web/EntityRegistrationAllowedEdit.pm Line:333
 #: templates/dashboards/personregistration.templ Line:128
+#: templates/selfrego/transfer_init.templ Line:44
 #: templates/selfrego/selfregohistorybody.templ Line:32
 #: templates/registration/what.templ Line:61
 #: templates/registration/summary.templ Line:52
@@ -1325,7 +1328,7 @@ msgstr "簡短名稱 (國際)"
 #: templates/workflow/view/transfer.templ Line:212
 #: templates/workflow/view/club.templ Line:192
 #: templates/workflow/view/personregistration.templ Line:272
-#: templates/flow/club_summary.templ Line:44
+#: templates/flow/club_summary.templ
 #: templates/personrequest/access/current_club_view.templ Line:136
 #: templates/personrequest/access/requesting_club_view.templ Line:39 Line:168
 #: templates/personrequest/transfer/oldclubdetails.templ Line:13
@@ -1367,8 +1370,8 @@ msgstr "數據存取"
 #: templates/dashboards/entity.templ Line:53 templates/dashboards/club.templ
 #: Line:76 templates/dashboards/personregistration.templ Line:37 Line:121
 #: templates/dashboards/worktasks.templ Line:79
-#: templates/selfrego/accordion.templ Line:34
-#: templates/selfrego/selfregohistorybody.templ Line:25
+#: templates/selfrego/transfer_init.templ templates/selfrego/accordion.templ
+#: Line:34 templates/selfrego/selfregohistorybody.templ Line:25
 #: templates/registration/certifications.templ Line:8
 #: templates/registration/certificate_flow_backend.templ Line:21
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:40
@@ -1387,6 +1390,7 @@ msgstr "數據存取"
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
@@ -1523,8 +1527,8 @@ msgid "Valid From"
 msgstr "有效由"
 
 #: Person FieldLabels Club Field Labels web/PersonCertifications.pm Line:130
-#: web/EntityIdentifier.pm Line:355
-#: templates/selfrego/selfregohistorybody.templ Line:77
+#: web/EntityIdentifier.pm Line:355 templates/selfrego/transfer_init.templ
+#: Line:68 templates/selfrego/selfregohistorybody.templ Line:77
 #: templates/registration/certifications.templ Line:10
 msgid "Valid Until"
 msgstr "有效至"
@@ -1577,10 +1581,26 @@ msgstr "區域"
 msgid "[none]"
 msgstr "[無]"
 
+#: web/paytry.cgi Line:243
+#, fuzzy
+msgid "Continue to Payment"
+msgstr "確認付款"
+
+#: web/paytry.cgi Line:225
+msgid ""
+"If you are not automatically redirected to the payment page within 30 "
+"seconds then you can click the Continue to Payment button below"
+msgstr ""
+
 #: web/regoformphoto.cgi Line:76 web/productphoto.cgi Line:60
 #: web/ProductPhoto.pm Line:167 Line:592 web/Photo.pm Line:113 Line:498
 msgid "Photo"
 msgstr "相片"
+
+#: web/paytry.cgi Line:224
+#, fuzzy
+msgid "Please Wait - Processing"
+msgstr "請新增備忘"
 
 #: web/registration/ajax/aj_search.cgi Line:346 web/ajax/aj_search.cgi
 msgid "Organisations"
@@ -1675,7 +1695,8 @@ msgstr "新增"
 #: web/PendingRegistrations.pm Line:225 web/IncompleteRegistrations.pm
 #: Line:186 web/EntityRegistrationAllowedEdit.pm Line:341
 #: templates/dashboards/personregistration.templ Line:156
-#: templates/selfrego/selfregohistorybody.templ Line:62
+#: templates/selfrego/transfer_init.templ Line:62
+#: templates/selfrego/selfregohistorybody.templ
 #: templates/payment/bulk_invoice_query_fields.templ Line:61
 #: templates/workflow/view/person.templ Line:256
 #: templates/workflow/view/personregistration.templ Line:286
@@ -1756,6 +1777,7 @@ msgstr "日期/時間"
 #: Line:928 Line:1070 Line:1365 Line:2161 Line:2213 web/Venues.pm Line:993
 #: Line:1004 Line:1037 Line:1048 Line:1137 Line:1252 Line:1263 Line:1295
 #: Line:1352 web/registration/SelfUserWorkFlow.pm Line:52 Line:61
+#: web/registration/SelfUserTransfer.pm Line:60
 #: templates/entity/venue_fields.templ Line:129
 #: templates/payment/payment_error.templ Line:17
 #: templates/payment/pay_invoice_payment_error.templ Line:4
@@ -1801,6 +1823,7 @@ msgstr "欠"
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
@@ -1823,6 +1846,7 @@ msgstr "N/A"
 #: Line:331 web/IncompleteRegistrations.pm Line:280 web/TransLog.pm Line:2196
 #: web/PaymentSplit/PaymentSplitList.pm Line:62
 #: templates/search/grid/personregistration.templ Line:7
+#: templates/selfrego/transfer_init.templ Line:18
 #: templates/registration/master.products.templ Line:20
 #: templates/registration/products.templ
 #: templates/reports/reportoptions_header.templ Line:14
@@ -1904,6 +1928,7 @@ msgstr "註冊"
 
 #: web/PersonRegistrationDetail.pm Line:294
 #: templates/dashboards/personregistration.templ Line:107
+#: templates/selfrego/transfer_init.templ Line:32
 #: templates/selfrego/selfregohistorybody.templ Line:18
 #: templates/workflow/history.templ Line:14
 #: templates/workflow/view/person.templ Line:229
@@ -2388,6 +2413,7 @@ msgstr "沒有這種註冊類型"
 #: Line:1011 web/EntityIdentifier.pm Line:343 web/IncompleteRegistrations.pm
 #: Line:161 Line:166 Line:284 web/TransLog.pm Line:653
 #: templates/dashboards/personregistration.templ Line:135
+#: templates/selfrego/transfer_init.templ Line:50
 #: templates/selfrego/selfregohistorybody.templ Line:39
 #: templates/entity/auditlog.templ Line:9
 #: templates/entity/venue_docs_summary.templ Line:4
@@ -2743,11 +2769,11 @@ msgstr "帳單日期"
 
 #: web/PayInvoice.pm Line:297 Line:584 web/ListTransactions.pm Line:105
 #: web/TransLog.pm Line:638 Line:1625 Line:1907
-#: templates/selfrego/selfregotxnbody.templ Line:9
+#: templates/selfrego/selfregotxnbody.templ Line:11
 #: templates/emails/payments/payment_receipt.templ Line:86
 #: templates/txn_receipt/receiptbody.templ Line:35
 #: templates/payment/invoicenum_frm.templ Line:3 Line:7
-#: templates/workflow/generic/payment.templ
+#: templates/workflow/generic/payment.templ Line:9
 msgid "Invoice Number"
 msgstr "帳單編號"
 
@@ -2788,10 +2814,9 @@ msgstr "現在支付帳單"
 #: Line:1583 Line:1865 Line:2104 Line:2192
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1434
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#: templates/selfrego/selfregotxnbody.templ Line:15
 #: templates/txn_receipt/fnswreceipt.templ Line:51
 #: templates/txn_receipt/receiptbody.templ Line:23
-#: templates/workflow/generic/payment.templ
+#: templates/workflow/generic/payment.templ Line:15
 msgid "Payment Type"
 msgstr "付款形式"
 
@@ -2931,9 +2956,8 @@ msgstr "的部份的付款"
 
 #: web/Transactions.pm Line:405 web/Reports/ReportAdvanced_MyPeople.pm
 #: Line:1378 web/Reports/ReportAdvanced_BelowPeople.pm
-#: templates/selfrego/selfregotxnbody.templ Line:11
 #: templates/emails/payments/payment_receipt.templ Line:100
-#: templates/workflow/generic/payment.templ
+#: templates/workflow/generic/payment.templ Line:11
 msgid "Product"
 msgstr "產品"
 
@@ -2992,6 +3016,7 @@ msgstr "交易已被刪除"
 
 #: web/Transactions.pm Line:112 web/Navbar.pm Line:722 Line:1144 Line:1195
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1741
+#: templates/selfrego/accordion.templ Line:12
 msgid "Transactions"
 msgstr "交易"
 
@@ -3021,7 +3046,7 @@ msgstr "此會員相關的機構已連結"
 msgid "Approx. Time"
 msgstr "大約時間"
 
-#: web/ListAuditLog.pm Line:92 web/Navbar.pm Line:744 Line:917 Line:1175
+#: web/ListAuditLog.pm Line:96 web/Navbar.pm Line:744 Line:917 Line:1175
 #: web/FacilityEdit.pm Line:236 Line:237 Line:240
 msgid "Audit Trail"
 msgstr "審計線索"
@@ -3749,8 +3774,8 @@ msgstr "請檢查此球員並無在其他球會註冊"
 msgid "Proceed to Payment and Submit to Member Association"
 msgstr "繼續至付款及遞交到足總"
 
-#: web/ListTransactions.pm Line:43 templates/selfrego/selfregotxnbody.templ
-#: Line:10 templates/workflow/generic/payment.templ
+#: web/ListTransactions.pm Line:43 templates/workflow/generic/payment.templ
+#: Line:10
 msgid "Qty"
 msgstr "數量"
 
@@ -4069,7 +4094,8 @@ msgstr "抱歉, 未有數據"
 msgid "Source Club"
 msgstr "現在球會"
 
-#: web/PersonRequest.pm Line:2003 templates/entity/venue_fields.templ Line:150
+#: web/PersonRequest.pm Line:2003 templates/selfrego/transfer_init.templ
+#: Line:106 templates/entity/venue_fields.templ Line:150
 #: templates/workflow/generic/actions.templ Line:75
 #: templates/personrequest/access/personregistration_summary.templ Line:82
 #: templates/personrequest/transfer/current_club_view.templ Line:250
@@ -4101,11 +4127,10 @@ msgid "Total"
 msgstr "總共"
 
 #: web/Payments.pm Line:313 web/TransLog.pm Line:644 Line:1626 Line:1908
-#: Line:2057 templates/selfrego/selfregotxnbody.templ Line:8
-#: templates/emails/payments/payment_receipt.templ Line:93
+#: Line:2057 templates/emails/payments/payment_receipt.templ Line:93
 #: templates/payment/invoicetemplate.templ Line:54
 #: templates/payment/txn_list.templ Line:4
-#: templates/workflow/generic/payment.templ
+#: templates/workflow/generic/payment.templ Line:8
 msgid "Transaction Number"
 msgstr "交易號碼"
 
@@ -4152,7 +4177,7 @@ msgstr "新增場地"
 msgid "Bulk Registration"
 msgstr "大量註冊"
 
-#: web/PageMain.pm Line:585 templates/selfrego/wrapper.templ Line:76
+#: web/PageMain.pm Line:596 templates/selfrego/wrapper.templ Line:76
 #: templates/page_wrapper/main_wrapper.templ Line:149
 #: templates/user/index.templ Line:75
 msgid "COPYRIGHT"
@@ -4443,6 +4468,17 @@ msgstr "無效交易"
 msgid "Invalid access."
 msgstr "無效ID"
 
+#: web/registration/SelfUserTransfer.pm Line:59
+#, fuzzy
+msgid "Invalid parameters."
+msgstr "無效ID"
+
+#: web/registration/SelfUserTransfer.pm Line:69 Line:131
+msgid ""
+"It's either the record does not exist or you have a pending request for the "
+"same person registration record."
+msgstr ""
+
 #: web/TransLog.pm Line:1904
 msgid "Items making up this Payment"
 msgstr "此付款所需項目"
@@ -4505,6 +4541,11 @@ msgstr "付款記錄"
 msgid "Payments Checkout"
 msgstr "結帳"
 
+#: web/registration/SelfUserTransfer.pm Line:100
+#, fuzzy
+msgid "Please select from the list of Clubs."
+msgstr "請在欄位表選擇"
+
 #: web/TransLog.pm Line:429
 msgid "Potential Problems"
 msgstr "潛在問題"
@@ -4537,6 +4578,14 @@ msgstr "解決付款暫緩"
 msgid "Response Code"
 msgstr "應對編碼"
 
+#: web/registration/SelfUserTransfer.pm Line:74 Line:136
+#: templates/registration/complete_sr.templ Line:59
+#: templates/registration/complete.templ Line:60
+#: templates/personrequest/transfer/selftransfercomplete.templ Line:26
+#, fuzzy
+msgid "Return to your Dashboard"
+msgstr "請前往提示板"
+
 #: web/TransLog.pm Line:402
 msgid ""
 "Review the payment details below, then click Confirm Payment or Cancel "
@@ -4549,6 +4598,11 @@ msgstr "檢閱以下付款細節然後按確認付款或取消付款"
 #: templates/personrequest/loan/search_result.templ
 msgid "Select"
 msgstr "選擇"
+
+#: web/registration/SelfUserTransfer.pm Line:55
+#, fuzzy
+msgid "Start Transfer"
+msgstr "銀行轉帳"
 
 #: web/TransLog.pm Line:1630 Line:1912 templates/txn_receipt/receiptbody.templ
 #: Line:38
@@ -4953,7 +5007,6 @@ msgstr "無效的電郵地址/密碼"
 
 #: templates/dashboards/entity.templ Line:54 templates/dashboards/club.templ
 #: Line:77 templates/dashboards/worktasks.templ Line:38 Line:80
-#: templates/selfrego/accordion.templ Line:35
 msgid "Actions"
 msgstr "動作"
 
@@ -5052,6 +5105,7 @@ msgid "Personal Information"
 msgstr "個人資料"
 
 #: templates/dashboards/personregistration.templ Line:100
+#: templates/selfrego/transfer_init.templ Line:25
 #: templates/selfrego/selfregohistorybody.templ Line:11
 #: templates/workflow/view/person.templ Line:224
 msgid "Registration Period"
@@ -5158,6 +5212,23 @@ msgstr "清除"
 msgid "Columns"
 msgstr ""
 
+#: templates/selfrego/transfer_init.templ Line:74
+#: templates/emails/notification/personrequest/html/requestloan_denied.templ
+#: Line:24
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: templates/personrequest/access/personregistration_summary.templ Line:26
+#: templates/personrequest/generic/reg_summary.templ Line:5
+msgid "Current Club"
+msgstr "現在球會"
+
 #: templates/selfrego/accordion.templ Line:22
 msgid "DOB"
 msgstr ""
@@ -5187,17 +5258,6 @@ msgstr "請前往提示板"
 #: templates/personrequest/loan/search_result.templ
 msgid "Latest"
 msgstr "最新"
-
-#: templates/selfrego/selfregotxnbody.templ Line:3
-#: templates/workflow/result/person.templ Line:78
-#: templates/workflow/view/venue.templ Line:199
-#: templates/workflow/view/loan.templ Line:247
-#: templates/workflow/view/transfer.templ Line:234
-#: templates/workflow/view/club.templ
-#: templates/workflow/view/personregistration.templ Line:346
-#: templates/workflow/generic/payment.templ
-msgid "License and Payment Details"
-msgstr "證書及付款內容"
 
 #: templates/dashboards/worktasks.templ Line:236 Line:248
 msgid "List Pending Registrations"
@@ -5274,6 +5334,7 @@ msgid "Oldest"
 msgstr "最大"
 
 #: templates/search/grid/personregistration.templ Line:8
+#: templates/selfrego/accordion.templ Line:32
 #: templates/registration/what.templ Line:54
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:26
 #: Line:29 templates/emails/notification/workflow/html/wftask_rejected.templ
@@ -5293,11 +5354,6 @@ msgstr "最大"
 #: templates/person/renewal_roledetails.templ Line:5
 #: templates/person/auditlog.templ
 msgid "Organisation"
-msgstr "機構"
-
-#: templates/selfrego/accordion.templ Line:32
-#, fuzzy
-msgid "Organization"
 msgstr "機構"
 
 #: templates/dashboards/personstatus.templ Line:197
@@ -5324,11 +5380,6 @@ msgstr "密碼"
 msgid "Passwords do not match"
 msgstr "密碼不符"
 
-#: templates/selfrego/selfregotxnbody.templ Line:14
-#: templates/workflow/generic/payment.templ
-msgid "Payment Status"
-msgstr "付款狀態"
-
 #: templates/selfrego/accordion.templ Line:33
 #, fuzzy
 msgid "Period"
@@ -5338,10 +5389,15 @@ msgstr "選擇時期"
 msgid "Person Details"
 msgstr "個人細節"
 
-#: templates/selfrego/accordion.templ Line:31
-#, fuzzy
-msgid "Person Type/Level"
-msgstr "個人級別"
+#: templates/selfrego/transfer_init.templ Line:129
+#: templates/personrequest/transfer/current_club_view.templ Line:276
+#: templates/personrequest/transfer/search_form.templ Line:310
+#: templates/personrequest/transfer/new_club_view.templ Line:305
+#: templates/personrequest/transfer/view.templ Line:258
+#: templates/personrequest/generic/search_form.templ Line:309
+#: templates/personrequest/loan/search_form.templ Line:302
+msgid "Please add notes"
+msgstr "請新增備忘"
 
 #: templates/selfrego/user/profile.templ Line:84
 #: templates/selfrego/user/signup.templ Line:91 templates/user/signup.templ
@@ -5362,10 +5418,10 @@ msgstr "請輸入名稱"
 msgid "Please provide a password"
 msgstr "請提供密碼"
 
-#: templates/selfrego/selfregotxnbody.templ Line:12
-#: templates/workflow/generic/payment.templ
-msgid "Product Type"
-msgstr "產品類別"
+#: templates/selfrego/transfer_init.templ Line:130
+#, fuzzy
+msgid "Please select from the list of Clubs"
+msgstr "請在欄位表選擇"
 
 #: templates/dashboards/worktasks.templ Line:232 Line:242
 msgid "Quick Links"
@@ -5428,6 +5484,11 @@ msgstr "批核存取申請"
 msgid "Request Access sent to Club"
 msgstr "存取申請已遞交至球會"
 
+#: templates/selfrego/transfer_init.templ Line:91
+#, fuzzy
+msgid "Request notes"
+msgstr "申請備忘"
+
 #: templates/dashboards/worktasks.templ Line:235 Line:246
 msgid "Request or Start a Transfer"
 msgstr "要求新增轉會"
@@ -5464,6 +5525,11 @@ msgstr "搜尋機構"
 #: templates/search/form.templ Line:30
 msgid "Search keyword is required."
 msgstr "需要以關鍵字搜尋"
+
+#: templates/selfrego/transfer_init.templ Line:82
+#, fuzzy
+msgid "Select Club"
+msgstr "選擇國家"
 
 #: templates/selfrego/home.templ Line:1
 #, fuzzy
@@ -5508,11 +5574,6 @@ msgstr "任務"
 msgid "To add a role to a person not at your club, search below"
 msgstr "請搜尋下方以新增身份到你的球會"
 
-#: templates/selfrego/selfregotxnbody.templ Line:13
-#: templates/workflow/generic/payment.templ
-msgid "Total Cost"
-msgstr "總成本"
-
 #: templates/dashboards/worktasks.templ Line:224
 msgid "Total Task Active"
 msgstr "活躍任務總數"
@@ -5529,10 +5590,25 @@ msgstr "待處理任務總數"
 msgid "Total Task Rejected"
 msgstr "已拒絕任務總數"
 
-#: templates/selfrego/accordion.templ Line:12
+#: templates/selfrego/transfer_init.templ Line:13
+#: templates/workflow/view/transfer.templ Line:39 Line:74
+#: templates/workflow/summary/transfer.templ Line:16
+#: templates/personrequest/transfer/current_club_view.templ Line:105
+#: templates/personrequest/transfer/search_form.templ Line:19
+#: templates/personrequest/transfer/new_club_view.templ Line:139
+#: templates/personrequest/generic/search_form.templ
+msgid "Transfer Details"
+msgstr "轉會內容"
+
+#: templates/selfrego/transfer_init.templ Line:80
 #, fuzzy
-msgid "Transaction History"
-msgstr "交易"
+msgid "Transfer To"
+msgstr "轉會"
+
+#: templates/selfrego/accordion.templ Line:31
+#, fuzzy
+msgid "Type/Level"
+msgstr "個人級別"
 
 #: templates/selfrego/user/profile.templ Line:57
 #: templates/user/modify_user_password.templ Line:20
@@ -5875,12 +5951,6 @@ msgstr "大量續期"
 msgid "Return to login page"
 msgstr "回到發票"
 
-#: templates/registration/complete_sr.templ Line:59
-#: templates/registration/complete.templ Line:60
-#, fuzzy
-msgid "Return to your Dashboard"
-msgstr "請前往提示板"
-
 #: templates/registration/entityselect.templ Line:7
 msgid "SEARCH/FIND A CLUB"
 msgstr "搜尋球會"
@@ -5909,7 +5979,8 @@ msgstr "批核存取申請"
 #: templates/registration/complete_sr.templ Line:14
 #: templates/registration/complete.templ Line:15
 #: templates/emails/payments/payment_receipt.templ Line:55
-#: templates/personrequest/transfer/complete.templ Line:13
+#: templates/personrequest/transfer/selftransfercomplete.templ Line:13
+#: templates/personrequest/transfer/complete.templ
 #: templates/personrequest/generic/itc_confirmation.templ
 msgid "Thank you"
 msgstr "多謝"
@@ -6047,34 +6118,6 @@ msgstr "有效日子由"
 msgid "Date Valid Until"
 msgstr "有效日子至"
 
-#: templates/emails/registration/activate.templ Line:5
-#: templates/emails/notification/workflow/html/wftask_added.templ
-#: templates/emails/notification/workflow/html/wftask_rejected.templ
-#: templates/emails/notification/workflow/html/wftask_approved.templ
-#: templates/emails/notification/workflow/html/wftask_held.templ
-#: templates/emails/notification/workflow/html/wftask_resolved.templ
-#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
-#: templates/emails/notification/personrequest/html/requestloan_denied.templ
-#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
-#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
-#: templates/emails/notification/personrequest/html/requestloan_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_completed.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
-#: templates/emails/notification/personrequest/html/request_itc_content.templ
-#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-msgid "Dear"
-msgstr "親愛的"
-
 #: templates/registration/playerpassport.templ Line:9
 #, fuzzy
 msgid "End"
@@ -6103,43 +6146,6 @@ msgstr "找不到記錄"
 msgid "Optional Documents"
 msgstr "可選擇的文件"
 
-#: templates/emails/registration/activate.templ Line:9
-msgid "Please click"
-msgstr ""
-
-#: templates/emails/registration/activate.templ Line:13
-#: templates/emails/notification/workflow/html/wftask_added.templ Line:62
-#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:67
-#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:9
-#: templates/emails/notification/workflow/html/wftask_approved.templ
-#: templates/emails/notification/workflow/html/wftask_held.templ
-#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:68
-#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
-#: Line:52
-#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
-#: Line:57
-#: templates/emails/notification/personrequest/html/requestloan_denied.templ
-#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
-#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
-#: templates/emails/notification/personrequest/html/requestloan_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_completed.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
-#: templates/emails/notification/personrequest/html/request_itc_content.templ
-#: Line:94
-#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
-#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-msgid "Regards"
-msgstr "此致"
-
 #: templates/registration/complete.templ Line:18
 #, fuzzy
 msgid "Registration has been submitted for approval"
@@ -6159,10 +6165,6 @@ msgstr "所需文件"
 msgid "Start"
 msgstr "開始"
 
-#: templates/emails/registration/activate.templ Line:9
-msgid "Thank you for registering with"
-msgstr ""
-
 #: templates/registration/document_flow_backend.templ Line:48 Line:53 Line:153
 #: Line:158 templates/entity/required_docs.templ Line:39 Line:44 Line:126
 #: Line:131 templates/club/required_docs.templ Line:135 Line:140
@@ -6174,14 +6176,6 @@ msgstr "上傳"
 #: templates/club/required_docs.templ Line:59 Line:132 Line:154
 msgid "Uploaded"
 msgstr "已上傳"
-
-#: templates/emails/registration/activate.templ Line:9
-msgid "here"
-msgstr ""
-
-#: templates/emails/registration/activate.templ Line:9
-msgid "to confirm your account."
-msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:29
@@ -6196,20 +6190,34 @@ msgstr "現在球會"
 msgid "Copyright text goes here"
 msgstr "版權文字在此"
 
+#: templates/emails/registration/activate.templ Line:5
+#: templates/emails/notification/workflow/html/wftask_added.templ
+#: templates/emails/notification/workflow/html/wftask_rejected.templ
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: templates/emails/notification/personrequest/html/requestloan_denied.templ
-#: Line:24
+#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_accepted.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_completed.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-#: templates/personrequest/access/personregistration_summary.templ Line:26
-#: templates/personrequest/generic/reg_summary.templ Line:5
-msgid "Current Club"
-msgstr "現在球會"
+msgid "Dear"
+msgstr "親愛的"
 
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:23
 #: templates/emails/notification/workflow/html/wftask_rejected.templ
@@ -6239,6 +6247,7 @@ msgstr "支援部"
 
 #: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: Line:29
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 msgid "New Club"
 msgstr "新球會"
 
@@ -6256,6 +6265,10 @@ msgstr "新球會"
 #: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
 msgid "Originator"
 msgstr "創立者"
+
+#: templates/emails/registration/activate.templ Line:9
+msgid "Please click"
+msgstr ""
 
 #: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: Line:24 templates/emails/notification/personrequest/html/request_itc.templ
@@ -6277,6 +6290,7 @@ msgstr "前球會"
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
@@ -6286,10 +6300,39 @@ msgstr "前球會"
 msgid "Reason"
 msgstr "原因"
 
+#: templates/emails/registration/activate.templ Line:13
+#: templates/emails/notification/workflow/html/wftask_added.templ Line:62
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:67
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:9
+#: templates/emails/notification/workflow/html/wftask_approved.templ
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:68
+#: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
+#: Line:52
+#: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
+#: Line:57
+#: templates/emails/notification/personrequest/html/requestloan_denied.templ
+#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: templates/emails/notification/personrequest/html/requestaccess_completed.templ
-#: Line:9
-msgid "Request Access Completed"
-msgstr "要求存取已完成"
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_completed.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/request_itc_content.templ
+#: Line:94
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Regards"
+msgstr "此致"
 
 #: templates/emails/notification/personrequest/html/requestloan_denied.templ
 #: Line:29
@@ -6305,6 +6348,10 @@ msgstr "要求存取已完成"
 #: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
 msgid "Requesting Club"
 msgstr "提交要求的球會"
+
+#: templates/emails/registration/activate.templ Line:9
+msgid "Thank you for registering with"
+msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:9
@@ -6369,6 +6416,7 @@ msgstr "網站"
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
@@ -6427,6 +6475,14 @@ msgstr "已接納你對以下記錄的存取，你現在以有全面的存取"
 msgid "help desk"
 msgstr "支援"
 
+#: templates/emails/registration/activate.templ Line:9
+msgid "here"
+msgstr ""
+
+#: templates/emails/registration/activate.templ Line:9
+msgid "to confirm your account."
+msgstr ""
+
 msgid "Club's Name"
 msgstr "球會名稱"
 
@@ -6444,6 +6500,11 @@ msgstr "球員編號"
 #: templates/emails/notification/personrequest/html/request_itc.templ Line:253
 msgid "REQUEST FOR AN INTERNATIONAL TRANSFER CERTIFICATE"
 msgstr "要求國際轉會紙"
+
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: Line:9
+msgid "Request Access Completed"
+msgstr "要求存取已完成"
 
 #: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
 #: Line:9
@@ -6471,13 +6532,6 @@ msgid ""
 "the transfer or cancel this transfer request"
 msgstr "已批准的球員轉會的細節如下。你現在可繼續此轉會或取消轉會申請"
 
-#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
-#: Line:9
-msgid ""
-"has APPROVED the player transfer as detailed below.  You can now continue "
-"with the transfer or cancel this transfer request"
-msgstr "已批准的球員轉會的細節如下。你現在可繼續此轉會或取消轉會申請"
-
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: Line:9
 msgid ""
@@ -6486,14 +6540,6 @@ msgid ""
 "registration or renewal you will need to contact"
 msgstr ""
 "已拒絕記錄存取，原因如下。如你希望爲這目的或註冊或續期而繼續存取此記錄請聯絡"
-
-#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-#: Line:9
-msgid ""
-"has REJECTED the transfer of the player listed below. The reason for the "
-"rejection is detailed below. If you think there is a problem with this "
-"rejection you will need to contact"
-msgstr "已被拒絕轉會的球員如下。原因如下，如你對此拒絕有任何問題，請聯絡"
 
 #: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
 #: Line:9
@@ -6511,6 +6557,14 @@ msgid ""
 "has REQUESTED access to the person listed below, for the purpose of "
 "registration with a different role with"
 msgstr "已要求存取的人員如下，註冊另一嗰身份為了目的"
+
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: Line:9
+#, fuzzy
+msgid ""
+"has REQUESTED for a transfer. You are required to take action on this "
+"request within 7 days."
+msgstr "已要求轉會的球員如下，你需要在7天内處理"
 
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
 #: Line:9
@@ -6584,6 +6638,21 @@ msgstr "你的密碼已經成功更新"
 #, fuzzy
 msgid "at"
 msgstr "日期"
+
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: Line:9
+msgid ""
+"has APPROVED the player transfer as detailed below.  You can now continue "
+"with the transfer or cancel this transfer request"
+msgstr "已批准的球員轉會的細節如下。你現在可繼續此轉會或取消轉會申請"
+
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: Line:9
+msgid ""
+"has REJECTED the transfer of the player listed below. The reason for the "
+"rejection is detailed below. If you think there is a problem with this "
+"rejection you will need to contact"
+msgstr "已被拒絕轉會的球員如下。原因如下，如你對此拒絕有任何問題，請聯絡"
 
 #: templates/entity/complete.templ Line:18
 msgid "Add another venue"
@@ -6720,10 +6789,6 @@ msgstr "輸入你建議隊友的電郵地址，在每個電郵地址後加上逗
 msgid "Invite teammates"
 msgstr "邀請隊友"
 
-#: templates/team/team_staff.templ Line:26
-msgid "Position"
-msgstr "位置"
-
 #: templates/team/invite_teammates.templ Line:13
 msgid ""
 "Select the competition that you would like to invite your teammates to join"
@@ -6739,10 +6804,6 @@ msgid ""
 "teammates to join"
 msgstr "選擇你邀請隊友加入的賽事年度"
 
-#: templates/team/team_staff.templ Line:28
-msgid "Staff Member"
-msgstr "職員"
-
 #: templates/team/invite_teammates.templ Line:21
 msgid ""
 "The email that will be sent to your teammates, will contain a link to a "
@@ -6752,10 +6813,6 @@ msgstr "這電郵將傳送給你的隊友，將包含連結到註冊表格"
 #: templates/team/invite_teammates.templ Line:31
 msgid "When you have finished click 'Invite Teammates Now'"
 msgstr "如果完成，請按'現在邀請隊友'"
-
-#: templates/payment/pay_invoice_payment_error.templ Line:19
-msgid "Association Name"
-msgstr "總會名稱"
 
 #: templates/reports/reportoptions_header.templ Line:2
 msgid "Back to Configure"
@@ -6774,14 +6831,6 @@ msgstr "計算"
 msgid "Download CSV"
 msgstr "下載文CSV"
 
-#: templates/payment/pay_invoice_payment_error.templ Line:9
-msgid "Gateway Response Code"
-msgstr "平台回應碼"
-
-#: templates/payment/pay_invoice_payment_error.templ Line:24
-msgid "Payment ID"
-msgstr "付款編號"
-
 #: templates/payment/payment_error.templ Line:29
 #: templates/payment/payment_failure.templ Line:19
 msgid "Payment Reference Number"
@@ -6792,10 +6841,9 @@ msgstr "付款參考編號"
 msgid "Payment for"
 msgstr "為付款"
 
-#: templates/payment/invoicenum_frm.templ Line:5
-msgid ""
-"Please enter the invoice number for transaction payment you want to process."
-msgstr "請輸入你想處理的交易的單據號碼"
+#: templates/team/team_staff.templ Line:26
+msgid "Position"
+msgstr "位置"
 
 #: templates/reports/default_adv.templ Line:5
 msgid "Records returned:"
@@ -6823,6 +6871,10 @@ msgid ""
 "See below for details, please close this window and click Pay Now to try "
 "again"
 msgstr "細節如下，請關閉視窗及按現在付款重試"
+
+#: templates/team/team_staff.templ Line:28
+msgid "Staff Member"
+msgstr "職員"
 
 #: templates/reports/email_confirmation.templ Line:7
 msgid "The data contains"
@@ -6855,6 +6907,10 @@ msgstr "取消轉會"
 msgid "Amount To Pay"
 msgstr "需繳付銀碼"
 
+#: templates/payment/pay_invoice_payment_error.templ Line:19
+msgid "Association Name"
+msgstr "總會名稱"
+
 #: templates/translation/outstanding.templ Line:22
 #, fuzzy
 msgid "Coach Registration"
@@ -6864,6 +6920,10 @@ msgstr "新球會教練註冊"
 #, fuzzy
 msgid "Finance"
 msgstr "取消"
+
+#: templates/payment/pay_invoice_payment_error.templ Line:9
+msgid "Gateway Response Code"
+msgstr "平台回應碼"
 
 #: templates/page_wrapper/main_wrapper.templ Line:94
 #: templates/user/globalnav.templ Line:17
@@ -6900,6 +6960,10 @@ msgstr "單據編號並無交易"
 msgid "Payment Has Been Made For Invoice"
 msgstr "單據以繳付"
 
+#: templates/payment/pay_invoice_payment_error.templ Line:24
+msgid "Payment ID"
+msgstr "付款編號"
+
 #: templates/translation/outstanding.templ Line:21
 #, fuzzy
 msgid "Player Registration"
@@ -6908,6 +6972,11 @@ msgstr "新球員註冊"
 #: templates/payment/bulk_invoice_query_fields.templ Line:19
 msgid "Please enter the information for transaction you want to process."
 msgstr "請輸入你想處理的交易資料"
+
+#: templates/payment/invoicenum_frm.templ Line:5
+msgid ""
+"Please enter the invoice number for transaction payment you want to process."
+msgstr "請輸入你想處理的交易的單據號碼"
 
 #: templates/payment/bulkinvoicelisting.templ Line:1
 msgid ""
@@ -6984,17 +7053,6 @@ msgstr "轉會費"
 msgid "More Information"
 msgstr "更多資料"
 
-#: templates/workflow/result/club.templ Line:31
-#: templates/workflow/summary/club.templ
-msgid "Foundation Date"
-msgstr "創立日期"
-
-#: templates/workflow/result/person.templ Line:58
-#: templates/workflow/view/person.templ Line:196
-#: templates/workflow/view/personregistration.templ Line:209
-msgid "Last Update"
-msgstr "最後更新"
-
 #: templates/workflow/result/venue.templ Line:23
 #: templates/workflow/result/person.templ Line:16
 msgid "Local Name"
@@ -7027,19 +7085,6 @@ msgstr "所需文件"
 msgid "Short Name"
 msgstr "簡稱"
 
-#: templates/workflow/result/person.templ Line:51
-#: templates/workflow/view/person.templ Line:189
-#: templates/workflow/view/personregistration.templ Line:202
-msgid "Suspended Until"
-msgstr "暫停至"
-
-#: templates/workflow/result/club.templ Line:9
-#: templates/workflow/summary/venue.templ Line:10 Line:12
-#: templates/workflow/summary/club.templ
-#: templates/workflow/summary/personregistration.templ Line:29
-msgid "The following registration has been approved."
-msgstr "以下註冊經已被批准"
-
 #: templates/workflow/result/page.templ Line:29
 #: templates/personrequest/transfer/complete.templ Line:52
 msgid "Transfer another player"
@@ -7052,17 +7097,6 @@ msgstr "上載個人相片"
 #: templates/mapfinder/aussiehoops-searchresults.templ Line:250
 msgid "View Available Program Details"
 msgstr "檢視可得到的節目內容"
-
-#: templates/workflow/result/club.templ Line:58
-#: templates/workflow/result/personregistration.templ Line:57
-#: templates/workflow/summary/venue.templ Line:48
-#: templates/workflow/summary/loan.templ Line:61
-#: templates/workflow/summary/transfer.templ
-#: templates/workflow/summary/club.templ
-#: templates/workflow/summary/person.templ Line:26
-#: templates/workflow/summary/personregistration.templ Line:62
-msgid "View next available task"
-msgstr "檢視下一個任務"
 
 #: templates/workflow/result/venue.templ Line:51
 msgid "WebUrl"
@@ -7079,15 +7113,6 @@ msgstr "網址"
 #: templates/workflow/summary/personregistration.templ Line:60
 msgid "What would you like to do now?"
 msgstr "下一步"
-
-#: templates/workflow/result/club.templ Line:9
-#: templates/workflow/result/personregistration.templ Line:27
-#: templates/workflow/summary/venue.templ Line:12
-#: templates/workflow/summary/club.templ
-#: templates/workflow/summary/person.templ Line:14
-#: templates/workflow/summary/personregistration.templ Line:29
-msgid "has been notified."
-msgstr "已被通知"
 
 #: templates/workflow/view/loan.templ Line:235
 #: templates/workflow/view/transfer.templ Line:222
@@ -7112,6 +7137,11 @@ msgstr "文件描述"
 msgid "Fax Number"
 msgstr "傳真號碼"
 
+#: templates/workflow/result/club.templ Line:31
+#: templates/workflow/summary/club.templ
+msgid "Foundation Date"
+msgstr "創立日期"
+
 # :Person FieldLabels
 #: templates/workflow/view/personregistration.templ Line:306
 #, fuzzy
@@ -7122,6 +7152,12 @@ msgstr "姓氏(英文)"
 #, fuzzy
 msgid "International Transfer Details"
 msgstr "轉會內容"
+
+#: templates/workflow/result/person.templ Line:58
+#: templates/workflow/view/person.templ Line:196
+#: templates/workflow/view/personregistration.templ Line:209
+msgid "Last Update"
+msgstr "最後更新"
 
 #: templates/workflow/view/club.templ Line:185
 #: templates/flow/club_summary.templ Line:43
@@ -7137,6 +7173,16 @@ msgstr "處理中"
 #: templates/workflow/summary/personregistration.templ Line:47
 msgid "Level:"
 msgstr "級別"
+
+#: templates/workflow/result/person.templ Line:78
+#: templates/workflow/view/venue.templ Line:199
+#: templates/workflow/view/loan.templ Line:247
+#: templates/workflow/view/transfer.templ Line:234
+#: templates/workflow/view/club.templ
+#: templates/workflow/view/personregistration.templ Line:346
+#: templates/workflow/generic/payment.templ Line:3
+msgid "License and Payment Details"
+msgstr "證書及付款內容"
 
 #: templates/workflow/view/personregistration.templ Line:308
 msgid "Loan Source Club"
@@ -7169,10 +7215,6 @@ msgstr "保護年幼球員"
 #: templates/flow/club_summary.templ Line:41
 msgid "Organisation type"
 msgstr "機構類別"
-
-#: templates/workflow/generic/document.templ Line:10
-msgid "Person Documents"
-msgstr "個人文件"
 
 #: templates/workflow/view/person.templ Line:245
 #: templates/workflow/view/personregistration.templ Line:264
@@ -7240,6 +7282,12 @@ msgstr "體育"
 msgid "Summary Clubs transfer"
 msgstr "球會轉會摘要"
 
+#: templates/workflow/result/person.templ Line:51
+#: templates/workflow/view/person.templ Line:189
+#: templates/workflow/view/personregistration.templ Line:202
+msgid "Suspended Until"
+msgstr "暫停至"
+
 #: templates/workflow/view/personregistration.templ Line:312 Line:333
 #, fuzzy
 msgid "TMS Reference Number"
@@ -7256,6 +7304,13 @@ msgid ""
 "to be completed."
 msgstr "以下註冊已被批准，仍然有任務需要處理"
 
+#: templates/workflow/result/club.templ Line:9
+#: templates/workflow/summary/venue.templ Line:10 Line:12
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/personregistration.templ Line:29
+msgid "The following registration has been approved."
+msgstr "以下註冊經已被批准"
+
 #: templates/workflow/summary/transfer.templ Line:13
 msgid "The following transfer has been"
 msgstr "以下轉會經已"
@@ -7263,15 +7318,6 @@ msgstr "以下轉會經已"
 #: templates/workflow/summary/person.templ Line:14
 msgid "This request has been approved."
 msgstr "這要求經已批准"
-
-#: templates/workflow/view/transfer.templ Line:39 Line:74
-#: templates/workflow/summary/transfer.templ Line:16
-#: templates/personrequest/transfer/current_club_view.templ Line:105
-#: templates/personrequest/transfer/search_form.templ Line:19
-#: templates/personrequest/transfer/new_club_view.templ Line:139
-#: templates/personrequest/generic/search_form.templ
-msgid "Transfer Details"
-msgstr "轉會內容"
 
 #: templates/workflow/view/transfer.templ Line:258
 msgid "Transfer Status: Accepted"
@@ -7291,6 +7337,17 @@ msgstr "法定團體類別"
 msgid "Venue Short Name"
 msgstr "場地簡稱"
 
+#: templates/workflow/result/club.templ Line:58
+#: templates/workflow/result/personregistration.templ Line:57
+#: templates/workflow/summary/venue.templ Line:48
+#: templates/workflow/summary/loan.templ Line:61
+#: templates/workflow/summary/transfer.templ
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:26
+#: templates/workflow/summary/personregistration.templ Line:62
+msgid "View next available task"
+msgstr "檢視下一個任務"
+
 #: templates/workflow/view/venue.templ Line:44 Line:207
 #: templates/workflow/view/loan.templ Line:255
 #: templates/workflow/view/transfer.templ Line:242
@@ -7309,6 +7366,15 @@ msgstr "及"
 #: templates/workflow/summary/transfer.templ
 msgid "approved"
 msgstr "已批准"
+
+#: templates/workflow/result/club.templ Line:9
+#: templates/workflow/result/personregistration.templ Line:27
+#: templates/workflow/summary/venue.templ Line:12
+#: templates/workflow/summary/club.templ
+#: templates/workflow/summary/person.templ Line:14
+#: templates/workflow/summary/personregistration.templ Line:29
+msgid "has been notified."
+msgstr "已被通知"
 
 #: templates/workflow/summary/loan.templ Line:13
 #: templates/workflow/summary/transfer.templ
@@ -7340,18 +7406,21 @@ msgstr "忘記密碼？請聯絡支援重設密碼"
 msgid "Login"
 msgstr "登入"
 
-#: templates/user/modify_user_password.templ Line:10
-msgid "New Password"
-msgstr "新密碼"
+#: templates/workflow/generic/payment.templ Line:14
+msgid "Payment Status"
+msgstr "付款狀態"
 
-#: templates/user/url_link_reminder.templ Line:5
-msgid ""
-"Please click on the link below to create a new password for your account."
-msgstr "請按以下連結爲你的戶口建立新密碼"
+#: templates/workflow/generic/document.templ Line:10
+msgid "Person Documents"
+msgstr "個人文件"
 
 #: templates/workflow/generic/actions.templ Line:64
 msgid "Please enter Work task notes"
 msgstr "請輸入工作任務備忘"
+
+#: templates/workflow/generic/payment.templ Line:12
+msgid "Product Type"
+msgstr "產品類別"
 
 #: templates/workflow/generic/actions.templ Line:13
 msgid "Put on-hold"
@@ -7369,10 +7438,6 @@ msgstr "請在此電腦記得我"
 msgid "Resolution Notes"
 msgstr "解決備忘"
 
-#: templates/user/modify_user_password.templ Line:15
-msgid "Retype Password"
-msgstr "重新輸入密碼"
-
 #: templates/user/forgot_password_form.templ Line:9
 msgid "Send Me The Link"
 msgstr "傳送連結給我"
@@ -7380,6 +7445,10 @@ msgstr "傳送連結給我"
 #: templates/user/forgot_password_nav.templ Line:11
 msgid "Support"
 msgstr "支援"
+
+#: templates/workflow/generic/payment.templ Line:13
+msgid "Total Cost"
+msgstr "總成本"
 
 #: templates/workflow/generic/hold_reject_taskscreen.templ Line:11
 #: templates/personrequest/transfer/current_club_view.templ Line:196
@@ -7395,10 +7464,6 @@ msgstr "檢視爲"
 #: templates/workflow/generic/actions.templ Line:59
 msgid "Work task notes"
 msgstr "工作任務備忘"
-
-#: templates/user/url_link_reminder.templ Line:4
-msgid "You have requested for a new password."
-msgstr "你已要求新的密碼"
 
 #: templates/user/update_password_msg.templ Line:8
 msgid "Your password has successfully been updated."
@@ -7433,6 +7498,10 @@ msgstr "語言"
 msgid "Length of field"
 msgstr "欄位長度"
 
+#: templates/user/modify_user_password.templ Line:10
+msgid "New Password"
+msgstr "新密碼"
+
 #: templates/flow/club_summary.templ Line:13
 msgid "Organisation dissolution date"
 msgstr "機構結束日期"
@@ -7458,37 +7527,14 @@ msgid ""
 "Association for final approval."
 msgstr "請在提交至足總作最後批核前檢查及更新所有細節"
 
-#: templates/personrequest/history.templ Line:27
-msgid "Request Added"
-msgstr "申請已新增"
+#: templates/user/url_link_reminder.templ Line:5
+msgid ""
+"Please click on the link below to create a new password for your account."
+msgstr "請按以下連結爲你的戶口建立新密碼"
 
-#: templates/personrequest/history.templ Line:26
-#: templates/personrequest/access/view.templ Line:80 Line:227
-msgid "Request Notes"
-msgstr "申請備忘"
-
-#: templates/personrequest/history.templ Line:18
-msgid "Request approval status"
-msgstr "申請批核狀況"
-
-#: templates/personrequest/history.templ Line:10
-#: templates/personrequest/access/current_club_view.templ Line:113
-#: templates/personrequest/access/requesting_club_view.templ Line:144
-msgid "Request from"
-msgstr "申請由"
-
-#: templates/personrequest/history.templ Line:14
-msgid "Request response"
-msgstr "要求回應"
-
-#: templates/personrequest/history.templ Line:6
-msgid "Request to"
-msgstr "向申請"
-
-#: templates/personrequest/history.templ Line:28
-#: templates/personrequest/access/view.templ Line:84 Line:232
-msgid "Response Notes"
-msgstr "回應備忘"
+#: templates/user/modify_user_password.templ Line:15
+msgid "Retype Password"
+msgstr "重新輸入密碼"
 
 #: templates/flow/default.templ Line:66
 msgid "Save and Exit"
@@ -7510,17 +7556,13 @@ msgstr "轉會狀況: 已釋放"
 msgid "Type of field"
 msgstr "欄位類別"
 
-#: templates/personrequest/history.templ Line:29
-msgid "Updated"
-msgstr "已更新"
-
 #: templates/flow/facility_summary.templ Line:58
 msgid "Width of field"
 msgstr "欄位闊度"
 
-#: templates/personrequest/history.templ Line:2
-msgid "of"
-msgstr "的"
+#: templates/user/url_link_reminder.templ Line:4
+msgid "You have requested for a new password."
+msgstr "你已要求新的密碼"
 
 #: templates/personrequest/access/current_club_view.templ Line:173
 msgid "Approve access"
@@ -7551,15 +7593,6 @@ msgstr "批准後你將提供存取給"
 #: templates/personrequest/access/requesting_club_view.templ Line:202
 msgid "Cancel Access"
 msgstr "取消存取"
-
-#: templates/personrequest/transfer/new_club_view.templ Line:215
-msgid "Cancel Transfer"
-msgstr "取消轉會"
-
-#: templates/personrequest/transfer/new_club_view.templ Line:236
-#, fuzzy
-msgid "Continue Transfer"
-msgstr "取消轉會"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:24 Line:31
 msgid "Current Club Details"
@@ -7625,15 +7658,6 @@ msgstr "個人狀況"
 msgid "Player Details"
 msgstr "球員資料"
 
-#: templates/personrequest/transfer/current_club_view.templ Line:276
-#: templates/personrequest/transfer/search_form.templ Line:310
-#: templates/personrequest/transfer/new_club_view.templ Line:305
-#: templates/personrequest/transfer/view.templ Line:258
-#: templates/personrequest/generic/search_form.templ Line:309
-#: templates/personrequest/loan/search_form.templ Line:302
-msgid "Please add notes"
-msgstr "請新增備忘"
-
 #: templates/personrequest/access/personregistration_summary.templ Line:110
 msgid "Please add notes."
 msgstr "請新增備忘"
@@ -7643,15 +7667,6 @@ msgstr "請新增備忘"
 #: templates/personrequest/loan/current_club_view.templ
 msgid "Please approve or reject the request."
 msgstr "請批准或拒絕申請"
-
-#: templates/personrequest/transfer/new_club_view.templ Line:12
-#: templates/personrequest/loan/new_club_view.templ
-msgid "Please check and update all details before submitting to"
-msgstr "請在提交前作最後批核前檢查及更新所有細節"
-
-#: templates/personrequest/transfer/new_club_view.templ Line:7
-msgid "Please continue the transfer process."
-msgstr "請繼續處理轉會"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:16
 msgid "Please continue with the Add Role process and submit to"
@@ -7671,10 +7686,6 @@ msgstr "請註明取消申請原因"
 #: templates/personrequest/access/current_club_view.templ Line:230
 msgid "Please specify why request access was rejected."
 msgstr "請註明拒絕存取申請的原因"
-
-#: templates/personrequest/transfer/new_club_view.templ Line:265
-msgid "Please specify why transfer was cancelled."
-msgstr "請註明取消轉會原因"
 
 #: templates/personrequest/transfer/current_club_view.templ Line:236
 msgid "Please specify why transfer was rejected."
@@ -7725,9 +7736,18 @@ msgstr "存取申請:取消"
 msgid "Request Access: Rejected"
 msgstr "申請存取: 已拒絕"
 
+#: templates/personrequest/history.templ Line:27
+msgid "Request Added"
+msgstr "申請已新增"
+
 #: templates/personrequest/access/view.templ Line:150
 msgid "Request Details"
 msgstr "申請詳情"
+
+#: templates/personrequest/history.templ Line:26
+#: templates/personrequest/access/view.templ Line:80 Line:227
+msgid "Request Notes"
+msgstr "申請備忘"
 
 #: templates/personrequest/access/view.templ Line:32 Line:172
 msgid "Request Response"
@@ -7750,6 +7770,24 @@ msgstr "申請類別"
 msgid "Request access cancelled"
 msgstr "申請狀況: 已取消"
 
+#: templates/personrequest/history.templ Line:18
+msgid "Request approval status"
+msgstr "申請批核狀況"
+
+#: templates/personrequest/history.templ Line:10
+#: templates/personrequest/access/current_club_view.templ Line:113
+#: templates/personrequest/access/requesting_club_view.templ Line:144
+msgid "Request from"
+msgstr "申請由"
+
+#: templates/personrequest/history.templ Line:14
+msgid "Request response"
+msgstr "要求回應"
+
+#: templates/personrequest/history.templ Line:6
+msgid "Request to"
+msgstr "向申請"
+
 #: templates/personrequest/access/current_club_view.templ Line:25 Line:128
 msgid "Requesting Club Details"
 msgstr "申請球會資料"
@@ -7757,6 +7795,11 @@ msgstr "申請球會資料"
 #: templates/personrequest/access/view.templ Line:36 Line:177
 msgid "Response By"
 msgstr "由回應"
+
+#: templates/personrequest/history.templ Line:28
+#: templates/personrequest/access/view.templ Line:84 Line:232
+msgid "Response Notes"
+msgstr "回應備忘"
 
 #: templates/personrequest/access/personregistration_summary.templ Line:50
 #: templates/personrequest/transfer/search_form.templ Line:171
@@ -7779,10 +7822,6 @@ msgstr "這人員擁有多於一個註冊。請選擇其中一個以申請這轉
 msgid "Transfer Summary"
 msgstr "轉會摘要"
 
-#: templates/personrequest/transfer/new_club_view.templ Line:260
-msgid "Transfer cancelled"
-msgstr "轉會已取消"
-
 #: templates/personrequest/transfer/current_club_view.templ Line:231
 #: templates/personrequest/transfer/view.templ Line:213
 msgid "Transfer rejected"
@@ -7803,6 +7842,10 @@ msgstr "轉會類別"
 msgid "Transferring to"
 msgstr "轉會至"
 
+#: templates/personrequest/history.templ Line:29
+msgid "Updated"
+msgstr "已更新"
+
 #: templates/personrequest/access/current_club_view.templ Line:16
 msgid "details to"
 msgstr "詳情"
@@ -7815,14 +7858,13 @@ msgstr "詳情"
 msgid "has approved access of"
 msgstr "已批准申請"
 
-#: templates/personrequest/transfer/new_club_view.templ Line:7
-#: templates/personrequest/loan/new_club_view.templ
-msgid "has released"
-msgstr "已釋放"
-
 #: templates/personrequest/access/current_club_view.templ Line:8
 msgid "has requested data access for"
 msgstr "已申請數據存取"
+
+#: templates/personrequest/history.templ Line:2
+msgid "of"
+msgstr "的"
 
 #: templates/personrequest/transfer/current_club_view.templ Line:13
 #: templates/personrequest/loan/current_club_view.templ
@@ -7842,6 +7884,15 @@ msgstr "現在球會詳情"
 #: templates/personrequest/loan/search_form.templ Line:195
 msgid "Borrowing club"
 msgstr ""
+
+#: templates/personrequest/transfer/new_club_view.templ Line:215
+msgid "Cancel Transfer"
+msgstr "取消轉會"
+
+#: templates/personrequest/transfer/new_club_view.templ Line:236
+#, fuzzy
+msgid "Continue Transfer"
+msgstr "取消轉會"
 
 #: templates/personrequest/generic/search_form.templ Line:207
 #, fuzzy
@@ -7865,12 +7916,6 @@ msgstr "拒絕"
 #: templates/personrequest/generic/itc_confirmation.templ Line:2
 msgid "ITC Request submitted to MA"
 msgstr "國際轉會紙申請已提交到足總"
-
-#: templates/personrequest/loan/new_club_view.templ Line:19 Line:27
-#: templates/personrequest/loan/lendingclubdetails.templ Line:4
-#, fuzzy
-msgid "Lending Club Details"
-msgstr "申請球會資料"
 
 #: templates/personrequest/loan/current_club_view.templ Line:109
 #: templates/personrequest/loan/new_club_view.templ Line:143
@@ -7899,11 +7944,6 @@ msgstr "轉會狀況: 已申請"
 msgid "Player Loan Summary"
 msgstr "付款摘要"
 
-#: templates/personrequest/loan/new_club_view.templ Line:274
-#, fuzzy
-msgid "Player Loan cancelled"
-msgstr "轉會已取消"
-
 #: templates/personrequest/loan/current_club_view.templ Line:245
 #, fuzzy
 msgid "Player Loan rejected"
@@ -7923,20 +7963,23 @@ msgstr "轉會: 已取消"
 msgid "Please approve or reject the request"
 msgstr "請批准或拒絕申請"
 
-#: templates/personrequest/loan/new_club_view.templ Line:7
-#, fuzzy
-msgid "Please continue the player loan process."
-msgstr "請繼續處理轉會"
+#: templates/personrequest/transfer/new_club_view.templ Line:12
+#: templates/personrequest/loan/new_club_view.templ
+msgid "Please check and update all details before submitting to"
+msgstr "請在提交前作最後批核前檢查及更新所有細節"
 
-#: templates/personrequest/loan/new_club_view.templ Line:279
-#, fuzzy
-msgid "Please specify why player loan was cancelled."
-msgstr "請註明取消轉會原因"
+#: templates/personrequest/transfer/new_club_view.templ Line:7
+msgid "Please continue the transfer process."
+msgstr "請繼續處理轉會"
 
 #: templates/personrequest/loan/current_club_view.templ Line:250
 #, fuzzy
 msgid "Please specify why player loan was rejected."
 msgstr "請註明拒絕存轉會的原因"
+
+#: templates/personrequest/transfer/new_club_view.templ Line:265
+msgid "Please specify why transfer was cancelled."
+msgstr "請註明取消轉會原因"
 
 #: templates/personrequest/transfer/view.templ Line:218
 msgid ""
@@ -7972,6 +8015,11 @@ msgstr "檢閱身份詳情"
 msgid "Status: Requested"
 msgstr "狀況: 已申請"
 
+#: templates/personrequest/transfer/new_club_view.templ Line:260
+msgid "Transfer cancelled"
+msgstr "轉會已取消"
+
+#: templates/personrequest/transfer/selftransfercomplete.templ Line:19
 #: templates/personrequest/transfer/complete.templ Line:23
 msgid "You will be notified when this becomes effective."
 msgstr "如這更有效你將被通知"
@@ -7980,15 +8028,42 @@ msgstr "如這更有效你將被通知"
 msgid "Your ITC Request has been submitted"
 msgstr "你的國際轉會紙申請已提交"
 
-#: templates/personrequest/transfer/complete.templ Line:17
+#: templates/personrequest/transfer/selftransfercomplete.templ Line:17
+#: templates/personrequest/transfer/complete.templ
 #, fuzzy
 msgid "Your transfer request has been submitted for final approval."
 msgstr "你的轉會申請已提交至"
+
+#: templates/personrequest/transfer/new_club_view.templ Line:7
+#: templates/personrequest/loan/new_club_view.templ
+msgid "has released"
+msgstr "已釋放"
+
+#: templates/personrequest/loan/new_club_view.templ Line:19 Line:27
+#: templates/personrequest/loan/lendingclubdetails.templ Line:4
+#, fuzzy
+msgid "Lending Club Details"
+msgstr "申請球會資料"
+
+#: templates/personrequest/loan/new_club_view.templ Line:274
+#, fuzzy
+msgid "Player Loan cancelled"
+msgstr "轉會已取消"
 
 #: templates/personrequest/loan/request_denied.templ Line:5
 #, fuzzy
 msgid "Player Loan: Rejected"
 msgstr "轉會:已被拒絕"
+
+#: templates/personrequest/loan/new_club_view.templ Line:7
+#, fuzzy
+msgid "Please continue the player loan process."
+msgstr "請繼續處理轉會"
+
+#: templates/personrequest/loan/new_club_view.templ Line:279
+#, fuzzy
+msgid "Please specify why player loan was cancelled."
+msgstr "請註明取消轉會原因"
 
 #: templates/person/renewal_roledetails.templ Line:2
 #, fuzzy
@@ -7998,6 +8073,14 @@ msgstr "檢閱身份詳情"
 #: templates/person/list.templ Line:9
 msgid "Sub-Role"
 msgstr "子身份"
+
+#, fuzzy
+#~ msgid "Organization"
+#~ msgstr "機構"
+
+#, fuzzy
+#~ msgid "Transaction History"
+#~ msgstr "交易"
 
 #~ msgid "Beginning Of Registration"
 #~ msgstr "註冊的開始"
