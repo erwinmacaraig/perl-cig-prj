@@ -416,14 +416,10 @@ sub field_changetext {
 	my %TextReplacements = (
   	Clearance => $SystemConfig->{'txtCLR'} || 'Clearance',
 	Clearances => $SystemConfig->{'txtCLRs'} || 'Clearances',
-		Member => $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER},
-		Members => $Data->{'LevelNames'}{$Defs::LEVEL_MEMBER."_P"},
-		Team => $Data->{'LevelNames'}{$Defs::LEVEL_TEAM},
-		Teams => $Data->{'LevelNames'}{$Defs::LEVEL_TEAM."_P"},
+		Person => $Data->{'LevelNames'}{$Defs::LEVEL_PERSON},
+		Persons => $Data->{'LevelNames'}{$Defs::LEVEL_PERSON."_P"},
 		Club => $Data->{'LevelNames'}{$Defs::LEVEL_CLUB},
 		Clubs => $Data->{'LevelNames'}{$Defs::LEVEL_CLUB."_P"},
-		Association => $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC},
-		Associations => $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC."_P"},
 	);
 
 	$text =~s/ReplaceText-(\w+)/$TextReplacements{$1}/eg;
@@ -438,7 +434,7 @@ sub convert_permissions {
   my %newperms=();
   my $viewablefields=0;
   my $onlycompulsory=1;
-	my @permstypes = (qw(Member Club Team));
+	my @permstypes = (qw(Person Club Team));
 	for my $type (@permstypes)	{
 		for my $k (keys %{$perms->{$type}})  {
 			my $val=$perms->{$type}{$k} eq 'Hidden' ? 0 : 1;
@@ -462,15 +458,15 @@ sub convert_permissions {
 		) 
 		or (
 			$Data->{'SystemConfig'}{'Schools'} 
-			and $newperms{'Member'}{'intSchoolID'}
+			and $newperms{'Person'}{'intSchoolID'}
 		)
 	)  {
-    $newperms{'Member'}{'strSchoolName'}=1;
-    $newperms{'Member'}{'strSchoolSuburb'}=1;
+    $newperms{'Person'}{'strSchoolName'}=1;
+    $newperms{'Person'}{'strSchoolSuburb'}=1;
   }
   else  {
-    $newperms{'Member'}{'strSchoolName'}=0;
-    $newperms{'Member'}{'strSchoolSuburb'}=0;
+    $newperms{'Person'}{'strSchoolName'}=0;
+    $newperms{'Person'}{'strSchoolSuburb'}=0;
   }
   return \%newperms;
 }

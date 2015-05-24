@@ -321,16 +321,22 @@ sub showPersonHome	{
         $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
-        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
+        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID and $rego->{'intIsLoanedOut'} == 0);
 
 
         #FC-1105 - disable renewal from lending club if loan isn't completed yet
         #check PersonRequest::deactivatePlayerLoan
+        $rego->{'intOnLoan'} ||= 0;
+        $rego->{'existOpenLoan'} ||= 0;
         if(
             ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
             or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
             or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
             $rego->{'renew_link'} = $renew;
+        }
+        else    {
+            $rego->{'renew_link'} = '';
+            $rego->{'changelevel_link'} = '';
         }
 
     }

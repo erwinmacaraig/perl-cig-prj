@@ -534,6 +534,17 @@ sub regoPageForm {
     );
 
     $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/jscookie.js");
+    $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/bootstrap-tabcollapse/bootstrap-tabcollapse.js");
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        "jQuery('.nav.nav-tabs').tabCollapse({
+            tabsClass: 'hidden-xs',
+            accordionClass: 'visible-xs autoAccordian'
+        })",
+
+    );
+
     print runTemplate(
         $Data,      
         {

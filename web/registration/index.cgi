@@ -26,7 +26,7 @@ use AccountActivation;
 use AccountProfile;
 
 use SelfUserFlow;
-#use WorkFlow;
+use SelfUserTransfer;
 use Data::Dumper;
 
 main();
@@ -115,6 +115,9 @@ sub main {
         if($action eq 'P_u')    {
             $resultHTML .= showHome(\%Data, $user, $srp);
         }
+    }
+ 	elsif ($action =~ /TRANSFER_/) {
+        ($resultHTML, $pageHeading) = handleSelfUserTransfer(\%Data, $user, $action);
     }
     else {
         # Display login page

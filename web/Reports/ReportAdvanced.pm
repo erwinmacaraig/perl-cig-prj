@@ -137,7 +137,7 @@ sub displayOptions {
     next if !$displayname;
 		my $perms_type = $self->{'Config'}->{'DefaultPermType'} 
 			|| $options->{'permissionType'}
-			|| 'Member';
+			|| 'Person';
 		if (
 			$perms_ref 
 			and exists $perms_ref->{$perms_type} 

@@ -304,7 +304,8 @@ sub display_role_details {
         }
     }
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
    
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
 
