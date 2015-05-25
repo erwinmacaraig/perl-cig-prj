@@ -10,6 +10,7 @@ use TTTemplate;
 use Data::Dumper;
 use Reg_common;
 use Utils;
+use Encode qw(decode);
 
 sub new {
     my $class = shift;
@@ -62,6 +63,10 @@ sub getGridTemplate {
 
 sub getKeyword {
     my ($self) = shift;
+    my $decode = shift;
+    if($decode)  {
+        return decode('UTF-8',$self->{_keyword});
+    }
     return $self->{_keyword};
 }
 
