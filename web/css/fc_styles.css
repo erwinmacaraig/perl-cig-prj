@@ -1657,9 +1657,6 @@ span.fa-user{
 	padding-right: 0px;
 	margin-bottom: 10px;
 }
-.result-message{
-	padding: 0;
-}
 
 .reg-complete-wrapper {
 	padding:10px;
@@ -2288,6 +2285,9 @@ header .navbar-brand {
 .products-table .product-row:last-child {
     background: rgb(214, 214, 214);
 }
+@media (max-width: 992px){
+	.result-message { padding: 0; }
+}
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }
 }
@@ -2341,6 +2341,7 @@ header .navbar-brand {
 }
 .responsiveTablesDropDown button{margin: 6px!important;}
 @media (min-width: 250px) and (max-width: 480px) {
+   #content .steps{padding: 0}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
