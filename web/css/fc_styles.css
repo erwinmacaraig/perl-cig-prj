@@ -1654,6 +1654,11 @@ span.fa-user{
 
 .reg-complete-summary-left-bar {
 	margin-left: -15px;
+	padding-right: 0px;
+	margin-bottom: 10px;
+}
+.result-message{
+	padding: 0;
 }
 
 .reg-complete-wrapper {
