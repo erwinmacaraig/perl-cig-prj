@@ -18,7 +18,7 @@ msgstr ""
 
 #: Defs::genderEntityInfo
 msgid "ALL"
-msgstr ""
+msgstr "KAIKKI"
 
 #: web/forgotten_password.cgi Line:21 web/index.cgi Line:28 web/emailform.cgi
 #: Line:14 web/user/login.cgi Line:109
@@ -26,9 +26,8 @@ msgid "APPNAME"
 msgstr "Pelipaikka"
 
 #: Club Field Labels
-#, fuzzy
 msgid "Accept Self Registration"
-msgstr "Valitse rekisteröinti"
+msgstr "Hyväksy rekisteröinti"
 
 #: Defs::personRequestResponse Defs::personRequestStatus
 #: templates/dashboards/worktasks.templ Line:65
@@ -100,7 +99,7 @@ msgstr "Amatööri"
 
 #: Defs::personLevel
 msgid "Amateur (Under Contract)"
-msgstr "Amatööri (sopimuksella)"
+msgstr "Sopimuksellinen amatööri"
 
 #: Defs::registrationNature templates/dashboards/worktasks.templ Line:221
 #: templates/workflow/view/person.templ Line:295
@@ -158,7 +157,7 @@ msgstr "Syntymätodistus voimassa alkaen"
 # :Person FieldLabels
 #: Person FieldLabels
 msgid "Birth Certificate Validity Date To"
-msgstr "Syntymätodistus voimassa päättyen"
+msgstr "Syntymätodistus voimassa asti"
 
 # :Person FieldLabels
 #: Person FieldLabels
@@ -178,7 +177,7 @@ msgstr "Käteinen"
 # :Person FieldLabels
 #: Person FieldLabels templates/registration/certifications.templ Line:7
 msgid "Certification"
-msgstr "Sertifiointi"
+msgstr "Lisenssi"
 
 #: Defs::wfTaskType
 msgid "Check Document"
@@ -240,7 +239,6 @@ msgid "College"
 msgstr "Yliopisto"
 
 #: Defs::LevelNames
-#, fuzzy
 msgid "Comp"
 msgstr "Valmis"
 
@@ -413,9 +411,8 @@ msgid "Domestic"
 msgstr "Kotimainen"
 
 #: Defs::registrationNature
-#, fuzzy
 msgid "Domestic Player Loan"
-msgstr "Onko pelaajalla kansainvälinen pelilupa (ITC)?"
+msgstr "Kotimainen määräaikainen pelaajasiirto"
 
 #: Defs::wfTaskType
 msgid "Duplicate Resolution Issue"
@@ -423,19 +420,19 @@ msgstr "Ongelma kaksoiskappaleiden käsittelyssä"
 
 #: Defs::paymentTypes Defs::manualPaymentTypes
 msgid "Eftpos - Bankcard"
-msgstr ""
+msgstr "Eftpos - Bankcard"
 
 #: Defs::paymentTypes Defs::manualPaymentTypes
 msgid "Eftpos - Mastercard"
-msgstr ""
+msgstr "Eftpos - Mastercard"
 
 #: Defs::paymentTypes Defs::manualPaymentTypes
 msgid "Eftpos - Savings"
-msgstr ""
+msgstr "Eftpos - Savings"
 
 #: Defs::paymentTypes Defs::manualPaymentTypes
 msgid "Eftpos - Visa"
-msgstr ""
+msgstr "Eftpos - Visa"
 
 #: Person FieldLabels
 msgid "Email 2"
@@ -463,7 +460,7 @@ msgstr "Hätäyhteystiedot - suhde"
 
 #: Defs::LevelNames
 msgid "Event"
-msgstr ""
+msgstr "Tapahtuma"
 
 #: Defs::NationalityType
 msgid "Ex Patriot"
@@ -471,7 +468,7 @@ msgstr "Asuu ulkomailla"
 
 #: Defs::genderEntityInfo
 msgid "FEMALE"
-msgstr ""
+msgstr "NAINEN"
 
 #: Club Field Labels
 msgid "FIFA ID"
@@ -610,11 +607,11 @@ msgstr "Kova kenttä"
 
 #: Defs::personLevel
 msgid "Hobby"
-msgstr ""
+msgstr "Harraste"
 
 #: Defs::ProdTransactionStatus Defs::TransactionStatus Defs::TransLogStatus
 msgid "Hold/Check"
-msgstr ""
+msgstr "Odottaa/Tarkista"
 
 #: Club Field Labels web/EntityIdentifier.pm Line:347
 msgid "Identifier"
@@ -643,7 +640,7 @@ msgstr "Maan kattava"
 
 #: Defs::LevelNames
 msgid "Inter Zone"
-msgstr ""
+msgstr "Inter Zone"
 
 #: Defs::LevelNames Defs::personTransferType
 #: templates/personrequest/transfer/search_form.templ Line:33
@@ -668,9 +665,8 @@ msgstr "Kansainvälinen etunimi"
 
 # :Person FieldLabels
 #: Defs::registrationNature
-#, fuzzy
 msgid "International Player Loan"
-msgstr "Kansainvälinen sukunimi"
+msgstr "Kansainvälinen määräaikainen pelaajasiirto"
 
 # :Person FieldLabels
 #: Person FieldLabels templates/workflow/view/person.templ Line:73
@@ -741,7 +737,7 @@ msgstr "Liiton akatemia"
 #: templates/workflow/view/personregistration.templ Line:300
 #: templates/flow/club_summary.templ Line:48
 msgid "MA Comment"
-msgstr "Liiton kommentti"
+msgstr "Kommentti"
 
 #: Defs::personType
 msgid "MA Official"
@@ -753,7 +749,7 @@ msgstr "Liiton organisaatio ID"
 
 #: Defs::genderEntityInfo
 msgid "MALE"
-msgstr ""
+msgstr "MIES"
 
 #: Person FieldLabels templates/dashboards/person.templ Line:36
 msgid "Maiden name"
@@ -769,9 +765,8 @@ msgid "Match Official"
 msgstr "Toimihenkilö"
 
 #: Defs::LevelNames
-#, fuzzy
 msgid "Member"
-msgstr "PalloID"
+msgstr "Jäsen"
 
 #: Defs::genderEventInfo
 msgid "Men"
@@ -800,11 +795,11 @@ msgstr "Nimi (kansainvälinen)"
 
 #: Defs::NationalityType Defs::DisplayEntityLevelNames Defs::LevelNames
 msgid "National"
-msgstr "Kansallinen"
+msgstr "Liitto"
 
 #: Defs::entityType
 msgid "National Association"
-msgstr "Kansallinen liitto"
+msgstr "Liitto"
 
 #: Person FieldLabels templates/team/team_staff.templ Line:27
 msgid "National Number"
@@ -886,18 +881,16 @@ msgid "Official"
 msgstr "Toimihenkilö"
 
 #: Defs::entityStatus
-#, fuzzy
 msgid "On Hold"
-msgstr "Tehtävä pidossa"
+msgstr "Palautettu"
 
 #: Defs::personRegoStatus
 msgid "On hold"
-msgstr "Pidossa"
+msgstr "Palautettu"
 
 #: Defs::wfTaskAction
-#, fuzzy
 msgid "On-hold"
-msgstr "Pidossa"
+msgstr "Palautettu"
 
 #: Defs::fieldGroundNatureType
 msgid "One Star Artificial Turf"
@@ -1041,19 +1034,16 @@ msgid "Parent/Guardian 2 Surname"
 msgstr "Huoltaja 2 sukunimi"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Parent/Guardian family name"
-msgstr "Huoltaja 2 sukunimi"
+msgstr "Huoltajan sukunimi"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Parent/Guardian first name"
-msgstr "Huoltaja 2 etunimi"
+msgstr "Huoltajan etunimi"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Parent/Guradian Relationship"
-msgstr "Huoltaja 1 titteli"
+msgstr "Huoltaja suhde"
 
 #: Defs::personRegoStatus
 msgid "Passive"
@@ -1140,28 +1130,24 @@ msgstr "Pelaaja"
 
 #: Defs::personRequest web/WorkFlow.pm Line:2905
 #: templates/dashboards/worktasks.templ Line:220
-#, fuzzy
 msgid "Player Loan"
-msgstr "Pelaaja"
+msgstr "Määräaikainen pelaajasiirto"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Player Loan End Date"
-msgstr "Maksupäivä"
+msgstr "Määräaikaisen pelaajasiirron päättymispäivä"
 
 #: Person FieldLabels
 msgid "Player Loan Source Club"
-msgstr ""
+msgstr "Pelaajan oma seura"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Player Loan Start Date"
-msgstr "Maksupäivä"
+msgstr "Määräaikaisen pelaajasiirron alkupäivä"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Player Loan TMS Reference"
-msgstr "Maksutapahtuma"
+msgstr "Määräaikaisen pelaajasiirron TMS-viite"
 
 #: Person FieldLabels
 msgid "Police Check Date"
@@ -1201,12 +1187,11 @@ msgstr "Ammattilainen"
 
 #: Defs::LevelNames
 msgid "Program"
-msgstr ""
+msgstr "Ohjelma"
 
 #: Defs::personType
-#, fuzzy
 msgid "RA Official"
-msgstr "Liiton toimihenkilö"
+msgstr "Piirin toimihenkilö"
 
 # :Person FieldLabels
 #: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:259
@@ -1284,11 +1269,11 @@ msgstr "Hylätty"
 
 #: Defs::registrationNature
 msgid "Renewal"
-msgstr "Uudistaa"
+msgstr "Uudistaminen"
 
 #: Defs::personRequest
 msgid "Request Access (Add Role)"
-msgstr "Pyydä pääsyä (lisää rooli)"
+msgstr "Pyydä henkilön tietoja (lisää rooli)"
 
 #: Defs::wfTaskAction templates/workflow/result/venue.templ Line:98
 #: templates/workflow/result/person.templ Line:101
@@ -1416,23 +1401,20 @@ msgid "Suspended"
 msgstr "Suljettu toiminnasta"
 
 #: Defs::wfTaskStatus
-#, fuzzy
 msgid "Task Complete"
-msgstr "Valmis"
+msgstr "Tehtävä valmis"
 
 #: Defs::wfTaskStatus templates/dashboards/worktasks.templ Line:64
 msgid "Task On Hold"
-msgstr "Tehtävä pidossa"
+msgstr "Tehtävä palautettu"
 
 #: Defs::wfTaskStatus
-#, fuzzy
 msgid "Task Pending"
-msgstr "Odottavia tehtäviä"
+msgstr "Tehtävä odottaa"
 
 #: Defs::wfTaskStatus
-#, fuzzy
 msgid "Task Rejected"
-msgstr "Hylättyjä tehtäviä"
+msgstr "Tehtävä hylätty"
 
 #: Defs::entityInfo Defs::LevelNames
 msgid "Team"
@@ -1469,20 +1451,17 @@ msgstr "Pelaajasiirto"
 
 #: Person FieldLabels templates/workflow/view/personregistration.templ
 #: Line:337
-#, fuzzy
 msgid "Transfer Date"
-msgstr "Pelaajasiirron tyyppi"
+msgstr "Pelaajasiirron päivämäärä"
 
 #: Person FieldLabels templates/workflow/view/personregistration.templ
 #: Line:329
-#, fuzzy
 msgid "Transfer Source Club"
-msgstr "Pelaajasiirto seuraan"
+msgstr "Pelaajasiirron vanha seura"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Transfer TMS Reference"
-msgstr "Pelaajasiirron hinta"
+msgstr "Pelaajasiirron TMS-viite"
 
 #: Defs::personStatus Defs::personRegoStatus
 msgid "Transferred"
@@ -1495,7 +1474,7 @@ msgstr "Pelaajasiirrot"
 
 #: Defs::VenueTypes
 msgid "Tribunal Venue"
-msgstr ""
+msgstr "Kunniakenttä"
 
 #: Defs::fieldGroundNatureType
 msgid "Two Star Artificial Turf"
@@ -1531,7 +1510,7 @@ msgstr "Voimassa alkaen"
 #: Line:68 templates/selfrego/selfregohistorybody.templ Line:77
 #: templates/registration/certifications.templ Line:10
 msgid "Valid Until"
-msgstr "päättyen"
+msgstr "Voimassa asti"
 
 #: Defs::entityInfo Defs::LevelNames Defs::documentFor
 #: web/IncompleteRegistrations.pm Line:264
@@ -1557,7 +1536,6 @@ msgid "Women"
 msgstr "Naiset"
 
 #: Defs::sportType Defs::entitySportType
-#, fuzzy
 msgid "Women's Football"
 msgstr "Jalkapallo"
 
@@ -1582,15 +1560,16 @@ msgid "[none]"
 msgstr "[ei mitään]"
 
 #: web/paytry.cgi Line:243
-#, fuzzy
 msgid "Continue to Payment"
-msgstr "Hyväksy maksu"
+msgstr "Siirry maksamaan"
 
 #: web/paytry.cgi Line:225
 msgid ""
 "If you are not automatically redirected to the payment page within 30 "
 "seconds then you can click the Continue to Payment button below"
 msgstr ""
+"Jos selaimesi ei 30 sekunnin sisällä automaattisesti siirry maksusivulle "
+"voit siirtyä painamalla alla olevaa Jatka maksusivulle -nappia"
 
 #: web/regoformphoto.cgi Line:76 web/productphoto.cgi Line:60
 #: web/ProductPhoto.pm Line:167 Line:592 web/Photo.pm Line:113 Line:498
@@ -1598,9 +1577,8 @@ msgid "Photo"
 msgstr "Valokuva"
 
 #: web/paytry.cgi Line:224
-#, fuzzy
 msgid "Please Wait - Processing"
-msgstr "Lisää muistiinpanot"
+msgstr "Hetkinen - käsitellään"
 
 #: web/registration/ajax/aj_search.cgi Line:346 web/ajax/aj_search.cgi
 msgid "Organisations"
@@ -1631,25 +1609,22 @@ msgid "Email address is not valid"
 msgstr "Sähköpostiosoite ei ole kelvollinen"
 
 #: web/registration/user/signup.cgi Line:104
-#, fuzzy
 msgid "Email already in use"
 msgstr "Sähköpostiosoite on jo käytössä"
 
 #: web/registration/user/signup.cgi Line:118
 msgid "Error creating user account"
-msgstr ""
+msgstr "Virhe luotaessa käyttäjätiliä"
 
 #: web/registration/user/signup.cgi Line:75 templates/selfrego/accordion.templ
 #: Line:20 templates/selfrego/user/profile.templ Line:31
 #: templates/selfrego/user/signup.templ Line:35
-#, fuzzy
 msgid "Family name"
 msgstr "Sukunimi"
 
 #: web/registration/user/signup.cgi Line:74 templates/selfrego/accordion.templ
 #: Line:18 templates/selfrego/user/profile.templ Line:25
 #: templates/selfrego/user/signup.templ Line:29
-#, fuzzy
 msgid "First name"
 msgstr "Etunimi"
 
@@ -1912,9 +1887,8 @@ msgid "Person Request"
 msgstr "Henkilön pyyntö"
 
 #: web/WorkFlow.pm Line:3770
-#, fuzzy
 msgid "Player Loan - Approved"
-msgstr "Pelaajasiirto - Hyväksytty"
+msgstr "Määräaikainen pelaajasiirto - Hyväksytty"
 
 #: web/WorkFlow.pm Line:592
 msgid "Please review this record"
@@ -1981,7 +1955,7 @@ msgstr "Tehtävän tyyppi"
 
 #: web/WorkFlow.pm Line:320
 msgid "Task has been put on-hold."
-msgstr "Tehtävä on pidossa."
+msgstr "Tehtävä on palautettu."
 
 #: web/WorkFlow.pm Line:2338
 msgid "Task has been resolved."
@@ -2072,29 +2046,29 @@ msgid ""
 "You have placed this Club Official Renewal On Hold, the \".$raID-"
 ">{'strLocalName'}.\" will be informed."
 msgstr ""
-"Olet asettanut tämän seuratoimihenkilön uudistamisen pitoon, tästä menee "
-"ilmoitus henkilölle \".$raID->{'strLocalName'}.\"."
+"Olet palauttanut tämän seuratoimihenkilön uudistamisen, ilmoitus lähetetään "
+"henkilölle \".$raID->{'strLocalName'}.\"."
 
 msgid ""
 "You have placed this MA Official Renewal On Hold, the \".$raID-"
 ">{'strLocalName'}.\" will be informed."
 msgstr ""
-"Olet asettanut tämän liiton toimihenkilön uudistamisen pitoon, tästä menee "
-"ilmoitus henkilölle \".$raID->{'strLocalName'}.\"."
+"Olet palauttanut tämän liiton toimihenkilön uudistamisen, ilmoitus "
+"lähetetään henkilölle \".$raID->{'strLocalName'}.\"."
 
 msgid ""
 "You have placed this Player Renewal On Hold, the \".$raID->{'strLocalName'}."
 "\" will be informed."
 msgstr ""
-"Olet asettanut tämän pelaajan uudistamisen pitoon, tästä menee ilmoitus "
-"henkilölle \".$raID->{'strLocalName'}.\"."
+"Olet palauttanut tämän pelaajan uudistamisen, ilmoitus lähetetään henkilölle "
+"\".$raID->{'strLocalName'}.\"."
 
 msgid ""
 "You have placed this Team Official Renewal On Hold, the \".$raID-"
 ">{'strLocalName'}.\" will be informed."
 msgstr ""
-"Olet asettanut tämän joukkuetoimihenkilön uudistamisen pitoon, tästä menee "
-"ilmoitus henkilölle  \".$raID->{'strLocalName'}.\"."
+"Olet palauttanut tämän joukkuetoimihenkilön uudistamisen, ilmoitus "
+"lähetetään henkilölle  \".$raID->{'strLocalName'}.\"."
 
 #: web/WorkFlow.pm Line:4094
 msgid ""
@@ -2102,8 +2076,8 @@ msgid ""
 "you would be able to verify and continue with the Amendment of Person "
 "Details process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset tarkistamaan ja lisäämään henkilön tietoja."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset tarkistamaan ja lisäämään henkilön tietoja."
 
 #: web/WorkFlow.pm Line:4078
 msgid ""
@@ -2111,16 +2085,16 @@ msgid ""
 "you would be able to verify and continue with the Club Official Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan seuratoimihenkilön rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan seuratoimihenkilön rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4061
 msgid ""
 "You have put this task on-hold, once the submitting Club resolves the issue, "
 "you would be able to verify and continue with the Coach Registration process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan valmentajan rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan valmentajan rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4090
 msgid ""
@@ -2128,8 +2102,8 @@ msgid ""
 "you would be able to verify and continue with the New Club Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan uuden seuran rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan uuden seuran rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4086
 msgid ""
@@ -2137,17 +2111,16 @@ msgid ""
 "you would be able to verify and continue with the New Facility Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan uuden kentän rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan uuden kentän rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4053
-#, fuzzy
 msgid ""
 "You have put this task on-hold, once the submitting Club resolves the issue, "
 "you would be able to verify and continue with the Player Loan process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan pelaajan rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan pelaajan rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4057
 msgid ""
@@ -2155,8 +2128,8 @@ msgid ""
 "you would be able to verify and continue with the Player Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan pelaajan rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan pelaajan rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4082
 msgid ""
@@ -2164,16 +2137,16 @@ msgid ""
 "you would be able to verify and continue with the Team Official Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan joukkueen toimihenkilön rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan joukkueen toimihenkilön rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4049
 msgid ""
 "You have put this task on-hold, once the submitting Club resolves the issue, "
 "you would be able to verify and continue with the Transfer process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset jatkamaan pelaajasiirtoa."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset jatkamaan pelaajasiirtoa."
 
 #: web/WorkFlow.pm Line:4070
 msgid ""
@@ -2181,8 +2154,8 @@ msgid ""
 "you would be able to verify and continue with the MA Official Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä liitto on korjannut "
-"ongelman, pääset jatkamaan liiton toimihenkilön rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä liitto on korjannut ongelman, "
+"pääset jatkamaan liiton toimihenkilön rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4066
 msgid ""
@@ -2190,8 +2163,8 @@ msgid ""
 "you would be able to verify and continue with the Referee Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä liitto on korjannut "
-"ongelman, pääset jatkamaan erotuomarin rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä liitto on korjannut ongelman, "
+"pääset jatkamaan erotuomarin rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4098
 msgid ""
@@ -2199,8 +2172,8 @@ msgid ""
 "the issue, you would be able to verify and continue with the Amendment of "
 "Club Details process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä organisaatio on "
-"korjannut ongelman, pääset tarkistamaan ja lisäämään seuran tietoja."
+"Olet palauttanut tämän tehtävän. Kun lähettävä organisaatio on korjannut "
+"ongelman, pääset tarkistamaan ja lisäämään seuran tietoja."
 
 #: web/WorkFlow.pm Line:4102
 msgid ""
@@ -2208,8 +2181,8 @@ msgid ""
 "the issue, you would be able to verify and continue with the Amendment of "
 "Venue Details process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä seura on korjannut "
-"ongelman, pääset tarkistamaan ja lisäämään kentän tietoja."
+"Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, "
+"pääset tarkistamaan ja lisäämään kentän tietoja."
 
 #: web/WorkFlow.pm Line:4074
 msgid ""
@@ -2217,9 +2190,8 @@ msgid ""
 "you would be able to verify and continue with the RA Official Registration "
 "process."
 msgstr ""
-"Olet asettanut tämän tehtävän pitoon. Kun lähettävä piiri on korjannut "
-"ongelman, pääset tarkistamaan ja jatkamaan piirin toimihenkilön "
-"rekisteröintiä."
+"Olet palauttanut tämän tehtävän. Kun lähettävä piiri on korjannut ongelman, "
+"pääset tarkistamaan ja jatkamaan piirin toimihenkilön rekisteröintiä."
 
 #: web/WorkFlow.pm Line:4179
 msgid "You have rejected this Amendment of Person Registration."
@@ -2365,7 +2337,7 @@ msgstr "on hylätty."
 
 #: web/WorkFlow.pm Line:631
 msgid "to"
-msgstr ""
+msgstr "to"
 
 #: web/PersonEntity.pm Line:175
 msgid "Add Person Entity"
@@ -2381,7 +2353,7 @@ msgstr "Lisää uusi dokumentti tähän rekisteröintiin"
 
 #: web/HomePerson.pm Line:321
 msgid "Change $pType Level"
-msgstr ""
+msgstr "Muuta $pType taso"
 
 #: web/PersonEntity.pm Line:64
 msgid "Close Person Entity"
@@ -2472,14 +2444,12 @@ msgid "Selection Not Required"
 msgstr "Valintaa ei vaadita"
 
 #: web/PersonRegisterWhat.pm Line:386
-#, fuzzy
 msgid "This type of registration is not available."
 msgstr "Tämä rekisteröintityyppi ei ole mahdollinen"
 
 #: web/PersonRegisterWhat.pm Line:390
-#, fuzzy
 msgid "This type of registration is not within the window."
-msgstr "Tämä rekisteröintityyppi ei ole mahdollinen"
+msgstr "Tämä rekisteröintityyppi ei ole nyt mahdollinen"
 
 #: web/Person.pm Line:299 Line:391 web/EntityDocuments.pm Line:112
 #: web/PendingRegistrations.pm Line:191 Line:204 web/PersonRequest.pm
@@ -2565,9 +2535,8 @@ msgid "Feb"
 msgstr "Helmi"
 
 #: web/Flow_DisplayFields.pm Line:1131 Line:1136 web/EntityFields.pm Line:297
-#, fuzzy
 msgid "Field required"
-msgstr "Kenttien määrä: pakollinen"
+msgstr "Pakollinen kenttä"
 
 #: web/Flow_DisplayFields.pm Line:934 templates/translation/outstanding.templ
 #: Line:2
@@ -2630,24 +2599,20 @@ msgid "Phone"
 msgstr "Puhelin"
 
 #: web/Flow_DisplayFields.pm Line:1176
-#, fuzzy
 msgid "Please enter a valid URL"
-msgstr "Syötä sukunimesi"
+msgstr "Syötä kelvollinen verkkosivun osoite"
 
 #: web/Flow_DisplayFields.pm Line:1154
-#, fuzzy
 msgid "Please enter a valid email address"
-msgstr "Sinun on annettava sähköpostiosoite"
+msgstr "Syötä kelvollinen sähköpostiosoite"
 
 #: web/Flow_DisplayFields.pm Line:1165
-#, fuzzy
 msgid "Please enter only digits"
-msgstr "Lisää työtehtävän merkinnät"
+msgstr "Syötä vain numeroita"
 
 #: web/Flow_DisplayFields.pm Line:610
-#, fuzzy
 msgid "Required"
-msgstr "Pyydetty"
+msgstr "Pakollinen"
 
 #: web/Flow_DisplayFields.pm Line:347 templates/registration/what.templ
 #: Line:42 templates/personrequest/transfer/search_form.templ Line:23
@@ -2657,14 +2622,12 @@ msgid "Required fields"
 msgstr "Pakolliset kentät"
 
 #: web/EntityFieldObj.pm Line:73
-#, fuzzy
 msgid "Select Discipline"
-msgstr "Kentän laji"
+msgstr "Valitse laji"
 
 #: web/EntityFieldObj.pm Line:113
-#, fuzzy
 msgid "Select Type of Field"
-msgstr "Kentän tyyppi"
+msgstr "Valitse kentän tyyppi"
 
 #: web/Flow_DisplayFields.pm Line:490 templates/translation/outstanding.templ
 #: Line:18
@@ -2700,7 +2663,7 @@ msgstr "Vuosi"
 
 #: web/PersonSummaryPanel.pm Line:52
 msgid "valid to"
-msgstr "päättyen"
+msgstr "voimassa asti"
 
 #: web/PersonCertifications.pm Line:299 Line:312
 msgid "Add Another Certificate"
@@ -2759,7 +2722,7 @@ msgstr "Todistukset"
 #: templates/club/required_docs.templ Line:61 Line:156
 #: templates/workflow/view/document_upload.templ Line:42
 msgid "Click here to upload file"
-msgstr "Lähetä tiedosto"
+msgstr "Lisää tiedosto"
 
 #: web/PayInvoice.pm Line:417 Line:709 web/TransLog.pm Line:418 Line:1104
 #: Line:2109 Line:2217
@@ -2830,7 +2793,7 @@ msgstr "Tiedostopääte"
 #: templates/personrequest/loan/search_result.templ
 #: templates/person/list.templ Line:106
 msgid "Filter"
-msgstr "Suodatin"
+msgstr "Rajaa"
 
 #: web/EntityDocuments.pm Line:88 Line:92
 msgid "Get File"
@@ -2848,7 +2811,7 @@ msgstr "Laskun päivämäärä"
 #: templates/payment/invoicenum_frm.templ Line:3 Line:7
 #: templates/workflow/generic/payment.templ Line:9
 msgid "Invoice Number"
-msgstr "Laskunumero"
+msgstr "Laskun numero"
 
 #: web/PayInvoice.pm Line:306 Line:593 web/Payments.pm Line:314
 #: web/TransLog.pm Line:662 Line:1627 Line:1909 Line:2058
@@ -3047,9 +3010,8 @@ msgid "Record updated successfully"
 msgstr "Tietue päivitetty"
 
 #: web/Transactions.pm Line:97
-#, fuzzy
 msgid "Return to Invoices"
-msgstr "Palaa maksuihin"
+msgstr "Palaa laskuihin"
 
 #: web/Transactions.pm Line:447 Line:451
 msgid "Return to Transaction"
@@ -3095,9 +3057,8 @@ msgid "Transactions"
 msgstr "Maksut"
 
 #: web/Transactions.pm Line:420
-#, fuzzy
 msgid "Update Transaction"
-msgstr "Lisää maksu"
+msgstr "Päivitä maksutapahtuma"
 
 #: web/EntityEdit.pm Line:49 Line:50 Line:51 Line:59 Line:60
 #: web/FacilityEdit.pm Line:52 Line:53
@@ -3233,7 +3194,7 @@ msgstr "minuuttia"
 
 #: web/Navbar.pm Line:408
 msgid "Add Club"
-msgstr "Lisää seura"
+msgstr "Uusi seura"
 
 #: web/Navbar.pm Line:248 Line:847
 msgid "Add Club Official"
@@ -3253,7 +3214,7 @@ msgstr "Lisää pelaaja"
 
 #: web/Navbar.pm Line:236 Line:835
 msgid "Add RA Official"
-msgstr "Lisää piiritoimihenkilö"
+msgstr "Lisää piirin toimihenkilö"
 
 #: web/Navbar.pm Line:254 Line:853
 msgid "Add Referee"
@@ -3412,7 +3373,7 @@ msgstr "Henkilön etusivu"
 
 #: web/Navbar.pm Line:707
 msgid "Person Rollover"
-msgstr ""
+msgstr "Uudista henkilö"
 
 #: web/Navbar.pm Line:401 Line:668 web/Flow_ClubBackend.pm Line:94
 msgid "Products"
@@ -3436,9 +3397,8 @@ msgid "Reports"
 msgstr "Raportit"
 
 #: web/Navbar.pm Line:768
-#, fuzzy
 msgid "Request a Player loan"
-msgstr "Vanha seura"
+msgstr "Aloita määräaikainen pelaajasiirto"
 
 #: web/Navbar.pm Line:810
 msgid "Request for Person Details"
@@ -3501,9 +3461,8 @@ msgid "Both"
 msgstr "Molemmat"
 
 #: web/EntityFields.pm Line:268
-#, fuzzy
 msgid "Capacity"
-msgstr "Kentän kapasiteetti"
+msgstr "Kapasiteetti"
 
 #: web/EntityFieldsSetup.pm Line:289 web/Flow_ClubBackend.pm Line:48
 #: templates/workflow/view/club.templ Line:54
@@ -3520,9 +3479,8 @@ msgid "Created By"
 msgstr "Luonut"
 
 #: web/EntityFields.pm Line:252
-#, fuzzy
 msgid "Field ID"
-msgstr "Kentät"
+msgstr "Kentän ID"
 
 #: web/EntityFields.pm Line:259 templates/entity/venue_fields.templ Line:52
 #: templates/entity/venue_fields_summary.templ Line:5
@@ -3539,7 +3497,6 @@ msgid "Field Number"
 msgstr "Kentän numero"
 
 #: web/EntityFields.pm Line:262
-#, fuzzy
 msgid "FieldDiscipline"
 msgstr "Kentän laji"
 
@@ -3563,7 +3520,6 @@ msgstr "Kentän pituus"
 
 #: web/PersonRegistrationFlow_Backend.pm Line:112 web/Flow_PersonBackend.pm
 #: Line:871
-#, fuzzy
 msgid ""
 "New failed, existing registration found. In order to continue, a Transfer "
 "from the existing Entity must be organised or select another Level"
@@ -3686,9 +3642,8 @@ msgid "Build a Report"
 msgstr "Rakenna raportti"
 
 #: web/Flow_ClubBackend.pm Line:95
-#, fuzzy
 msgid "Choose Products"
-msgstr "Kopioi tuote"
+msgstr "Valitse tuotteet"
 
 #: web/Flow_PersonBackend.pm Line:80
 msgid "Choose Registration Type"
@@ -3721,18 +3676,16 @@ msgid "Enter Certifications"
 msgstr "Lisää todistukset"
 
 #: web/Flow_ClubBackend.pm Line:50
-#, fuzzy
 msgid "Enter Club Information"
-msgstr "Seuran tiedot"
+msgstr "Lisää seuran tiedot"
 
 #: web/Flow_PersonBackend.pm Line:69 web/Flow_ClubBackend.pm Line:62
 msgid "Enter Contact Information"
 msgstr "Lisää yhteystiedot"
 
 #: web/Flow_ClubBackend.pm Line:74
-#, fuzzy
 msgid "Enter Organisation Information"
-msgstr "Lisää henkilötiedot"
+msgstr "Lisää organisaation tiedot"
 
 #: web/Flow_PersonBackend.pm Line:55
 msgid "Enter Personal Information"
@@ -3834,15 +3787,13 @@ msgid "Personal Details"
 msgstr "Henkilön tiedot"
 
 #: web/Flow_LoanBackend.pm Line:1371
-#, fuzzy
 msgid "Player Loan Submitted to MA"
-msgstr "Pelaajasiirto on lähetetty liittoon"
+msgstr "Määräaikainen pelaajasiirto lähetetty liittoon hyväksyttäväksi"
 
 #: web/Flow_LoanBackend.pm Line:791 Line:840 Line:1034 Line:1117 Line:1198
 #: Line:1239
-#, fuzzy
 msgid "Player loan failed, cannot find registration."
-msgstr "Pelaajasiirto epäonnistui, rekisteröintiä ei löytynyt"
+msgstr "Määräaikainen pelaajasiirto epäonnistui, rekisteröintiä ei löytynyt."
 
 #: web/Flow_PersonBackend.pm Line:225 web/registration/Flow_PersonSelfReg.pm
 #: Line:181
@@ -3853,7 +3804,7 @@ msgstr "Onko pelaaja aikaisemmin rekisteröity toiseen seuraan?"
 #: web/Flow_ClubBackend.pm Line:736 web/Flow_LoanBackend.pm Line:1270
 #: web/Flow_BulkRenewalsBackend.pm Line:404
 msgid "Proceed to Payment and Submit to Member Association"
-msgstr "Siirry maksuun ja lähetä liittoon hyväksyttäväksi"
+msgstr "Siirry maksuun ja lähetä hyväksyttäväksi"
 
 #: web/ListTransactions.pm Line:43 templates/workflow/generic/payment.templ
 #: Line:10
@@ -3897,7 +3848,7 @@ msgstr "Tallenna ja jatka"
 #: web/Flow_FacilityBackend.pm Line:828 web/Flow_BulkRenewalsBackend.pm
 #: Line:397
 msgid "Submit to Member Association"
-msgstr "Lähetä liittoon hyväksyttäväksi"
+msgstr "Lähetä hyväksyttäväksi"
 
 #: web/Flow_PersonBackend.pm Line:133 web/Flow_ClubBackend.pm Line:111
 #: web/Flow_TransferBackend.pm Line:117 web/Flow_FacilityBackend.pm Line:107
@@ -3935,7 +3886,7 @@ msgstr "Lähetä dokumentteja"
 
 #: web/Flow_LoanBackend.pm Line:1655 web/Flow_TransferBackend.pm Line:1667
 msgid "Use the Continue button to go to the next page"
-msgstr "Valitse Seuraava jatkaaksesi seuraavalle sivulle"
+msgstr "Valitse jatka, jatkaaksesi seuraavalle sivulle"
 
 #: web/ListPersons.pm Line:335
 msgid "Y"
@@ -3948,19 +3899,16 @@ msgid "Approved"
 msgstr "Hyväksytty"
 
 #: web/Flow_TransferBackend.pm Line:69
-#, fuzzy
 msgid "Check/Update Contact Details"
-msgstr "Yhteystiedot"
+msgstr "Tarkista/päivitä yhteystiedot"
 
 #: web/Flow_TransferBackend.pm Line:90
-#, fuzzy
 msgid "Check/Update Documents"
-msgstr "Tarkista dokumentti"
+msgstr "Tarkista/päivitä dokumentit"
 
 #: web/Flow_TransferBackend.pm Line:55
-#, fuzzy
 msgid "Check/Update Personal Details"
-msgstr "Henkilön tiedot"
+msgstr "Tarkista/päivitä henkilötiedot"
 
 #: web/EditMemberClubs.pm Line:457
 msgid "Clubs Updated"
@@ -3971,18 +3919,16 @@ msgid "Confirm Request"
 msgstr "Vahvista pyyntö"
 
 #: web/Flow_TransferBackend.pm Line:100
-#, fuzzy
 msgid "Confirm Transfer Fee"
 msgstr "Pelaajasiirron hinta"
 
 #: web/Flow_TransferBackend.pm Line:80
-#, fuzzy
 msgid "Confirm Transfer Registration"
-msgstr "Uuden valmentajan rekisteröinti"
+msgstr "Vahvista pelaajasiirto"
 
 #: web/Payments.pm Line:662
 msgid "Congratulations your payment has been successful"
-msgstr ""
+msgstr "Kiitos, maksu kirjattu onnistuneesti"
 
 #: web/PersonRequest.pm Line:651
 msgid "Do you have the player's International Transfer Certificate?"
@@ -4009,16 +3955,14 @@ msgstr "Viimeinen"
 #: web/PersonRequest.pm Line:2250 templates/workflow/view/loan.templ Line:229
 #: templates/workflow/view/personregistration.templ Line:320
 #: templates/workflow/summary/loan.templ Line:31
-#, fuzzy
 msgid "Loan End Date"
-msgstr "Päättymispäivä"
+msgstr "Määräaikaisen siirron päättymispäivä"
 
 #: web/PersonRequest.pm Line:2240 templates/workflow/view/loan.templ Line:224
 #: templates/workflow/view/personregistration.templ Line:316
 #: templates/workflow/summary/loan.templ Line:27
-#, fuzzy
 msgid "Loan Start Date"
-msgstr "Alkupäivä"
+msgstr "Määräaikaisen siirron alkupäivä"
 
 #: web/PersonRequest.pm Line:995
 #: templates/search/grid/personregistration.templ Line:6
@@ -4046,9 +3990,8 @@ msgid "No matching records found"
 msgstr "Hakuehtojen mukaisia tietoja ei löytynyt"
 
 #: web/Flow_TransferBackend.pm Line:48
-#, fuzzy
 msgid "Old Club"
-msgstr "Lisää seura"
+msgstr "Vanha seura"
 
 #: web/Flow_TransferBackend.pm Line:49
 #: templates/personrequest/transfer/oldclubdetails.templ Line:4
@@ -4070,9 +4013,8 @@ msgid "Person Request not found."
 msgstr "Henkilön pyyntöä ei löytynyt."
 
 #: web/PersonRequest.pm Line:878
-#, fuzzy
 msgid "Player Loan - Submitted to Current Club"
-msgstr "Aloita pelaajasiirto - Odottaa vanhan seuran hyväksyntää"
+msgstr "Määräaikainen pelaajasiirto - Odottaa vanhan seuran hyväksyntää"
 
 #: web/Payments.pm Line:348
 msgid ""
@@ -4099,7 +4041,7 @@ msgstr "Pyyntöä ei voi jatkaa ilman liiton uudelleenhyväksyntää."
 
 #: web/PersonRequest.pm Line:105
 msgid "Request Access to Person Details"
-msgstr "Pyydä pääsy henkilön tietoihin"
+msgstr "Pyydä henkilön tietoja"
 
 #: web/PersonRequest.pm Line:1003 templates/personrequest/access/view.templ
 #: Line:20 Line:160
@@ -4120,9 +4062,8 @@ msgid "Request for an International Transfer Certificate"
 msgstr "Kansainvälisen peliluvan pyyntö (ITC)"
 
 #: web/PersonRequest.pm Line:123
-#, fuzzy
 msgid "Request/Initiate Player Loan"
-msgstr "Aloita pelaajasiirto"
+msgstr "Aloita määräaikainen pelaajasiirto"
 
 #: web/PersonRequest.pm Line:69
 msgid "Request/Initiate a Transfer"
@@ -4146,9 +4087,8 @@ msgid "Response has been submitted already."
 msgstr "Vastaus on jo lähetetty."
 
 #: web/PersonRequest.pm Line:254
-#, fuzzy
 msgid "Result"
-msgstr "Jatka"
+msgstr "Tulos"
 
 #: web/PersonRequest.pm Line:276
 msgid "Search Result"
@@ -4173,9 +4113,8 @@ msgid "Sorry there is no data to return"
 msgstr "Ei näytettäviä tietoja"
 
 #: web/PersonRequest.pm Line:2231
-#, fuzzy
 msgid "Source Club"
-msgstr "Nykyinen seura"
+msgstr "Pelaajan oma seura"
 
 #: web/PersonRequest.pm Line:2003 templates/selfrego/transfer_init.templ
 #: Line:106 templates/entity/venue_fields.templ Line:150
@@ -4192,14 +4131,13 @@ msgstr "Lähetä"
 
 #: web/Flow_TransferBackend.pm Line:110
 msgid "Summary and Submission"
-msgstr ""
+msgstr "Kooste ja lähetys"
 
 #: web/PersonRequest.pm Line:2260 templates/workflow/summary/loan.templ
 #: Line:36 templates/personrequest/loan/current_club_view.templ Line:134
 #: templates/personrequest/loan/new_club_view.templ Line:168
-#, fuzzy
 msgid "TMS Reference"
-msgstr "Erotuomari"
+msgstr "TMS-viite"
 
 #: web/Payments.pm Line:322 templates/registration/products.templ Line:109
 #: templates/registration/summary.templ Line:72
@@ -4215,7 +4153,7 @@ msgstr "Yhteensä"
 #: templates/payment/txn_list.templ Line:4
 #: templates/workflow/generic/payment.templ Line:8
 msgid "Transaction Number"
-msgstr "Maksunumero"
+msgstr "Maksun numero"
 
 #: web/Flow_TransferBackend.pm Line:1383
 msgid "Transfer Submitted to MA"
@@ -4237,7 +4175,7 @@ msgstr "Hyväksymme"
 #: web/Payments.pm Line:672 templates/registration/complete_sr.templ Line:37
 #: templates/registration/complete.templ Line:38
 msgid "We are sorry, there was a problem with your payment."
-msgstr ""
+msgstr "Pahoittelut, maksun rekisteröinti epäonnistui."
 
 msgid ""
 "You have \" . lc $requestResponseSuffix . \" the \" . $Defs::"
@@ -4251,9 +4189,8 @@ msgid "You will be notified once the transfer is effective and approved by "
 msgstr "Saat ilmoituksen kun pelaajasiirto on voimassa ja sen on hyväksynyt"
 
 #: web/Payments.pm Line:668
-#, fuzzy
 msgid "Your payment has been put on Hold"
-msgstr "Maksusi on hyväksytty"
+msgstr "Maksusi odottaa / on palautettu"
 
 #: web/Venues.pm Line:1135 templates/workflow/generic/actions.templ Line:36
 msgid "Add Fields"
@@ -4363,31 +4300,26 @@ msgid "Delete Rule"
 msgstr "Poista sääntö"
 
 #: web/Flow_FacilityBackend.pm Line:81
-#, fuzzy
 msgid "Enter Additional Information"
-msgstr "Lisätiedot"
+msgstr "Syötä lisätietoja"
 
 #: web/Flow_FacilityBackend.pm Line:58
-#, fuzzy
 msgid "Enter Contact Details"
-msgstr "Yhteystiedot"
+msgstr "Syötä yhteystiedot"
 
 #: web/Flow_FacilityBackend.pm Line:70
-#, fuzzy
 msgid "Enter Number of Fields"
-msgstr "Kenttien määrä"
+msgstr "Syötä lenttien määrä"
 
 #: web/Flow_FacilityBackend.pm Line:46
-#, fuzzy
 msgid "Enter Venue Information"
-msgstr "Lisää henkilötiedot"
+msgstr "Lisää kentän tiedot"
 
 # :Person FieldLabels
 #: web/Flow_FacilityBackend.pm Line:46 Line:58 Line:70 Line:81 Line:91
 #: Line:101 Line:107
-#, fuzzy
 msgid "Facility"
-msgstr "Kansalaisuus"
+msgstr "Laitos"
 
 #: web/Flow_FacilityBackend.pm Line:69 Line:80 web/FacilityEdit.pm Line:167
 #: templates/entity/venue_fields.templ Line:41
@@ -4427,9 +4359,8 @@ msgid "Invalid Facility ID"
 msgstr "Virheellinen kenttä ID"
 
 #: web/PersonFieldsSetup.pm Line:708
-#, fuzzy
 msgid "Loan Information"
-msgstr "Lisätiedot"
+msgstr "Määräaikaisen pelaajasiirron tiedot"
 
 #: web/IncompleteRegistrations.pm Line:346
 msgid "No Incomplete Registrations"
@@ -4476,9 +4407,8 @@ msgid "The system does not allow this combination"
 msgstr "Järjestelmä ei salli tätä yhdistelmää"
 
 #: web/PersonFieldsSetup.pm Line:709
-#, fuzzy
 msgid "Transfer Information"
-msgstr "Lisätiedot"
+msgstr "Pelaajasiirron tiedot"
 
 #: web/IncompleteRegistrations.pm Line:126 Line:257
 msgid "View & Resume"
@@ -4486,7 +4416,7 @@ msgstr "Näytä ja jatka"
 
 #: web/PersonFieldsSetup.pm Line:613
 msgid "What is your relationship to the minor you are registering?"
-msgstr ""
+msgstr "Mikä on suhteesi alaikäiseen henkilöön jonka olet rekisteröimässä?"
 
 #: web/PersonFieldsSetup.pm Line:501
 msgid "You must choose one of the following options"
@@ -4497,9 +4427,8 @@ msgid "to return to list of current registration types accepted"
 msgstr "palataksesi hyväksyttävien rekisteröintien listalle"
 
 #: web/registration/AccountActivation.pm Line:25
-#, fuzzy
 msgid "Account Activation"
-msgstr "Yhdistys"
+msgstr "Käyttäjätilin aktivointi"
 
 #: web/TransLog.pm Line:912
 msgid "Add Transaction"
@@ -4507,7 +4436,7 @@ msgstr "Lisää maksu"
 
 #: web/registration/AccountProfile.pm Line:76
 msgid "All fields must be entered"
-msgstr ""
+msgstr "Kaikki kentät on täytettävä"
 
 #: web/TransLog.pm Line:406
 msgid "Amount."
@@ -4515,11 +4444,11 @@ msgstr "Summa"
 
 #: web/registration/SelfUserWorkFlow.pm Line:61
 msgid "An invalid Action Code has been passed to me."
-msgstr ""
+msgstr "Virheellinen tapahtumakoodi annettu"
 
 #: web/registration/AccountProfile.pm Line:104
 msgid "Both fields must be the same"
-msgstr ""
+msgstr "Molempien kenttien on oltavat samat"
 
 #: web/TransLog.pm Line:447
 msgid "Cancel Payment"
@@ -4538,7 +4467,6 @@ msgid "Gateway Text"
 msgstr "Yhdyskäytävän teksti"
 
 #: web/TransLog.pm Line:164
-#, fuzzy
 msgid "Go to your Dashboard"
 msgstr "Siirry omalle etusivullesi"
 
@@ -4555,20 +4483,20 @@ msgid "Invalid Transaction"
 msgstr "Virheellinen maksu"
 
 #: web/registration/SelfUserWorkFlow.pm Line:52
-#, fuzzy
 msgid "Invalid access."
-msgstr "Virheellinen ID"
+msgstr "Virheellinen pääsy"
 
 #: web/registration/SelfUserTransfer.pm Line:59
-#, fuzzy
 msgid "Invalid parameters."
-msgstr "Virheellinen ID"
+msgstr "Virheelliset asetukset"
 
 #: web/registration/SelfUserTransfer.pm Line:69 Line:131
 msgid ""
 "It's either the record does not exist or you have a pending request for the "
 "same person registration record."
 msgstr ""
+"Tietuetta ei löydy, tai samalle henkilön rekisteröinnille on jo pyyntö "
+"odottamassa."
 
 #: web/TransLog.pm Line:1904
 msgid "Items making up this Payment"
@@ -4591,13 +4519,11 @@ msgid "List of Payment Records"
 msgstr "Lista maksutapahtumista"
 
 #: web/registration/Flow_PersonSelfReg.pm Line:649
-#, fuzzy
 msgid ""
 "New failed, existing registration found.  In order to continue, a Transfer "
 "from the existing Entity must be organised."
 msgstr ""
-"Rekisteröinti uutena epäonnistui, olemassa oleva rekisteröinti löytyi. Tee "
-"siirto jatkaaksesi."
+"Uusi virheellinen rekisteröinti löydetty. Tee pelaajasiirto jatkaaksesi."
 
 #: web/TransLog.pm Line:2103
 msgid "No Payment Records can be found in the database."
@@ -4605,7 +4531,7 @@ msgstr "Maksutapahtumia ei löydy tietokannasta."
 
 #: web/TransLog.pm Line:803
 msgid "No records were found with this filter"
-msgstr "Tietoja ei löytynyt tällä suodatuksella"
+msgstr "Tietoja ei löytynyt tällä rajauksella"
 
 #: web/TransLog.pm Line:986 templates/registration/product_flow_backend.templ
 #: Line:24
@@ -4619,7 +4545,6 @@ msgid "Payment For"
 msgstr "Maksu"
 
 #: web/TransLog.pm Line:956
-#, fuzzy
 msgid "Payment History"
 msgstr "Maksuhistoria"
 
@@ -4636,9 +4561,8 @@ msgid "Payments Checkout"
 msgstr "Siirry maksamaan"
 
 #: web/registration/SelfUserTransfer.pm Line:100
-#, fuzzy
 msgid "Please select from the list of Clubs."
-msgstr "Valitse kenttäluettelosta."
+msgstr "Valitse seura luettelosta."
 
 #: web/TransLog.pm Line:429
 msgid "Potential Problems"
@@ -4676,9 +4600,8 @@ msgstr "Vastauskoodi"
 #: templates/registration/complete_sr.templ Line:59
 #: templates/registration/complete.templ Line:60
 #: templates/personrequest/transfer/selftransfercomplete.templ Line:26
-#, fuzzy
 msgid "Return to your Dashboard"
-msgstr "Siirry omalle etusivullesi"
+msgstr "Palaa omalle etusivullesi"
 
 #: web/TransLog.pm Line:402
 msgid ""
@@ -4694,9 +4617,8 @@ msgid "Select"
 msgstr "Valitse"
 
 #: web/registration/SelfUserTransfer.pm Line:55
-#, fuzzy
 msgid "Start Transfer"
-msgstr "Tilisiirto"
+msgstr "Aloita pelaajasiirto"
 
 #: web/TransLog.pm Line:1630 Line:1912 templates/txn_receipt/receiptbody.templ
 #: Line:38
@@ -4738,7 +4660,7 @@ msgstr "Yhteissumma"
 
 #: web/registration/AccountProfile.pm Line:26
 msgid "User Profile"
-msgstr ""
+msgstr "Käyttäjätiedot"
 
 #: web/TransLog.pm Line:725
 msgid "View Payments"
@@ -4770,7 +4692,7 @@ msgstr "Muokkaa etusivua"
 
 #: web/registration/user/ConfirmationEmail.pm Line:62
 msgid "Confirm your email with "
-msgstr ""
+msgstr "Vahvista sähköpostiosoitteesi "
 
 #: web/dashboard/DashboardConfig.pm Line:168
 msgid "Dashboard Updated"
@@ -4829,99 +4751,85 @@ msgstr "Käyttäjätiliäsi ei ole vielä hyväksytty"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1740
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1738
-#, fuzzy
 msgid "Affiliations"
-msgstr "Ilmoitukset"
+msgstr "Kumppanuudet"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1446
 #: web/Reports/ReportAdvanced_BelowPeople.pm
 #: templates/emails/payments/payment_receipt.templ Line:71
-#, fuzzy
 msgid "Bank Reference Number"
-msgstr "Maksutapahtuma"
+msgstr "Pankin viitenumero"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:566
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Birth Certificate Country"
-msgstr "Syntymätodistus"
+msgstr "Syntymätodistuksen alkuperämaa"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:557
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Birth Certificate Notes"
-msgstr "Syntymätodistus"
+msgstr "Syntymätodistuksen lisätiedot"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:548
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Birth Certificate Number"
-msgstr "Syntymätodistus"
+msgstr "Syntymätodistuksen numero"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:579
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Birth Certificate Valid From"
 msgstr "Syntymätodistus voimassa alkaen"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:591
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Birth Certificate Valid To"
-msgstr "Syntymätodistus voimassa päättyen"
+msgstr "Syntymätodistus voimassa asti"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:389
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Entity Name"
-msgstr "Etunimi"
+msgstr "Kohteen nimi"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1738
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1736
-#, fuzzy
 msgid "Financial"
-msgstr "Peruuta"
+msgstr "Taloudellinen"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1737
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1735
-#, fuzzy
 msgid "Identifications"
-msgstr "Todistukset"
+msgstr "Tunnisteet"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1403
 #: web/Reports/ReportAdvanced_BelowPeople.pm
 msgid "Line Item Total"
-msgstr ""
+msgstr "Rivit yhteensä"
 
 # :Person FieldLabels
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1424
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Manual Receipt Reference"
 msgstr "Selite/viite"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1741
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1739
-#, fuzzy
 msgid "Member Records"
-msgstr "Jäsenkortit"
+msgstr "Jäsentiedot"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1464
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Order Total"
 msgstr "Yhteensä"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1739
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1737
-#, fuzzy
 msgid "Other Fields"
-msgstr "Poista kentät"
+msgstr "Muut kentät"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1488
 #: web/Reports/ReportAdvanced_BelowPeople.pm
@@ -4932,38 +4840,33 @@ msgstr "Maksupäivä"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1455
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Payment Log ID"
-msgstr "Maksunumero"
+msgstr "Maksun numero"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1554
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Payment Record Notes"
-msgstr "Maksutapahtuma"
+msgstr "Maksutapahtuman lisätiedot"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:373
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Payment Required ?"
-msgstr "Maksu vaaditaan"
+msgstr "Maksu vaaditaan?"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1223
 #: web/Reports/ReportAdvanced_BelowPeople.pm
 msgid "Photo Present?"
-msgstr ""
+msgstr "Onko valokuva olemassa?"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1393
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Product Group"
-msgstr "Tuotteen tyyppi"
+msgstr "Tuoteryhmä"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1363
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Product Reporting"
-msgstr "Tuotteen tyyppi"
+msgstr "Tuotetilasto"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1735
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1733
@@ -4974,39 +4877,33 @@ msgstr "Rekisteröinnit"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1499
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Settlement Date"
 msgstr "Maksupäivä"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1475
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Transaction Date"
-msgstr "Tapahtuman tiedot"
+msgstr "Tilauispäivä"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1354
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Transaction ID"
-msgstr "Maksut"
+msgstr "Maksun numero"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1545
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Transaction Notes"
-msgstr "Maksut"
+msgstr "Maksun lisätiedot"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1534
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Transaction Status"
-msgstr "Tapahtuman tiedot"
+msgstr "Maksun tila"
 
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:207
 #: web/Reports/ReportAdvanced_BelowPeople.pm
-#, fuzzy
 msgid "Year of Birth"
-msgstr "Syntymäaika"
+msgstr "Syntymävuosi"
 
 #: web/Reports/ReportAdvanced.pm Line:336
 msgid "All Records"
@@ -5055,7 +4952,7 @@ msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:260
 msgid "Filter Only"
-msgstr "Pelkkä suodatus"
+msgstr "Pelkkä rajaus"
 
 #: web/Reports/ReportAdvanced.pm Line:411
 msgid "Group By"
@@ -5139,9 +5036,8 @@ msgstr "Hyväksyjä"
 
 #: templates/dashboards/personregistration.templ Line:210
 #: templates/personrequest/loan/new_club_view.templ Line:229
-#, fuzzy
 msgid "Cancel Player Loan"
-msgstr "Peruuta maksu"
+msgstr "Peruuta määräaikainen pelaajasiirto"
 
 #: templates/dashboards/club.templ Line:29
 msgid "Contacts"
@@ -5155,9 +5051,8 @@ msgstr "Kotipuhelin"
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:24
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
-#, fuzzy
 msgid "Lending Club"
-msgstr "Pyytävä seura"
+msgstr "Pelaaja oma seura"
 
 #: templates/dashboards/person.templ Line:153
 msgid "Mark as Duplicate"
@@ -5243,7 +5138,7 @@ msgstr "Tehtävät"
 #: templates/dashboards/personregistration.templ Line:176
 #: templates/workflow/view/person.templ Line:265
 msgid "Valid To"
-msgstr "Päättyen"
+msgstr "Voimassa asti"
 
 #: templates/dashboards/personregistration.templ Line:71
 #: templates/workflow/generic/document.templ Line:68
@@ -5272,26 +5167,23 @@ msgstr "roolilla"
 
 #: templates/selfrego/home.templ Line:20
 msgid "A minor in my care"
-msgstr ""
+msgstr "Lisää alaikäinen lapseni"
 
 #: templates/selfrego/accordion.templ Line:63
-#, fuzzy
 msgid "Add Coach Role"
-msgstr "Lisää valmentaja"
+msgstr "Lisää valmentajarooli"
 
 #: templates/selfrego/accordion.templ Line:60 Line:62
-#, fuzzy
 msgid "Add Player Role"
-msgstr "Lisää pelaaja"
+msgstr "Lisää pelaajarooli"
 
 #: templates/selfrego/accordion.templ Line:64
-#, fuzzy
 msgid "Add Referee Role"
-msgstr "Lisää erotuomari"
+msgstr "Lisää erotuomarirooli"
 
 #: templates/selfrego/home.templ Line:9
 msgid "Add an additional person?"
-msgstr ""
+msgstr "Lisää toinen henkilö?"
 
 #: templates/dashboards/worktasks.templ Line:71
 msgid "All tasks"
@@ -5303,11 +5195,11 @@ msgstr "Muokka henkilön tietoja"
 
 #: templates/selfrego/home.templ Line:22
 msgid "Another minor in my care"
-msgstr ""
+msgstr "Toinen alaikäinen lapseni"
 
 #: templates/selfrego/user/profile.templ Line:42
 msgid "Change your password"
-msgstr ""
+msgstr "Vaihda salasana"
 
 #: templates/dashboards/personstatus.templ Line:77 Line:79
 msgid "Cleared Out"
@@ -5316,7 +5208,7 @@ msgstr "Tyhjennetty"
 #: templates/selfrego/wrapper.templ Line:93
 #: templates/page_wrapper/main_wrapper.templ Line:172
 msgid "Columns"
-msgstr ""
+msgstr "Sarakkeet"
 
 #: templates/selfrego/transfer_init.templ Line:74
 #: templates/emails/notification/personrequest/html/requestloan_denied.templ
@@ -5337,7 +5229,7 @@ msgstr "Nykyinen seura"
 
 #: templates/selfrego/accordion.templ Line:22
 msgid "DOB"
-msgstr ""
+msgstr "Syntymäaika"
 
 #: templates/search/grid/people.templ Line:7
 msgid "Date Added"
@@ -5355,9 +5247,8 @@ msgid "Enter a person's name or Member ID"
 msgstr "Syötä henkilön nimi tai PalloID"
 
 #: templates/selfrego/user/login.templ Line:16
-#, fuzzy
 msgid "Forgot your password?"
-msgstr "Siirry omalle etusivullesi"
+msgstr "Salasana unohtunut?"
 
 #: templates/dashboards/worktasks.templ Line:54
 #: templates/personrequest/transfer/search_result.templ Line:25
@@ -5371,7 +5262,7 @@ msgstr "Listaa odottavat rekisteröinnit"
 
 #: templates/selfrego/home.templ Line:17
 msgid "Myself"
-msgstr ""
+msgstr "Itseni"
 
 #: templates/dashboards/worktasks.templ Line:284
 msgid "New Club Official Registration"
@@ -5417,7 +5308,7 @@ msgstr "Uusi tehtävä"
 #: templates/personrequest/transfer/search_result.templ Line:67
 #: templates/person/list.templ Line:106
 msgid "No entries to show"
-msgstr ""
+msgstr "Ei tuloksia"
 
 #: templates/search/wrapper.templ Line:8
 msgid "No result found"
@@ -5487,9 +5378,8 @@ msgid "Passwords do not match"
 msgstr "Salasanat eivät täsmää"
 
 #: templates/selfrego/accordion.templ Line:33
-#, fuzzy
 msgid "Period"
-msgstr "Valitse kausi"
+msgstr "Kausi"
 
 #: templates/search/form.templ Line:5
 msgid "Person Details"
@@ -5525,9 +5415,8 @@ msgid "Please provide a password"
 msgstr "Keksi salasana"
 
 #: templates/selfrego/transfer_init.templ Line:130
-#, fuzzy
 msgid "Please select from the list of Clubs"
-msgstr "Valitse kenttäluettelosta."
+msgstr "Valitse seura luettelosta"
 
 #: templates/dashboards/worktasks.templ Line:232 Line:242
 msgid "Quick Links"
@@ -5556,9 +5445,8 @@ msgid "Registered but Inactive"
 msgstr "Rekisteröity mutta inaktiivinen"
 
 #: templates/selfrego/accordion.templ Line:46
-#, fuzzy
 msgid "Renew"
-msgstr "Uudistaa"
+msgstr "Uudista"
 
 #: templates/dashboards/worktasks.templ Line:289 Line:327
 msgid "Renewal of Coach Registration"
@@ -5578,31 +5466,29 @@ msgstr "Uudistamiset"
 
 #: templates/dashboards/worktasks.templ Line:219
 msgid "Request Access"
-msgstr "Pyydä pääsy"
+msgstr "Pyydä henkilön tietoja"
 
 #: templates/search/grid/personregistration.templ Line:64
 #: templates/person/list.templ Line:88
 msgid "Request Access for approval"
-msgstr "Pyydä pääsy hyväksymään"
+msgstr "Pyydä henkilön tietoja, hyväksyttäväksi"
 
 #: templates/search/grid/personregistration.templ Line:62
 #: templates/person/list.templ Line:86
 msgid "Request Access sent to Club"
-msgstr "Pyydä pääsy lähettämään seuralle"
+msgstr "Pyydä henkilön tietoja, lähetetty seuralle"
 
 #: templates/selfrego/transfer_init.templ Line:91
-#, fuzzy
 msgid "Request notes"
-msgstr "Pyynnön merkinnät"
+msgstr "Pyynnön lisätiedot"
 
 #: templates/dashboards/worktasks.templ Line:235 Line:246
 msgid "Request or Start a Transfer"
 msgstr "Pyydä tai aloita pelaajasiirto"
 
 #: templates/dashboards/worktasks.templ Line:140
-#, fuzzy
 msgid "Review Player loan of"
-msgstr "Tarkista pelaajasiirto"
+msgstr "Tarkista määräaikainen pelaajasiirto"
 
 #: templates/dashboards/worktasks.templ Line:128
 msgid "Review Transfer of"
@@ -5633,14 +5519,12 @@ msgid "Search keyword is required."
 msgstr "Hakusana on pakollinen."
 
 #: templates/selfrego/transfer_init.templ Line:82
-#, fuzzy
 msgid "Select Club"
-msgstr "Valitse maa"
+msgstr "Valitse seura"
 
 #: templates/selfrego/home.templ Line:1
-#, fuzzy
 msgid "Self Registration Dashboard"
-msgstr "Valitse rekisteröinti"
+msgstr "Jäsenrekisterin etusivu"
 
 #: templates/selfrego/user/login.templ Line:13 templates/user/loginform.templ
 #: Line:16
@@ -5648,9 +5532,8 @@ msgid "Sign in"
 msgstr "Kirjaudu sisään"
 
 #: templates/selfrego/user/login.templ Line:9
-#, fuzzy
 msgid "Sign into Self Registration"
-msgstr "Rekisteröinnin loppu"
+msgstr "Kirjaudu jäsenrekisteriin"
 
 #: templates/dashboards/worktasks.templ Line:53
 #: templates/search/grid/personregistration.templ Line:25
@@ -5686,7 +5569,7 @@ msgstr "Aktiivisia tehtäviä"
 
 #: templates/dashboards/worktasks.templ Line:225
 msgid "Total Task On Hold"
-msgstr "Pidossa olevia tehtäviä"
+msgstr "Palautettuja tehtäviä"
 
 #: templates/dashboards/worktasks.templ Line:226
 msgid "Total Task Pending"
@@ -5707,14 +5590,12 @@ msgid "Transfer Details"
 msgstr "Pelaajasiirron tiedot"
 
 #: templates/selfrego/transfer_init.templ Line:80
-#, fuzzy
 msgid "Transfer To"
-msgstr "Pelaajasiirto"
+msgstr "Siirry seuraan"
 
 #: templates/selfrego/accordion.templ Line:31
-#, fuzzy
 msgid "Type/Level"
-msgstr "Henkilön taso"
+msgstr "Taso"
 
 #: templates/selfrego/user/profile.templ Line:57
 #: templates/user/modify_user_password.templ Line:20
@@ -5722,14 +5603,12 @@ msgid "Update Password"
 msgstr "Päivitä salasana"
 
 #: templates/selfrego/home.templ Line:3
-#, fuzzy
 msgid "Update Profile"
-msgstr "Lähetä profiilikuva"
+msgstr "Päivitä käyttäjätiedot"
 
 #: templates/selfrego/user/profile.templ Line:14
-#, fuzzy
 msgid "Update your details"
-msgstr "pelaajatietoihin taholle"
+msgstr "Päivitä käyttäjätietosi"
 
 #: templates/search/grid/personregistration.templ Line:66
 #: templates/personrequest/transfer/search_result.templ Line:52
@@ -5752,18 +5631,16 @@ msgid "Welcome"
 msgstr "Tervetuloa"
 
 #: templates/selfrego/user/login.templ Line:6
-#, fuzzy
 msgid "Welcome..."
 msgstr "Tervetuloa"
 
 #: templates/selfrego/home.templ Line:29
-#, fuzzy
 msgid "What type of registration do you want?"
-msgstr "Tämä rekisteröintityyppi ei ole mahdollinen"
+msgstr "Minkä rekisteröinnin haluat tehdä?"
 
 #: templates/selfrego/home.templ Line:11
 msgid "Who are you registering for?"
-msgstr ""
+msgstr "Kenet haluat rekisteröidä?"
 
 #: templates/search/grid/personregistration.templ Line:26
 #: templates/person/list.templ Line:24
@@ -5774,7 +5651,7 @@ msgstr "Nuorin"
 #: templates/personrequest/transfer/search_result.templ Line:67
 #: templates/person/list.templ Line:106
 msgid "filtered from _MAX_ records"
-msgstr ""
+msgstr "Rajattu määrästä _MAX_ records"
 
 #: templates/dashboards/worktasks.templ Line:93 Line:105 Line:117
 msgid "has accepted request for"
@@ -5782,18 +5659,17 @@ msgstr "on hyväksynyt pyynnön"
 
 #: templates/dashboards/worktasks.templ Line:107
 #: templates/personrequest/loan/current_club_view.templ Line:8
-#, fuzzy
 msgid "has requested a player loan for"
-msgstr "on hyväksynyt pelaajasiirron"
+msgstr "on pyytänyt määräaikaisen pelaajasiirron pelaajalle"
 
 #: templates/dashboards/worktasks.templ Line:95
 #: templates/personrequest/transfer/current_club_view.templ Line:8
 msgid "has requested a transfer for"
-msgstr "on hyväksynyt pelaajasiirron"
+msgstr "on pyytänyt pelaajasiirron pelaajalle"
 
 #: templates/dashboards/worktasks.templ Line:119
 msgid "has requested access for"
-msgstr "on pyytänyt pääsyä"
+msgstr "on pyytänyt seuraavan henkilön tietoja:"
 
 #: templates/selfrego/user/profile.templ Line:102 Line:106
 #: templates/selfrego/user/signup.templ Line:94 Line:98
@@ -5804,26 +5680,23 @@ msgstr "on oltava vähintään 6 merkkiä pitkä"
 
 #: templates/selfrego/user/profile.templ Line:47
 #: templates/selfrego/user/signup.templ Line:44
-#, fuzzy
 msgid "password"
-msgstr "Salasana"
+msgstr "salasana"
 
 #: templates/selfrego/user/profile.templ Line:53
 #: templates/selfrego/user/signup.templ Line:51
-#, fuzzy
 msgid "re-enter password"
-msgstr "Salasana uudelleen"
+msgstr "vahvista salasana"
 
 #: templates/selfrego/accordion.templ Line:42
-#, fuzzy
 msgid "valid until"
-msgstr "päättyen"
+msgstr "voimassa asti"
 
 #: templates/registration/complete_sr.templ Line:21
 #: templates/registration/complete.templ Line:22
 #: templates/personrequest/transfer/complete.templ Line:19
 msgid " Please note that any Level/Status change is subject to"
-msgstr ""
+msgstr " Huomaa että tason tai pelaajastatuksen muutos aiheuttaa"
 
 #: templates/registration/product_flow_backend.templ Line:25 Line:32
 msgid "(after you submit the registration to the"
@@ -5839,6 +5712,8 @@ msgid ""
 "An error has been encountered while activating your account. Please check "
 "your email for the correct link."
 msgstr ""
+"Virhe käyttäjätilin vahvistamisessa. Tarkista oikea vahvistuslinkki "
+"sähköpostistasi."
 
 #: templates/registration/complete_sr.templ Line:25
 #: templates/registration/completebulk.templ Line:10
@@ -5888,7 +5763,7 @@ msgstr "Nimen kieli"
 
 #: templates/registration/sr_account_activation_result.templ Line:12
 msgid "Login to continue"
-msgstr ""
+msgstr "Kirjaudu jatkaaksesi"
 
 #: templates/registration/summary.templ Line:13
 msgid "Maiden Name"
@@ -5912,7 +5787,7 @@ msgstr "Rekisteröinnin laatu"
 #: templates/registration/complete.templ Line:22
 #: templates/personrequest/transfer/complete.templ Line:19
 msgid "New Level/Status"
-msgstr ""
+msgstr "Uusi taso/pelaajastatus"
 
 #: templates/registration/no_prev_certification.templ Line:6
 msgid "No Previous Certifications found"
@@ -5982,21 +5857,18 @@ msgstr "Postinumero"
 #: templates/registration/complete_sr.templ Line:21
 #: templates/registration/complete.templ Line:22
 #: templates/personrequest/transfer/complete.templ Line:19
-#, fuzzy
 msgid "Previous Level/Status"
-msgstr "Edellinen seura"
+msgstr "Edellinen taso/pelaajastatus"
 
 #: templates/registration/complete_sr.templ Line:63
 #: templates/registration/complete.templ Line:64
-#, fuzzy
 msgid "Register another "
-msgstr "Rekisteröi toinen"
+msgstr "Rekisteröi uusi"
 
 #: templates/registration/complete_sr.templ Line:65
 #: templates/registration/complete.templ Line:66
-#, fuzzy
 msgid "Register another Person"
-msgstr "Rekisteröi toinen henkilö"
+msgstr "Rekisteröi uusi henkilö"
 
 #: templates/registration/summary.templ Line:51
 #: templates/registration/summarybulk.templ Line:36
@@ -6052,14 +5924,12 @@ msgid "Reset Registration"
 msgstr "Nollaa rekisteröinti"
 
 #: templates/registration/completebulk.templ Line:34
-#, fuzzy
 msgid "Return to Bulk Renewals"
-msgstr "Nippu-uudistaminen"
+msgstr "Palaa nippu-uudistamiseen"
 
 #: templates/selfrego/user/signupfinish.templ Line:18
-#, fuzzy
 msgid "Return to login page"
-msgstr "Palaa maksuihin"
+msgstr "Palaa kirjautumissivulle"
 
 #: templates/registration/entityselect.templ Line:7
 msgid "SEARCH/FIND A CLUB"
@@ -6073,9 +5943,8 @@ msgstr "Valitse maksutapa"
 #: templates/registration/complete_sr.templ Line:21
 #: templates/registration/complete.templ Line:22
 #: templates/personrequest/transfer/complete.templ Line:19
-#, fuzzy
 msgid "Status Change"
-msgstr "Tila"
+msgstr "Tilan muutos"
 
 #: templates/registration/what.templ Line:65
 #: templates/registration/whatbulk.templ Line:30
@@ -6083,9 +5952,8 @@ msgid "Sub Role"
 msgstr "Kategoria"
 
 #: templates/registration/summary.templ Line:105
-#, fuzzy
 msgid "Submit for approval"
-msgstr "Pyydä pääsy hyväksymään"
+msgstr "Lähetä hyväksyttäväksi"
 
 #: templates/registration/complete_sr.templ Line:14
 #: templates/registration/complete.templ Line:15
@@ -6139,27 +6007,25 @@ msgid "Who do you wish to add a New To"
 msgstr "Kenelle haluat lisätä uuden"
 
 #: templates/registration/complete_sr.templ Line:17
-#, fuzzy
 msgid "Your Registration has been submitted for approval"
-msgstr "Rekisteröinti on lähetetty kohteeseen"
+msgstr "Rekisteröinti on lähetetty hyväksyttäväksi"
 
 #: templates/registration/sr_account_activation_result.templ Line:11
-#, fuzzy
 msgid "Your account has been activated successfully."
-msgstr "Käyttäjätilisi on poistettu"
+msgstr "Käyttäjätilisi on nyt aktivoitu"
 
 #: templates/registration/sr_account_activation_result.templ Line:7
 msgid ""
 "Your confirmation key is invalid. Please check your email for the correct "
 "link."
-msgstr ""
+msgstr "Vahvistusavain on virheellinen. Tarkista oikea linkki sähköpostistasi."
 
 #: templates/registration/complete_sr.templ Line:34
 #: templates/registration/complete.templ Line:35
 msgid ""
 "Your payment has been put on Hold.<br>Once processed you will be notified as "
 "to Payment Status."
-msgstr ""
+msgstr "Maksusi on asetettu odottamaan.<br>Saat tiedon kun se on käsitelty."
 
 #: templates/registration/what.templ Line:37
 #: templates/registration/whatbulk.templ Line:15
@@ -6191,9 +6057,8 @@ msgstr ""
 #: templates/registration/complete_sr.templ Line:21
 #: templates/registration/complete.templ Line:22
 #: templates/personrequest/transfer/complete.templ Line:19
-#, fuzzy
 msgid "approval"
-msgstr "hyväksytty"
+msgstr "hyväksyntä"
 
 #: templates/registration/document_flow_backend.templ Line:75
 #: templates/club/required_docs.templ Line:64 Line:159
@@ -6239,9 +6104,8 @@ msgid "Date Valid Until"
 msgstr "Voimassa asti"
 
 #: templates/registration/playerpassport.templ Line:9
-#, fuzzy
 msgid "End"
-msgstr "ja"
+msgstr "Loppu"
 
 #: templates/registration/playerpassport.templ Line:12
 #: templates/emails/notification/myfas-notification-template.templ Line:32
@@ -6267,9 +6131,8 @@ msgid "Optional Documents"
 msgstr "Vapaaehtoiset dokumentit"
 
 #: templates/registration/complete.templ Line:18
-#, fuzzy
 msgid "Registration has been submitted for approval"
-msgstr "Rekisteröinti on lähetetty kohteeseen"
+msgstr "Rekisteröinti on lähetetty hyväksyttäväksi"
 
 #: templates/registration/document_flow_backend.templ Line:76
 #: templates/club/required_docs.templ Line:65 Line:160
@@ -6281,9 +6144,8 @@ msgid "Required Documents"
 msgstr "Pakolliset dokumentit"
 
 #: templates/registration/playerpassport.templ Line:8
-#, fuzzy
 msgid "Start"
-msgstr "Aloitettu"
+msgstr "Alku"
 
 #: templates/registration/document_flow_backend.templ Line:48 Line:53 Line:153
 #: Line:158 templates/entity/required_docs.templ Line:39 Line:44 Line:126
@@ -6300,15 +6162,14 @@ msgstr "Lähetetty"
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:29
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
-#, fuzzy
 msgid "Borrowing Club"
-msgstr "Nykyinen seura"
+msgstr "Seura määräaikana"
 
 #: templates/emails/notification/myfas-notification-template.templ Line:49
 #: templates/emails/notification/hk-notification-template.templ
 #: templates/emails/notification/FI-notification-template.templ
 msgid "Copyright text goes here"
-msgstr ""
+msgstr "Copyright Suomen Palloliitto"
 
 #: templates/emails/registration/activate.templ Line:5
 #: templates/emails/notification/workflow/html/wftask_added.templ
@@ -6337,7 +6198,7 @@ msgstr ""
 #: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
 msgid "Dear"
-msgstr "Rakas"
+msgstr "Hyvä"
 
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:23
 #: templates/emails/notification/workflow/html/wftask_rejected.templ
@@ -6388,7 +6249,7 @@ msgstr "Alkuunpanija"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "Please click"
-msgstr ""
+msgstr "Paina tästä"
 
 #: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: Line:24 templates/emails/notification/personrequest/html/request_itc.templ
@@ -6471,13 +6332,13 @@ msgstr "Pyytävä seura"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "Thank you for registering with"
-msgstr ""
+msgstr "Kiitos rekisteröitymisestä -"
 
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:9
 #: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
 msgid "The"
-msgstr ""
+msgstr " "
 
 #: templates/emails/notification/workflow/html/wftask_approved.templ Line:9
 msgid ""
@@ -6504,8 +6365,8 @@ msgid ""
 "you are required to take are detailed below. Please action this as soon as "
 "possible."
 msgstr ""
-"Seuraava tehtävä on PIDOSSA. Tarkemmat tiedot löydät alla. Ole hyvä ja tee "
-"tarvittavat toimet mahdollisimman pian."
+"Seuraava tehtävä on PALAUTETTU. Tarkemmat tiedot löydät alla. Ole hyvä ja "
+"tee tarvittavat toimet mahdollisimman pian."
 
 #: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: Line:9
@@ -6560,32 +6421,32 @@ msgstr "Työtehtävää on jatkettu"
 
 #: templates/emails/notification/personrequest/html/requestloan_denied.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has REJECTED the loan of the player listed below. The reason for the "
 "rejection is detailed below. If you think there is a problem with this "
 "rejection you will need to contact"
 msgstr ""
-"on HYLÄNNYT alla olevan pelaajasiirron. Alla tarkemmat tiedot hylkäämisen "
-"syystä. Jos olet asiasta eri mieltä, ole yhteydessä seuraavaan tahoon"
+"on HYLÄNNYT alla olevan määräaikaisen pelaajasiirron. Alla tarkemmat tiedot "
+"hylkäämisen syystä. Jos olet asiasta eri mieltä, ole yhteydessä seuraavaan "
+"tahoon"
 
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has REJECTED this loan. The reason for this is detailed below. This "
 "transaction is now cancelled. Please note that when a task is rejected it "
 "cannot be resumed. You would need start over and resubmit a new task through"
 msgstr ""
-"on HYLÄNNYT tämän pelaajasiirron. Näet tarkemman syyn alla. Tämä tehtävä on "
-"nyt päättynyt, eikä sitä voi jatkaa. Jos haluat jatkaa, aloita uusi tehtävä"
+"on HYLÄNNYT tämän määräaikaisen pelaajasiirron. Näet tarkemman syyn alla. "
+"Tämä tehtävä on nyt päättynyt, eikä sitä voi jatkaa. Jos haluat jatkaa, "
+"aloita uusi tehtävä"
 
 #: templates/emails/notification/workflow/html/wftask_resolved.templ Line:9
 msgid ""
 "has UPDATED the following task, which was  previously on hold. It is now "
 "availble for you review and approval."
 msgstr ""
-"on PÄIVITTÄNYT seuraavaa tehtävää, joka on aikaisemmin ollut pidossa. "
+"on PÄIVITTÄNYT seuraavaa tehtävää, joka on aikaisemmin ollut palautettuna. "
 "Tehtävä odottaa nyt sinun tarkastusta ja hyväksyntään."
 
 #: templates/emails/notification/personrequest/html/requestaccess_accepted.templ
@@ -6607,11 +6468,11 @@ msgstr "tukipalvelu"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "here"
-msgstr ""
+msgstr "tästä"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "to confirm your account."
-msgstr ""
+msgstr "vahvistaaksesi käyttäjätilisi"
 
 msgid "Club's Name"
 msgstr "Seuran nimi"
@@ -6639,17 +6500,16 @@ msgstr "Pyyntö pääsystä valmistunut"
 #: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
 #: Line:9
 msgid "Request Access Rejected"
-msgstr "Pyyntö pääsyyn on hylätty"
+msgstr "Pyyntö pääsystä henkilön tietoihin on hylätty"
 
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "The request for loan for the player listed below has been APPROVED by all "
 "necessary organisations. The player record is now assigned to the new club"
 msgstr ""
-"Alla oleva pelaajasiirto on nyt kaikkien tarvittavien tahojen hyväksymä. "
-"Pelaaja on nyt rekisteröity uuteen seuraan."
+"Alla oleva määräaikainen pelaajasiirto on nyt kaikkien tarvittavien tahojen "
+"HYVÄKSYMÄ. Pelaaja on nyt rekisteröity uuteen seuraan määräajaksi."
 
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
 #: Line:9
@@ -6658,13 +6518,12 @@ msgstr "Sinulta vaaditaan toimenpiteitä tähän pyyntöön liittyen"
 
 #: templates/emails/notification/personrequest/html/requestloan_accepted.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has APPROVED the player loan as detailed below.  You can now continue with "
 "the transfer or cancel this transfer request"
 msgstr ""
-"on HYVÄKSYNYT alla olevan pelaajasiirron. Voit nyt jatkaa pelaajasiirtoa, "
-"tai hylätä siirtopyynnön"
+"on HYVÄKSYNYT alla olevan määräaikaisen pelaajasiirron. Voit nyt jatkaa "
+"pelaajasiirtoa, tai hylätä siirtopyynnön"
 
 #: templates/emails/notification/personrequest/html/requestaccess_denied.templ
 #: Line:9
@@ -6697,7 +6556,6 @@ msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has REQUESTED for a transfer. You are required to take action on this "
 "request within 7 days."
@@ -6707,13 +6565,12 @@ msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestloan_sent.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has REQUESTED the loan of the following player. You are required to take "
 "action on this request within 7 days."
 msgstr ""
-"on PYYTÄNYT seuraavan pelaajan pelaajasiirtoa. Sinulta vaaditaan vastaus 7 "
-"päivän sisällä."
+"on PYYTÄNYT seuraavan pelaajan määräaikaista pelaajasiirtoa. Sinulta "
+"vaaditaan vastaus 7 päivän sisällä."
 
 #: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
 #: Line:9
@@ -6726,11 +6583,10 @@ msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: Line:9
-#, fuzzy
 msgid ""
 "has decided to cancel this request for loan. The player remains with your "
 "organisation."
-msgstr "on päättänyt perua pelaajasiirron. Pelaaja jää seuraasi."
+msgstr "on päättänyt perua määräaikaisen pelaajasiirron. Pelaaja jää seuraasi."
 
 #: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
 #: Line:9
@@ -6754,19 +6610,16 @@ msgid "has submitted an ITC request for the person listed below."
 msgstr "on lähettänyt kansainvälisen pelilupapyynnön seuraavasta henkilöstä"
 
 #: templates/emails/payments/payment_receipt.templ Line:81
-#, fuzzy
 msgid "A payment of"
 msgstr "Maksu"
 
 #: templates/emails/payments/payment_receipt.templ Line:64
-#, fuzzy
 msgid "Date Purchased"
 msgstr "Maksupäivä"
 
 #: templates/emails/payments/payment_receipt.templ Line:18
-#, fuzzy
 msgid "Payment Confirmation"
-msgstr "Maksuasetukset"
+msgstr "Maksun vahvistus"
 
 #: templates/emails/payments/payment_receipt.templ Line:38
 #: templates/txn_receipt/fnswreceipt.templ Line:55
@@ -6775,14 +6628,12 @@ msgid "Receipt No"
 msgstr "Kuitin numero"
 
 #: templates/emails/payments/payment_receipt.templ Line:59
-#, fuzzy
 msgid "You have successfully made a payment of"
-msgstr "Salasanasi on nyt päivitetty."
+msgstr "Maksu suoritettu onnistuneesti"
 
 #: templates/emails/payments/payment_receipt.templ Line:81
-#, fuzzy
 msgid "at"
-msgstr "Päivämäärä"
+msgstr "aika"
 
 #: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
 #: Line:9
@@ -6913,9 +6764,8 @@ msgid "There is no viewer for this type of file."
 msgstr "Tämän tyyppisen tiedoston esikatselua ei voida näyttää."
 
 #: templates/entity/venue_fields.templ Line:145
-#, fuzzy
 msgid "To delete click 'Submit', to cancel, click 'Close'"
-msgstr "Valitse 'Lähetä' jatkaaksesi, muuten 'Sulje'"
+msgstr "Valitse 'Lähetä' poistaaksesi, muuten 'Sulje'"
 
 #: templates/team/invite_teammates.templ Line:11
 msgid "Choose competition"
@@ -6987,13 +6837,11 @@ msgstr "Lataa CSV"
 
 #: templates/payment/payment_error.templ Line:29
 #: templates/payment/payment_failure.templ Line:19
-#, fuzzy
 msgid "Payment Reference Number"
-msgstr "Maksutapahtuma"
+msgstr "Maksun viitenumero"
 
 #: templates/payment/payment_error.templ Line:25
 #: templates/payment/payment_failure.templ Line:15
-#, fuzzy
 msgid "Payment for"
 msgstr "Maksu"
 
@@ -7026,7 +6874,7 @@ msgstr "Tallenne raportti"
 msgid ""
 "See below for details, please close this window and click Pay Now to try "
 "again"
-msgstr ""
+msgstr "Lisätiedot alla. Sulje tämä ikkuna, ja yritä maksua uudelleen"
 
 #: templates/team/team_staff.templ Line:28
 msgid "Staff Member"
@@ -7038,9 +6886,8 @@ msgstr "Tieto sisältää"
 
 #: templates/payment/payment_error.templ Line:11
 #: templates/payment/payment_failure.templ Line:2
-#, fuzzy
 msgid "There was an Error with your Payment."
-msgstr "Virheellinen maksu"
+msgstr "Virhe maksua suoritettaessa."
 
 #: templates/reports/email_confirmation.templ Line:3
 msgid "Your data export has been processed and emailed to"
@@ -7051,33 +6898,28 @@ msgid "rows"
 msgstr "riviä"
 
 #: templates/translation/outstanding.templ Line:32
-#, fuzzy
 msgid "Advanced Club"
-msgstr "Lisää seura"
+msgstr "Tarkennettu seura"
 
 #: templates/translation/outstanding.templ Line:34
-#, fuzzy
 msgid "Advanced Transfers Report"
-msgstr "Peruuta pelaajasiirto"
+msgstr "Laaja pelaajasiirtoraportti"
 
 #: templates/payment/invoicetemplate.templ Line:68
-#, fuzzy
 msgid "Amount To Pay"
-msgstr "Maksettu"
+msgstr "Maksettava summa"
 
 #: templates/payment/pay_invoice_payment_error.templ Line:19
 msgid "Association Name"
 msgstr "Yhdistyksen nimi"
 
 #: templates/translation/outstanding.templ Line:22
-#, fuzzy
 msgid "Coach Registration"
-msgstr "Uuden valmentajan rekisteröinti"
+msgstr "Valmentajan rekisteröinti"
 
 #: templates/translation/outstanding.templ Line:29
-#, fuzzy
 msgid "Finance"
-msgstr "Peruuta"
+msgstr "Talous"
 
 #: templates/payment/pay_invoice_payment_error.templ Line:9
 msgid "Gateway Response Code"
@@ -7089,9 +6931,8 @@ msgid "Help"
 msgstr "Apua"
 
 #: templates/payment/invoicetemplate.templ Line:47
-#, fuzzy
 msgid "Invoice No."
-msgstr "Maksa laskut nyt"
+msgstr "Lasku nro"
 
 #: templates/page_wrapper/main_wrapper.templ Line:96
 #: templates/user/globalnav.templ Line:20
@@ -7099,9 +6940,8 @@ msgid "Logout"
 msgstr "Kirjaudu ulos"
 
 #: templates/translation/outstanding.templ Line:24
-#, fuzzy
 msgid "MA Official Registration"
-msgstr "Uuden liiton toimihenkilön rekisteröinti"
+msgstr "Liiton toimihenkilön rekisteröinti"
 
 #: templates/translation/outstanding.templ Line:19
 msgid "National Body"
@@ -7121,12 +6961,11 @@ msgstr "Maksu on suoritettu laskulle"
 
 #: templates/payment/pay_invoice_payment_error.templ Line:24
 msgid "Payment ID"
-msgstr "Maksunumero"
+msgstr "Maksun numero"
 
 #: templates/translation/outstanding.templ Line:21
-#, fuzzy
 msgid "Player Registration"
-msgstr "Uuden pelaajan rekisteröinti"
+msgstr "Pelaajan rekisteröinti"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:19
 msgid "Please enter the information for transaction you want to process."
@@ -7145,14 +6984,12 @@ msgstr ""
 "Valitse rekisteröitävät henkilöt alla olevalta listalta, ja valitse päivitä."
 
 #: templates/payment/invoicetemplate.templ Line:3
-#, fuzzy
 msgid "Receipt"
-msgstr "Kuitin numero"
+msgstr "Kuitti"
 
 #: templates/translation/outstanding.templ Line:23
-#, fuzzy
 msgid "Referee Registration"
-msgstr "Uuden erotuomarin rekisteröinti"
+msgstr "Erotuomarin rekisteröinti"
 
 #: templates/translation/outstanding.templ Line:20
 msgid "Run Report"
@@ -7176,34 +7013,32 @@ msgstr "Valitse henkilön tyyppi"
 
 #: templates/translation/outstanding.templ Line:36
 msgid "Set your own parameters etc for reporting on Clubs."
-msgstr ""
+msgstr "Määritä omat asetuksesi seuraraporttia varten"
 
 #: templates/translation/outstanding.templ Line:35
 msgid "Set your own parameters etc for reporting on People"
-msgstr ""
+msgstr "Määritä omat asetuksesi henkilöraporttia varten"
 
 #: templates/translation/outstanding.templ Line:37
 msgid "Set your own parameters etc for reporting on Transfers"
-msgstr ""
+msgstr "Määritä omat asetuksesi pelaajasiirtoraporttia varten"
 
 # :Person FieldLabels
 #: templates/translation/outstanding.templ Line:25
-#, fuzzy
 msgid "Social Security Number"
-msgstr "Kanta-asiakasnumero"
+msgstr "Henkilötunnus"
 
 #: templates/page_wrapper/main_wrapper.templ Line:65
 msgid "Toggle navigation"
-msgstr ""
+msgstr "Navigointi päälle/pois"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:17
 msgid "Transaction Details"
 msgstr "Tapahtuman tiedot"
 
 #: templates/translation/outstanding.templ Line:33
-#, fuzzy
 msgid "Transfers Below Report"
-msgstr "Pelaajasiirron hinta"
+msgstr "Pelaajasiirrot"
 
 #: templates/mapfinder/searchresults_aru.templ Line:128
 #: templates/mapfinder/searchresults_default.templ Line:127
@@ -7235,12 +7070,11 @@ msgstr "Rekisteröi joukkueesi nyt"
 
 #: templates/club/complete.templ Line:43
 msgid "Register another Club"
-msgstr "Rekisteröi toinen seura"
+msgstr "Rekisteröi uusi seura"
 
 #: templates/club/required_docs.templ Line:1
-#, fuzzy
 msgid "Required Club Documents"
-msgstr "Pakolliset dokumentit"
+msgstr "Seuran pakolliset dokumentit"
 
 #: templates/workflow/result/venue.templ Line:16
 msgid "Short Name"
@@ -7305,14 +7139,12 @@ msgstr "Perustamispäivä"
 
 # :Person FieldLabels
 #: templates/workflow/view/personregistration.templ Line:306
-#, fuzzy
 msgid "International Loan Details"
-msgstr "Kansainvälinen sukunimi"
+msgstr "Kansainvälisen määräaikaisen pelaajasiirron tiedot"
 
 #: templates/workflow/view/personregistration.templ Line:327
-#, fuzzy
 msgid "International Transfer Details"
-msgstr "Pelaajasiirron tiedot"
+msgstr "Kansainvälisen pelaajasiirron tiedot"
 
 #: templates/workflow/result/person.templ Line:58
 #: templates/workflow/view/person.templ Line:196
@@ -7326,9 +7158,8 @@ msgid "Legal entity identification number"
 msgstr "Y-tunnus"
 
 #: templates/workflow/view/loan.templ Line:204
-#, fuzzy
 msgid "Lending To"
-msgstr "Odottaa"
+msgstr "Määräaikaisena seuraan"
 
 #: templates/workflow/result/personregistration.templ Line:45
 #: templates/workflow/summary/personregistration.templ Line:47
@@ -7346,14 +7177,13 @@ msgid "License and Payment Details"
 msgstr "Lisenssi ja maksutiedot"
 
 #: templates/workflow/view/personregistration.templ Line:308
-#, fuzzy
 msgid "Loan Source Club"
-msgstr "Lisää seura"
+msgstr "Vanha seura"
 
 #: templates/workflow/view/person.templ Line:41
 #: templates/workflow/view/personregistration.templ Line:40
 msgid "Member Detail Summary"
-msgstr "Jäsentietojen yhteenveto"
+msgstr "Henkilön tiedot"
 
 #: templates/workflow/view/loan.templ Line:43
 #: templates/workflow/view/transfer.templ
@@ -7388,14 +7218,12 @@ msgstr "Henkilön rooli"
 #: templates/personrequest/loan/current_club_view.templ Line:105
 #: templates/personrequest/loan/search_form.templ Line:9
 #: templates/personrequest/loan/new_club_view.templ Line:139
-#, fuzzy
 msgid "Player Loan Details"
-msgstr "Pelaajan tiedot"
+msgstr "Määräaikaisen pelaajasiirron tiedot"
 
 #: templates/workflow/view/loan.templ Line:271
-#, fuzzy
 msgid "Player Loan Status: Accepted"
-msgstr "Pelaajasiirron tila: Hyväksytty"
+msgstr "Määräaikaisen pelaajasiirron tila: Hyväksytty"
 
 #: templates/workflow/view/transfer.templ Line:202
 #: templates/workflow/view/personregistration.templ Line:235
@@ -7451,14 +7279,12 @@ msgid "Suspended Until"
 msgstr "Suljettu toiminnasta asti"
 
 #: templates/workflow/view/personregistration.templ Line:312 Line:333
-#, fuzzy
 msgid "TMS Reference Number"
-msgstr "Maksutapahtuma"
+msgstr "TMS-viite"
 
 #: templates/workflow/summary/loan.templ Line:13
-#, fuzzy
 msgid "The following Player loan has been"
-msgstr "Seuraava pelaajasiirto on"
+msgstr "Seuraava määräaikainen pelaajasiirto on"
 
 #: templates/workflow/result/personregistration.templ Line:27
 msgid ""
@@ -7538,12 +7364,12 @@ msgstr "hyväksytty"
 #: templates/workflow/summary/person.templ Line:14
 #: templates/workflow/summary/personregistration.templ Line:29
 msgid "has been notified."
-msgstr "on ilmoitettu."
+msgstr "on saanut ilmoituksen."
 
 #: templates/workflow/summary/loan.templ Line:13
 #: templates/workflow/summary/transfer.templ
 msgid "have been notified"
-msgstr "on ilmoitettu"
+msgstr "ovat saaneet ilmoituksen"
 
 #: templates/workflow/generic/actions.templ Line:27
 #: templates/personrequest/transfer/view.templ Line:157
@@ -7589,7 +7415,7 @@ msgstr "Tuotteen tyyppi"
 
 #: templates/workflow/generic/actions.templ Line:13
 msgid "Put on-hold"
-msgstr "Aseta pitoon"
+msgstr "Palauta"
 
 #: templates/user/globalnav.templ Line:18
 msgid "Release Notes"
@@ -7682,9 +7508,8 @@ msgstr "Organisaation nimi"
 #: templates/flow/loan.templ Line:85
 #: templates/personrequest/loan/request_accepted.templ Line:5
 #: templates/personrequest/loan/new_club_view.templ Line:262
-#, fuzzy
 msgid "Player Loan Status: Released"
-msgstr "Pelaajasiirron tila: Vapautettu"
+msgstr "Määräaikaisen pelaajasiirron tila: Pelilupa annettu"
 
 #: templates/flow/loan.templ Line:8 templates/flow/transfer.templ
 msgid ""
@@ -7755,7 +7580,7 @@ msgstr "Takaisin etusivulle"
 #: templates/personrequest/transfer/view.templ
 #: templates/personrequest/loan/current_club_view.templ
 msgid "By approving you are giving access to all of"
-msgstr "Hyväksymällä annat pääsyn kaikille seuraaville"
+msgstr "Hyväksymällä annat pääsyn henkilön"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:202
 msgid "Cancel Access"
@@ -7796,7 +7621,7 @@ msgstr "Sukunimi"
 #: templates/personrequest/transfer/new_club_view.templ Line:12
 #: templates/personrequest/loan/new_club_view.templ
 msgid "Member Association for final approval."
-msgstr "liittoon lopullista hyväksyntää varten."
+msgstr "lopullista hyväksyntää varten."
 
 #: templates/personrequest/transfer/current_club_view.templ Line:21 Line:136
 #: templates/personrequest/loan/current_club_view.templ Line:150
@@ -7852,7 +7677,7 @@ msgstr "Perustele miksi pyyntö pääsystä tietoihin peruttiin."
 
 #: templates/personrequest/access/current_club_view.templ Line:230
 msgid "Please specify why request access was rejected."
-msgstr "Perustele miksi pyyntö pääsyyn hylättiin."
+msgstr "Miksi pyyntö pääsystä henkilön tietoihin hylättiin?"
 
 #: templates/personrequest/transfer/current_club_view.templ Line:236
 msgid "Please specify why transfer was rejected."
@@ -7882,13 +7707,12 @@ msgstr "Hylkää siirto"
 
 #: templates/personrequest/transfer/request_accepted.templ Line:5
 #: templates/personrequest/transfer/new_club_view.templ Line:248
-#, fuzzy
 msgid "Released"
-msgstr "Kuollut"
+msgstr "Pelilupa annettu"
 
 #: templates/personrequest/access/current_club_view.templ Line:225
 msgid "Request Access rejected"
-msgstr "Pyyntö pääsyyn on hylätty"
+msgstr "Pyyntö pääsystä henkilön tietoihin on hylätty"
 
 #: templates/personrequest/access/request_accepted.templ Line:5
 #: templates/personrequest/access/requesting_club_view.templ Line:247
@@ -8017,7 +7841,7 @@ msgstr "Päivitetty"
 
 #: templates/personrequest/access/current_club_view.templ Line:16
 msgid "details to"
-msgstr "tiedot"
+msgstr "tietoihin, seuralle"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:8
 msgid "details."
@@ -8029,7 +7853,7 @@ msgstr "on hyväksynyt pääsyn"
 
 #: templates/personrequest/access/current_club_view.templ Line:8
 msgid "has requested data access for"
-msgstr "on pyytänyt pääsyä"
+msgstr "on pyytänyt seuraavan henkilön tietoja:"
 
 #: templates/personrequest/history.templ Line:2
 msgid "of"
@@ -8038,44 +7862,37 @@ msgstr "Yhteensä"
 #: templates/personrequest/transfer/current_club_view.templ Line:13
 #: templates/personrequest/loan/current_club_view.templ
 msgid "player details to"
-msgstr "pelaajatietoihin taholle"
+msgstr "pelaajatietoihin, seuralle"
 
 #: templates/personrequest/loan/current_club_view.templ Line:194
-#, fuzzy
 msgid "Approve player loan"
-msgstr "Hyväksytty maksun jälkeen"
+msgstr "Hyväksy määräaikainen pelaajasiirto"
 
 #: templates/personrequest/loan/current_club_view.templ Line:21
-#, fuzzy
 msgid "Borrowing Club Details"
-msgstr "Nykyisen seuran tiedot"
+msgstr "Määräajan seuran tiedot"
 
 #: templates/personrequest/loan/search_form.templ Line:195
-#, fuzzy
 msgid "Borrowing club"
-msgstr "Nykyinen seura"
+msgstr "Määräajan seura"
 
 #: templates/personrequest/transfer/new_club_view.templ Line:215
 msgid "Cancel Transfer"
 msgstr "Peruuta pelaajasiirto"
 
 #: templates/personrequest/transfer/new_club_view.templ Line:236
-#, fuzzy
 msgid "Continue Transfer"
-msgstr "Peruuta pelaajasiirto"
+msgstr "Jatka pelaajasiirtoa"
 
 #: templates/personrequest/generic/search_form.templ Line:207
-#, fuzzy
 msgid "Current club"
 msgstr "Nykyinen seura"
 
 #: templates/personrequest/generic/search_form.templ Line:213
-#, fuzzy
 msgid "Current registration"
-msgstr "Rekisteröinnit"
+msgstr "Nykyinen rekisteröinti"
 
 #: templates/personrequest/generic/search_form.templ Line:219
-#, fuzzy
 msgid "Current sport"
 msgstr "Nykyinen laji"
 
@@ -8089,45 +7906,38 @@ msgstr "Kansainvälinen pelilupapyyntö (ITC) lähetetty liittoon"
 
 #: templates/personrequest/loan/current_club_view.templ Line:109
 #: templates/personrequest/loan/new_club_view.templ Line:143
-#, fuzzy
 msgid "Lending to"
-msgstr "Odottaa"
+msgstr "Määräaikaisena seuraan"
 
 #: templates/personrequest/loan/current_club_view.templ Line:129
 #: templates/personrequest/loan/new_club_view.templ Line:163
 msgid "Loan End"
-msgstr ""
+msgstr "Määräajan loppu"
 
 #: templates/personrequest/loan/current_club_view.templ Line:125
 #: templates/personrequest/loan/new_club_view.templ Line:159
-#, fuzzy
 msgid "Loan Start"
-msgstr "Henkilön tila"
+msgstr "Määräajan alku"
 
 #: templates/personrequest/loan/current_club_view.templ Line:210
-#, fuzzy
 msgid "Player Loan Status: Requested"
-msgstr "Tila: Pyydetty"
+msgstr "Määräaikaisen pelaajasiirron tila: Pyydetty"
 
 #: templates/personrequest/loan/search_form.templ Line:172
-#, fuzzy
 msgid "Player Loan Summary"
-msgstr "Maksun yhteenveto"
+msgstr "Määräaikaisen pelaajasiirron yheenveto"
 
 #: templates/personrequest/loan/current_club_view.templ Line:245
-#, fuzzy
 msgid "Player Loan rejected"
-msgstr "Pelaajasiirto hylätty"
+msgstr "Määräaikainen pelaajasiirto hylätty"
 
 #: templates/personrequest/loan/search_form.templ Line:19
-#, fuzzy
 msgid "Player Loan type"
-msgstr "Pelaajan tiedot"
+msgstr "Määräaikaisen pelaajasiirron tyyppi"
 
 #: templates/personrequest/loan/request_cancelled.templ Line:5
-#, fuzzy
 msgid "Player Loan: Cancelled"
-msgstr "Pelaajasiirto peruttu"
+msgstr "Määräaikainen pelaajasiirto: Peruttu"
 
 #: templates/personrequest/transfer/view.templ Line:8
 msgid "Please approve or reject the request"
@@ -8143,9 +7953,8 @@ msgid "Please continue the transfer process."
 msgstr "Jatka pelaajasiirtoprosessia."
 
 #: templates/personrequest/loan/current_club_view.templ Line:250
-#, fuzzy
 msgid "Please specify why player loan was rejected."
-msgstr "Perustele miksi pelaajasiirto hylättiin."
+msgstr "Perustele miksi määräaikainen pelaajasiirto hylättiin."
 
 #: templates/personrequest/transfer/new_club_view.templ Line:265
 msgid "Please specify why transfer was cancelled."
@@ -8160,14 +7969,12 @@ msgstr ""
 "pääsy lisättyihin dokumentteihin."
 
 #: templates/personrequest/loan/current_club_view.templ Line:198 Line:229
-#, fuzzy
 msgid "Reject player loan"
-msgstr "Hylkää siirto"
+msgstr "Hylkää määräaikainen pelaajasiirto"
 
 #: templates/personrequest/loan/search_form.templ Line:228
-#, fuzzy
 msgid "Request Player Loan Notes"
-msgstr "Pelaajasiirtopyynnön viesti"
+msgstr "Määräaikaisen pelaajasiirtopyynnön viesti"
 
 #: templates/personrequest/transfer/search_result.templ Line:50
 #: templates/personrequest/loan/search_result.templ
@@ -8202,45 +8009,38 @@ msgstr "Kansainvälinen pelilupapyyntösi (ITC) on lähetetty "
 
 #: templates/personrequest/transfer/selftransfercomplete.templ Line:17
 #: templates/personrequest/transfer/complete.templ
-#, fuzzy
 msgid "Your transfer request has been submitted for final approval."
-msgstr "Siirtopyyntösi on lähetetty taholle"
+msgstr "Siirtopyyntösi on lähetetty hyväksyttäväksi."
 
 #: templates/personrequest/transfer/new_club_view.templ Line:7
 #: templates/personrequest/loan/new_club_view.templ
 msgid "has released"
-msgstr "on vapauttanut"
+msgstr "on myöntänyt pelioikeuden pelaajalle"
 
 #: templates/personrequest/loan/new_club_view.templ Line:19 Line:27
 #: templates/personrequest/loan/lendingclubdetails.templ Line:4
-#, fuzzy
 msgid "Lending Club Details"
-msgstr "Pyytävän seuran tiedot"
+msgstr "Pelaajan oman seuran tiedot"
 
 #: templates/personrequest/loan/new_club_view.templ Line:274
-#, fuzzy
 msgid "Player Loan cancelled"
-msgstr "Pelaajasiirto peruttu"
+msgstr "Määräaikainen pelaajasiirto peruttu"
 
 #: templates/personrequest/loan/request_denied.templ Line:5
-#, fuzzy
 msgid "Player Loan: Rejected"
-msgstr "Hylättyjä tehtäviä"
+msgstr "Määräaikainen pelaajasiirto: Hylätty"
 
 #: templates/personrequest/loan/new_club_view.templ Line:7
-#, fuzzy
 msgid "Please continue the player loan process."
-msgstr "Jatka pelaajasiirtoprosessia."
+msgstr "Jatka määräaikaisen pelaajasiirron prosessia."
 
 #: templates/personrequest/loan/new_club_view.templ Line:279
-#, fuzzy
 msgid "Please specify why player loan was cancelled."
-msgstr "Perustele miksi pelaajasiirto peruttiin."
+msgstr "Perustele miksi määräaikainen pelaajasiirto peruttiin."
 
 #: templates/person/renewal_roledetails.templ Line:2
-#, fuzzy
 msgid "Review Role Renewal Details"
-msgstr "Tarkista roolin tiedot"
+msgstr "Tarkista roolin uudistamisen tiedot"
 
 #: templates/person/list.templ Line:9
 msgid "Sub-Role"
