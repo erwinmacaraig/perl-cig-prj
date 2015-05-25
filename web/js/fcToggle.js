@@ -43,6 +43,7 @@
             }
         });
         if(count > 4)  {
+            jQuery(s).chosen({disable_search_threshold: 10});
             return '';
         }
         else if(count == 1)  {
@@ -63,6 +64,9 @@
         jQuery('#' + ele_id).off("click.fcToggle","a");
         jQuery(s).off("change.fcToggle");
         jQuery(s).show();
+        if(jQuery(s).data('chosen'))   {
+            jQuery(s).chosen('destroy');
+        }
     }
 
     function build(s) {
