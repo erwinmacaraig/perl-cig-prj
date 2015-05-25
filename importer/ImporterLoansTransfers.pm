@@ -76,7 +76,7 @@ sub insertLOANPersonRequestRecord   {
             dtLoanTo,
             intOpenLoan,
             strTMSReference,
-            NOW()    
+            tTimeStamp
         )
         VALUES (
             ?,
@@ -102,6 +102,7 @@ sub insertLOANPersonRequestRecord   {
             ?,
             ?,
             ?,
+            NOW()
         )
     ];
     my $qryINS= $db->prepare($stINS) or query_error($stINS);
@@ -150,8 +151,10 @@ sub insertLOANPersonRequestRecord   {
             $dref->{'dtCommenced'},
             $dref->{'dtExpiry'},
             $openLoan,
+            ''
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
+        print STDERR Dumper "ID $ID " . $dref->{'intToPersonRegoID'} . "\n";
         if ($ID and $dref->{'intToPersonRegoID'})   {
             my $stUPD = qq[
                 UPDATE tblPersonRegistration_1
@@ -159,7 +162,7 @@ sub insertLOANPersonRequestRecord   {
                 WHERE intPersonRegistrationID = ?
             ];
             my $qryUPD = $db->prepare($stUPD) or query_error($stUPD);
-            $qryUPD->execute($dref->{'intToPersonRegoID'});
+            $qryUPD->execute($ID, $dref->{'intToPersonRegoID'});
         }
     }
 }
@@ -186,7 +189,7 @@ sub linkLOANBorrowingPR{
 
         my $stTO = qq[
             SELECT *
-            TO tblPersonRegistration_1
+            FROM tblPersonRegistration_1
             WHERE
                 intPersonID = ?
                 AND intOnLoan=1
@@ -205,7 +208,8 @@ sub linkLOANBorrowingPR{
             $dref->{'strPersonLevel'},
             $dref->{'dtCommenced'},
             $dref->{'dtExpiry'},
-            $dref->{'intEntityFromID'},
+            #$dref->{'intEntityFromID'},
+            $dref->{'intEntityToID'},
         );
         my $TOref= $qryTO->fetchrow_hashref();
         if ($TOref->{'intPersonRegistrationID'})  {
