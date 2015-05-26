@@ -2663,6 +2663,32 @@ header .navbar-brand {
      margin-left:-15px;
      margin-right:-15px;
    }
+  #docViewerPanel {
+    display:table-footer-group;
+  }
+  #docViewerFileBlock {
+    display:table-header-group;
+    width:100%;
+    height:auto;
+    margin-top:-200px;
+  }
+  .docViewer-imgBlock img {
+    width:100%;
+  }
+  #docViewerContent {
+    display:table;
+  }
+  #docViewerHeader {
+    font-size:12px;
+    margin-top:50px;
+  }
+  #docViewerHeader .close {
+    font-size:10px;
+  }
+  #docViewerOverlay   {
+    height:2000px;
+  }
+
 }
 
 /*** payment ***/
