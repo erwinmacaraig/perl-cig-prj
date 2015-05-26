@@ -27,7 +27,7 @@ sub importTXN   {
     my $responseText = 'PAYMENT_SUCCESSFUL';
 
     $payRef ||= '';
-    $paymentType ||= 2;
+    $paymentType ||= 20;
     $personID || return;
     $personRegistrationID || return;
     $entityID || return;
