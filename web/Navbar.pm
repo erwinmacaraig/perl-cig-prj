@@ -794,7 +794,7 @@ sub getClubMenuData {
                 url => $baseurl."a=PFB_", #PREGFB_T",
             };
         }
-        if ($SystemConfig->{'allowFindPayment'}) {
+        if ($SystemConfig->{'allowFindPaymentMinLevel'} and $Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'allowFindPaymentMinLevel'}) {
 		    $menuoptions{'findpayment'} = { 
 			    name => $lang->txt('Find Payment'),
 			    url => $baseurl."a=TXN_FIND",
