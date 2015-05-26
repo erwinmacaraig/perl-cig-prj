@@ -1033,17 +1033,22 @@ sub submitPersonRegistration    {
             $personRegistrationID,
             'REGO'
         );
-
+	  #
+	  my $regNature = $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '';
+	  if(exists($rego_ref->{'preqtype'})  && ($rego_ref->{'preqtype'} eq 'LOAN')  && exists($rego_ref->{'itc'})){
+	    $regNature = $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN;
+	  }
+	  #
             my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $regNature,
             $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
             0,
-$pr_ref->{'intInternationalTransfer'}
+	    $pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

@@ -1327,7 +1327,7 @@ sub display_complete {
             my $rc = WorkFlow::addWorkFlowTasks(
                 $self->{'Data'},
                 'PERSON',
-                'NEW',
+                $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN,
                 $self->{'ClientValues'}{'authLevel'} || 0,
                 getID($self->{'ClientValues'}) || 0,
                 $personID,

@@ -872,9 +872,9 @@ sub addWorkFlowTasks {
         $personID,
         $personRegistrationID,
         $documentID,
-	$itc
+		$itc
     ) = @_;
-#print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
+
 	
 	$itc ||= 0;
     $entityID ||= 0;
@@ -882,7 +882,14 @@ sub addWorkFlowTasks {
     $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
-
+	#	
+	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; # 
+	if($regNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN){
+		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT;
+		$regNature = $Defs::REGISTRATION_NATURE_NEW;
+		#Because International Player Loan is treated as a New Registration
+	}
+	#
 	my $q = '';
 	my $db=$Data->{'db'};
     my $checkOk = 1;
@@ -1165,6 +1172,9 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
             );
+			if($notificationType eq $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT){
+				$notificationData{'WorkTaskType'} = $Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'};
+			}			
 
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
@@ -1172,7 +1182,7 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
             $emailNotification->setFromEntityID($problemEntityID);
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
-            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+            $emailNotification->setNotificationType($notificationType);
             $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
