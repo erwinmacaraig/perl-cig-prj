@@ -440,7 +440,13 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
-    if ($SystemConfig->{'allowPayInvoice'}) {
+    if ($SystemConfig->{'allowFindPaymentMinLevel'} and $Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'allowFindPaymentMinLevel'}) {
+		$menuoptions{'findpayment'} = { 
+			name => $lang->txt('Find Payment'),
+			url => $baseurl."a=TXN_FIND",
+		}; 
+    }
+	if ($SystemConfig->{'allowPayInvoice'}) {
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
 			url => $baseurl."a=TXN_PAY_INV",
@@ -498,6 +504,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'myAssociation',
         ]],
         [ $lang->txt('Payments'), 'menu',[
+		    'findpayment',
 		    'payinvoice',
 		    'bulkpayment',
 		    'paymenthistory',
@@ -787,6 +794,12 @@ sub getClubMenuData {
                 url => $baseurl."a=PFB_", #PREGFB_T",
             };
         }
+        if ($SystemConfig->{'allowFindPayment'}) {
+		    $menuoptions{'findpayment'} = { 
+			    name => $lang->txt('Find Payment'),
+			    url => $baseurl."a=TXN_FIND",
+		    }; 
+        }
         if ($SystemConfig->{'allowPayInvoice'}) {
 		    $menuoptions{'bulkpayment'} = { 
 			    name => $lang->txt('Pay Invoice'),
@@ -918,6 +931,7 @@ sub getClubMenuData {
             'auditlog'
         ]],
          [ $lang->txt('Payments'), 'menu',[
+		    'findpayment',
 		    'payinvoice',
 		    'bulkpayment',
 		    'paymenthistory',
