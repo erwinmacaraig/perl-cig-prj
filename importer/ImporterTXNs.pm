@@ -41,7 +41,7 @@ sub importTXN   {
             NP.dtTo as NPTo
         FROM
             tblPersonRegistration_1 as PR
-            INNER JOIN tblNationalPeriod as NP (
+            INNER JOIN tblNationalPeriod as NP ON (
                 NP.intNationalPeriodID = PR.intNationalPeriodID
             )
         WHERE
