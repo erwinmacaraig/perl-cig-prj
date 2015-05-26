@@ -393,11 +393,6 @@ sub listPersonRecord {
     ];
     #(P.strNationalNum = ? OR P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
 
-    #
-    open FH, ">dumpfile.txt";
-    print FH "\n$st\n";
-    print FH "\n PR.intEntityID != $entityID \nePR.intEntityID = $entityID\n searchKeyword = $searchKeyword\n";
-    #
     my $db = $Data->{'db'};
     my $q = $db->prepare($st) or query_error($st);
     $q->execute(
@@ -515,7 +510,7 @@ sub listPersonRecord {
         @tData = ();
     }
 
-    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No record foundXXX.")) if !$found;
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No record found.")) if !$found;
     #return ("$found record found.", $title) if !$found;
 
     my $resultHTML = undef;
@@ -843,7 +838,7 @@ sub submitRequestPage {
             $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate); #if $emailTemplate->getConfig('toEntityNotification') == 1;
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
 
             push @rowdata, {
                 id => $regDetails->{'intPersonRegistrationID'} || 0,
