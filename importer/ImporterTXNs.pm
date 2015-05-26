@@ -25,6 +25,7 @@ sub importTXN   {
     my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $dtPaid, $payRef, $status, $paymentType) = @_;
 
     my $responseText = 'PAYMENT_SUCCESSFUL';
+    my $responseCode= 'OK';
 
     $payRef ||= '';
     $paymentType ||= 20;
@@ -41,7 +42,7 @@ sub importTXN   {
             NP.dtTo as NPTo
         FROM
             tblPersonRegistration_1 as PR
-            INNER JOIN tblNationalPeriod as NP (
+            INNER JOIN tblNationalPeriod as NP ON (
                 NP.intNationalPeriodID = PR.intNationalPeriodID
             )
         WHERE
@@ -101,12 +102,14 @@ sub importTXN   {
             intAmount,
             intRealmID,
             intStatus,
+            strResponseCode,
             strResponseText,
             intPaymentType,
             strTXN,
             strOtherRef2
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -156,19 +159,20 @@ sub importTXN   {
         $amountPaid
     );
     my $txnID = $qryTXN->{mysql_insertid} || 0;
-    next if ! $txnID;
-    next if ! $status;
+    return if ! $txnID;
+    return if ! $status;
     $qryTL->execute(
         $dtPaid,
         $amountPaid,
         1,
         $status,
+        $responseCode,
         $responseText,
         $paymentType,
         $payRef
     );
     my $TLogID= $qryTL->{mysql_insertid} || 0;
-    next if ! $TLogID;
+    return if ! $TLogID;
     $qryTXNLogs->execute(
         $txnID,
         $TLogID
