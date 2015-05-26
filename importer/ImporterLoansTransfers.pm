@@ -174,7 +174,7 @@ sub linkLOANBorrowingPR{
 
     my $st = qq[
         SELECT * FROM tmpLoansTransfers
-        WHERE intPersonID>0 and intEntityToID > 0 AND strStatus = 'APPROVED'
+        WHERE intPersonID>0 and intEntityToID > 0
     ];
     my $stUPDtmp = qq[
         UPDATE tmpLoansTransfers
@@ -212,7 +212,6 @@ sub linkLOANBorrowingPR{
             $dref->{'intEntityToID'},
         );
         my $TOref= $qryTO->fetchrow_hashref();
-        print $TOref->{'intPersonRegistrationID'} . "\n";
         if ($TOref->{'intPersonRegistrationID'})  {
             $qryUPDtmp->execute($TOref->{'intPersonRegistrationID'}, $dref->{'intID'});
         }
