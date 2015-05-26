@@ -79,6 +79,7 @@ sub queryFindByNumber {
             AND (
                 strOnlinePayReference = ?
                 OR strTXN= ?
+                OR intLogID= ?
             )
 	];
 	
@@ -100,6 +101,7 @@ sub queryFindByNumber {
 	my $sth = $Data->{'db'}->prepare($query) or print STDERR "DDD";
 	$sth->execute(
         $Data->{'Realm'},
+        $findNumber,
         $findNumber,
         $findNumber
     );

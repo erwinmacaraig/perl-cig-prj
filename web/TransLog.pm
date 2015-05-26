@@ -1503,7 +1503,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
@@ -1788,7 +1788,7 @@ sub viewTransLog	{
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
