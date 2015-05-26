@@ -174,7 +174,7 @@ sub linkLOANBorrowingPR{
 
     my $st = qq[
         SELECT * FROM tmpLoansTransfers
-        WHERE intPersonID>0 and intEntityToID > 0
+        WHERE intPersonID>0 and intEntityToID > 0 AND strStatus = 'APPROVED'
     ];
     my $stUPDtmp = qq[
         UPDATE tmpLoansTransfers
@@ -192,26 +192,27 @@ sub linkLOANBorrowingPR{
             FROM tblPersonRegistration_1
             WHERE
                 intPersonID = ?
-                AND intOnLoan=1
+                AND (intOnLoan=1 OR dtFrom = ?)
                 AND strPersonType='PLAYER'
                 AND strSport = ?
                 AND strPersonLevel = ?
-                AND dtFrom = ?
-                AND dtTo = ?
                 AND intEntityID = ?
             LIMIT 1
         ];
+        #AND dtFrom = ?
+        #AND dtTo = ? 
         my $qryTO = $db->prepare($stTO) or query_error($stTO);
         $qryTO->execute(
             $dref->{'intPersonID'},
+            $dref->{'dtCommenced'},
             $dref->{'strSport'},
             $dref->{'strPersonLevel'},
-            $dref->{'dtCommenced'},
-            $dref->{'dtExpiry'},
+            #$dref->{'dtExpiry'},
             #$dref->{'intEntityFromID'},
             $dref->{'intEntityToID'},
         );
         my $TOref= $qryTO->fetchrow_hashref();
+        print $TOref->{'intPersonRegistrationID'} . "\n";
         if ($TOref->{'intPersonRegistrationID'})  {
             $qryUPDtmp->execute($TOref->{'intPersonRegistrationID'}, $dref->{'intID'});
         }
@@ -253,7 +254,7 @@ sub linkLOANLendingPR {
                 AND strSport = ?
                 AND strPersonLevel = ?
                 AND intEntityID = ?
-                AND dtFrom < ?
+                AND dtFrom <= ?
             ORDER BY dtFrom DESC
             LIMIT 1
         ];
