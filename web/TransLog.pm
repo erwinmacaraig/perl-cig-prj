@@ -1503,7 +1503,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
@@ -1732,7 +1732,10 @@ sub viewTransLog	{
 
     my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID,
+		SELECT 
+            DISTINCT
+            T.intTransactionID,
+            T.intTransLogID,
              M.strLocalSurname,
              M.strLocalFirstName,
              E.*,
@@ -1748,6 +1751,7 @@ sub viewTransLog	{
              P.curPriceTax,
              P.dblTaxRate
 		FROM tblTransactions as T
+            LEFT JOIN tblTXNLogs as TXNLog ON (TXNLog.intTXNID = T.intTransactionID)
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
@@ -1757,7 +1761,7 @@ sub viewTransLog	{
                 AND LT_P.intID = P.intProductID
                 AND LT_P.strLocale = '$locale'
             )
-		WHERE intTransLogID = $intTransLogID  
+		WHERE (T.intTransLogID = $intTransLogID or TXNLog.intTLogID = $intTransLogID)
 		AND T.intRealmID = $Data->{'Realm'}
 	];
 	
@@ -1784,7 +1788,7 @@ sub viewTransLog	{
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
@@ -1839,7 +1843,7 @@ sub viewTransLog	{
                                 },
 				
 			},
-                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
+                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
                         options => {
                                 labelsuffix => ':',
                                 hideblank => 1,
@@ -1918,6 +1922,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	my $count=0;
 	my $thisassoc=0;
 	$thisassoc=1 if ($TLref->{intEntityPaymentID} == $Data->{'clientValues'}{'assocID'});
+    my $otherTransLogCount = 0;
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
 		$count++;
         my $paymentFor = '';
@@ -1927,6 +1932,11 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		my $taxRateinPercent = $dref->{'dblTaxRate'} * 100;
+        my $otherTransLog = ''; 
+        if ($dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} and $intTransLogID and $dref->{'intTransLogID'} != $intTransLogID)   {
+            $otherTransLogCount++;
+            $otherTransLog = qq[*];
+        }
 		$body .= qq[
 			<tr>
 				<td>$dref->{'strInvoiceNumber'}</td>
@@ -1936,15 +1946,20 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$dref->{intQty}</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
-				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
+				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[$otherTransLog</td>
 			</tr>
-		];
+        ];
+            
 	}
   	$qry_trans->finish;
 
 	$body .= qq[</table>];
+    if ($otherTransLogCount)    {
+        $body .= qq[<p><b>* ].$lang->txt("TRANSACTION PAID VIA A DIFFERENT PAYMENT RECORD").qq[</b></p>];
+    }
 	
-	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
+	$body = $count ? $resultHTML.$body: $resultHTML;
+	#$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
 	#$body .= qq[<a href="$Data->{target}?client=$client&amp;a=WF_" class="btn-main pull-right">Go to your Dashboard</a>];
 	my $chgoptions='';
