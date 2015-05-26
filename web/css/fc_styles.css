@@ -2590,7 +2590,7 @@ header .navbar-brand {
    		width: 100%;
    }
 
-   .smartphoneheader img.header-logo { max-width: 100px; }
+   .smartphoneheader img.header-logo { max-width: 50px; }
    .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
    .navbar-nav { margin-left: -1px; }

@@ -1149,7 +1149,6 @@ sub listTransactions {
 
       }
   } 
-	$body = qq[<div class = "col-md-12">$body</div>];
   return ($body, $header);
 }
 

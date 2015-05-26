@@ -69,7 +69,7 @@ sub getFieldLabels	{
 			strP1Salutation=> 'Parent/Guardian 1 Salutation',
 			strP1FName => 'Parent/Guardian first name',
 			strP1SName => 'Parent/Guardian family name',
-			strGuardianRelationship => 'Parent/Guradian Relationship',
+			strGuardianRelationship => 'Parent/Guardian Relationship',
 			strP2Salutation=> 'Parent/Guardian 2 Salutation',
 			strP2FName => 'Parent/Guardian 2 Firstname',
 			strP2SName => 'Parent/Guardian 2 Surname',
