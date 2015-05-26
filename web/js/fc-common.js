@@ -501,6 +501,8 @@ jQuery('.container').on('click','a.responsiveTableColumnOptions',function(e) {
     var st= jQuery(this).attr('selcol');
     var newstatus = jQuery(this).attr('selcol') == 'true' ? 'false' : 'true';
     jQuery(this).attr('selcol',newstatus);
+    var menu = jQuery(this).closest('ul');
+    //jQuery(menu).dropdown('toggle');
     var t = jQuery(this).closest('.res-wrapper').find('table.res-table');
     responsiveTableDraw(t);
     e.preventDefault();
@@ -515,7 +517,7 @@ function responsiveTableDraw(table) {
         }
     });
 
-    $.each(['tbody td', 'thead th'], function(index, ele) {
+    $.each(['tbody td', 'thead th', 'thead td'], function(index, ele) {
         $(table).find(ele).each(function(){
             var columnIndex = $(this).index();
             if($.inArray(columnIndex, activeColumns) != -1){
