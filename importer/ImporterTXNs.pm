@@ -181,5 +181,17 @@ sub importTXN   {
         $TLogID,
         $txnID
     );
+    my $stRef = qq[
+        UPDATE tblTransLog
+        SET strOnlinePayReference = ?
+        WHERE intLogID = ?
+    ];
+
+    my $ref = $TLogID;
+    my $qryRef= $db->prepare($stRef);
+    $qryRef->execute(
+        $ref,
+        $TLogID
+    );
 }
 
