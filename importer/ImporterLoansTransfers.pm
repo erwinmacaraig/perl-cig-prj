@@ -192,22 +192,22 @@ sub linkLOANBorrowingPR{
             FROM tblPersonRegistration_1
             WHERE
                 intPersonID = ?
-                AND (intOnLoan=1 OR dtFrom = ?)
+                AND (intOnLoan=1)
                 AND strPersonType='PLAYER'
                 AND strSport = ?
-                AND strPersonLevel = ?
+                AND strPersonLevel IN (?, 'HOBBY', '')
+                AND dtFrom = ?
+                AND dtTo = ? 
                 AND intEntityID = ?
             LIMIT 1
         ];
-        #AND dtFrom = ?
-        #AND dtTo = ? 
         my $qryTO = $db->prepare($stTO) or query_error($stTO);
         $qryTO->execute(
             $dref->{'intPersonID'},
-            $dref->{'dtCommenced'},
             $dref->{'strSport'},
             $dref->{'strPersonLevel'},
-            #$dref->{'dtExpiry'},
+            $dref->{'dtCommenced'},
+            $dref->{'dtExpiry'},
             #$dref->{'intEntityFromID'},
             $dref->{'intEntityToID'},
         );

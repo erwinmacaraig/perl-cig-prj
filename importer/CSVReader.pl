@@ -108,6 +108,7 @@ sub readCSVFile{
     }
 
     say 'Total Input Records: #'.$ctr;
+    #return;
     my $records = ApplyPreRules($config->{"rules"},\@records);
     my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
 
