@@ -25,9 +25,10 @@ sub importTXN   {
     my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $dtPaid, $payRef, $status, $paymentType) = @_;
 
     my $responseText = 'PAYMENT_SUCCESSFUL';
+    my $responseCode= 'OK';
 
     $payRef ||= '';
-    $paymentType ||= 2;
+    $paymentType ||= 20;
     $personID || return;
     $personRegistrationID || return;
     $entityID || return;
@@ -101,12 +102,14 @@ sub importTXN   {
             intAmount,
             intRealmID,
             intStatus,
+            strResponseCode,
             strResponseText,
             intPaymentType,
             strTXN,
             strOtherRef2
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -156,19 +159,20 @@ sub importTXN   {
         $amountPaid
     );
     my $txnID = $qryTXN->{mysql_insertid} || 0;
-    next if ! $txnID;
-    next if ! $status;
+    return if ! $txnID;
+    return if ! $status;
     $qryTL->execute(
         $dtPaid,
         $amountPaid,
         1,
         $status,
+        $responseCode,
         $responseText,
         $paymentType,
         $payRef
     );
     my $TLogID= $qryTL->{mysql_insertid} || 0;
-    next if ! $TLogID;
+    return if ! $TLogID;
     $qryTXNLogs->execute(
         $txnID,
         $TLogID
@@ -176,6 +180,18 @@ sub importTXN   {
     $qryTXNUpdate->execute(
         $TLogID,
         $txnID
+    );
+    my $stRef = qq[
+        UPDATE tblTransLog
+        SET strOnlinePayReference = ?
+        WHERE intLogID = ?
+    ];
+
+    my $ref = $TLogID;
+    my $qryRef= $db->prepare($stRef);
+    $qryRef->execute(
+        $ref,
+        $TLogID
     );
 }
 

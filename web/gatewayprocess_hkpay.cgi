@@ -126,7 +126,8 @@ print STDERR "$Vals{'secureHash'} | " . $secureHashReceive;
 	}
 print STDERR "MAC ACTION IS $chkAction\n";
 
-        $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
+        #$returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
+        $returnVals{'GATEWAY_TXN_ID'}= param('PayRef') || '';
         $returnVals{'GATEWAY_AUTH_ID'}= param('AuthId') || '';
         my $co_status = param('successcode');
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
