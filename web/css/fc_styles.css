@@ -2381,7 +2381,11 @@ header .navbar-brand {
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
   .navbar-collapse { border-top: none; box-shadow: none; }
   header .navbar {padding-left: 0px;width: 100%}
-  header nav ul#menu li a {background-color: #333;color: #7d7d7d; border-bottom: 1px solid #383838; }
+  header nav ul#menu li a {background-color: #333; border-bottom: 1px solid #383838; font-size: 12px;
+  color: white;}
+  header nav ul#menu li a:hover,
+  header nav ul#menu li a:active,
+  header nav ul#menu li a:focus{color: #7d7d7d;}
   header nav ul#menu li ul li a {background-color: #c7c5c5;color: #333;}
   ul#menu li:hover > ul {position: unset;}
   header nav ul#menu li a:hover {width: 100%;}
@@ -2599,7 +2603,7 @@ header .navbar-brand {
    .smartphoneheader img.header-logo { max-width: 100px; }
    .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
-   .navbar-nav { margin-left: -1px; }
+   .navbar-nav { margin-left: -1px; width: 100%;}
    /*.progressFlow .col-md-2.previous.step.step-3 { width: 100%; }*/
    .panel-body p.reg-text { font-size: 13px; }
    .taskListCounter { left: 35%; }
