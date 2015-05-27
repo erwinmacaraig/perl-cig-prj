@@ -345,6 +345,11 @@ use LoanFlow;
 		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
 		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
 	}
+	elsif($action =~ /^TXN_FIND/){
+		use FindPayment;
+		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
+		($resultHTML, $pageHeading) = FindPayment::handleFindPayment($action, \%Data, $clubID);				
+	}
 
 	elsif($action eq 'itcf'){
 		use ITC_TransferCertificate;

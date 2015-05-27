@@ -122,7 +122,6 @@ function checkIfDocsAllApproved() {
         //}
         //localStorage.removeItem("workflowtabs");
         //this means you are viewing a new work task
-        console.log("new task:" + taskID);
     }
     
  }
@@ -267,7 +266,6 @@ $(document).ready(function(){
 					}
 				);
 				//
-				console.log(totalamount);
 				if(totalamount > 0){
 					$('#payment_manual').css('display','block');
 					$('#payment_cc').show();
@@ -443,52 +441,31 @@ jQuery(document).ready(function(){
         $(this).children(':eq('+index+')').addClass('ellipsis');
        
         })
-    })
-    /*Saeid*/ 
+    });
+
     function checkWidth(){
         return $(window).width() < 800
     }
-    // $(window).resize(function(){checkWidth()}) < 800
-    if( checkWidth() == true  || $(".res-table thead tr th").length > 20){
-        /* find responsive-table and prepend a dropdown*/ 
-        // get No. of columns with res-table class
-        var noOfRequests = $('.res-table').length;
-        // Convert "initial-cols" 's  value to array
-        var initialCols = [];
-        // $(".res-table").attr("initial-cols").split("-").map(Number);   
-        $(".res-table").each(function(){
-            var key = $(this).index();
-            var val = $(this).attr("initial-cols");
-            item = {}
-            item ["val"] = val;
+    jQuery('.res-table').each(function() {
+        var table = this;
+        if( checkWidth() == true  || $(table).find("thead tr th").length > 20){
 
-            initialCols.push(item);
-        })
-        // get length of initialCols array
-        initialColsLength = initialCols.length;
-        // dropdown generator function
-        var dropdownGenerator = function(i){
-             $(".res-table:eq("+i+") .res-headers th").each(function() {
-             // location of header (Numeric)
-             headerLocation = $(this).index();
-             // create li elements for our custom dropdown
-             /* selcol = boolean
-                ellipsis = boolean
-                data = integer
-                onclick = responsiveTables(int)
-             */
-             if ($(this).html() != "") {
-                // check if a header is empty
-                var headerChecker = function(val){if(val == " "){return "Actions";}else{return val;}}
-                 headers += '<li>\
-                              <a selcol="true" ellipsis="false" data="'+headerLocation+'" data-value="'+i+'" class="small" tabindex="-1"  onclick="responsiveTables(\''+headerLocation+'\'\ ,\' '+i+'\'\)">\
-                                &nbsp;'+headerChecker($(this).html())+'\
-                              </a>\
-                            </li>';
-                columnCounter += 1;
-            };
+        var dropdownGenerator = function(){
+            var headers = '';
+            $(table).find(".res-headers th").each(function() {
+                 // create li elements for our custom dropdown
+                 if ($(this).html() != "") {
+                    // check if a header is empty
+                    var headerChecker = function(val){if(val == " "){return "Actions";}else{return val;}}
+                     headers += '<li>\
+                                  <a selcol="false" ellipsis="false" class="small responsiveTableColumnOptions" tabindex="-1" >  \
+                                    &nbsp;'+headerChecker($(this).html())+'\
+                                  </a>\
+                                </li>';
+                    columnCounter += 1;
+                };
             });
-             // wrap up made li's with a custom ul
+            // wrap up made li's with a custom ul
             return '<div class="button-group responsiveTablesDropDown">\
                       <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">' + $('#label_columns').val() + ' <i class = "fa fa-caret-down"></i></button>\
                           <ul style="top:inherit" class="dropdown-menu res-items-group">\
@@ -497,75 +474,62 @@ jQuery(document).ready(function(){
                     </div>';
         }
         // check if dropdown is empty
-        if($(".res-items-group").length<=0){
-            $(".res-table").wrap('<div class="res-wrapper"></div>'); 
-            for(var i=0;i<noOfRequests;i++){
-                // flash headers Variable first
-                headers = "";
-                // generate a drop down
-                if($(".res-table:eq("+i+") tbody tr").length > 0)   {
-                    $(".res-table:eq("+i+") ").before(dropdownGenerator(i))
-                }
-            }
-            // click on all dropdown for initializating purposes
-            $(".res-items-group li a").trigger("click");
-            // trigger only the columns requested in initial-cols attribute
-            for (var i = 0; i < initialColsLength; i++) {
-                var tableLocation = i
-                var toInitialize = $(".res-table:eq("+i+")").attr("initial-cols").split("-").map(Number);   
-                var toInitializeLength = toInitialize.length;
-                for (var v = 0; v < toInitializeLength; v++) {
-                    // click each one of requested initial-cols
-                    $(".res-items-group:eq("+tableLocation+") li:eq("+toInitialize[v]+") a").trigger("click")
-                };
-                
-            }
-            console.log(initialCols)
+        if($(table).find(".res-items-group").length<=0){
+            $(table).wrap('<div class="res-wrapper"></div>'); 
+            $(table).before(dropdownGenerator())
+            var toInitialize = $(table).attr("initial-cols").split("-").map(Number);   
+            var toInitializeLength = toInitialize.length;
+            for (var v = 0; v < toInitializeLength; v++) {
+                $(table).parent().parent().find(".res-items-group li:eq("+toInitialize[v]+") a").attr('selcol','true');
+            };
             // wrap entire table with a div for width purposes
-            
             // fit the width of visible columns based on percentage
-            $('.res-table thead tr th:not(.res-invisible)').each(function () {
-            $(this).css('width',90/columnCounter+"%")    
+            $(table).find('thead tr th:not(.res-invisible)').each(function () {
+                $(this).css('width',90/columnCounter+"%")    
             });   
         }
+        responsiveTableDraw(table);
     }
-});
-function responsiveTables(headerLocation,gridLocation){
-// Get ready variables
-    // get status of colsel(Selected Column) 
-    var status = $('.responsiveTablesDropDown:eq('+gridLocation+') a[data="'+headerLocation+'"]').attr('selcol'),
-    header = $(".res-table:eq("+gridLocation+") .res-headers th:eq("+headerLocation+") , .res-table .res-headers td:eq("+headerLocation+")");
- // Do hide/show
-
- // check if a column select TO SHOW
- if(status == 'false'){
-     // show selected header
-     header.removeClass('res-invisible');
-     // show selected column (**Note that columns and header has different show/hide line of code)
-     $(".res-table:eq("+gridLocation+") tbody tr").each(function() {
-       // find all related td and show them
-       $(this).children(':eq('+headerLocation+')').removeClass('res-invisible');
-       // change status of NOT SELECTED to SELECTED
-       $('.responsiveTablesDropDown:eq('+gridLocation+') a[data="'+headerLocation+'"]').attr('selcol','true')
-      })
-     // columnCounter is checking how many columns currently exist.
-    columnCounter += 1;
-
- // check if a column select TO HIDE
- }else if(status == 'true'){ 
-    header.addClass('res-invisible');
-    $(".res-table:eq("+gridLocation+") tbody tr").each(function() {
-       $(this).children(':eq('+headerLocation+')').addClass('res-invisible');
-       $('.responsiveTablesDropDown:eq('+gridLocation+') a[data="'+headerLocation+'"]').attr('selcol','false') 
-        })
-    columnCounter -=1;
- };
-    // fit width of headers.
-    $('.res-table:eq('+gridLocation+') thead tr th:not(.res-invisible)').each(function () {
-        $(this).css('width',100/columnCounter+"%")
-           
     });
+});
+
+jQuery('.container').on( 'draw.dt','.res-wrapper .res-table', function () {
+    responsiveTableDraw(this);
+});
+
+jQuery('.container').on('click','a.responsiveTableColumnOptions',function(e) {
+    var st= jQuery(this).attr('selcol');
+    var newstatus = jQuery(this).attr('selcol') == 'true' ? 'false' : 'true';
+    jQuery(this).attr('selcol',newstatus);
+    var t = jQuery(this).closest('.res-wrapper').find('table.res-table');
+    responsiveTableDraw(t);
+    $(this).closest(".dropdown-menu").prev().dropdown("toggle");
+    e.preventDefault();
+    return false;
+});
+
+function responsiveTableDraw(table) {
+    var activeColumns = [];
+    $(table).parent().parent().find('.responsiveTablesDropDown li a').each(function(index) {
+        if(jQuery(this).attr('selcol') == 'true') {
+            activeColumns.push(index);
+        }
+    });
+
+    $.each(['tbody td', 'thead th', 'thead td'], function(index, ele) {
+        $(table).find(ele).each(function(){
+            var columnIndex = $(this).index();
+            if($.inArray(columnIndex, activeColumns) != -1){
+               $(this).removeClass('res-invisible');
+            }
+            else    {
+               $(this).addClass('res-invisible');
+            }
+        });
+    });
+    return true;
 }
+
 function spinnerGenerator(command){
     if(command == "kill"){
         $(".spinner").remove()

@@ -215,6 +215,19 @@ sub linkPRProducts {
             $dref->{'intProductID'},
             $dref->{'strProductCode'} 
         );
+         my $stUPD2 = qq[
+            UPDATE tmpPersonRego
+            SET intProductID = ?
+            WHERE
+                CONCAT(strProductCode, strPersonType, strSport) = ?
+                AND strSport <> ''
+                AND strPersonType <> ''
+        ];
+         my $qryUPD2 = $db->prepare($stUPD2) or query_error($stUPD2);
+        $qryUPD2->execute(
+            $dref->{'intProductID'},
+            $dref->{'strProductCode'}
+        );
     }
 
 }

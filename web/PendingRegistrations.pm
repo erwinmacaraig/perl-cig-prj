@@ -355,7 +355,6 @@ sub listPendingRegistrations    {
             filters => $filterfields,
         ); 
         $resultHTML .=  qq[
-            <div style="clear:both">&nbsp;</div>
             <div class="clearfix">
                     $grid             
             </div>
