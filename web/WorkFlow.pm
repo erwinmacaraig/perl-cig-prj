@@ -4132,6 +4132,10 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the player loan of ") . qq[$task->{'strLocalFirstname'}  $task->{'strLocalSurname'}.];
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
