@@ -1037,13 +1037,13 @@ sub submitPersonRegistration    {
             my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '',
             $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
             0,
-$pr_ref->{'intInternationalTransfer'}
+	    $pr_ref->{'intInternationalTransfer'}
         );
         personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);

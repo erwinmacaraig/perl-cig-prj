@@ -227,6 +227,7 @@ sub queryInvoiceByNumber {
 			my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
 			my $st = $Data->{'db'}->prepare($subquery);
 			my @clubs = ();
+			push @clubs,$intTXNEntityID;
 			$st->execute();
 			while(my $dref = $st->fetchrow_hashref()){
 				push @clubs, $dref->{'intChildEntityID'};
@@ -516,10 +517,12 @@ sub queryInvoiceByOtherInfo {
 			my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
 			my $st = $Data->{'db'}->prepare($subquery);
 			my @clubs = ();
+			push @clubs,$intTXNEntityID;
 			$st->execute();
 			while(my $dref = $st->fetchrow_hashref()){
 				push @clubs, $dref->{'intChildEntityID'};
 			}
+			
 			$query .= qq[ AND tblTransactions.intTXNEntityID IN ('', ] . join(',',@clubs) . q[)];
 		}
 
