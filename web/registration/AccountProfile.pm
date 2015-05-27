@@ -16,6 +16,7 @@ use Utils;
 use Lang;
 use SelfUserObj;
 use ConfirmationEmail;
+use PasswordFormat;
 
 use Switch;
 
@@ -25,14 +26,29 @@ sub handleAccountProfile {
     my $resultHTML  = q{};
     my $pageHeading = $Data->{'lang'}->txt("User Profile");
 
+    my $result = 0;
     if($action eq 'P_u')    {
-        $resultHTML = updateProfilePage($Data);
+        ($result, $resultHTML) = updateProfilePage($Data);
     }
     elsif($action eq 'P_pu')    {
-        $resultHTML = updatePassword($Data);
+        ($result, $resultHTML) = updatePassword($Data);
     }
-    else    {
-        $resultHTML = displayProfilePage($Data);
+    if($resultHTML) {
+        my $type = $result ? 'fa-info' : '';
+        if($result) {
+            $resultHTML = qq[
+    <div class="alert "> 
+        <div>
+            <span class="fa $type fa-exclamation"></span>
+                <p>$resultHTML</p>
+        </div>
+    </div>
+            ];
+        }
+    }
+    $action = 'P_';
+    if($action eq 'P_')    {
+        $resultHTML .= displayProfilePage($Data);
     }
 
     return ($resultHTML, $pageHeading);
@@ -73,7 +89,7 @@ sub updateProfilePage {
             or !$updateData{'strFamilyName'} 
             or !$updateData{'strEmail'} 
         )   {
-            return $Data->{'lang'}->txt('All fields must be entered');
+            return (0,$Data->{'lang'}->txt('All fields must be entered'));
         }
         $user->update(\%updateData);
         $Data->{'User'}->reload();
@@ -84,7 +100,8 @@ sub updateProfilePage {
             $body = $Data->{'lang'}->txt(qq[You have been sent an email to confirm your new email address.  You must click the link in the email to confirm your account.]);
         }
     }
-    return $body;
+    $body ||= $Data->{'lang'}->txt("Your profile has been updated");
+    return (1,$body);
 }
 
 sub updatePassword {
@@ -101,11 +118,14 @@ sub updatePassword {
             or !$updateData{'pw2'} 
             or $updateData{'pw1'} ne $updateData{'pw2'} 
         )   {
-            return $Data->{'lang'}->txt('Both fields must be the same');
+            return (0,$Data->{'lang'}->txt('Both fields must be the same'));
+        }
+        if(!isValidPasswordFormat($Data, $updateData{'pw1'}))   {
+            return (0,$Data->{'lang'}->txt("New password doesn't meet requirements"));
         }
         $user->setPassword($updateData{'pw1'});
     }
-    return '';
+    return (1,$Data->{'lang'}->txt("Password updated"));
 }
 1;
 

@@ -20,17 +20,17 @@
     	</div>
     </div>
     <div class = "form-group">
-		<label class="col-md-2" for="firstname">[% Lang.txt('First Name') %]</label>
-		<div class="col-md-6 control-fields">
-			<input type = "text" name = "firstname" value = "[% FirstName %]" size = "50" id = "signup-fname"  class="form-control fields required" title="[% Lang.txt('First name') %]">
-		</div>
-		</div>
-    <div class = "form-group">
 		<label class="col-md-2" for="familyname">[% Lang.txt('Family Name') %]</label>
 		<div class="col-md-6 control-fields">
 			<input type = "text" name = "familyname" value = "[% FamilyName %]" size = "50" id = "signup-sname"  class="form-control fields required" title="[% Lang.txt('Family name') %]">
 		</div>
 	</div>
+    <div class = "form-group">
+		<label class="col-md-2" for="firstname">[% Lang.txt('First Name') %]</label>
+		<div class="col-md-6 control-fields">
+			<input type = "text" name = "firstname" value = "[% FirstName %]" size = "50" id = "signup-fname"  class="form-control fields required" title="[% Lang.txt('First name') %]">
+		</div>
+		</div>
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update') %] ">
     <input type = "hidden" name = "a" value = "P_u">
     <input type = "hidden" name = "srp" value = "[% srp %]">
@@ -41,16 +41,24 @@
 <div>
     <h3>[% Lang.txt('Change your password') %]</h3>
     <form id = "updatepw-form" action = "[% BaseURL %]/registration/" method ="POST">
+    <p>[% Lang.txt('Passwords must follow these rules') %]:
+        <ul>
+            <li>[% Lang.txt("At least 8 characters long") %]</li>
+            <li>[% Lang.txt("Contain at least one upper-case character") %]</li>
+            <li>[% Lang.txt("Contain at least one lower-case character") %]</li>
+            <li>[% Lang.txt("Contain at least one non-alphabetic character eg a number or special character") %]</li>
+        </ul><br>
+    </p>
     <div class = "form-group">
-        <label class="col-md-2" for="password">[% Lang.txt('Password') %]</label>
+        <label class="col-md-2" for="password">[% Lang.txt('New password') %]</label>
         <div class="col-md-6 control-fields">
-       		<input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('password') %]" class="form-control" id = "password1">
+       		<input type = "password" name = "password" value = "" size = "15" maxsize = "50" title="[% Lang.txt('new password') %]" class="form-control" id = "password1">
        	</div>
     </div>
     <div class = "form-group">  
-        <label class="col-md-2" for="password2">[% Lang.txt('Re-enter Password') %]</label>
+        <label class="col-md-2" for="password2">[% Lang.txt('Re-enter new password') %]</label>
         <div class="col-md-6 control-fields">
-	  		<input type = "password" name = "password2" value = "" size = "15" maxsize = "50" id = "password2" class="form-control" title="[% Lang.txt('re-enter password') %]">
+	  		<input type = "password" name = "password2" value = "" size = "15" maxsize = "50" id = "password2" class="form-control" title="[% Lang.txt('re-enter new password') %]">
 	  	</div>
     </div>
 
@@ -88,22 +96,22 @@
 			rules: {
 				password : {
 					required: true,
-					minlength: 6
+					minlength: 8
 				},
 				password2 : {
 					required: true,
-					minlength: 6,
+					minlength: 8,
 					equalTo: "#password1"
 				}
 			},
 			messages: {
 				password: {
 					required: "[% Lang.txt('Please provide a password') %]",
-					minlength: "[% Lang.txt('must be at least 6 characters long') %]"
+					minlength: "[% Lang.txt('must be at least 8 characters long') %]"
 				},
 				password2 : {
 					required: "[% Lang.txt('Please provide a password') %]",
-					minlength: "[% Lang.txt('must be at least 6 characters long') %]",
+					minlength: "[% Lang.txt('must be at least 8 characters long') %]",
 					equalTo: "[% Lang.txt('Passwords do not match') %]"
 				}
 			}
@@ -112,3 +120,4 @@
     </script>
 [% END %]
 </div>
+<p><br><a href = "../registration">[% Lang.txt('Return to dashboard') %]</a></p>
