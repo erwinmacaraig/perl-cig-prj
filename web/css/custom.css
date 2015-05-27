@@ -368,35 +368,35 @@ th {
   background-size: 2%;
   background-position: center center;
 }
-  .member-home-page .autoAccordian {
-    margin-left:-15px;
-    margin-right:-15px;
-  }
-  .autoAccordian .panel-heading a{
-    display:block;
-  }
-  * .js-tabcollapse-panel-heading:after {
-    font-family: FontAwesome;
-    content: "\f078";
-    float: right;
-    color: #fff;
-  }
-  .js-tabcollapse-panel-heading.collapsed:after {
-    font-family: FontAwesome;
-    content: "\f054";
-  }
-  .autoAccordian .panel-heading{
-    border-radius:0px;
-    border:none;
-    border-bottom:1px solid #888;
-    padding:20px;
-  }
-  .autoAccordian .panel{
-    margin-top:0px !important;
-  }
-  .panel-body.js-tabcollapse-panel-body {
-    background-color:#fff; 
-  }
+.member-home-page .autoAccordian {
+  margin-left:-15px;
+  margin-right:-15px;
+}
+.autoAccordian .panel-heading a{
+  display:block;
+}
+* .js-tabcollapse-panel-heading:after {
+  font-family: FontAwesome;
+  content: "\f078";
+  float: right;
+  color: #fff;
+}
+.js-tabcollapse-panel-heading.collapsed:after {
+  font-family: FontAwesome;
+  content: "\f054";
+}
+.autoAccordian .panel-heading{
+  border-radius:0px;
+  border:none;
+  border-bottom:1px solid #888;
+  padding:20px;
+}
+.autoAccordian .panel{
+  margin-top:0px !important;
+}
+.panel-body.js-tabcollapse-panel-body {
+  background-color:#fff; 
+}
 @media only screen and (min-width:275px) and (max-width:313px){
   body{
     top:0!important;
