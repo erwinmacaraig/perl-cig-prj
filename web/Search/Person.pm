@@ -104,6 +104,7 @@ sub getUnique {
             strLocalFirstname
           LIMIT 10
         ];
+        
 		my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -419,6 +420,7 @@ sub getPlayerLoan {
                 strLocalFirstname
             LIMIT 100
         ];
+		 
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
