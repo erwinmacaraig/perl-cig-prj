@@ -4,7 +4,11 @@ UPDATE tblSystemConfig SET strValue=1 WHERE intSystemConfigID=3955;
 UPDATE tblProducts SET curDefaultAmount=3 WHERE intProductID=59;
 UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
 
-UPDATE tblPayTry SET dtTry='2015-05-25 05:30:41' WHERE intTransLogID = XX LIMIT 1;
+INSERT INTO tblSystemConfig VALUES (0, 1, 'selfRego_RENEW_PLAYER', 1, NOW(),1,0);
+INSERT INTO tblSystemConfig VALUES (0,1, 'allowFindPaymentMinLevel', 100, NOW(),1,0);
+INSERT INTO tblSystemConfig VALUES (0,1, 'paymentPrefix', 'FAF15-', NOW(),1,0); ###TEST
+UPDATE tblGenerate SET intCurrentNum = (SELECT MAX(strNationalNum) + 1 FROM tblPerson) WHERE strGenType='PERSON';
+
 
 ## FOR TESTING
 UPDATE tblPaymentConfig SET strGatewayUsername="375917", strGatewayPassword="SAIPPUAKAUPPIAS" WHERE intPaymentConfigID=3;
