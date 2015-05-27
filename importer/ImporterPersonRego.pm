@@ -114,13 +114,13 @@ sub insertPersonRegoRecord {
 
     my $st = qq[
         SELECT * FROM tmpPersonRego
-        LIMIT 10
     ];
 print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     while (my $dref= $qry->fetchrow_hashref())    {
-        next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+        #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+
         my $dtFrom = $dref->{'dtFrom'};
         my $dtTo   = $dref->{'dtTo'};
         my $onLoan = 0; 

@@ -2,8 +2,8 @@
 package TableRules;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue calculateAgeLevel);
-@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink linkIdEntry defaultValue calculateAgeLevel);
+@EXPORT = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink entityLink2 linkIdEntry defaultValue calculateAgeLevel);
+@EXPORT_OK = qw(multiplyEntry insertLink removeLinkField getConfig strToIntEntry setUniqField multiDestEntry insertField entityLink entityLink2 linkIdEntry defaultValue calculateAgeLevel);
 
 # This is where you should include the migration rule for your table
 use lib '..', '../..', '../web/';
@@ -90,6 +90,7 @@ sub insertLink{
     }
     return $links;
 }
+
 sub entityLink{
 	my ($links,$records,$rule) = @_;
 	my $entstruct = [];
@@ -153,6 +154,46 @@ sub entityLink{
     }
     return $links, $entstruct;
 }
+
+
+sub entityLink2{
+	my ($links,$records,$rule) = @_;
+	my $entstruct = [];
+    foreach my $record ( @{$records} ){
+		
+        my $realmid = getRecord($db,"tblEntity","intrealmid","strImportEntityParentCode",$record->{"strImportEntityParentCode"});
+        my $parentid = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityParentCode"});
+		my $childid = getRecord($db,"tblEntity","intEntityID","strImportEntityCode",$record->{"strImportEntityCode"}),
+
+		my %link = ();
+		my %structure = ();
+
+        $link{'intParentEntityID'} = $parentid;
+        $link{'intChildEntityID'} = $childid;
+
+		if( ($record->{'strEntityType'} eq 'CLUB') || ($record->{'strEntityType'} eq 'ACADEMY') ) {
+			$structure{'intChildLevel'} = "3";
+		}elsif( $record->{'strEntityType'} eq 'ZONE') {
+			$structure{'intChildLevel'} = "10";
+		}elsif( $record->{'strEntityType'} eq 'REGION' || $record->{'strEntityType'} eq 'DISTRICT') {
+			$structure{'intChildLevel'} = "20";
+		}elsif( $record->{'strEntityType'} eq 'STATE') {
+			$structure{'intChildLevel'} = "30";
+		}elsif( $record->{'strEntityType'} eq 'VENUE') {
+			$structure{'intChildLevel'} = "-47";
+		}
+		
+		$structure{'intRealmID'} = $realmid;
+		$structure{'intParentID'} = $link{'intParentEntityID'};
+		$structure{'intChildID'} = $link{'intChildEntityID'};
+
+        push ($links,\%link);
+		push ($entstruct,\%structure)
+    }
+    return $links, $entstruct;
+}
+
+
 
 sub linkIdEntry{
 	my ($records,$rule, $rkey) = @_;

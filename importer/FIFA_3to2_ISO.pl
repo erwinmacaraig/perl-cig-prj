@@ -201,6 +201,50 @@ $Countries{'VIETN'} = "VN";
 $Countries{'WALLI'} = "WF";
 $Countries{'YEMEN'} = "YE";
 $Countries{'ZAMBI'} = "ZM";
+
+
+$Countries{'KOSOVA'} = "";
+$Countries{'INDIA'} = "IN";
+$Countries{'MAHOR'} = "";
+$Countries{'SLOVA'} = "SK";
+$Countries{'LATVI'} = "LV";
+$Countries{'UZBEK'} = "UZ";
+$Countries{'ERITR'} = "ER";
+$Countries{'KYRGY'} = "KG";
+$Countries{'MALAY'} = "MY";
+$Countries{'Chechenian'} = "";
+$Countries{'TAJIK'} = "TJ";
+$Countries{'BENIN'} = "BJ";
+$Countries{'FALKL'} = "FK";
+$Countries{'TONGA'} = "TO";
+$Countries{'ZIMBA'} = "ZW";
+$Countries{'CAMBO'} = "KH";
+$Countries{'DOMIN'} = "DM";
+$Countries{'MALAW'} = "MW";
+$Countries{'KAZAK'} = "KZ";
+$Countries{'SOUTH'} = "";
+$Countries{'ICELA'} = "IS";
+$Countries{'PUERT'} = "PR";
+$Countries{'TAIWA'} = "TW";
+$Countries{'ARMEN'} = "AM";
+$Countries{'MONTE'} = "ME";
+$Countries{'GUATE'} = "GT";
+$Countries{'AZERB'} = "AZ";
+$Countries{'SAUDI'} = "SA";
+$Countries{'MALTE'} = "MT";
+$Countries{'PHILI'} = "PH";
+$Countries{'EMIRA'} = "AE";
+$Countries{'STVIN'} = "";
+$Countries{'FIJIA'} = "";
+$Countries{'GABON'} = "GA";
+$Countries{'MALIA'} = "";
+$Countries{'HAITI'} = "HT";
+$Countries{'MOZAM'} = "MZ";
+$Countries{'SINGA'} = "SG";
+$Countries{'BVI'} = "";
+$Countries{'SALVA'} = "";
+$Countries{'NED'} = "";
+
     for my $field (@dbFields)   {
         my $st = qq[
             UPDATE tblPerson SET $field=? WHERE $field=? AND intRealmID=?
