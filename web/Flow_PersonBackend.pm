@@ -1510,10 +1510,6 @@ sub display_complete {
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
 	
-	#
-	$rego_ref->{'preqtype'} = $self->{'RunParams'}{'preqtype'};
-	$rego_ref->{'itc'} = $self->{'RunParams'}{'itc'};
-	#
         ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 

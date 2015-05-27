@@ -872,24 +872,20 @@ sub addWorkFlowTasks {
         $personID,
         $personRegistrationID,
         $documentID,
-		$itc
+	$itc
     ) = @_;
 
 	
-	$itc ||= 0;
+    $itc ||= 0;
     $entityID ||= 0;
     $personID ||= 0;
     $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
-	#	
-	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; # 
-	if($regNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN){
-		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT;
-		$regNature = $Defs::REGISTRATION_NATURE_NEW;
-		#Because International Player Loan is treated as a New Registration
-	}
 	#
+	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; 
+	# 
+	
 	my $q = '';
 	my $db=$Data->{'db'};
     my $checkOk = 1;
@@ -1010,16 +1006,18 @@ sub addWorkFlowTasks {
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
 			r.strTaskType,
-            r.strWFRuleFor,
+			r.strWFRuleFor,
 			r.intDocumentTypeID,
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			pr.intPersonID,
 			pr.intPersonRegistrationID,
-            pr.intEntityID as RegoEntity,
-            pr.intCreatedByUserID,
-            0 as DocumentID
-		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+			pr.intEntityID as RegoEntity,
+			pr.intCreatedByUserID,
+			pr.intNewBaseRecord,
+			p.intInternationalLoan,
+			0 as DocumentID
+	FROM tblPersonRegistration_$Data->{'Realm'} AS pr
         INNER JOIN tblPerson as p ON (p.intPersonID = pr.intPersonID)
         INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
@@ -1043,7 +1041,7 @@ sub addWorkFlowTasks {
             AND r.intSubRealmID IN (0, ?)
             AND r.intOriginLevel = ?
             AND r.strEntityType IN ('', e.strEntityType)
-			AND r.strRegistrationNature = ?
+	    AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
             AND (
                 r.intUsingPersonLevelChangeFilter = 0
@@ -1052,8 +1050,9 @@ sub addWorkFlowTasks {
             )
 		];
 	    $q = $db->prepare($st);
-		$itc ||= 0;
+	    $itc ||= 0;
   	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+  	   
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -1162,6 +1161,10 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
             my $task = getTask($Data, $qINS->{mysql_insertid});
 			
             my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+            if($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}){
+		$workTaskType .=  qq[ ($Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'}) ];
+		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT
+            }
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
@@ -1172,11 +1175,8 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
             );
-			if($notificationType eq $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT){
-				$notificationData{'WorkTaskType'} = $Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'};
-			}			
-
-            $emailNotification->setRealmID($Data->{'Realm'});
+            
+	    $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
             $emailNotification->setFromEntityID($problemEntityID);
