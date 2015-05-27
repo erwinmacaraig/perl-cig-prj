@@ -156,11 +156,13 @@ sub listIncompleteRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Person'),
             field => 'LocalLatinName',
+            defaultShow => 1,
         },
         {
             name  => $Data->{'lang'}->txt('Type'),
             field => 'RegistrationNature',
             width  => 60,
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
@@ -191,7 +193,6 @@ sub listIncompleteRegistrations    {
             name  => $Data->{'lang'}->txt('Added'),
             field => 'dtAdded',
             sortdata => 'dtAdded_RAW',
-            width  => 50,
         },
         {
             name => ' ',
@@ -199,6 +200,7 @@ sub listIncompleteRegistrations    {
             field => 'resume',
             width  => 100,
             sortable => 0,
+            defaultShow => 1,
         },
         {
             name => ' ',
@@ -279,17 +281,17 @@ sub listIncompleteRegistrations    {
         {
             name  => $Data->{'lang'}->txt('Name'),
             field => 'strLocalName',
+            defaultShow => 1,
         },
         {
             name  => $Data->{'lang'}->txt('Type'),
             field => 'regoType',
-            width  => 60,
+            defaultShow => 1,
         },
         {
             name  => $Data->{'lang'}->txt('Added'),
             field => 'dtAdded',
             sortdata => 'dtAdded_RAW',
-            width  => 50,
         },
         {
             name => ' ',
@@ -297,6 +299,7 @@ sub listIncompleteRegistrations    {
             field => 'resume',
             width  => 100,
             sortable => 0,
+            defaultShow => 1,
         },
         {
             name => ' ',
