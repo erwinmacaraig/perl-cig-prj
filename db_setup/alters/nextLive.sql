@@ -116,3 +116,8 @@ ALTER TABLE tblPayTry ADD COLUMN intSelfRego TINYINT default 0;
 
 #150507_tblNationalPeriod.sql
 ALTER TABLE tblNationalPeriod ADD COLUMN strImportPeriodCode varchar(30) default '';
+
+# FC267
+ALTER TABLE tblPersonRequest
+ADD COLUMN `intSelfTriggered` TINYINT NOT NULL DEFAULT 0 COMMENT 'Flag to identify if the request has been initiated by self user' AFTER `strRequestStatus`,
+ADD COLUMN `intRequestFromSelfUserID` INT NOT NULL DEFAULT 0 COMMENT 'Self User ID who initiated the request' AFTER `intSelfTriggered`;

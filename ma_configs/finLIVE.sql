@@ -7,6 +7,8 @@ UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
 INSERT INTO tblSystemConfig VALUES (0, 1, 'selfRego_RENEW_PLAYER', 1, NOW(),1,0);
 INSERT INTO tblSystemConfig VALUES (0,1, 'allowFindPaymentMinLevel', 100, NOW(),1,0);
 INSERT INTO tblSystemConfig VALUES (0,1, 'paymentPrefix', 'FAF15-', NOW(),1,0); ###TEST
+
+## CHECK THIS
 UPDATE tblGenerate SET intCurrentNum = (SELECT MAX(strNationalNum) + 1 FROM tblPerson) WHERE strGenType='PERSON';
 
 
