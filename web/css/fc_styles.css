@@ -680,7 +680,7 @@ table.table tr td.align-right {
 table.table thead tr th {
 	background-color: #d8d8d8;
 	border-bottom:1px solid #ccc;
-	font-size: 16px;
+	font-size: 15px;
 }
 
 table.table.tableboxheader thead tr th {
@@ -1657,6 +1657,8 @@ span.fa-user{
 
 .reg-complete-summary-left-bar {
 	margin-left: -15px;
+	padding-right: 0px;
+	margin-bottom: 10px;
 }
 
 .reg-complete-wrapper {
@@ -2286,6 +2288,9 @@ header .navbar-brand {
 .products-table .product-row:last-child {
     background: rgb(214, 214, 214);
 }
+@media (max-width: 992px){
+	.result-message { padding: 0; }
+}
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }
 }
@@ -2339,6 +2344,7 @@ header .navbar-brand {
 }
 .responsiveTablesDropDown button{margin: 6px!important;}
 @media (min-width: 250px) and (max-width: 480px) {
+   #content .steps{padding: 0}
    table.table.tableboxheader thead tr th { font-size: 11px; }
    table.table.tableboxheader thead tr td { font-size: 11px; }
    
@@ -2600,7 +2606,7 @@ header .navbar-brand {
    .smartphoneheader img.header-logo { max-width: 50px; }
    .smartphoneheader .smartphonename { color:#fff; font-size:15px; }
    .footer-section.section { height: 20px; }
-   .navbar-nav { margin-left: -1px; }
+   .navbar-nav { margin-left: -1px; width: 100%;}
    /*.progressFlow .col-md-2.previous.step.step-3 { width: 100%; }*/
    .panel-body p.reg-text { font-size: 16px; }
    .taskListCounter { left: 35%; }
