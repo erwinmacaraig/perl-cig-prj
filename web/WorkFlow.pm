@@ -461,7 +461,9 @@ sub listTasks {
             preqTo.strLocalName as preqToClub,
             pr.intPersonLevelChanged,
             pr.strPreviousPersonLevel,
-            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
+            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', '')) as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired
 	    FROM tblWFTask AS t
                 LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
@@ -542,6 +544,10 @@ sub listTasks {
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
+        my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $dref->{'sysConfigApprovalLockRuleFor'}};
+        if($sysConfigApprovalLockPaymentRequired and $dref->{'paymentRequired'}){
+            $dref->{'strTaskStatus'} = 'LOCKED';
+        }
         #F-609 - list in dashboard if ON-HOLD and created by == approval entity
         #next if (
         #    $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
