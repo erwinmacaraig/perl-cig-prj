@@ -204,13 +204,17 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 my $otheroptions = '';
                 $otheroptions = qq[style="width:$f->{'width'}"]
                   if ( exists $f->{'width'} and $f->{'width'} );
+                my $trans = undef;
+                if($f->{'translateLookupValues'})   {
+                    $trans = $fields_ref;
+                }
                 $field_html = drop_down(
                     "$fieldname",      $f->{'options'},
                     $f->{'order'},       $f->{'value'},
                     $f->{'size'},        $f->{'multiple'},
                     $f->{'firstoption'}, $otheroptions,
                     $onChange,           $f->{'class'},
-                    $f->{'disable'},
+                    $f->{'disable'},   $trans,
                 );
             }
             elsif ( $type eq 'date' ) {
@@ -250,6 +254,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                   $f->{'compulsory'};
                 $clientside_validation{$fieldname}{'validate'} =
                   $f->{'validate'};
+                $clientside_validation{$fieldname}{'validateData'} =
+                  $f->{'validateData'};
             }
             $label = $compulsory.$label if $f->{'compulsory'} and $type ne 'hidden';
             $label = qq[<label for="l_$fieldname">$label</label>] if $label;
@@ -534,7 +540,7 @@ sub drop_down {
     my (
         $name , $options_ref, $order_ref,    $default,  $size,
         $multi, $pre,         $otheroptions, $onChange, $class,
-        $disabled
+        $disabled, $trans
     ) = @_;
     #DEBUG "genereate dropdown for $name";
     return '' if ( !$name or !$options_ref );
@@ -578,8 +584,12 @@ sub drop_down {
             }
         }
         else { $selected = 'SELECTED' if $val eq $default; }
+        my $opt = $options_ref->{$val};
+        if($trans)  {
+            $opt = langlookup($trans,$opt);
+        }
         $subBody .=
-          qq[ <option $selected value="$val">$options_ref->{$val}</option>];
+          qq[ <option $selected value="$val">$opt</option>];
     }
     $multi = ' multiple ' if $multi;
     $size = min($size, scalar (keys %$options_ref) + 1);
@@ -1407,6 +1417,7 @@ qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0
     $field_html .= $daysfield;
     $field_html .= $monthsfield;
     $field_html .= $yearsfield;
+    $field_html = qq[ <div class = "dateselection-group">$field_html</div> ];
 
     return $field_html;
 }
@@ -1647,6 +1658,28 @@ sub generate_clientside_validation {
                       langlookup( $fields_ref, "Please enter a valid number",
                         $num1, $num2 );
                 }
+                elsif ( $t eq 'REMOTE' ) {
+                    my $vdata = $validation->{$k}{'validateData'} || next;
+                    my %remote_data = ();
+                    my $otherfields =  $vdata->{'otherfields'} || [];
+                    push @{$otherfields}, $k;
+                    for my $f (@{$otherfields})    {
+                        $remote_data{$f} = "REMOVEQfunction() { return jQuery( 'input[name=d_$f]' ).val(); }REMOVEQ";
+                    }
+                    foreach my $k (keys %{$vdata->{'postvalues'}})    {
+                        $remote_data{$k} = $vdata->{'postvalues'}{$k} || 0;
+                    }
+
+                    $valinfo{'rules'}{ 'd_' . $k }{'remote'} = {
+                            url => $vdata->{'url'},
+                            type => "post",
+                            data => \%remote_data,
+                    };
+
+                    $valinfo{'messages'}{ 'd_' . $k }{'remote'} =
+                      langlookup( $fields_ref, "Number is invalid",
+                        $num1, $num2 );
+                }
             }
         }
     }
@@ -1661,6 +1694,9 @@ sub generate_clientside_validation {
         $val_rules =~ s/"true"/true/g;
         $val_rules =~ s/"false"/false/g;
         $val_rules =~ s/}$//;
+        $val_rules =~ s/"REMOVEQ//g;
+        $val_rules =~ s/REMOVEQ"//g;
+        $val_rules =~ s/REMOVEQ//g;
         $val_rules .= qq~
             ,
             ignore: ".ignore",

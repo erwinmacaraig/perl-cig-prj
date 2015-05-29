@@ -6,6 +6,7 @@ CREATE TABLE IF NOT EXISTS `tblCertificationTypes` (
   `strCertificationName` VARCHAR(50) NOT NULL,
   `tTimeStamp` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `intActive` TINYINT NOT NULL DEFAULT 1,
-    `intDisplayOrder` smallint(6) DEFAULT '0',
+  intActiveOrder  TINYINT NOT NULL DEFAULT 0,
+  `intDisplayOrder` smallint(6) DEFAULT '0',
   PRIMARY KEY (`intCertificationTypeID`)
 ) DEFAULT CHARSET=utf8;

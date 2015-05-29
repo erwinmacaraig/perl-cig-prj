@@ -1,21 +1,52 @@
 <p>[% Lang.txt('Please select the people you wish to register from the list below and click on the update button to commit your change.') %]</p>
+
 <script>
 jQuery().ready(function() {
-    jQuery('#grid').on('change','.grid_chk',function(){
-        update_selected();
+	var table;	
+	jQuery("#flow-btn-continue").hide();	
+	
+[% IF rowcount %]
+	if(jQuery.fn.dataTable.isDataTable('#renewalsid')){
+		table = jQuery('#grid').DataTable();
+	}
+	else {
+		table = jQuery('#grid').DataTable();
+	}
+	jQuery('#grid').on('change','.grid_chk',function(){	
+		var cells = table.cells( ).nodes();
+		var IDs = [];  
+		var n = jQuery(cells).find(':checkbox');	
+		update_selected();	
+		jQuery.each(n, function(key, value){
+			if(jQuery(value).prop('checked')){
+				var v = jQuery(this).val();
+                IDs.push(jQuery(this).val());
+			}			
+		});	
+		jQuery('#rolloverIDs').val(IDs.join('|'));
     });
+		
+	
     function update_selected()    {
-        var changedIDs = [];
-        jQuery('.chk_intPersonID:checked').each(function()  {
+        var changedIDs = [];  
+		jQuery('.chk_intPersonID:checked').each(function()  {
                 var v = jQuery(this).val();
-                changedIDs.push(jQuery(this).val());
+                changedIDs.push(jQuery(this).val());	
         });
-        jQuery('#rolloverIDs').val(changedIDs.join('|'));
+		jQuery('#roIdsPrev').val(changedIDs.join('|'));
+
+		if(jQuery.isEmptyObject(changedIDs)){
+			jQuery("#flow-btn-continue").hide();
+		}
+		else {
+			jQuery("#flow-btn-continue").show();
+		}
     }
+[% END %]
 });
 </script>
 <input type="hidden" name="roIds" value="" id = "rolloverIDs">
-
+<input type="hidden" name="roIdsPrev" value="" id="roIdsPrev" />
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">
 [% END %]

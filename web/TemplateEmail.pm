@@ -38,7 +38,11 @@ sub sendTemplateEmail	{
 	$fromaddress ||= $Defs::admin_email;
     $fromaddress = $Defs::admin_email if  $fromaddress eq ';';
     my $fromname = '';
-    if($fromaddress eq $Defs::admin_email)  {
+
+    if($Data->{'SystemConfig'}{'AdminEmailSenderName'}) {
+        $fromname = $Data->{'SystemConfig'}{'AdminEmailSenderName'};
+    }
+    elsif($fromaddress eq $Defs::admin_email)  {
         $fromname = $Defs::admin_email_name;
     }
 
@@ -59,14 +63,17 @@ sub sendTemplateEmail	{
             $bccaddress = '';
         }
         if($mailer) {
+            my @bcc = split /\s*,\s*/, $bccaddress;
+            my @cc = split /\s*,\s*/, $ccaddress;
+
             my ($ok, $msg) = $mailer->send(
                 HTMLMessage => $templateblob || '',
                 Subject => $subject,
                 ToAddress => $toaddress,
                 FromAddress => $fromaddress,
                 FromName => $fromname,
-                BCCRecipients => (split /\s*,\s*/, $bccaddress) || [],
-                CCRecipients => (split /\s*,\s*/, $ccaddress) || [],
+                BCCRecipients => \@bcc || [],
+                CCRecipients => \@cc || [],
             );
             if($ok) {
                 print MAILLOG (scalar localtime()).":Template:$subject:$toaddress: FROM $fromaddress Sent OK\n";

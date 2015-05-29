@@ -2,7 +2,8 @@ package EmailNotifications::Notification;
 
 use strict;
 use lib '.', '..';
-use Email;
+#use Email;
+use TemplateEmail;
 use EmailNotifications::Template;
 use Data::Dumper;
 
@@ -23,6 +24,9 @@ sub new {
         _lang               => $args{lang} || undef,
         _htmlTemplatePath   => $args{htmlTemplatePath} || undef,
         _textTemplatePath   => $args{textTemplatePath} || undef,
+        _data               => $args{data} || undef,
+        _workTaskDetails    => $args{workTaskDetails} || undef,
+        _toOriginLevel      => $args{OriginLevel} || undef,
     };
 
     $self = bless ($self, $class);
@@ -91,6 +95,21 @@ sub getTextTemplatePath {
     return $self->{_textTemplatePath};
 }
 
+sub getData {
+    my ($self) = shift;
+    return $self->{_data};
+}
+
+sub getWorkTaskDetails {
+    my ($self) = shift;
+    return $self->{_workTaskDetails};
+}
+
+sub getToOriginLevel {
+    my ($self) = shift;
+    return $self->{_toOriginLevel} || 100;
+}
+
 sub initialise {
     my ($self) = shift;
 
@@ -113,16 +132,21 @@ sub send {
     my $templateData = $template->getTemplateData();
     my $config = $template->getConfig();
 
-    sendEmail(
+    my $Data = $self->getData();
+    #TODO: send text template if no wrapper
+
+    my ($emailsentOK, $message)  = sendTemplateEmail(
+        $Data,
+        $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'},
+        $templateData,
         $templateData->{'To'}{'email'},
-        $templateData->{'From'}{'email'},
         $config->{'strSubjectPrefix'} . $self->getSubject(),
-        '',
-        $content,
-        '',
-        '',
-        '',
+        $templateData->{'From'}{'email'},
+        $templateData->{'CC'}{'email'},
     );
+    
+    #print STDERR Dumper "SENT STATUS ". $emailsentOK;
+    #print STDERR Dumper "MESSAGE ". $message;
 }
 
 sub setRealmID {
@@ -195,6 +219,24 @@ sub setTextTemplatePath {
     my $self = shift;
     my ($textTemplatePath) = @_;
     $self->{_textTemplatePath} = $textTemplatePath if defined $textTemplatePath;
+}
+
+sub setData {
+    my $self = shift;
+    my ($Data) = @_;
+    $self->{_data} = $Data if defined $Data;
+}
+
+sub setWorkTaskDetails {
+    my $self = shift;
+    my ($workTaskDetails) = @_;
+    $self->{_workTaskDetails} = $workTaskDetails if defined $workTaskDetails;
+}
+
+sub setToOriginLevel {
+    my $self = shift;
+    my ($originLevel) = @_;
+    $self->{_toOriginLevel} = $originLevel if defined $originLevel;
 }
 
 1;

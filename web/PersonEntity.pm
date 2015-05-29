@@ -16,6 +16,7 @@ use Reg_common;
 sub closePERecord {
     my($Data, $personID, $entityID, $dtTo, $Reg_ref) = @_;
 
+    return;
     my $status = $Defs::PERSON_ENTITY_STATUS_INACTIVE;
     my %reg = ();
     if (! $dtTo)    {
@@ -66,6 +67,7 @@ sub closePERecord {
 sub doesOpenPEExist {
     my($Data, $personID, $entityID, $Reg_ref) = @_;
 
+    return;
     my %reg = ();
     $reg{'personType'} = $Reg_ref->{'personType'} || '';
     $reg{'personLevel'} = $Reg_ref->{'personLevel'} || '';
@@ -112,6 +114,7 @@ sub doesOpenPEExist {
     
 sub addPERecord {
     my($Data, $personID, $entityID, $Reg_ref) = @_;
+    return;
 
     my %reg = ();
     $reg{'personType'} = $Reg_ref->{'personType'} || '';

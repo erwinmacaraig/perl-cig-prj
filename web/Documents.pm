@@ -5,8 +5,8 @@
 package Documents;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(handle_documents pendingDocumentActions);
-@EXPORT_OK = qw(handle_documents pendingDocumentActions);
+@EXPORT = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
+@EXPORT_OK = qw(handle_documents pendingDocumentActions pendingEntityDocumentActions);
 
 use strict;
 use lib "..",".";
@@ -24,7 +24,7 @@ use GridDisplay;
 
 use PersonObj;
 use WorkFlow;
-
+use Switch;
 
 use Data::Dumper;
 
@@ -196,10 +196,12 @@ sub list_docs {
 		{
 			name => $Data->{'lang'}->txt('Title'),
 			field => 'Title',
+            defaultShow => 1,
 		},
 		{
 			name => $Data->{'lang'}->txt('Document Type'),
 			field => 'DocumentType',
+            defaultShow => 1,
 		},
        {
             name => $Data->{'lang'}->txt('Size'),
@@ -219,6 +221,7 @@ sub list_docs {
             field => 'View',
             type => 'HTML',
             sortable => 0,
+            defaultShow => 1,
         },
          {
             name => $Data->{'lang'}->txt('Delete'),
@@ -317,7 +320,8 @@ sub new_doc_form {
 		<form action="$target" method="POST" enctype="multipart/form-data" class="dropzone" id = "docform">			
          <script>
               Dropzone.options.docform = { 
-                  maxFilesize: 25 // MB 
+                  maxFilesize: 25, // MB
+				  dictDefaultMessage:"] . $Data->{'lang'}->txt('Click here to upload file') . qq["	 
               };
          </script>
 
@@ -472,7 +476,43 @@ sub pendingDocumentActions {
 		
     }
 }
+sub pendingEntityDocumentActions {
+	my ($Data, $entityID, $fileID) = @_;
+	my $query = qq[ SELECT strActionPending FROM tblDocuments INNER JOIN tblEntity 
+					ON tblDocuments.intEntityID = tblEntity.intEntityID 
+					INNER JOIN tblDocumentType ON 
+					(tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID 
+					AND tblDocumentType.intRealmID = tblEntity.intRealmID)
+					WHERE tblDocuments.intUploadFileID = ? AND tblEntity.intEntityID = ?];
+	
+	my $sth = $Data->{'db'}->prepare($query);
+	$sth->execute($fileID, $entityID);	
 
+	my ($valuePending) = $sth->fetchrow_array();
+
+	switch ($valuePending) {
+		case ['CLUB','VENUE'] {
+			my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $entityID, cache => $Data->{'cache'});
+			$entityObj->load();
+			if($entityObj){
+				$entityObj->setValues({'strStatus' => $Defs::ENTITY_STATUS_PENDING});
+           		$entityObj->write();
+			}
+		}
+	}
+	my $rc = WorkFlow::addWorkFlowTasks(
+                $Data,
+                'ENTITY',
+                'AMENDMENT',
+                $Data->{'clientValues'}{'authLevel'} || 0,
+                $entityID, #originEntityID,
+                0,
+                0,
+                0,
+            );
+	
+
+}
 
 
 

@@ -1,0 +1,92 @@
+				<div class = "selfreg-details col-md-8">
+					<fieldset class="read-only-field">
+						<legend>
+							[% Lang.txt('Registration History') %]
+						</legend>
+						[% FOREACH rego IN  regohist %]
+							 <table class = "table ">
+								
+							[% IF rego.NationalPeriodName%]
+								<tr>
+									<td class="">[% Lang.txt('Registration Period') %]:</td>
+                                    <td>[% Lang.txt(rego.NationalPeriodName) %]</td>
+                                </tr>
+                            [% END %]
+
+                            [% IF rego.RegistrationType %]
+								<tr>
+									<td class="">[% Lang.txt('Registration Type') %]: </td>
+									<td> [% Lang.txt(rego.RegistrationType) %] </td>
+                                </tr>
+                            [% END %]
+
+							 [% IF rego.Status %]
+								<tr>
+									<td class="">[% Lang.txt('Status') %]:</td>
+									<td>[% Lang.txt(rego.Status) %]</td>
+								</tr>                                
+                            [% END %]
+
+							[% IF rego.Sport %]
+								<tr>
+									<td class="">[% Lang.txt('Sport') %]:</td>
+									<td>[% Lang.txt(rego.Sport) %]</td>
+								</tr>                                
+                            [% END %]
+
+							[% IF rego.PersonType %]
+								<tr>
+									<td class="">[% Lang.txt('Type') %]:</td>
+									<td>[% Lang.txt(rego.PersonType) %]</td>
+								</tr>
+                            [% END %]
+
+                            [% IF rego.PersonEntityRole %]
+								<tr>
+									<td class="">[% Lang.txt('Role') %]:</td>
+									<td>[% Lang.txt(rego.PersonEntityRole) %]</td>
+								</tr>                                
+								
+                            [% END %]
+
+                            [% IF rego.PersonLevel %]
+                                <tr>
+									<td class="">[% Lang.txt('Level') %]:</td>
+									<td>[% Lang.txt(rego.PersonLevel) %]</td>
+								</tr>
+
+                            [% END %]
+
+                            [% IF rego.AgeLevel %]
+                                <tr>
+									<td class="">[% Lang.txt('Age Level') %]:</td>
+									<td>[% Lang.txt(rego.AgeLevel) %]</td>
+								</tr>
+
+                            [% END %]                           
+
+                            [% IF rego.NPdtFrom and rego.NPdtFrom != '0000-00-00' %]
+                                <tr>
+									<td class="">[% Lang.txt('Valid From') %]:</td>
+									<td>[% DateFormat.format(rego.NPdtFrom,'MEDIUM') %]</td>
+								</tr>
+
+                            [% END %]
+								[% IF rego.NPdtTo and rego.NPdtTo != '0000-00-00' %]
+                                <tr>
+									<td class="">[% Lang.txt('Valid Until') %]:</td>
+									<td>[% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
+								</tr>
+
+                            [% END %]
+                            [% IF rego.PersonType == 'REFEREE' or rego.PersonType == 'COACH' %]
+                                <tr>
+									<td class="">[% Lang.txt('Certifications') %]:</td>
+									<td>[% IF rego.Certifications %] [% rego.Certifications %] [% ELSE %] - [% END %]</td>
+								</tr>
+
+                            [% END %]
+							</table>
+						[% END %]
+							</div>
+					</fieldset>

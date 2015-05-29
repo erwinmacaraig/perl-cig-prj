@@ -86,7 +86,7 @@ sub putFileToS3 {
     return 0;
   }
   else  {
-    warn("file uploaded");
+    #warn("file uploaded");
     eval {
       unlink($localfile); 
     };

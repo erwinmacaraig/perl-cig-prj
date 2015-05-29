@@ -1,0 +1,1 @@
+ALTER TABLE tblProducts ADD COLUMN intMinAddSingleTXNLevel TINYINT DEFAULT 0;

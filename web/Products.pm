@@ -23,6 +23,7 @@ use Utils;
 use MemberFunctions;
 use GridDisplay;
 use ProductPhoto;
+#use WorkFlow;
 
 require InstanceOf;
 require NationalReportingPeriod;
@@ -295,7 +296,7 @@ sub list_products	{
 		my $active = ! $dref->{intInactive} || 0;
 		my $shade=$i%2==0? 'class="rowshade" ' : '';
 		$i++;
-		my $amount=currency($dref->{'curAmount'}||$dref->{'curDefaultAmount'} || 0);
+		my $amount=$dref->{'curAmount'}||$dref->{'curDefaultAmount'} || 0;
 
 		   push @rowdata, {
       id => $dref->{'intProductID'} || next,
@@ -332,7 +333,7 @@ sub list_products	{
       	field =>  'amount',
     	},
     	{
-    	  name =>   $Data->{'lang'}->txt('Active ?'),
+    	  name =>   $Data->{'lang'}->txt('Active'),
     	  field =>  'active',
 				type => 'tick',
     	},
@@ -436,8 +437,8 @@ sub detail_products  {
     my $dref = get_product($Data,$id);
 	my $name=$dref->{'strName'} || '';
     my $hasPhoto = $dref->{'intPhoto'}||0;
-    my $amount = currency($dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0);
-		my $currency_symbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
+    my $amount = $dref->{'curAmount'} || $dref->{'curDefaultAmount'} || $dref->{'curAmount_Adult1'} || 0;
+		my $currency_symbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     my $compulsory=qq[<img src="images/compulsory.gif" alt="Compulsory Field" title="Compulsory Field"/>];
     #$body = qq[<p>Enter the name of the product in the box provided and its default cost, then press the Update button.</p>
 		my $fulledit = (
@@ -680,12 +681,12 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 					? $amount
 					: $amounts{"curAmount_$j".$nums[$i-1]};
 				#$dref->{$k} = '' if $dref->{$k} eq '0.00';
-				$amounts{$k} = currency($dref->{$k} || $prev_amount || 0);
+				$amounts{$k} = $dref->{$k} || $prev_amount || 0;
 			}
 		}
 		
 		foreach my $field (qw/ curAmountMin  curAmountMax /){
-		    $amounts{$field} = currency($dref->{$field} || $amount || 0);
+		    $amounts{$field} = $dref->{$field} || $amount || 0;
 		}
 		
 		my $single_active = '';
@@ -849,7 +850,6 @@ my $warning_note = $Data->{'SystemConfig'}{'ProductEditNote'} || '';
 								next if ($splitName =~ /Club/ and $Data->{'SystemConfig'}{'dontAllowClubsSplits'});
 				$hasSplits++;
                 $splitID = $paymentSplit->{'intSplitID'};
-								print STDERR $splitName;
                 $splits{$splitID} = $splitName;
             }
 						$splits{''} = '';
@@ -2038,6 +2038,8 @@ my $entityTypeID = $Data->{'currentLevel'};
             ( pd.intLevel = $Defs::LEVEL_CLUB AND pd.intID = ? )
             OR
             ( pd.intLevel = $Defs::LEVEL_NATIONAL AND pd.intID = ? )
+            OR
+            ( pd.intLevel = 0 and pd.intID=0)
         ) 
     ];
 
@@ -2083,8 +2085,8 @@ my $entityTypeID = $Data->{'currentLevel'};
     WHERE 
       intProductID = ?
       AND intRealmID = ?
-      AND intID = ?
-      AND intLevel = ?
+      AND intID IN (0, ?)
+      AND intLevel IN (0, ?)
       AND intAttributeType = ?
   ];
   my $sth = $Data->{'db'}->prepare($query);
@@ -2262,11 +2264,12 @@ sub product_apply_transaction {
                 T.intID,
                 P.intCanResetPaymentRequired,
                 T.intPersonRegistrationID,
-                T.intStatus
+                T.intStatus,
+                PR.intEntityID
 			FROM tblTransactions as T
                 INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (PR.intPersonRegistrationID = T.intPersonRegistrationID AND T.intPersonRegistrationID > 0)
 			WHERE T.intTransLogID = ?
-				AND T.intTableType = 1
 		];
     my $q = $db->prepare($st);
     $q->execute($transLogID);
@@ -2294,14 +2297,16 @@ sub product_apply_transaction {
     my $qUPDEntity = $db->prepare($stUPDEntity);
    
 
-    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus) = $q->fetchrow_array())	{
+    while( my ($productID,$tableType, $ID, $resetPaymentReq, $personRegoID, $txnStatus, $PREntityID) = $q->fetchrow_array())	{
         apply_product_rules($Data,$productID,$ID,$transLogID);
         next if (! $ID or ! $productID or $txnStatus != 1 or ! $resetPaymentReq);
         if ($tableType = $Defs::LEVEL_PERSON and $personRegoID) {
             $qUPD->execute($ID, $personRegoID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $PREntityID, $ID, $personRegoID);
         }
         if ($tableType >= $Defs::LEVEL_CLUB) {
             $qUPDEntity->execute($ID);
+            WorkFlow::checkRulePaymentFlagActions($Data, $ID, 0,0);
         }
     }
     $q->finish();
@@ -2416,49 +2421,10 @@ sub apply_product_rules {
     
     #if($dtStart ne 'NULL' || $dtEnd ne 'NULL'){
     #print STDERR $query;
-    
     $Data->{'db'}->do($query);
     #}
     
-    # Update the Member_Associations table.
-    # - Check if we should set the members financial status or registered until date.
-    my %ColumnsValues = ();
-    my $query2 = qq[
-                        UPDATE tblPerson_Associations SET
-                        ];
-    
-    if ($product->{intProductMemberPackageID}) {
-        $ColumnsValues{'intMemberPackageID'} = $product->{intProductMemberPackageID};
-        $ColumnsValues{'dtLastRegistered'} = qq[NOW()];
-        $ColumnsValues{'dtFirstRegistered'} = qq[IF(dtFirstRegistered, dtFirstRegistered, NOW())];
-    }
-    
-    if($product->{intSetMemberFinancial}){
-        $ColumnsValues{'intFinancialActive'} = 1;
-    }
-    if($product->{intSetMemberActive}){
-        $ColumnsValues{'intRecStatus'} = 1;
-    }
-    
-    
-    if($product->{intMemberExpiryDays} > 0) {
-        $ColumnsValues{'dtRegisteredUntil'} = 'DATE_ADD(SYSDATE(), INTERVAL ' . $product->{intMemberExpiryDays} . ' DAY)';
-        }
-    elsif($product->{dtMemberExpiry} and $product->{dtMemberExpiry} ne '0000-00-00 00:00:00' and $product->{dtMemberExpiry} ne '0000-00-00' ){
-        $ColumnsValues{'dtRegisteredUntil'} = "'$product->{dtMemberExpiry}'";
-    }
-    
-    if(scalar (keys %ColumnsValues)) {
-        while(my ($column, $value) = (each %ColumnsValues)){
-            $query2 .= "$column = $value,";
-        }
-        $query2 =~s/\,$//;
-        $query2 .= " WHERE intPersonID = $personID ";
-        
-        $Data->{'db'}->do($query2);
-    }
-
-   {
+     {
 
         my $st = qq[
             UPDATE tblTransactions as T
@@ -2487,62 +2453,22 @@ sub apply_product_rules {
 		);
     }
 
-    warn("PERSON REGO RECORD HERE ?");
-
 }
 
 sub getFormProductAttributes {
     my (
         $Data,
-        $formID
+        $productIds
     ) = @_;
     
     my @product_list;
     my %AttributeValues=();
     
+    my $productID_str = join(',',@{$productIds});
+
     # Select products at the node level
-    my $node_search_sql = qq[
-        SELECT
-            intProductID
-        FROM
-            tblRegoFormProducts
-        WHERE
-            intRegoFormID = ?
-    ];
-    
-    my $node_search_sth = $Data->{'db'}->prepare($node_search_sql);
-    $node_search_sth->execute($formID);
-    my $node_products = $node_search_sth->fetchall_arrayref([0]);
-    
-    foreach my $ref ( @$node_products){
-        push @product_list, $ref->[0];
-    }
-    
-    # Select added products at assoc or club level
-    my $added_search_sql = qq[
-        SELECT
-            intProductID
-        FROM
-            tblRegoFormProductsAdded
-        WHERE
-            intRegoFormID = ?
-            AND intClubID = ?
-    ];
-    my $added_search_sth = $Data->{'db'}->prepare($added_search_sql);
-    
-    my $clubID = $Data->{'clientValues'}{'clubID'}>0 ? $Data->{'clientValues'}{'clubID'} : 0;
-    
-    $added_search_sth->execute($formID, $clubID);
-    
-    my $added_products = $added_search_sth->fetchall_arrayref([0]);
-    
-    foreach my $ref ( @$added_products){
-        push @product_list, $ref->[0];
-    }
-    
     # Get product attributes for our list of products
-    if (@product_list){
-        my $products_where = join (', ', map{'?'} @product_list );
+    if (@{$productIds}){
         my $query = qq[
             SELECT 
                 intProductID,
@@ -2551,7 +2477,7 @@ sub getFormProductAttributes {
             FROM 
                 tblProductAttributes
             WHERE 
-                intProductID in ( $products_where )
+                intProductID in ( $productID_str)
         ];
         my $sth = $Data->{'db'}->prepare($query);
         $sth->execute(@product_list);

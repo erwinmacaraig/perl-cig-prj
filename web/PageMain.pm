@@ -17,6 +17,7 @@ use AddToPage;
 use TTTemplate;
 use Log;
 use Data::Dumper;
+use LanguageChooser;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -187,18 +188,23 @@ sub pageMain {
         });
     ];
     $Data->{'AddToPage'}->add('js_bottom','file','js/jscookie.js');
-    #$Data->{'AddToPage'}->add(
-        #'js_bottom',
-        #'inline',
-        #$search_js,
-    #);
+    $Data->{'AddToPage'}->add('js_bottom','file','js/bootstrap-tabcollapse/bootstrap-tabcollapse.js');
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        "jQuery('.nav.nav-tabs').tabCollapse({
+            tabsClass: 'hidden-xs',
+            accordionClass: 'visible-xs autoAccordian'
+        })",
+
+    );
 
    if($Defs::DisableResponsiveLayout)    {
-        $Data->{'AddToPage'}->add( 
-            'css',
-            'file',
-            'css/noresponsive.css',
-        );
+        #$Data->{'AddToPage'}->add( 
+            #'css',
+            #'file',
+            #'css/noresponsive.css',
+        #);
     }
  
     my $helpURL=$Data->{'SystemConfig'}{'HELP'} 
@@ -252,6 +258,9 @@ sub pageMain {
         Menu => '',
         HomeURL => "$Data->{'target'}?client=$homeClient&amp;a=".$HomeAction{$Data->{'clientValues'}{'authLevel'}},
         AtLoginLevel => $atloginlevel,
+        LanguageChooser => genLanguageChooser($Data),
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
     );
 
   my $globalnav = runTemplate(
@@ -271,8 +280,8 @@ sub pageMain {
         StatsCounter =>  $statscounter || '',
         Content => $body || '',
         Title => $title || '',
-        MemListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'}) || $Data->{'lang'}->txt('PEOPLE'),
-        ClubListName => uc($Data->{'LevelNames'}{$Defs::LEVEL_CLUB.'_P'}) || $Data->{'lang'}->txt('CLUBS'),
+        MemListName => uc($Data->{'lang'}->txt('Persons')),
+        ClubListName => uc($Data->{'lang'}->txt('Clubs')),
         GlobalNav => $globalnav || '',
         Header => $Data->{'SystemConfig'}{'Header'} || '',
         NavBar => $navbar || '',
@@ -283,6 +292,10 @@ sub pageMain {
         BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
         BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
         DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
+        HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        NavTree => $navTree,
+        LanguageChooser => genLanguageChooser($Data,2),
         #FullScreen => $Data->{'FullScreen'} || 0,
     );
 
@@ -402,8 +415,9 @@ $BottomJSInline
 
 
 sub pageForm    {
-    my($title, $body, $clientValues_ref,$client, $Data) = @_;
+    my($title, $body, $clientValues_ref,$client, $Data, $templatefile) = @_;
     $title ||= '';
+    $templatefile ||= 'main.templ';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
  $Data->{'TagManager'}='';#getTagManager($Data);
 
@@ -461,11 +475,12 @@ my $h3eader = $o->header();
         $header = "Content-type: text/html\n\n";
     }
     print $header;
-    print runTemplate($Data, $meta, 'main.templ');
+    print runTemplate($Data, $meta, $templatefile);
 }
 
 sub regoPageForm {
-    my($title, $body, $clientValues_ref,$client, $Data) = @_;
+    my($title, $body, $clientValues_ref, $client, $Data) = @_;
+
     $title ||= '';
     $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
     $Data->{'TagManager'}=''; #getTagManager($Data);
@@ -486,47 +501,80 @@ sub regoPageForm {
             $cookies_string = join(',', @cookie_array);
         }
 
-        print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
+        if($Data->{'RedirectTo'})   {
+            print $output->redirect (-uri => $Data->{'RedirectTo'},-cookie=>[$cookies_string]);
+        }
+        else    {
+            print $output->header(-cookie=>[$cookies_string]); # -charset=>'UTF-8');
+            #$header = $output->header(-cookie=>[$cookies_string], -P3P => $p3p, -charset=>'UTF-8');
+        }
+
+    } elsif($Data->{'RedirectTo'}) {
+        my $output = new CGI;
+        print $output->redirect ($Data->{'RedirectTo'});
     } else {
         print "Content-type: text/html\n\n";
     }
 
-    my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);
-    my $meta = {};
-    $meta->{'title'} = $title;
-    $meta->{'head'} = $html_head;
-    $meta->{'page_begin'} = qq[
-        <div id="global-nav-wrap">
-        $page_navigator
-        </div>
-    ];
-    $meta->{'page_header'} = qq[
-        <div> 
-        $page_header 
-        </div>
-    ];
+    my $globalnav = runTemplate(
+      $Data,
+      {
+        AtLoginLevel => 1,
+        HeaderLogo => "$Defs::base_url/$Data->{'SystemConfig'}{'MA_logo'}",
+        HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        DefaultSystemConfig => $Data->{'SystemConfig'},
+        LanguageChooser => genLanguageChooser($Data),
+      },
+      'user/globalnav.templ',
+    );
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
+    );
 
-    $meta->{'page_content'} = $body;
-    $meta->{'page_footer'} = qq [
-        <div id="footer-links">
-            $powered
-        </div>
-    ];
-    $meta->{'page_end'} = qq [
-        <script type="text/javascript">
-        $Data->{'TagManager'}
-        </script>
-    ];
+    $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/jscookie.js");
+    $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/bootstrap-tabcollapse/bootstrap-tabcollapse.js");
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        "jQuery('.nav.nav-tabs').tabCollapse({
+            tabsClass: 'hidden-xs',
+            accordionClass: 'visible-xs autoAccordian'
+        })",
 
-    print runTemplate($Data, $meta, 'regoform/main.templ');
-    #New regoform wrapper not ready for public consumption, Regs 16/4/14
-    #print runTemplate($Data, $meta, 'regoform/main_2014.templ');
+    );
+
+    print runTemplate(
+        $Data,      
+        {
+            Content => $body,
+            GlobalNav => $globalnav,
+            Header => $Data->{'SystemConfig'}{'Header'} || '',
+            CSSFiles => $Data->{'AddToPage'}->get('css','file') || '',
+            CSSInline => $Data->{'AddToPage'}->get('css','inline') || '',
+            TopJSFiles => $Data->{'AddToPage'}->get('js_top','file') || '',
+            TopJSInline => $Data->{'AddToPage'}->get('js_top','inline') || '',
+            BottomJSFiles => $Data->{'AddToPage'}->get('js_bottom','file') || '',
+            BottomJSInline => $Data->{'AddToPage'}->get('js_bottom','inline') || '',
+            DisableResponsiveLayout => $Defs::DisableResponsiveLayout || 0,
+        },
+       'selfrego/wrapper.templ'
+    );
 }
 
 sub getPageCustomization{
     my ($Data) = @_;
 
-    my $nav = runTemplate( $Data, {PassportLink => ''}, 'user/globalnav.templ');
+    my $nav = runTemplate(
+        $Data,
+        {
+            PassportLink => '',
+            DefaultSystemConfig => $Data->{'SystemConfig'},
+            HeaderLogo => "$Defs::base_url/$Data->{'SystemConfig'}{'MA_logo'}",
+        },
+        'user/globalnav.templ'
+    );
 
     my $html_head = $Data->{'HTMLHead'} || '';
     my $html_head_style = '';

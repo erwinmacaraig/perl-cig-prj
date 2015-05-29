@@ -12,6 +12,7 @@ CREATE TABLE tblPaymentConfig (
 
     intGatewayStatus TINYINT DEFAULT 0,
     intFeeAllocationType TINYINT DEFAULT 0,
+    intProcessPreGateway TINYINT DEFAULT 0,
 
     strCurrency CHAR(5) DEFAULT 'AUD',
 

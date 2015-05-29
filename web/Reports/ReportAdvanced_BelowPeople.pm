@@ -51,9 +51,10 @@ sub _getConfiguration {
     my $PRtablename = "tblPersonRegistration_$Data->{'Realm'}";
     my $txn_WHERE = '';
     if ( $clientValues->{clubID} and $clientValues->{clubID} > 0 ) {
-        $txn_WHERE = qq[ AND TX.intTXNClubID IN (0, $clientValues->{clubID})];
+        $txn_WHERE = qq[ AND TX.intTXNEntityID IN (0, $clientValues->{clubID})];
     }
 
+    my $lang = $Data->{'lang'};
     my %config = (
         Name => 'Detailed Person Report',
 
@@ -111,7 +112,7 @@ sub _getConfiguration {
                 }
             ],
             strLatinFirstname => [
-                'International First Name',
+                'International First name',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -122,7 +123,7 @@ sub _getConfiguration {
             ],
 
             strLatinSurname => [
-                'International Family Name',
+                'International Family name',
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
@@ -203,7 +204,7 @@ sub _getConfiguration {
             ],
 
             dtYOB => [
-                'Year of Birth',
+                $lang->txt('Year of Birth'),
                 {
                     displaytype   => 'date',
                     fieldtype     => 'text',
@@ -227,7 +228,7 @@ sub _getConfiguration {
 
 
             strPlaceOfBirth => [
-                'Place (Town) of Birth',
+                'City of Birth',
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
@@ -243,7 +244,7 @@ sub _getConfiguration {
                     displaytype => 'lookup',
                     fieldtype   => 'dropdown',
                     dropdownoptions =>
-                      { '' => '&nbsp;', 1 => 'Male', 2 => 'Female' },
+                      { 1 => 'Male', 2 => 'Female' },
                     dropdownorder => [ '', 1, 2 ],
                     size          => 2,
                     multiple      => 1,
@@ -255,7 +256,7 @@ sub _getConfiguration {
 
             
             intEthnicityID => [
-                'Ethnicity',
+                'Race',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -282,7 +283,7 @@ sub _getConfiguration {
             ],
 
             PRstrPersonType=> [
-                'Registration Role',
+                'Role',
                 {
                     dbfield         => 'PR.strPersonType',
                     displaytype     => 'lookup',
@@ -293,7 +294,7 @@ sub _getConfiguration {
                 }
             ],
             PRstrPersonLevel=> [
-                'Registration Level',
+                'Level',
                 {
                     dbfield         => 'PR.strPersonLevel',
                     displaytype     => 'lookup',
@@ -304,7 +305,7 @@ sub _getConfiguration {
                 }
             ],
             PRstrRegistrationNature=> [
-                'Registration Nature',
+                'Nature of Registration',
                 {
                     dbfield         => 'PR.strRegistrationNature',
                     displaytype     => 'lookup',
@@ -316,7 +317,7 @@ sub _getConfiguration {
             ],
 
             PRstrStatus=> [
-                'Registration Status',
+                'Status',
                 {
                     dbfield         => 'PR.strStatus',
                     displaytype     => 'lookup',
@@ -327,7 +328,7 @@ sub _getConfiguration {
                 }
             ],
             PRstrSport=> [
-                'Registration Sport',
+                'Sport',
                 {
                     dbfield         => 'PR.strSport',
                     displaytype     => 'lookup',
@@ -347,7 +348,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtFrom=> [
-                'Date Registration From',
+                'Date From',
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -358,7 +359,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtTo=> [
-                'Date Registration To',
+                'Date To',
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -369,7 +370,7 @@ sub _getConfiguration {
                 }
             ],
             PRintPaymentRequired=> [
-                'Payment Required ?',
+                $lang->txt('Payment Required ?'),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -385,7 +386,7 @@ sub _getConfiguration {
 
 
            PRstrLocalName=> [
-                'Entity Name',
+                $lang->txt('Entity Name'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -417,22 +418,11 @@ sub _getConfiguration {
             ],
 
             strSuburb => [
-                'Suburb',
+                'City',
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
                     dbfield       => 'tblPerson.strSuburb',
-                    allowsort     => 1,
-                    optiongroup   => 'contactdetails',
-                    allowgrouping => 1
-                }
-            ],
-
-            strCityOfResidence => [
-                'City of Residence',
-                {
-                    displaytype   => 'text',
-                    fieldtype     => 'text',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -545,7 +535,7 @@ sub _getConfiguration {
 
 
             strPreferredLang => [
-                'Preferred Language',
+                $lang->txt('Preferred Language'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -555,7 +545,7 @@ sub _getConfiguration {
             ],
 
             strBirthCert => [
-                'Birth Certificate Number',
+                $lang->txt('Birth Certificate Number'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -564,7 +554,7 @@ sub _getConfiguration {
                 }
             ],
             strBirthCertDesc=> [
-                'Birth Certificate Notes',
+                $lang->txt('Birth Certificate Notes'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -573,7 +563,7 @@ sub _getConfiguration {
                 }
             ],
             strBirthCertCountry => [
-                'Birth Certificate Country',
+                $lang->txt('Birth Certificate Country'),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -586,7 +576,7 @@ sub _getConfiguration {
             ],
 
             dtBirthCertValidityDateFrom=> [
-                'Birth Certificate Valid From',
+                $lang->txt('Birth Certificate Valid From'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -598,7 +588,7 @@ sub _getConfiguration {
                 }
             ],
             dtBirthCertValidityDateTo=> [
-                'Birth Certificate Valid To',
+                $lang->txt('Birth Certificate Valid To'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -611,7 +601,7 @@ sub _getConfiguration {
             ],
 
             strOtherPersonIdentifier=> [
-                $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} : 'Other Identifier',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifier_Text'} : $lang->txt('Other Identifier'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -620,7 +610,7 @@ sub _getConfiguration {
                 }
             ],
             strOtherPersonIdentifierDesc=> [
-                $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : 'Other Identifier Description',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierDesc_Text'} : $lang->txt('Other Identifier Description'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -629,7 +619,7 @@ sub _getConfiguration {
                 }
             ],
             strOtherPersonIdentifierIssueCountry=> [
-                $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} : 'Other Identifier Issuance Country',
+                $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} ? $Data->{'SystemConfig'}{'strOtherPersonIdentifierIssueCountry_Text'} : $lang->txt('Other Identifier Issuance Country'),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -642,7 +632,7 @@ sub _getConfiguration {
             ],
 
             dtOtherPersonIdentifierValidDateFrom=> [
-                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} : 'Other Identifier Validity Date From',
+                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateFrom_Text'} : $lang->txt('Other Identifier Validity Date From'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -654,7 +644,7 @@ sub _getConfiguration {
                 }
             ],
             dtOtherPersonIdentifierValidDateTo=> [
-                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : 'Other Identifier Validity Date To',
+                $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} ? $Data->{'SystemConfig'}{'dtOtherPersonIdentifierValidDateTo_Text'} : $lang->txt('Other Identifier Validity Date To'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -1217,7 +1207,7 @@ sub _getConfiguration {
             ],
            
             strMemberNotes => [
-                'Notes',
+                $lang->txt('Notes'),
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1230,7 +1220,7 @@ sub _getConfiguration {
             ],
 
             intPhoto => [
-                'Photo Present?',
+                $lang->txt('Photo Present?'),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -1257,56 +1247,6 @@ sub _getConfiguration {
 
             #Affilitations
 
-              strClubNumber => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel == $Defs::LEVEL_CLUB
-                    )
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}
-                      . ' Default Number'
-                    : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "CMSPN.strJumperNum",
-                    dbfrom =>
-" LEFT JOIN tblCompMatchSelectedPlayerNumbers CMSPN ON (CMSPN.intClubID=tblPerson_Clubs.intClubID and CMSPN.intPersonID=tblPerson_Clubs.intPersonID and CMSPN.intMatchID=-1 AND (CMSPN.intTeamID=-1 or CMSPN.intTeamID=0))",
-                    optiongroup   => 'otherfields',
-                    allowgrouping => 1,
-                }
-              ],
-
-              strClubName => [
-                (
-                    (
-                        (
-                                !$SystemConfig->{'NoClubs'}
-                              or $Data->{'Permissions'}
-                              {$Defs::CONFIG_OTHEROPTIONS}{'ShowClubs'}
-                        )
-                          and $currentLevel > $Defs::LEVEL_CLUB
-                    ) ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} . ' Name' : ''
-                ),
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    dbfield     => "C.strName",
-                    dbfrom =>
-"LEFT JOIN tblPerson_Clubs ON (tblPerson.intPersonID=tblPerson_Clubs.intPersonID  AND tblPerson_Clubs.intStatus=$Defs::RECSTATUS_ACTIVE) LEFT JOIN tblClub as C ON (C.intClubID=tblPerson_Clubs.intClubID ) LEFT JOIN tblAssoc_Clubs as AC ON (AC.intAssocID=tblAssoc.intAssocID AND AC.intClubID=C.intClubID)",
-                    optiongroup   => 'affiliations',
-                    allowgrouping => 1,
-                    dbwhere => 
-" AND (AC.intAssocID = tblAssoc.intAssocID OR tblPerson_Clubs.intPersonID IS NULL) AND (($PRtablename.intEntityID=C.intClubID AND $PRtablename.intEntityTypeID= $Defs::LEVEL_CLUB) or tblPerson_Clubs.intPersonID IS NULL)",
-                }
-              ],
               strZoneName => [
                 (
                       $currentLevel > $Defs::LEVEL_ZONE
@@ -1411,7 +1351,7 @@ sub _getConfiguration {
 
               #Transactions
               intTransactionID => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Transaction ID' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction ID') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1420,7 +1360,7 @@ sub _getConfiguration {
                 }
               ],
               intProductNationalPeriodID => [
-                "Product Reporting",
+                $lang->txt("Product Reporting"),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -1435,7 +1375,7 @@ sub _getConfiguration {
                 }
               ],
               intProductID => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Product' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product') : '',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -1450,7 +1390,7 @@ sub _getConfiguration {
                 }
               ],
               strGroup => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Product Group' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Group') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1460,7 +1400,7 @@ sub _getConfiguration {
                 }
               ],
               curAmount => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Line Item Total' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Line Item Total') : '',
                 {
                     displaytype => 'currency',
                     fieldtype   => 'text',
@@ -1470,7 +1410,7 @@ sub _getConfiguration {
                 }
               ],
               intQty => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Quantity' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Quantity') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1481,7 +1421,7 @@ sub _getConfiguration {
               ],
               TLstrReceiptRef => [
                 $SystemConfig->{'AllowTXNrpts'}
-                ? 'Manual Receipt Reference'
+                ? $lang->txt('Manual Receipt Reference')
                 : '',
                 {
                     displaytype => 'text',
@@ -1491,7 +1431,7 @@ sub _getConfiguration {
                 }
               ],
               payment_type => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Payment Type' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Type') : '',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -1503,7 +1443,7 @@ sub _getConfiguration {
                 }
               ],
               strTXN => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Bank Reference Number' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Bank Reference Number') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1512,7 +1452,7 @@ sub _getConfiguration {
                 }
               ],
               intLogID => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Payment Log ID' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Log ID') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1521,7 +1461,7 @@ sub _getConfiguration {
                 }
               ],
               intAmount => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Order Total' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Order Total') : '',
                 {
                     displaytype => 'currency',
                     fieldtype   => 'text',
@@ -1532,7 +1472,7 @@ sub _getConfiguration {
                 }
               ],
               dtTransaction => [
-                ( $SystemConfig->{'AllowTXNrpts'} ? 'Transaction Date' : '' ),
+                ( $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Date') : '' ),
                 {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
@@ -1545,7 +1485,7 @@ sub _getConfiguration {
                 }
               ],
               dtPaid => [
-                ( $SystemConfig->{'AllowTXNrpts'} ? 'Payment Date' : '' ),
+                ( $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Date') : '' ),
                 {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
@@ -1556,7 +1496,7 @@ sub _getConfiguration {
                 }
               ],
               dtSettlement => [
-                ( $SystemConfig->{'AllowTXNrpts'} ? 'Settlement Date' : '' ),
+                ( $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Settlement Date') : '' ),
                 {
                     displaytype   => 'date',
                     fieldtype     => 'date',
@@ -1569,7 +1509,7 @@ sub _getConfiguration {
                 }
               ],
               dtStart => [
-                ( $SystemConfig->{'AllowTXNrpts'} ? 'Start Date' : '' ),
+                ( $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Start Date') : '' ),
                 {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
@@ -1580,7 +1520,7 @@ sub _getConfiguration {
                 }
               ],
               dtEnd => [
-                ( $SystemConfig->{'AllowTXNrpts'} ? 'End Date' : '' ),
+                ( $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('End Date') : '' ),
                 {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
@@ -1591,7 +1531,7 @@ sub _getConfiguration {
                 }
               ],
               intTransStatusID => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Transaction Status' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Status') : '',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -1602,7 +1542,7 @@ sub _getConfiguration {
                 }
               ],
               strTransNotes => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Transaction Notes' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Notes') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1611,7 +1551,7 @@ sub _getConfiguration {
                 }
               ],
               strTLNotes => [
-                $SystemConfig->{'AllowTXNrpts'} ? 'Payment Record Notes' : '',
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Record Notes') : '',
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
@@ -1619,7 +1559,7 @@ sub _getConfiguration {
                     dbfield     => 'TL.strComments'
                 }
               ],
-              ClubPaymentID => [
+              EntityPaymentID => [
                 $SystemConfig->{'AllowTXNrpts'}
                 ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment for]
                 : '',
@@ -1627,9 +1567,9 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     optiongroup => 'transactions',
-                    dbfield     => 'PaymentClub.strName',
+                    dbfield     => 'PaymentEntity.strLocalName',
                     dbfrom =>
-"LEFT JOIN tblClub as PaymentClub ON (PaymentClub.intClubID=intClubPaymentID)"
+"LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID=intEntityPaymentID)"
                 }
               ],
 
@@ -1680,7 +1620,6 @@ sub _getConfiguration {
               strAddress2
               strSuburb
 
-              strCityOfResidence
               strState
               strCountry
               strPostalCode
@@ -1774,7 +1713,7 @@ sub _getConfiguration {
               dtSettlement
               dtStart
               dtEnd
-              ClubPaymentID
+              EntityPaymentID
               strMemberRecordTypeList
               dtMemberRecordIn
               )
@@ -1790,21 +1729,19 @@ sub _getConfiguration {
             ],
           },
           OptionGroups => {
-            details         => [ 'Personal Details', { active => 1 } ],
-            regos=> [ 'Registrations',  {} ],
-            contactdetails  => [ 'Contact Details',  {} ],
-            contactdetails  => [ 'Contact Details',  {} ],
-            identifications => [ 'Identifications',  {} ],
-            financial       => [ 'Financial',        {} ],
-            otherfields     => [ 'Other Fields',     {} ],
-            affiliations    => [ 'Affiliations',     {} ],
-            seasons         => [ 'Seasons',   {} ],
-            records         => [ 'Member Records',   {} ],
+            details         => [ $lang->txt('Personal Details'), { active => 1 } ],
+            regos=> [ $lang->txt('Registrations'),  {} ],
+            contactdetails  => [ $lang->txt('Contact Details'),  {} ],
+            identifications => [ $lang->txt('Identifications'),  {} ],
+            financial       => [ $lang->txt('Financial'),        {} ],
+            otherfields     => [ $lang->txt('Other Fields'),     {} ],
+            affiliations    => [ $lang->txt('Affiliations'),     {} ],
+            records         => [ $lang->txt('Member Records'),   {} ],
             transactions => [
-                $txt_Transactions,
+                $lang->txt('Transactions'),
                 {
                     from =>
-"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intTableType =1 AND TX.intAssocID = tblPerson_Associations.intAssocID $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
+"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intTableType =1 $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
                 }
             ],
           },

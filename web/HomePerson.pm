@@ -23,6 +23,7 @@ use NationalReportingPeriod;
 use DuplicatesUtils;
 use Data::Dumper;
 use PersonSummaryPanel;
+use WorkFlow;
 
 require AccreditationDisplay;
 
@@ -78,6 +79,7 @@ sub showPersonHome	{
     #print STDERR Dumper $personObj;
     my $enableRenew = 1;
     my $enableAdd = 1;
+    my $enableCancelLoan = 1;
 
     $enableRenew = $enableAdd = 0 if $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_REGISTERED;
 
@@ -138,6 +140,15 @@ sub showPersonHome	{
 	my $rego;
     
     foreach $rego (@{$Reg_ref})  {
+        my %getwtparams = (
+            type => 'PERSON',
+            registrationid => $rego->{'intPersonRegistrationID'},
+            personid => $rego->{'intPersonID'},
+        );
+
+        my $workTaskHistory = WorkFlow::getRegistrationWorkTasks($Data, \%getwtparams);
+        $rego->{'worktaskhistory'} = $workTaskHistory;
+
 		my @alldocs = ();
 		my $fileID = 0;
 		my $doc;
@@ -148,13 +159,18 @@ sub showPersonHome	{
 		my $displayAdd = 0;
 		my $displayReplace = 0;
 
+        my @regoworktasks = ();
+        #push @regoworktask
 #BAFF
 	    my @validdocsforallrego = ();
 	    my %validdocs = ();
 	    my $query = qq[
             SELECT 
-                tblDocuments.intDocumentTypeID, 
-                tblDocuments.intUploadFileID 
+                DISTINCT
+                tblDocuments.strApprovalStatus,
+                tblDocuments.intDocumentTypeID,
+                tblDocumentType.strActionPending,
+                tblDocuments.intUploadFileID
             FROM 
                 tblDocuments 
                 INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
@@ -171,7 +187,9 @@ sub showPersonHome	{
                 AND tblRegistrationItem.strPersonLevel IN ('', ?)
                 AND tblRegistrationItem.intOriginLevel = ?
                 AND tblRegistrationItem.intEntityLevel = ?
-            GROUP BY intDocumentTypeID
+            ORDER BY 
+                tblDocuments.tTimeStamp DESC, 
+                tblDocuments.intUploadFileID DESC
     ];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
@@ -184,13 +202,13 @@ sub showPersonHome	{
         $rego->{'intOriginLevel'}, 
         $rego->{'intEntityLevel'}, 
     );
+
 	while(my $dref = $sth->fetchrow_hashref()){
+        next if $dref->{'strApprovalStatus'} ne 'APPROVED';
+        next if exists $validdocs{$dref->{'intDocumentTypeID'}};
 		push @validdocsforallrego, $dref->{'intDocumentTypeID'};
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
-
-
-
 		foreach $doc (@{$rego->{'documents'}}) {			
 			$displayAdd = 0;
 			$fileID = 0;
@@ -204,7 +222,7 @@ sub showPersonHome	{
 						$status = 'MISSING';
 					}
 					else {
-						$status = 'Optional. Not Provided';
+						$status = $Data->{'lang'}->txt('Optional. Not Provided');
 						$displayReplace = 0;
 					}
 				}
@@ -247,10 +265,10 @@ sub showPersonHome	{
             $replaceLink = '';
             $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-inside-docs-panel btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
         }
-
-
-
-		#push @alldocs, { . " - $rego->{intPersonRegistrationID} "
+		#
+		next if(!$doc->{'strApprovalStatus'} && (!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego) && ($doc->{'strDocumentName'} eq 'ITC'));		
+		#
+		
 		push @{$rego->{'alldocs'}},{
 				strDocumentName => $doc->{'strDocumentName'}, 
 				Status => $status,
@@ -269,11 +287,22 @@ sub showPersonHome	{
 
 		
 		my $renew = '';
+		my $changelevel= '';
         $rego->{'renew_link'} = '';
+        $rego->{'changelevel_link'} = '';
+        $rego->{'cancel_loan_link'} = '';
+
+    
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
-        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
+
+        #enable early deactivation of a player loan
+        if($rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
+            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}";
+        }
+
+        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
         my $newAgeLevel = '';
 
@@ -282,13 +311,38 @@ sub showPersonHome	{
             $newAgeLevel = Person::calculateAgeLevel($Data, $rego->{'currentAge'});
         }
         my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego->{'strSport'}, $rego->{'personType'}, 'RENEWAL');
-        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
-        #$renew = $Data->{'target'} . "?client=$client&amp;a=PREGF_TU&amp;pt=$rego->{'strPersonType'}&amp;per=$rego->{'strPersonEntityRole'}&amp;pl=$rego->{'strPersonLevel'}&amp;sp=$rego->{'strSport'}&amp;ag=$newAgeLevel&amp;nat=RENEWAL";
-        #$renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rsp=$rego->{'strSport'}&amp;rpl=$rego->{'strPersonLevel'}&amp;rper=$rego->{'strPersonEntityRole'}&amp;rag=$newAgeLevel&amp;rpt=$rego->{'strPersonType'}";
-        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rpID=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r";
-        $rego->{'renew_link'} = $renew;
+        $renew = $Data->{'target'} . "?client=$client&amp;a=PF_&amp;pID=$rego->{'intPersonID'}&amp;dnat=RENEWAL&amp;rtargetid=$rego->{'intPersonRegistrationID'}&amp;_ss=r&amp;rfp=r&amp;dsport=$rego->{'strSport'}&amp;dtype=$rego->{'strPersonType'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&amp;nat=RENEWAL"; ## TO default the PersonLevel dlevel=$rego->{'strPersonLevel'}
+        if ($rego->{'intOnLoan'})   {
+            $renew .= "&amp;dlevel=$rego->{'strPersonLevel'}";
+        }
+
+
+        if (! $rego->{'intOnLoan'} && $Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
+            $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
+        }
+        $rego->{'changelevel_link'} = $changelevel;
+        my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
+        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
+        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID and $rego->{'intIsLoanedOut'} == 0);
+
+
+        #FC-1105 - disable renewal from lending club if loan isn't completed yet
+        #check PersonRequest::deactivatePlayerLoan
+        $rego->{'intOnLoan'} ||= 0;
+        $rego->{'existOpenLoan'} ||= 0;
+        if(
+            ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
+            or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
+            or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
+            $rego->{'renew_link'} = $renew;
+        }
+        else    {
+            $rego->{'renew_link'} = '';
+            $rego->{'changelevel_link'} = '';
+        }
+
     }
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
@@ -340,10 +394,10 @@ sub getMemFields {
         
 		my $val = $FieldDefinitions->{'fields'}{$f}{'value'} || $personObj->getValue($f) || '';
 		if($FieldDefinitions->{'fields'}{$f}{'options'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'options'}{$val} || $val);
 		}
 		if($FieldDefinitions->{'fields'}{$f}{'displaylookup'})	{
-			$val = $FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val;
+			$val = $Data->{'lang'}->txt($FieldDefinitions->{'fields'}{$f}{'displaylookup'}{$val} || $val);
 		}
 		push @{$fields_grouped{$group}}, [$f, $label];
 		my $string = '';
@@ -356,8 +410,8 @@ sub getMemFields {
             }
         }
 		if (($val and $val ne '00/00/0000') or ($is_header))	{
-			$string .= qq[<div class="mfloat"><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
-			if(length($label) >= 46)  {
+			$string .= qq[<div class=""><span class = "details-left">$label:</span>] if !$nolabelfields{$f};
+			if(length($label) >= 100)  {
 				$string .= '<span class="detail-value"><br/>'.$val.'</span></div>';
 			}else{
 				$string .= '<span class="detail-value">'.$val.'</span></div>';

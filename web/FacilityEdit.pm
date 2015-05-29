@@ -16,6 +16,7 @@ use FieldLabels;
 use Data::Dumper;
 use PersonUserAccess;
 use TTTemplate;
+use FlashMessage;
 
 sub handleFacilityEdit {
     my ($action, $Data) = @_;
@@ -27,6 +28,7 @@ sub handleFacilityEdit {
     my $e_action = param('e_a') || '';
     my $back_screen = param('bscrn') || '';
     my $entityID = param('venueID') || 0;
+	
     if(!doesUserHaveEntityAccess($Data, $entityID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -156,24 +158,96 @@ sub handleFacilityEdit {
             Disciplines => \%Defs::sportType,
             GroundNature => \%Defs::fieldGroundNatureType,
             fieldData   => $fields,
-        ); 
+	    ); 
         my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
         if($fields_summary) {
+            
             $body .= qq[
-    <div class="read-only">
-        <h4>].$Data->{'lang'}->txt('Fields') .qq[</h4>
-        <div class="read-only-text">
-            $fields_summary
-            <div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
-        </div>
-        
-    </div>
+                <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
+                    <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Fields') .qq[</h3>
+                    <div class="panel-body fieldSectionGroup">
+                        $fields_summary
+                        <div class="fieldSectionGroupFooter">
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPD&amp;venueID=$entityID">delete</a>
+                        </div>
+                    </div>
+                    
+                </div>
             ];
+
         }
+		
+		# Process documents here
+		
+		my $query = qq[SELECT 
+						T.intDocumentTypeID,
+						T.strDocumentName,
+						T.strLockAtLevel, 
+						D.strApprovalStatus, 
+						D.intUploadFileID, 
+						U.dtUploaded
+					FROM tblDocuments as D INNER JOIN tblDocumentType as T ON
+					D.intDocumentTypeID = T.intDocumentTypeID
+					INNER JOIN tblUploadedFiles as U ON D.intUploadFileID = U.intFileID
+					WHERE D.intEntityID = ? AND T.intRealmID = ?
+				   ];
+		
+		#$templateData{'venueDocuments'} = \@venueDocs;
+		# 	
+			
+        my $docs_summary = runTemplate($Data,\%templateData,'entity/venue_docs_summary.templ');
+        if($Data->{'SystemConfig'}{'hasVenueDocuments'}){
+		    $body .= qq[
+		            <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
+		                <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Documents') .qq[</h3>
+		                <div class="panel-body fieldSectionGroup"> $docs_summary <tbody>];
+		    #<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$client&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a>               
+			my $sth = $Data->{'db'}->prepare($query);
+			$sth->execute($entityID, $Data->{'Realm'});
+			while(my $dref = $sth->fetchrow_hashref()){
+				my $parameters = qq[&amp;client=$client&doctype=$dref->{'intDocumentTypeID'}&pID=$entityID&nff=1&entitydocs=1];
+				my $documentName = $dref->{'strDocumentName'};
+				$documentName =~ s/'/\\\'/g;
+				$body .= qq[
+					<tr>
+		   				 <td>$dref->{'strDocumentName'}</td>
+						 <td>$dref->{'strApprovalStatus'}</td>
+						 <td>$dref->{'dtUploaded'}</td>
+						 <td><a href="#" class="btn-main btn-view-replace" onclick="docViewer($dref->{'intUploadFileID'},'client=$client&amp;a=view');return false;">] . $Data->{'lang'}->txt('View'). qq[</a></td>
+		   				 <td><a href="#" class="btn-main btn-view-replace" onclick="replaceFile($dref->{'intUploadFileID'},'$parameters','$documentName','');return false;">] . $Data->{'lang'}->txt('Replace') . qq[</a></td>
+					</tr>
+				];
+			}
+
+		    $body .= qq[</tbody> </table>
+		                </div>
+		                
+		            </div>
+		        ];
+		}
+		#<div class="fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a></div>
 
     }
 
-    $body = qq[ <div class="col-md-12">$body</div>];
+    my $auditLog = '';
+    if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL) {
+        #$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID">].$Data->{'lang'}->txt('Audit Trail').qq[</a>];
+        $auditLog =  $back_screen ? '' : qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail'). "</a>" ;
+
+
+		#$auditLog = qq[<a href="$Data->{'target'}?client=$client&amp;a=V_HISTLOG&amp;venueID=$entityID" class = "btn-main">].$Data->{'lang'}->txt('Audit Trail')."</a>" ;
+    }
+
+    my %flashMessage;
+    my $rflashMessage = FlashMessage::getFlashMessage($Data, 'FAC_FM');
+
+    $body = qq[<div class="col-md-12">
+                $rflashMessage
+                $auditLog
+                $body
+            </div>];
 
     my $pageHeading = $entityObj->name();
     return ($body, $pageHeading);
@@ -247,7 +321,7 @@ sub getFieldNames {
         strLegalID
         strImportEntityCode
         intImportID
-        strAcceptSelfRego
+        intAcceptSelfRego
         strShortNotes
         intNotifications
         strOrganisationLevel

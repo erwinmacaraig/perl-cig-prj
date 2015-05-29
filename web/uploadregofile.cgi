@@ -13,6 +13,7 @@ use MD5;
 use Data::Dumper;
 use Documents;
 use JSON;
+use SystemConfig;
 use strict;
 
 my $client = param('client') || param('clm') || 0;
@@ -32,8 +33,9 @@ $Data{'db'}=$db;
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-
+	$Data{'lang'} = $lang;
 if($uploaded_filename ne ''){  
     my $filefield = 'file';  
     my $permission = 1; 
@@ -50,7 +52,12 @@ if($uploaded_filename ne ''){
     #UploadFiles::processUploadFile(\%Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 	my $fileID = UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 
-	pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow);
+	if($notFromFlow){
+		(!$isForEntity) ? pendingDocumentActions(\%Data,$personID,$regoID,$fileID) : pendingEntityDocumentActions(\%Data,$personID,$fileID);
+	}
+
+	#pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow && !$isForEntity);
+	
 	$other_person_info{'f'} = $fileID;  
     if($fromURL)    {
         my $cgi = new CGI;
@@ -59,7 +66,7 @@ if($uploaded_filename ne ''){
     else    {
         print "Content-type: text/html \n\n"; 
         my $jFileData = JSON->new->utf8->encode(\%other_person_info);
-        print $jFileData;       
+        print $jFileData if($notFromFlow == 0);       
     }
          
 }

@@ -30,19 +30,18 @@ sub listPersons {
     my $db            = $Data->{'db'};
     my $resultHTML    = '';
     my $client        = unescape($Data->{client});
-    my $from_str      = '';
     my $type          = $Data->{'clientValues'}{'currentLevel'};
     my $levelName     = $Data->{'LevelNames'}{$type} || '';
     my $action_IN     = $action || '';
-    my $target        = $Data->{'target'} || '';;
+    my $target        = $Data->{'target'} || '';
     my $realm_id      = $Data->{'Realm'};
     my $title = '';
     my $lang = $Data->{'lang'};
     #checks begins here
     #check if the entity viewing the list > LEVEL_NATIONAL
+
     my $unlockInactiveLevel = $Data->{'SystemConfig'}{'unlockListPeople_level'} || $Defs::LEVEL_NATIONAL;
     my $entityChecks = Entity::loadEntityDetails($db, $entityID); 
-    #if($entityChecks->{'intEntityLevel'} < $unlockInactiveLevel){    	
     if($Data->{'clientValues'}{'authLevel'} < $unlockInactiveLevel){    	
     	if($entityChecks->{'strStatus'} ne 'ACTIVE'){ 
     		$resultHTML =qq[
@@ -56,132 +55,60 @@ sub listPersons {
     
     my ($AgeGroups, undef) = AgeGroups::getAgeGroups($Data);
 
+    return textMessage($lang->txt('Invalid page requested')) if !$type;
 
-   
-    my %textLabels = (
-        'addPerson' => $lang->txt("Add"),
-        'transferPerson' => $lang->txt('Transfer Person'),
-        'modifyPersonList' => $lang->txt('Modify Person List'),
-        'personsInLevel' => $lang->txt("$Data->{'LevelNames'}{$Defs::LEVEL_PERSON.'_P'} in $Data->{'LevelNames'}{$type}"),
-        'invalidPageRequested' => $lang->txt('Invalid page requested.'),
-    );
-
-    my $groupBy = '';
-    my $showRecordType=1;
-    my $mtypefilter= $Data->{'CookiePersonTypeFilter'} ? qq[ AND $Data->{'CookiePersonTypeFilter'} = 1 ] : '';
-    return textMessage($textLabels{'invalidPageRequested'}) if !$type;
-
-    my $from_str_ORIG = $from_str || '';
-    my $totalPersons=0;
-
-    my $showfields = setupPersonListFields($Data);
-
-    # do not display strStatus/intMCStatus if is_pending_registration
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my $CustomFieldNames=CustomFields::getCustomFieldNames($Data, $Data->{'SubRealm'} || 0) || '';
-    if($Data->{'SystemConfig'}{'PersonListFields'})    {
-        my @sf =split /,/, $Data->{'SystemConfig'}{'PersonListFields'} ;
-        $showfields = \@sf;
-    }
 
-    my $select = '';
-    my @headers = (
-        {
-            type => 'Selector',
-            field => 'SelectLink',
-        },
-    );
-
-    my $date_format = '%d/%m/%Y';
-    my $datetime_format = '%d/%m/%Y %H:%i';
-    my @select_fields = ();
-
-    my $used_playerfields = 0;
-    my $used_coachfields = 0;
-    my $used_umpirefields = 0;
-    my $used_miscfields = 0;
-    my $used_volunteerfields = 0;
-    my $used_schoolGrade    = 0;
-
-
-    $memfieldlabels->{'MCStatus'} = "Active in $Data->{'LevelNames'}{$type}";
-
-    for my $f (@{$showfields})    {
-        my $label = '';
-        my $skip_add_to_select = 0;
-        $skip_add_to_select = 1 if $f =~ /^SKIP_/;
-        $skip_add_to_select = 1 if $f =~ /strAgeGroupDesc/;
-        $f=~s/^SKIP_//;
-        if(exists $CustomFieldNames->{$f})    {
-            $label = $CustomFieldNames->{$f}[0];
-        }
-        else    {
-            $label = $memfieldlabels->{$f} || '';
-        }
-        my $field = $f;
-        my $dbfield = $f;
-        $field =~ s/\./_/g;
-        if(!$skip_add_to_select)    {
-            my $qualdbfield = _qualifyDBFields($dbfield);
-            my $dbfield_str = '';
-            push @select_fields, "$qualdbfield AS $dbfield".'_RAW' if $dbfield =~/^dt/;
-            $dbfield_str = "DATE_FORMAT($qualdbfield,'$date_format')" if $dbfield =~/^dt/;
-            $dbfield_str = "DATE_FORMAT($qualdbfield,'$datetime_format')" if $dbfield =~/^tTime/;
-            $dbfield_str ||= $qualdbfield;
-            $dbfield_str .= " AS $field" if($f=~/\./ or $dbfield_str =~ /FORMAT/);
-            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intAgeGroupID';
-            $dbfield_str = "PR." . $dbfield_str if $dbfield eq 'intPersonRegistrationID';
-            push @select_fields, $dbfield_str;
-        }
-
-        my ($type, $editor, $width) = getPersonListFieldOtherInfo($Data, $f);
-        push @headers, {
-            name   => $label || '',
-            field  => $field,
-            type   => $type,
-            editor => $editor,
-            width  => $width,
-        };
-
-    }
-
-    my $clubID = $Data->{'clientValues'}{'clubID'} || 0;
-
-    my $select_str = '';
-    $select_str = ", ".join(',',@select_fields) if scalar(@select_fields);
-
-    my $default_sort = ($Data->{'Permissions'}{'PersonList'}{'SORT'}[0]) ? $Data->{'Permissions'}{'PersonList'}{'SORT'}[0].", " : '';
-
-    
     my $statement=qq[
         SELECT DISTINCT 
             P.intPersonID,
             P.strStatus,
-            PR.strStatus as PRStatus,
-            PR.intPaymentRequired as PRintPaymentRequired,
-            PRActive.strStatus as PRActiveStatus,
-            PRActive.intPaymentRequired as PRActiveIntPaymentRequired,
-            P.intSystemStatus
-            $select_str
+            P.intSystemStatus,
+            P.strLocalSurname,
+            P.strLocalFirstname,
+            P.strNationalNum,
+            P.strFIFAID,
+            P.dtDOB,
+            PR.strPersonType AS PRstrPersonType,
+            PR.strStatus AS PRStatus,
+            PR.strPersonSubType AS PRstrPersonSubType,
+            PR.strPersonEntityRole AS PRstrPersonEntityRole,
+            ETR.strEntityRoleName AS PRstrPersonEntityRoleName,
+            PR.strPersonLevel AS PRstrPersonLevel,
+            PC.intCertificationTypeID,
+            CT.strCertificationName
         FROM tblPerson  AS P
-            LEFT JOIN tblPersonRegistration_$realm_id AS PRActive ON ( 
-                P.intPersonID = PRActive.intPersonID
-                AND PRActive.intEntityID = ?
-                AND PRActive.strStatus IN ('ACTIVE')
-            )
             INNER JOIN tblPersonRegistration_$realm_id AS PR ON ( 
                 P.intPersonID = PR.intPersonID
                 AND PR.strStatus NOT IN ('ROLLED_OVER')
                 AND PR.intEntityID = ?
             )
-        LEFT JOIN tblPersonNotes ON tblPersonNotes.intPersonID = P.intPersonID
-        WHERE P.strStatus <> 'DELETED' AND PR.strStatus <> 'INPROGRESS'
-            AND P.intRealmID = $Data->{'Realm'}
-        ORDER BY PR.intPersonRegistrationID DESC, $default_sort strLocalSurname, strLocalFirstname
+            LEFT JOIN tblEntityTypeRoles as ETR ON (
+                ETR.strEntityRoleKey = PR.strPersonEntityRole
+            ) 
+            LEFT JOIN tblPersonCertifications as PC ON (
+                P.intPersonID = PC.intPersonID
+                AND PC.strStatus = 'ACTIVE'
+            ) 
+            LEFT JOIN tblCertificationTypes as CT ON (
+                PC.intCertificationTypeID = CT.intCertificationTypeID
+            ) 
+        WHERE 
+            P.strStatus <> 'DELETED' 
+            AND PR.strStatus = 'ACTIVE'
+            AND P.intRealmID = $realm_id
+        ORDER BY 
+            strLocalSurname, 
+            strLocalFirstname,
+            P.intPersonID
     ];
+            #AND PR.strStatus <> 'INPROGRESS'
 
-    my $query= $Data->{'db'}->prepare($statement);
-    $query->execute($entityID, $entityID) or query_error($statement);
+    my $query = $Data->{'db'}->prepare($statement);
+    $query->execute(
+        $entityID, 
+    );
     my $found = 0;
     my @rowdata = ();
     my $newaction='P_HOME';
@@ -190,319 +117,216 @@ sub listPersons {
     my %tempClientValues = getClient($client);
     $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
     my %PersonSeen=();
+    my %PersonRegos = ();
+    my %UsedTypes = ();
+    my %UsedSubRoles = ();
+    my %UsedLevels = ();
+    my %subRoleNames = ();
+    my %certNames = ();
+    my %UsedCerts = ();
     while (my $dref = $query->fetchrow_hashref()) {
+        next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
         next if (
             (
                 $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_DELETED
-                or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_DELETED
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED 
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_SUSPENDED
+                or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_DELETED
                 or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED
             )
             and $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL
         );
-        next if exists $PersonSeen{$dref->{'intPersonID'}};
-        $PersonSeen{$dref->{'intPersonID'}} = 1;
-        $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
-        $dref->{'PRintPaymentRequired'} = $dref->{'PRActiveIntPaymentRequired'} if ($dref->{'PRActiveIntPaymentRequired'});
 
+        $dref->{'strNationalNum'} ||= $Defs::personStatus{$dref->{'strStatus'}} || '';
+        $dref->{'PRStatus'} = $dref->{'PRActiveStatus'} if ($dref->{'PRActiveStatus'});
         $dref->{'PRStatus'} = ($dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and $dref->{'PRintPaymentRequired'}) ? $Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT : $Defs::PERSONREGO_STATUS_ACTIVE;
 
         $dref->{'PRStatus'} = $lang->txt('SUSPENDED') if ($dref->{'strStatus'} eq 'SUSPENDED');
-        #$dref->{'strStatus'} = $lang->txt($Defs::personRegoStatus{$dref->{'PRStatus'}}); ## Lets use PR status
         $dref->{'strStatus'} = $lang->txt($Defs::personStatus{$dref->{'strStatus'}}); ## Lets use PR status
         
-        next if (defined $dref->{intSystemStatus} and $dref->{intSystemStatus} == $Defs::PERSONSTATUS_DELETED);
-        $tempClientValues{personID} = $dref->{intPersonID};
-        my $tempClient = setClient(\%tempClientValues);
+        push @{$PersonRegos{$dref->{'intPersonID'}}}, {
+            type => $dref->{'PRstrPersonType'},
+            status => $dref->{'PRStatus'},
+            subtype => $dref->{'PRstrPersonSubType'},
+            level => $dref->{'PRstrPersonLevel'},
+            entityrole => $dref->{'PRstrPersonEntityRole'},
+            certType => $dref->{'intCertificationTypeID'} || 0,
+        };
+        if($dref->{'PRstrPersonEntityRole'})    {
+            $UsedSubRoles{$dref->{'PRstrPersonEntityRole'}} =  1;
+            $subRoleNames{$dref->{'PRstrPersonEntityRole'}} = $dref->{'PRstrPersonEntityRoleName'} || '';
+        }
+        $UsedLevels{$dref->{'PRstrPersonLevel'}} =  1 if $dref->{'PRstrPersonLevel'};
+        if($dref->{'PRstrPersonType'})  {
+            $UsedTypes{$dref->{'PRstrPersonType'}} =  1;
+        }
+        if($dref->{'intCertificationTypeID'})  {
+            $certNames{$dref->{'intCertificationTypeID'}} =  $dref->{'strCertificationName'} || '';
+            $UsedCerts{$dref->{'intCertificationTypeID'}} =  1;
+        }
+        next if exists $PersonSeen{$dref->{'intPersonID'}};
+        $PersonSeen{$dref->{'intPersonID'}} = 1;
 
-        $dref->{'id'} = $dref->{'intPersonID'}.$found || 0;
-        $dref->{'intAgeGroupID'} = -1 if (exists $dref->{'intAgeGroupID'} and $dref->{'intAgeGroupID'} eq 0);
-        $dref->{'AgeGroups_strAgeGroupDesc'} = $dref->{'intAgeGroupID'}
-        ? ($AgeGroups->{$dref->{'intAgeGroupID'}} || '')
-        : '';
         $dref->{'intGender'} ||= 0;
         $dref->{'strLocalFirstname'} ||= '';
         $dref->{'strLocalSurname'} ||= '-';
-        $dref->{'TxnTotalCount'} ||= 0;
-        $dref->{'TxnTotalCount'} = ''. qq[<a href="$Data->{'target'}?client=$tempClient&amp;a=P_TXN_LIST">$dref->{TxnTotalCount}</a>];
         for my $k (keys %{$lookupfields})    {
             if($k and $dref->{$k} and $lookupfields->{$k} and $lookupfields->{$k}{$dref->{$k}}) {
                 $dref->{$k} = $lookupfields->{$k}{$dref->{$k}};
             }
         }
 
-        $dref->{'strStatus_Filter'}=$dref->{'strStatus'};
         if($dref->{'intSystemStatus'} ==$Defs::PERSONSTATUS_POSSIBLE_DUPLICATE )    {
             my %keepduplicatefields = (
-                id => 1,
                 intPersonID => 1,
                 strLocalSurname => 1,
                 strLocalFirstname=> 1,
                 intPersonID=> 1,
                 strStatus=> 1,
-                intSeasonID=> 1,
-                intAgeGroupID=> 1,
             );
             for my $k (keys %{$dref})    {
                 if(!$keepduplicatefields{$k})    {
                     delete $dref->{$k};
                 }
             }
-            $dref->{'strStatus_Filter'}='1';
             $dref->{'strStatus'}=$lang->txt('DUPLICATE');
         }
-
-        if(allowedAction($Data, 'm_d') and $Data->{'SystemConfig'}{'AllowPersonDelete'})    {
-            $dref->{'DELETELINK'} = qq[
-            <a href="$Data->{'target'}?client=$tempClient&amp;a=P_DEL" 
-                onclick="return confirm('Are you sure you want to Delete this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}');">Delete
-            </a>
-            ] 
-        }
-        $dref->{'SelectLink'} = "$target?client=$tempClient&amp;a=$newaction";
+        $tempClientValues{personID} = $dref->{intPersonID};
+        my $tempClient = setClient(\%tempClientValues);
+        $dref->{'link'} = "$target?client=$tempClient&amp;a=$newaction";
         push @rowdata, $dref;
         $found++;
     }
-
-
-    my $error='';
-    my $list_instruction = $Data->{'SystemConfig'}{"ListInstruction_$Defs::LEVEL_PERSON"} ? 
-    qq[<div class="listinstruction">$Data->{'SystemConfig'}{"ListInstruction_$Defs::LEVEL_PERSON"}</div>] : '';
-    $list_instruction=eval("qq[$list_instruction]") if $list_instruction;
-  
-my $filterfields = [
-    {
-      field => 'strLocalSurname',
-      elementID => 'id_textfilterfield',
-      type => 'regex',
-    },
-    {
-      field => 'PRStatus',
-      elementID => 'dd_actstatus',
-      allvalue => 'ALL',
-    }
-  ];
-
-    my $msg_area_id   = '';
-    my $msg_area_html = '';
-
-    my $grid = showGrid(
-        Data          => $Data,
-        columns       => \@headers,
-        rowdata       => \@rowdata,
-        msgareaid     => $msg_area_id,
-        gridid        => 'grid',
-        width         => '99%',
-        height        => '700',
-        ffilters       => $filterfields,
-        client        => $client,
-        #saveurl       => 'ajax/aj_persongrid_update.cgi',
-        ajax_keyfield => 'intPersonID',
-    );
-
-    my %options = ();
-
-    my $allowClubAdd = 1;
-
-    #if(allowedAction($Data, 'm_a') && !$Data->{'ReadOnlyLogin'})    {
-    #    $options{'addperson'} = [
-    #    "$target?client=$client&amp;a=PF_&amp;l=$Defs::LEVEL_PERSON",
-    #    $textLabels{'addPerson'}
-    #    ];
-    #    delete $options{'addperson'} if $Data->{'SystemConfig'}{'LockPerson'} or !$allowClubAdd;
-    #}
-
-
-    if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'Club_PersonEditOnly'}) {
-        delete $options{'rollover_persons'} ;
-        delete $options{'activateperson'};
-        delete $options{'addperson'};
-    }
-
-    my $modoptions = '';
-    if(scalar(keys %options) )    {
-        for my $i (qw(addperson modifyplayerlist bulkchangetags ))    {
-            if(exists $options{$i})    {
-                $modoptions .=qq~<span class = "button-small generic-button"><a href = "$options{$i}[0]">$options{$i}[1]</a></span>~;
+    foreach my $row (@rowdata)  {
+        my $id = $row->{'intPersonID'} || next;
+        my %types = ();
+        my %subtypes = ();
+        my %levels = ();
+        my %entityroles = ();
+        my %certs = ();
+        foreach my $reg (@{$PersonRegos{$id}}) {
+            my $type = $reg->{'type'} || '';
+            my $status = $reg->{'status'} || 'PASSIVE';
+            my $subtype = $reg->{'subtype'} || '';
+            my $level = $reg->{'level'} || '';
+            my $entityrole = $reg->{'entityrole'} || '';
+            my $cert = $reg->{'certType'} || '';
+            if(
+                !exists $types{$type}
+                or (exists $types{$type} and $status eq 'ACTIVE')
+            ) {
+                $types{$type} = $status;
             }
+            if(
+                !exists $subtypes{$subtype}
+                or (exists $subtypes{$subtype} and $status eq 'ACTIVE')
+            ) {
+                $subtypes{$subtype} = $status;
+            }
+            if(
+                !exists $levels{$level}
+                or (exists $levels{$level} and $status eq 'ACTIVE')
+            ) {
+                $levels{$level} = $status;
+            }
+            if(
+                !exists $entityroles{$entityrole}
+                or (exists $entityroles{$entityrole} and $status eq 'ACTIVE')
+            ) {
+                $entityroles{$entityrole} = $status;
+            }
+            if(
+                !exists $certs{$cert}
+                or (exists $certs{$cert} and $status eq 'ACTIVE')
+            ) {
+                $certs{$cert} = $status;
+            }
+        } 
+        my $types_str = '';
+        for my $t (keys %types) {
+            next if !$t;
+            my $status = $types{$t} || 'PASSIVE';
+            $types_str .= '/' if $types_str;
+            $types_str .= qq[<span class = "TYPE_STATUS_$status"><span class = "hidden-col-val">$t</span>].$lang->txt($Defs::personType{$t}).qq[</span>];
         }
-        $modoptions = qq[<div class="changeoptions">$modoptions</div>] if $modoptions;
+        my $subtypes_str = '';
+        for my $st (keys %subtypes) {
+            next if !$st;
+            my $status = $subtypes{$st} || 'PASSIVE';
+            $subtypes_str .= '/' if $subtypes_str;
+            $subtypes_str .= qq[<span class = "SUBTYPE_STATUS_$status"><span class = "hidden-col-val">$st</span>].$lang->txt($subRoleNames{$st}).qq[</span>];
+        }
+        for my $er (keys %entityroles) {
+            next if !$er;
+            my $status = $entityroles{$er} || 'PASSIVE';
+            $subtypes_str .= '/' if $subtypes_str;
+            $subtypes_str .= qq[<span class = "SUBTYPE_STATUS_$status"><span class = "hidden-col-val">$er</span>].$lang->txt($subRoleNames{$er}).qq[</span>];
+        }
+        my $levels_str = '';
+        for my $l (keys %levels) {
+            next if !$l;
+            my $status = $levels{$l} || 'PASSIVE';
+            $levels_str .= '/' if $levels_str;
+            $levels_str .= qq[<span class = "LEVEL_STATUS_$status"><span class = "hidden-col-val">$l</span>].$lang->txt($Defs::personLevel{$l}).qq[</span>];
+        }
+        my $certs_str = '';
+        for my $l (keys %certs) {
+            next if !$l;
+            my $status = $certs{$l} || 'PASSIVE';
+            $certs_str .= '/' if $certs_str;
+            $certs_str .= qq[<span class = "CERT_STATUS_$status"><span class = "hidden-col-val">$l</span>].$lang->txt($certNames{$l}).qq[</span>];
+        }
+        $row->{'types'} = $types_str;
+        $row->{'subtypes'} = $subtypes_str;
+        $row->{'levels'} = $levels_str;
+        $row->{'certs'} = $certs_str;
     }
 
-    $title=$textLabels{'personsInLevel'};
-    $title = $modoptions.$title;
-    #$title = 'Pending ' . $title if ($is_pending_registration);
 
-    my $rectype_options=show_recordtypes(
+    $title = $lang->txt("Persons in [_1]",$Data->{'LevelNames'}{$type});
+    if ($type == $Defs::LEVEL_NATIONAL) {
+        $title = $lang->txt("List of people registered directly with the Member Association");
+    }
+    if ($type == $Defs::LEVEL_REGION) {
+        $title = $lang->txt("List of people registered directly with the Region");
+    }
+    if ($type == $Defs::LEVEL_CLUB) {
+        $title = $lang->txt("List of people registered with the Club");
+    }
+
+    my %typeValues = (); 
+    my %subRoleValues = ();
+    my %levelValues = ();
+    my %certValues = ();
+
+    for my $i (keys %UsedTypes) {
+        $typeValues{$i} =  $Defs::personType{$i} || '';
+    }
+    for my $i (keys %UsedSubRoles) {
+        $subRoleValues{$i} =  $subRoleNames{$i} || '';
+    }
+    for my $i (keys %UsedLevels) {
+        $levelValues{$i} =  $Defs::personLevel{$i} || '';
+    }
+    for my $i (keys %UsedCerts) {
+        $certValues{$i} =  $certNames{$i} || '';
+    }
+    $resultHTML = runTemplate(
         $Data,
-        $Data->{'lang'}->txt('Family Name'),
-        '',
-        \%Defs::personStatus,
-        { 'ALL' => $Data->{'lang'}->txt('All'), },
-    ) || '';
-$rectype_options = ''; #OFF FOR NOW
-
-    $resultHTML =qq[
-        $list_instruction
-        $msg_area_html
-        <div class ="grid-filter-wrap">
-            $rectype_options
-            $grid
-        </div>
-        $error
-    ];
+        {
+            rowdata => \@rowdata,
+            filter => {
+                types => \%typeValues,
+                subtypes => \%subRoleValues,
+                levels => \%levelValues,
+                certs => \%certValues,
+            }
+        },
+        'person/list.templ',
+    );
 
     return ($resultHTML,$title);
-}
-
-sub setupPersonListFields    {
-    my ($Data) = @_;
-
-    #Setup default fields
-    my @listfields=qw( 
-        strLocalSurname 
-        strLocalFirstname 
-        strLatinSurname 
-        strLatinFirstname 
-        intAgeGroupID
-        strStatus 
-        dtDOB 
-        intGender
-        strSuburb 
-        strPhoneMobile 
-        strEmail
-    );
-
-    # These fields are only relevant to particular levels of person lists
-    my $level_relevant = {
-    };
-
-    if($Data->{'Permissions'} and $Data->{'Permissions'}{'PersonList'}) {
-        @listfields = sort {
-            $Data->{'Permissions'}{'PersonList'}{$a}[0] <=> $Data->{'Permissions'}{'PersonList'}{$b}[0] 
-        } keys %{$Data->{'Permissions'}{'PersonList'}};
-    }
-    my $count_fields = 0;
-    my @showfields=();
-    for my $f (@listfields) {
-        if( $f eq 'SORT') {
-            next;
-        }
-        if (exists $level_relevant->{$f} ){
-            # Skip unless we are relevant to this level
-            next unless $level_relevant->{$f}->{$Data->{'clientValues'}{'currentLevel'}};
-        }
-        $count_fields++;
-        if($Data->{'Permissions'}
-            and $Data->{'Permissions'}{'Person'}
-            and $Data->{'Permissions'}{'Person'}{$f}
-            and $Data->{'Permissions'}{'Person'}{$f} eq 'Hidden') {
-                next;
-        }
-        push @showfields, $f;
-    }
-
-    return \@showfields;
-}
-
-sub getPersonListFieldOtherInfo {
-    my ($Data, $field) = @_;
-
-    my %IntegerFields;
-    my %TextFields;
-
-    my %CheckBoxFields=(
-        strStatus=> $Defs::RECSTATUS_ACTIVE,
-        intMSRecStatus=> 1,
-        intPlayerPending=>1,
-        intDeceased=> 1,
-        intFinancialActive => 1,
-        intLifePerson => 1,
-        intMedicalConditions => 1,
-        intAllergies => 1,
-        intAllowMedicalTreatment => 1,
-        intMailingList => 1,
-        intFavNationalTeamPerson => 1,
-        intConsentSignatureSighted => 1,
-        'Player.intActive' => 1,
-        'Player.intInt2' => 1,
-        'Player.intInt3' => 1,
-        'Player.intInt4' => 1,
-        'Coach.intActive' => 1,
-        'Coach.intInt1' => 1,
-        'Umpire.intActive' => 1,
-        'Umpire.intInt2' => 1,
-        'Misc.intActive' => 1,
-        'Misc.intInt2' => 1,
-        'Volunteer.intActive' => 1,
-        'Volunteer.intInt2' => 1,
-        MCStatus=> $Defs::RECSTATUS_ACTIVE,
-        'Seasons.intMSRecStatus' => 1,
-        'Seasons.intPlayerStatus' => 1,
-        'Seasons.intPlayerFinancialStatus' => 1,
-        'Seasons.intCoachStatus' => 1,
-        'Seasons.intCoachFinancialStatus' => 1,
-        'Seasons.intUmpireStatus' => 1,
-        'Seasons.intUmpireFinancialStatus' => 1,
-        'Seasons.intMiscStatus' => 1,
-        'Seasons.intMiscFinancialStatus' => 1,
-        'Seasons.intVolunteerStatus' => 1,
-        'Seasons.intVolunteerFinancialStatus' => 1,
-        'Seasons.intOther1Status' => 1,
-        'Seasons.intOther1FinancialStatus' => 1,
-        'Seasons.intOther2Status' => 1,
-        'Seasons.intOther2FinancialStatus' => 1,
-        MTStatus=> $Defs::RECSTATUS_ACTIVE,
-        MTCompStatus=> $Defs::RECSTATUS_ACTIVE,
-        intNatCustomBool1 => 1,
-        intNatCustomBool2 => 1,
-        intNatCustomBool3 => 1,
-        intNatCustomBool4 => 1,
-        intNatCustomBool5 => 1,
-        TXNStatus=>1,
-    );
-    my $type = '';
-    my $editor = '';
-    $type = 'tick' if $CheckBoxFields{$field};    
-    if($Data->{'Permissions'}{'Person'})    {
-        #Setup Check Box Fields
-        for my $k (keys %CheckBoxFields)    {
-            if($k=~/\./)    {
-                delete $CheckBoxFields{$k} if !allowedAction($Data, 'mt_e');
-            }
-            else    {
-                delete $CheckBoxFields{$k} if !allowedAction($Data, 'm_e');
-                if ($k eq 'MCStatus' or $k eq 'MTStatus')    {
-                    ## If permission set,allow club to reactivate an inactive person
-                    delete $CheckBoxFields{$k} if ($Data->{'clientValues'}{'authLevel'} <= $Defs::LEVEL_CLUB and ! allowedAction($Data, 'm_ia'));
-                }
-                else    {
-                    delete $CheckBoxFields{$k} if ((!$Data->{'Permissions'}{'Person'}{$k} or $Data->{'Permissions'}{'Person'}{$k} eq 'Hidden' or $Data->{'Permissions'}{'Person'}{$k} eq 'ReadOnly') and    $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_ASSOC);
-                }
-            }
-        }
-        $CheckBoxFields{'TXNStatus'} = $Defs::TXN_PAID if(($Data->{'SystemConfig'}{'AllowProdTXNs'} or $Data->{'SystemConfig'}{'AllowTXNs'}) and allowedAction($Data, 'm_e') and $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC);
-    }
-    $type='tick' if ($field eq 'TXNStatus');
-    if( !allowedAction($Data, 'm_e') or $Data->{'SystemConfig'}{'LockPerson'}) {
-        for my $i (qw( strStatus intMSRecStatus MCStatus intActive MTStatus MTCompStatus)) {
-            delete $CheckBoxFields{$i};
-        }
-    }
-    $editor = 'checkbox' if $CheckBoxFields{$field};
-    $editor = 'text' if $TextFields{$field};    #todo: fix this to force integers?
-    my $width = 0;
-    $width = 50 if $field eq 'intGender';
-    $type = 'HTML' if($field eq 'TxnTotalCount');
-    $type = 'HTML' if $IntegerFields{$field}; 
-    return (
-        $type,
-        $editor,
-        $width,
-    );
-
 }
 
 sub personList_lookupVals {
@@ -519,28 +343,6 @@ sub personList_lookupVals {
 
     return \%lookupfields;
 }
-
-sub _qualifyDBFields    {
-    my ($field) = @_;
-    return $field if $field =~/\./;
-    my %FieldTables    = (
-        strAddress1 => 'P',
-        strAddress2 => 'P',
-        strSuburb => 'P',
-        strState => 'P',
-        strISOCountry => 'P',
-        strEmail => 'P',
-        strPostalCode => 'P',
-        strMobile => 'P',
-        strStatus => 'P',
-        tTimeStamp =>'P',
-    );
-    my $tablename = $FieldTables{$field} || '';
-
-    return $tablename ? "$tablename.$field" : $field;
-}
-
-
 
 1;
 # vim: set et sw=4 ts=4:

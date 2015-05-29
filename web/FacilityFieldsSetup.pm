@@ -83,6 +83,7 @@ sub facilityFieldsSetup {
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
         subRealmID => $Data->{'RealmSubType'},
+        locale     => $Data->{'lang'}->getLocale(),
     );
 
     my %entityTypeOptions = ();
@@ -104,7 +105,7 @@ sub facilityFieldsSetup {
                     value       => $values->{'intFacilityTypeID'},
                     type        => 'lookup',
                     options     => \%facilityTypeOptions,
-                    firstoption => [ '', 'Select Type' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Type') ],
                     compulsory => 1,
                     sectionname => 'core',
                     class       => 'chzn-select',
@@ -148,7 +149,7 @@ sub facilityFieldsSetup {
                     value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     sectionname => 'core',
                     class       => 'chzn-select',
@@ -158,7 +159,7 @@ sub facilityFieldsSetup {
                     value       => $values->{'intLocalLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
-                    firstoption => [ '', 'Select Language' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
                     compulsory => 1,
                     posttext => $nonlatinscript,
                     sectionname => 'core',
@@ -212,7 +213,7 @@ sub facilityFieldsSetup {
                 strISOCountry
             )],
             sections => [
-                [ 'core',        'Venue Details','','',$values->{'footer-core'} ],
+                [ 'core',        $Data->{'lang'}->txt('Venue Details'),'','',$values->{'footer-core'} ],
             ],
             fieldtransform => {
                 textcase => {
@@ -266,10 +267,10 @@ sub facilityFieldsSetup {
                 },
                 strContactISOCountry   => {
                     label       => $FieldLabels->{'strContactISOCountry'},
-                    value       => $values->{'strContactISOCountry'},
+                    value       => $values->{'strISOCountry'} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
                     type        => 'lookup',
                     options     => $isocountries,
-                    firstoption => [ '', 'Select Country' ],
+                    firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
                     compulsory => 1,
                     class       => 'chzn-select',
                     sectionname => 'contactdetails',
@@ -331,7 +332,7 @@ sub facilityFieldsSetup {
                 strWebURL
             )],
             sections => [
-                [ 'contactdetails',        'Contact Details','','',$values->{'footer-contactdetails'} ],
+                [ 'contactdetails',        $Data->{'lang'}->txt('Contact Details'),'','',$values->{'footer-contactdetails'} ],
             ],
             #fieldtransform => {
                 #textcase => {
@@ -356,7 +357,7 @@ sub facilityFieldsSetup {
                 intEntityFieldCount
             )],
             sections => [
-                [ 'roledetails', 'Field Information','','',$values->{'footer-roledetails'} ],
+                [ 'roledetails', $Data->{'lang'}->txt('Field Information'),'','',$values->{'footer-roledetails'} ],
             ],
         },
     };

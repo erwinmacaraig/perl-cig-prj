@@ -37,13 +37,21 @@ sub getCommonValues {
 	}
 
 	if($options->{'DefCodes'})	{
+        my $locale     = $Data->{'lang'}->generateLocale();
 		my $aID=getAssocID($clientValues_ref) || 0;
 		my %Codes=();
 
 		$aID=0 if $aID==-1;
 		my $statement=qq[
-			SELECT *
+			SELECT *,
+                COALESCE(LT.strString1,strName) AS strName
+
 			FROM tblDefCodes
+                LEFT JOIN tblLocalTranslations AS LT ON (
+                    LT.strType = 'DEFCODES'
+                    AND LT.intID = intCodeID
+                    AND LT.strLocale = '$locale'
+                )
       			WHERE intRealmID=$Data->{'Realm'}
         			AND (intAssocID = $aID OR intAssocID = 0)
 				AND intRecStatus<>$Defs::RECSTATUS_DELETED

@@ -49,46 +49,53 @@ sub personRegistrationDetail   {
                 type => 'lookup',
                 options => \%statusoptions,
                 readonly => $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 0 : 1,
+                translateLookupValues => 1,
             },
             strAgeLevel => {
                 label => 'Age Level',
-                value => $Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}},
+                value => $Data->{'lang'}->txt($Defs::ageLevel->{$RegistrationDetail->{'AgeLevel'}}),
                 type => 'text',
                 readonly => 1,
             },
             strSport => {
                 label => 'Sport',
-                value => $RegistrationDetail->{'Sport'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'Sport'}),
                 type => 'text',
                 readonly => 1,
             },
             strGender => {
                 label => 'Gender',
-                value => $Defs::genderInfo->{$RegistrationDetail->{'intGender'}},
+                value => $Data->{'lang'}->txt($Defs::genderInfo->{$RegistrationDetail->{'intGender'}}),
                 type => 'text',
                 readonly => 1,
             },
             strRegistrationNature => {
                 label => 'Registration Type',
-                value => $RegistrationDetail->{'RegistrationNature'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'RegistrationNature'}),
+                type => 'text',
+                readonly => 1,
+            },
+            strNationalPeriodName=> {
+                label => 'Registration Period',
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'strNationalPeriodName'}),
                 type => 'text',
                 readonly => 1,
             },
             strPersonType => {
                 label => 'Type',
-                value => $RegistrationDetail->{'PersonType'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'PersonType'}),
                 type => 'text',
                 readonly => 1,
             },
             strPersonLevel => {
                 label => 'Level',
-                value => $RegistrationDetail->{'PersonLevel'},
+                value => $Data->{'lang'}->txt($RegistrationDetail->{'PersonLevel'}),
                 type => 'text',
                 readonly => 1,
             },
-            strPersonLevel => {
+            DateRego=> {
                 label => 'Date Registration Added',
-                value => $RegistrationDetail->{'dtAdded_formatted'},
+                value => $Data->{'l10n'}{'date'}->TZformat($RegistrationDetail->{'dtApproved'},'MEDIUM','SHORT'),
                 type => 'text',
                 readonly => 1,
             },
@@ -100,13 +107,14 @@ sub personRegistrationDetail   {
             },
         },
         order => [qw(
+            strNationalPeriodName
             strStatus
             strAgeLevel
             strSport
             strGender
             strRegistrationNature
             strPersonType
-            strPersonLevel
+            DateRego
             strShortNotes
         )],
         options => {
@@ -115,7 +123,6 @@ sub personRegistrationDetail   {
             target => $Data->{'target'},
             formname => 'n_form',
             submitlabel => $Data->{'lang'}->txt('Update'),
-            introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             NoHTML => 1,
             updateSQL => qq[UPDATE tblPersonRegistration_$Data->{'Realm'} SET --VAL--
             WHERE intPersonRegistrationID=$personRegistrationID LIMIT 1],
@@ -191,7 +198,8 @@ sub personRegistrationWorkTasks {
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
-            RejectedEntity.strLatinName as RejectedEntityName
+            RejectedEntity.strLatinName as RejectedEntityName,
+		WR.intAutoActivateOnPayment
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblNationalPeriod as np ON (
@@ -209,6 +217,9 @@ sub personRegistrationWorkTasks {
                 AND WFT.intPersonID = pr.intPersonID
                 #AND WFT.strTaskStatus IN ('ACTIVE')
             )
+		LEFT JOIN tblWFRule as WR ON (
+			WR.intWFRuleID = WFT.intWFRuleID
+		)
             LEFT JOIN tblEntity as ApprovalEntity ON (
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
             )
@@ -218,7 +229,7 @@ sub personRegistrationWorkTasks {
         WHERE
             p.intRealmID = ?
             AND pr.intPersonRegistrationID = ?
-            AND pr.strStatus IN ('PENDING', 'REJECTED')
+            AND pr.strStatus IN ('ACTIVE', 'PENDING', 'REJECTED')
         ORDER BY
           pr.dtAdded DESC
     ];
@@ -247,17 +258,22 @@ sub personRegistrationWorkTasks {
             $taskTo.= qq[ ($dref->{'RejectedEntityName'})] if ($dref->{'RejectedEntityName'});
         }
 
+	my $status= $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '';
+	if ($dref->{'intAutoActivateOnPayment'})        {
+                $status = $lang->txt('Approved upon Payment');
+                $taskTo='-';
+        }
         push @rowdata, {
             id => $dref->{'WFTTaskID'} || 0,
-            dtAdded=> $dref->{'dtAdded_formatted'} || '',
-            PersonLevel=> $Defs::personLevel{$dref->{'strPersonLevel'}} || '',
+            dtAdded=>  $Data->{'l10n'}{'date'}->TZformat($dref->{'dtApproved'},'MEDIUM','SHORT') || '',
+            PersonLevel=> $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}}) || '',
             PersonEntityRole=> $dref->{'strEntityRoleName'} || '',
-            PersonType=> $Defs::personType{$dref->{'strPersonType'}} || '',
-            AgeLevel=> $Defs::ageLevel{$dref->{'strAgeLevel'}} || '',
-            RegistrationNature=> $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '',
-            Status=> $Defs::wfTaskStatus{$dref->{'WFTTaskStatus'}} || '',
+            PersonType=> $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'}}) || '',
+            AgeLevel=> $Data->{'lang'}->txt($Defs::ageLevel{$dref->{'strAgeLevel'}}) || '',
+            RegistrationNature=> $Data->{'lang'}->txt($Defs::registrationNature{$dref->{'strRegistrationNature'}}) || '',
+            Status=> $status,
             PersonEntityRole=> $dref->{'strPersonEntityRole'} || '',
-            Sport=> $Defs::sportType{$dref->{'strSport'}} || '',
+            Sport=> $Data->{'lang'}->txt($Defs::sportType{$dref->{'strSport'}} || ''),
             LocalName=>$localname,
             LatinName=>$name,
             LocalLatinName=>$local_latin_name,
@@ -265,9 +281,10 @@ sub personRegistrationWorkTasks {
             CurrentTaskApproval=>$dref->{'intApprovalEntityID'},
             CurrentTaskProblem=>$dref->{'intProblemResolutionEntityID'},
             NationalPeriodName => $dref->{'strNationalPeriodName'} || '',
-            TaskType => $Defs::wfTaskType{$dref->{'WFTTaskType'}} || '',
+            TaskType => $Data->{'lang'}->txt($Defs::wfTaskType{$dref->{'WFTTaskType'}} || ''),
             TaskTo=>$taskTo,
-            SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
+            #SelectLink => "$Data->{'target'}?client=$client&amp;a=PENDPR_D&amp;prID=$dref->{'intPersonRegistrationID'}",
+            SelectLink => "$Data->{'target'}?client=$client&amp;a=WF_H&amp;id=$dref->{'WFTTaskID'}",
           };
     }
 
@@ -308,11 +325,11 @@ sub personRegistrationWorkTasks {
             field => '',
             width  => 40,
         },
-        #{
-        #    name  => $Data->{'lang'}->txt('Task Type'),
-        #    field => 'TaskType',
-        #    width  => 50,
-        #},
+        {
+            name  => $Data->{'lang'}->txt('Task Type'),
+            field => 'SelectLink',
+            width  => 50,
+        },
         #{
         #    name  => $Data->{'lang'}->txt('Task Assigned To'),
         #    field => 'TaskTo',

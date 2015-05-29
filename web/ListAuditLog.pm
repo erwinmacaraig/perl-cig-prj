@@ -59,7 +59,10 @@ sub listPersonAuditLog    {
                 OR P.intPersonID=?
             )
             AND AL.strSection NOT IN ('Person Entity')
-            AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration", "WFTask")
+            AND (
+                AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
+                OR (AL.strSection = "WFTask" AND WFT.intPersonID=?)
+            )
         ORDER BY 
             AL.dtUpdated DESC
     
@@ -70,15 +73,17 @@ sub listPersonAuditLog    {
         $personID,
         $personID,
         $personID,
+        $personID,
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -88,7 +93,7 @@ sub listPersonAuditLog    {
 	};
 	 my $title = '';
 	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
-	 $title = 'Audit Trail';
+	 $title = $Data->{'lang'}->txt('Audit Trail');
 	 return ($resultHTML, $title);
 }
 sub listEntityAuditLog {
@@ -111,7 +116,7 @@ sub listEntityAuditLog {
             )
             LEFT JOIN tblEntity as E ON (
                 E.intEntityID= AL.intID 
-                AND AL.strSection IN ("Club", "Entity", "Venue")
+                AND AL.strSection IN ("Imported", "Club", "Entity", "Venue")
             )
         WHERE
             (
@@ -119,7 +124,10 @@ sub listEntityAuditLog {
                 OR WFT.intEntityID=? 
                 OR E.intEntityID=?
             )
-            AND AL.strSection IN ("Club", "Entity", "Venue", "WFTask")
+            AND (
+                AL.strSection IN ("Imported", "Club", "Entity", "Venue")
+                OR (AL.strSection = "WFTask" AND WFT.intEntityID=?)
+            )
         ORDER BY 
             AL.dtUpdated DESC
     
@@ -129,15 +137,17 @@ sub listEntityAuditLog {
         $entityID,
         $entityID,
         $entityID,
+        $entityID,
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
+        my $dt = $Data->{'l10n'}{'date'}->TZformat($ref->{'dtUpdated'},'MEDIUM','SHORT');
 		push @rowdata,{
 			Username=> $ref->{'strUsername'},
 			UserEntity=> $ref->{'strLocalName'},
 			Type => $ref->{'strType'},
 			Section=> $ref->{'strSection'},
-			DateUpdated=> $ref->{'dtUpdated'},
+			DateUpdated=> $dt,
 		};
 	}
 	$sth->finish();
@@ -146,7 +156,7 @@ sub listEntityAuditLog {
 		AuditLog=> \@rowdata,
 	};
 	 my $title = '';
-	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
+	 my $resultHTML = runTemplate($Data, $PageContent, 'entity/auditlog.templ') || '';
 	 $title = 'Audit Trail';
 	 return ($resultHTML, $title);
 }

@@ -18,7 +18,7 @@ use DBI;
 my $lang= Lang->get_handle() || die "Can't get a language handle!";
 # need this one for other languages 
 
-my $title=$lang->txt('APPNAME') || 'SportingPulse Membership'; 
+my $title=$lang->txt('APPNAME') || 'FIFA Connect'; 
 
 my %Data = (); #empty hash 
 $Data{lang} = $lang;	 

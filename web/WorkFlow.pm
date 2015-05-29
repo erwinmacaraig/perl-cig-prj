@@ -5,6 +5,7 @@ require Exporter;
 	handleWorkflow
   	addWorkFlowTasks
   	approveTask
+  	resolveTask
   	checkForOutstandingTasks
     addIndividualTask
     cleanTasks
@@ -21,6 +22,11 @@ require Exporter;
     toggleTask
     checkRelatedTasks
     deleteRegoTransactions
+    checkRulePaymentFlagActions
+    getRegistrationWorkTasks
+    updateTaskNotes
+    updateTaskScreen
+    getInitialTaskAssignee
 );
 
 use strict;
@@ -53,12 +59,106 @@ use MinorProtection;
 use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
+use PersonUtils;
+use PersonUserAccess;
 
 use SphinxUpdate;
 use InstanceOf;
 
 use PersonLanguages;
+use GatewayProcess;
+sub checkRulePaymentFlagActions {
 
+    my(
+        $Data,
+        $entityID,
+        $personID,
+        $personRegistrationID,
+    ) = @_;
+    $entityID ||= 0;
+    $personID ||= 0;
+    $personRegistrationID ||= 0;
+    
+    return if (! $entityID and ! $personID and ! $personRegistrationID);
+
+    my $st = qq[
+        SELECT
+            T.intWFTaskID,
+            R.intAutoActivateOnPayment,
+            R.intLockTaskUntilPaid,
+            R.intRemoveTaskOnPayment
+        FROM
+            tblWFTask as T
+            INNER JOIN tblWFRule as R ON (R.intWFRuleID = T.intWFRuleID)
+        WHERE
+            T.strTaskStatus = 'ACTIVE'
+            AND T.intPersonID = ?
+            AND T.intEntityID = ?
+            AND T.intPersonRegistrationID = ?
+        ORDER BY intWFTaskID DESC LIMIT 1
+    ];
+
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($personID, $entityID, $personRegistrationID);
+
+
+    my $countTaskSkipped= 0;
+    while (my $dref = $q->fetchrow_hashref())   {
+        if ($dref->{'intAutoActivateOnPayment'} == 1)   {
+            if ($personRegistrationID)  {
+                my $stUPD = qq[
+                    UPDATE tblPersonRegistration_$Data->{'Realm'}
+                    SET 
+                        dtLastUpdated=NOW(),
+                        dtApproved=NOW(),
+                        dtFrom = NOW(),
+                        strStatus = 'ACTIVE', 
+                        intWasActivatedByPayment = 1
+                    WHERE 
+                        intPersonID = ?
+                        AND intEntityID = ?
+                        AND intPersonRegistrationID = ?
+                        AND strStatus = 'PENDING'
+                        AND intPaymentRequired=0
+                ];
+                my $qUPD= $Data->{'db'}->prepare($stUPD);
+                $qUPD->execute($personID, $entityID, $personRegistrationID);
+            }
+            if (! $personRegistrationID and $entityID)  {
+                my $stUPD = qq[
+                    UPDATE tblEntity
+                    SET strStatus = 'ACTIVE', intWasActivatedByPayment = 1
+                    WHERE 
+                        intRealmID = ?
+                        AND intEntityID = ?
+                        AND strStatus = 'PENDING'
+                ];
+                my $qUPD= $Data->{'db'}->prepare($stUPD);
+                $qUPD->execute($Data->{'Realm'}, $entityID);
+            }
+        }
+        if ($dref->{'intRemoveTaskOnPayment'} == 1) {
+            my $stUPD = qq[
+                UPDATE tblWFTask
+                SET strTaskStatus = 'DELETED'
+                WHERE 
+                    intRealmID = ?
+                    AND intWFTaskID = ?
+            ];
+            my $qUPD= $Data->{'db'}->prepare($stUPD);
+            $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
+            $countTaskSkipped++;
+        }
+        GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
+    }
+    my $ruleFor = 'PERSON';
+    $ruleFor = 'REGO' if ($personRegistrationID);
+    $ruleFor = 'ENTITY' if (! $personID and ! $personRegistrationID);
+    if ($countTaskSkipped)    {
+        my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
+    }
+
+}
 sub cleanTasks  {
 
     my ($Data, $personID, $entityID, $personRegistrationID, $ruleFor) = @_;
@@ -153,6 +253,7 @@ sub addIndividualTask   {
         $task_ref->{'personRegistrationID'} || 0,
         $task_ref->{'documentID'} || 0,
     );
+
 }
 
 
@@ -266,7 +367,7 @@ sub handleWorkflow {
     }
     elsif ( $action eq 'WF_Verify' ) {
         verifyDocument($Data);
-        ( $body, $title ) = viewTask( $Data );
+        #( $body, $title ) = viewTask( $Data );
     }
     elsif ( $action eq 'WF_Summary' ) {
         ( $body, $title ) = viewSummaryPreApproval( $Data );
@@ -297,6 +398,9 @@ sub handleWorkflow {
     }
     elsif ($action eq 'WF_VNA') {
         ($body, $title) = viewNextAvailableTask($Data);
+    }
+    elsif ($action eq 'WF_H') {
+        ($body, $title) = viewWorkFlowHistory($Data);
     }
 	else {
         ( $body, $title ) = listTasks( $Data );
@@ -330,6 +434,7 @@ sub listTasks {
             pr.strAgeLevel,
             pr.strSport,
             pr.strPersonType,
+            pr.intNewBaseRecord,
             t.strRegistrationNature,
             t.tTimeStamp AS taskDate,
             UNIX_TIMESTAMP(t.tTimeStamp) AS taskTimeStamp,
@@ -338,6 +443,8 @@ sub listTasks {
             p.strLocalFirstname, 
             p.strLocalSurname, 
             p.intGender as PersonGender,
+            p.intInternationalTransfer,
+            p.intInternationalLoan,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
             t.strTaskStatus,
@@ -352,8 +459,13 @@ sub listTasks {
             t.intOnHold as OnHold,
             preqFrom.strLocalName as preqFromClub,
             preqTo.strLocalName as preqToClub,
-            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
+            pr.intPersonLevelChanged,
+            pr.strPreviousPersonLevel,
+            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', '')) as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired
 	    FROM tblWFTask AS t
+                LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
 		LEFT JOIN tblPersonRegistration_$Data->{'Realm'} AS pr ON (t.intPersonRegistrationID = pr.intPersonRegistrationID)
 		LEFT JOIN tblPersonRequest AS preq ON (preq.intPersonRequestID = pr.intPersonRequestID)
@@ -365,10 +477,26 @@ sub listTasks {
 		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
                   t.intRealmID = $Data->{'Realm'}
+                AND (
+                    tblWFRule.intLockTaskUntilPaid <> 1 
+                    OR pr.intPersonRegistrationID IS NULL
+                    OR (
+                        tblWFRule.intLockTaskUntilPaid= 1
+                        AND tblWFRule.intAutoActivateOnPayment <> 1
+                        AND pr.intPaymentRequired = 0 
+                    )
+                )
+                AND (
+                    tblWFRule.intLockTaskUntilGatewayResponse <> 1
+                    OR (
+                        tblWFRule.intLockTaskUntilGatewayResponse = 1 
+                        AND t.intPaymentGatewayResponded=1
+                    )
+                )
 		    AND (
-                      (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'HOLD' OR t.strTaskStatus = 'REJECTED'))
+                      (t.intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
                         OR
-                      (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
+                      (((t.intProblemResolutionEntityID = ?) or (t.intProblemResolutionEntityID = ? AND t.intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
             )
     ];
     #OR
@@ -400,8 +528,10 @@ sub listTasks {
 	$q->execute(
 		$entityID,
 		$entityID,
-	) or query_error($st);
-
+		$entityID,
+		$entityID,
+	) or query_error($st); 
+	
 	my @TaskList = ();
     my @taskType = ();
     my @taskStatus = ();
@@ -414,19 +544,31 @@ sub listTasks {
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
+        my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $dref->{'sysConfigApprovalLockRuleFor'}};
+        if($sysConfigApprovalLockPaymentRequired and $dref->{'paymentRequired'}){
+            $dref->{'strTaskStatus'} = 'LOCKED';
+        }
         #F-609 - list in dashboard if ON-HOLD and created by == approval entity
-        next if (
-            $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
-            and $dref->{'intApprovalEntityID'} == $entityID
-            and ($dref->{'CreatedByEntityID'} != $entityID)
-        );
+        #next if (
+        #    $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
+        #    and $dref->{'intApprovalEntityID'} != $entityID
+        #    and $dref->{'intProblemResolutionEntityID'} != $entityID
+        #    and ($dref->{'CreatedByEntityID'} != $entityID)
+        #);
 
         #moved checking of POSSIBLE_DUPLICATE here (if included in query, tasks for ENTITY are not capture)
         next if (defined $dref->{intSystemStatus} && $dref->{intSystemStatus} eq $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE && $dref->{strWFRuleFor} ne $Defs::WF_RULEFOR_PERSON);
 
         my $newTask = ($dref->{'taskTimeStamp'} >= $lastLoginTimeStamp) ? 1 : 0; #additional check if tTimeStamp > currentTimeStamp
+
+        if($dref->{'strRegistrationNature'} =~ /_LOAN/) {
+            $taskCounts{$Defs::PERSON_REQUEST_LOAN}++;
+        }
+        else {
+            $taskCounts{$dref->{'strRegistrationNature'}}++;
+        }
+
         $taskCounts{$dref->{'strTaskStatus'}}++;
-        $taskCounts{$dref->{'strRegistrationNature'}}++;
         $taskCounts{"newTasks"}++ if $newTask;
 
         my %tempClientValues = getClient($client);
@@ -479,12 +621,20 @@ sub listTasks {
         }
         elsif($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
             $ruleForType = $dref->{'strRegistrationNature'} . "_VENUE";
+			$viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         }
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
         }
         elsif($dref->{'strWFRuleFor'} eq "PERSON") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
+        }
+
+        my $changeLevelDescription = '';
+        if ($dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'})    {
+            my $fromLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPreviousPersonLevel'}});
+            my $newLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}});
+            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);# . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
         }
 
 	 my %single_row = (
@@ -495,7 +645,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Defs::workTaskTypeLabel{$ruleForType},
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
@@ -510,13 +660,18 @@ sub listTasks {
             showResolve => $showResolve,
             showView => $showView,
             OnHold => $dref->{OnHold},
-            taskDate => $dref->{taskDate},
+            taskDate => $Data->{'l10n'}{'date'}->TZformat($dref->{taskDate},'MEDIUM'),
+            taskDate_RAW => $dref->{taskDate},
             viewURL => $viewTaskURL,
             taskTypeLabel => $viewTaskURL,
-            RequestFromClub => $dref->{'preqFromClub'},
             RequestToClub => $dref->{'preqToClub'},
+            RequestFromClub => $dref->{'preqFromClub'},
             taskTimeStamp => $dref->{'taskTimeStamp'},
             newTask => $newTask,
+            changeLevelDescription => $changeLevelDescription,
+            NewBaseRecord => $dref->{'intNewBaseRecord'},
+            InternationalTransferDescription => ($dref->{'intInternationalTransfer'} and $dref->{'intNewBaseRecord'}) ? $Data->{'lang'}->txt("(International Transfer)") : "",
+            InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? $Data->{'lang'}->txt("(International Player Loan)") : "",
 		);
         #print STDERR Dumper \%single_row;
    
@@ -564,7 +719,10 @@ sub listTasks {
                 $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_COMPLETED
                 or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_REJECTED
                 or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_DENIED
+                or $request->{'strRequestStatus'} eq $Defs::PERSON_REQUEST_STATUS_CANCELLED
+                or ($request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED and $entityID == $request->{'intRequestToEntityID'})
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_HOLD
             );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
@@ -579,7 +737,7 @@ sub listTasks {
 
             my $taskStatusLabel = $request->{'strRequestResponse'} ? $Defs::personRequestStatus{$request->{'strRequestResponse'}} : $Defs::personRequestStatus{'PENDING'};
             my %personRequest = (
-                personRequestLabel => $Defs::personRequest{$request->{'strRequestType'}},
+                personRequestLabel => $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}),
                 TaskType => $request->{'strRequestType'},
                 TaskDescription => $Data->{'lang'}->txt('Person Request'),
                 Name => $name,
@@ -587,7 +745,8 @@ sub listTasks {
                 TaskStatusLabel => $taskStatusLabel,
                 viewURL => $viewURL,
                 showView => 1,
-                taskDate => $request->{'dtDateRequest'},
+                taskDate => $Data->{'l10n'}{'date'}->TZformat($request->{dtDateRequest},'MEDIUM'),
+                taskDate_RAW => $request->{dtDateRequest},
                 requestFrom => $request->{'requestFrom'},
                 requestTo => $request->{'requestTo'},
                 taskTimeStamp => $request->{'prRequestUpdateTimeStamp'},
@@ -622,6 +781,7 @@ sub listTasks {
         'type' => \@taskType,
         'status' => \@taskStatus,
     );
+
 	my %TemplateData = (
         #TaskList => \@TaskList,
         MA_allowTransfer => $Data->{'SystemConfig'}{'MA_allowTransfer'} || 0,
@@ -633,6 +793,11 @@ sub listTasks {
         TaskEntityID => $entityID,
         TaskFilters => \%taskFilters,
         client => $Data->{client},
+		Levels => {
+			CLUB => $Defs::LEVEL_CLUB,
+			NATIONAL => $Defs::LEVEL_NATIONAL,	
+			REGION => $Defs::LEVEL_REGION
+		},
 	);
 
     my $flashMessage = getFlashMessage($Data, 'WF_U_FM');
@@ -685,6 +850,24 @@ sub getEntityParentID   {
     return  $q->fetchrow_array() || 0;
 
 }
+
+sub getSelfUserParentID {
+    my ($Data, $CreatedByUserID, $PersonID, $PersonRegistrationID) = @_;
+
+    my $st = qq[
+        SELECT
+            intSelfUserID
+        FROM
+            tblSelfUserAuth
+        WHERE
+            intEntityTypeID = $Defs::LEVEL_PERSON
+            AND intEntityID = ?
+            AND intSelfUserID = ?
+    ];
+
+
+}
+
 sub addWorkFlowTasks {
      my(
         $Data,
@@ -694,18 +877,25 @@ sub addWorkFlowTasks {
         $entityID,
         $personID,
         $personRegistrationID,
-        $documentID
+        $documentID,
+	$itc
     ) = @_;
+
 	
+    $itc ||= 0;
     $entityID ||= 0;
     $personID ||= 0;
     $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
-
+	#
+	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; 
+	# 
+	
 	my $q = '';
 	my $db=$Data->{'db'};
     my $checkOk = 1;
+
 
     if ($ruleFor ne 'DOCUMENT') {
         my $stCheck = qq[
@@ -822,15 +1012,18 @@ sub addWorkFlowTasks {
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
 			r.strTaskType,
-            r.strWFRuleFor,
+			r.strWFRuleFor,
 			r.intDocumentTypeID,
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			pr.intPersonID,
 			pr.intPersonRegistrationID,
-            pr.intEntityID as RegoEntity,
-            0 as DocumentID
-		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+			pr.intEntityID as RegoEntity,
+			pr.intCreatedByUserID,
+			pr.intNewBaseRecord,
+			p.intInternationalLoan,
+			0 as DocumentID
+	FROM tblPersonRegistration_$Data->{'Realm'} AS pr
         INNER JOIN tblPerson as p ON (p.intPersonID = pr.intPersonID)
         INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
@@ -843,6 +1036,9 @@ sub addWorkFlowTasks {
             AND r.intEntityLevel = e.intEntityLevel
             AND (r.strISOCountry_IN IS NULL or r.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
             AND (r.strISOCountry_NOTIN IS NULL or r.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
+	    AND (r.intUsingITCFilter =0 
+		OR (r.intUsingITCFilter = 1 AND r.intNeededITC = ?)
+	    )
         )
 		WHERE
             pr.intPersonRegistrationID = ?
@@ -851,11 +1047,18 @@ sub addWorkFlowTasks {
             AND r.intSubRealmID IN (0, ?)
             AND r.intOriginLevel = ?
             AND r.strEntityType IN ('', e.strEntityType)
-			AND r.strRegistrationNature = ?
+	    AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
+            AND (
+                r.intUsingPersonLevelChangeFilter = 0
+                OR 
+                (r.intUsingPersonLevelChangeFilter = 1 AND r.intPersonLevelChange = pr.intPersonLevelChanged)
+            )
 		];
 	    $q = $db->prepare($st);
-  	    $q->execute($personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+	    $itc ||= 0;
+  	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+  	   
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -891,7 +1094,7 @@ sub addWorkFlowTasks {
         #AND e.strEntityType = r.strEntityType
 	    $q = $db->prepare($st);
   	    $q->execute($entityID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
-    }
+	}
     if ($ruleFor eq 'DOCUMENT' and $documentID)    {
         ## APPROVAL FOR DOCUMENT
         $st = qq[
@@ -932,8 +1135,17 @@ sub addWorkFlowTasks {
         while (my $dref= $q->fetchrow_hashref())    {
 			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
-            my $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+            my $problemEntityID = 0;
+
+            if($originLevel == 1) {
+                $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
+            }
+            else {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+            }
+
             next if (! $approvalEntityID and ! $problemEntityID);
+print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
 			
             $qINS->execute(
                 $dref->{'intWFRuleID'},
@@ -951,21 +1163,40 @@ sub addWorkFlowTasks {
                 $dref->{'intPersonID'},
                 $dref->{'intPersonRegistrationID'},
                 $dref->{'DocumentID'}
+            );			
+            my $task = getTask($Data, $qINS->{mysql_insertid});
+			
+            my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+            if($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}){
+		$workTaskType .=  qq[ ($Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'}) ];
+		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT
+            }
+            my %notificationData = (
+                'Reason' => '',
+                'WorkTaskType' => $workTaskType,
+                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'Club' => $task->{'strLocalName'},
+                'Venue' => $task->{'strLocalName'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
             );
-
-            $emailNotification->setRealmID($Data->{'Realm'});
+            
+	    $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
             $emailNotification->setFromEntityID($problemEntityID);
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
-            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
-            $emailNotification->setSubject("Work Task ID ");
+            $emailNotification->setNotificationType($notificationType);
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+            $emailNotification->send($emailTemplate) if ($emailTemplate->getConfig('toEntityNotification') == 1 and $task->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE);
 
         }
     }
@@ -973,28 +1204,28 @@ sub addWorkFlowTasks {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-	#$st = qq[
-	#	INSERT IGNORE INTO tblWFTaskPreReq (
-	#		intWFTaskID,
-	#		intWFRuleID,
-	#		intPreReqWFRuleID
-	#	)
-	#	SELECT
-	#		t.intWFTaskID,
-	#		t.intWFRuleID,
-	#		rpr.intPreReqWFRuleID
-	#	FROM tblWFTask AS t
-	#	INNER JOIN tblWFRulePreReq AS rpr
-	#		ON t.intWFRuleID = rpr.intWFRuleID
-	#	WHERE t.intPersonRegistrationID = ?
-	#	];
-#
-#  	$q = $db->prepare($st);
-#  	$q->execute($personRegistrationID);
-#
-#	if ($q->errstr) {
-#		return $q->errstr . '<br>' . $st;
-#	}
+	$st = qq[
+		INSERT IGNORE INTO tblWFTaskPreReq (
+			intWFTaskID,
+			intWFRuleID,
+			intPreReqWFRuleID
+		)
+		SELECT
+			t.intWFTaskID,
+			t.intWFRuleID,
+			rpr.intPreReqWFRuleID
+		FROM tblWFTask AS t
+		INNER JOIN tblWFRulePreReq AS rpr
+			ON t.intWFRuleID = rpr.intWFRuleID
+		WHERE t.intPersonRegistrationID = ?
+		];
+
+  	$q = $db->prepare($st);
+  	$q->execute($personRegistrationID);
+
+	if ($q->errstr) {
+		return $q->errstr . '<br>' . $st;
+	}
 
 	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
@@ -1015,6 +1246,7 @@ sub approveTask {
     my $WFTaskID = safe_param('TID','number') || '';
 
     my $task = getTask($Data, $WFTaskID);
+
     my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $task->{'sysConfigApprovalLockRuleFor'}};
     my $error = 0;
     my $response;
@@ -1022,7 +1254,7 @@ sub approveTask {
 
     #NOTE if new approval check needs to be done, just add another condition here (increment error, concat $response)
     if($sysConfigApprovalLockPaymentRequired and $task->{'paymentRequired'}){
-        $errorStr = $Data->{'lang'}->txt("ERROR: Payment required."); 
+        $errorStr = $Data->{'lang'}->txt("Error").': '. $Data->{'lang'}->txt("Payment required"); 
         $response = qq [
             <span>$errorStr</span><br/>
         ];
@@ -1056,22 +1288,6 @@ sub approveTask {
 	    if ($q->errstr) {
 	    	return $q->errstr . '<br>' . $st
 	    }
-
-        if($emailNotification) {
-            $emailNotification->setRealmID($Data->{'Realm'});
-            $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
-            $emailNotification->setDefsEmail($Defs::admin_email);
-            $emailNotification->setDefsName($Defs::admin_email_name);
-            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
-            $emailNotification->setLang($Data->{'lang'});
-            $emailNotification->setDbh($Data->{'db'});
-
-            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-            #$emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
-        }
 
     $st = qq[
         SELECT
@@ -1113,19 +1329,62 @@ sub approveTask {
         my $allComplete = checkRelatedTasks($Data);
         if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
-            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         }
         elsif ($allComplete) {
             PersonRequest::finaliseTransfer($Data, $personRequestID);
-            PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        }
+    }
+    if($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) {
+        #check for pending tasks?
+
+        my $allComplete = checkRelatedTasks($Data);
+        if ($allComplete) {
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+            PersonRequest::finalisePlayerLoan($Data, $personRequestID);
         }
     }
     elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
-        PersonRequest::setRequestStatus($Data, $personRequestID, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+    }
+    else {
+        my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+        my $cc = getCCRecipient($Data, $task);
+        my %notificationData = (
+            'Reason' => $task->{'holdNotes'},
+            'WorkTaskType' => $workTaskType,
+            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'Club' => $task->{'strLocalName'},
+            'Venue' => $task->{'strLocalName'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+            'CC' => $cc || '',
+        );
+
+        if($emailNotification) {
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_APPROVED);
+            $emailNotification->setSubject($workTaskType);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
+
     }
 
    	my $rc = checkForOutstandingTasks($Data,$ruleFor, $taskType, $entityID, $personID, $personRegistrationID, $documentID);
-
+	
     return($rc);
 
 }
@@ -1180,47 +1439,56 @@ sub checkForOutstandingTasks {
 		return $q->errstr . '<br>' . $st
 	}
 
-	my $prev_WFTaskID = 0;
-   	my $updateThisTask = '';
-   	my $pfx = '';
-   	my $list_WFTaskID = '';
-   	my $update_count = 0;
-   	my $count = 0;
+    my $prev_WFTaskID = 0;
+    my $updateThisTask = '';
+    my $pfx = '';
+    my $list_WFTaskID = '';
+    my $update_count = 0;
+    my $count = 0;
+    my @target_WFTaskID;
 
    	#Should be a cleverer way to do this, but check all the Pending Tasks and see if all of their
    	# pre-reqs have been completed. If so, update their status from Pending to Active.
-	while(my $dref= $q->fetchrow_hashref()) {
-		$count ++;
+    while(my $dref= $q->fetchrow_hashref()) {
+        $count ++;
 
-   		if ($dref->{intWFTaskID} != $prev_WFTaskID) {
-   			if ($prev_WFTaskID != 0) {
-   				if ($updateThisTask eq 'YES') {
-   					$list_WFTaskID .= $pfx . $prev_WFTaskID;
-   					$pfx = ",";
-					$update_count ++;
-			   			}
-   			}
-   			$updateThisTask = 'YES';
-   			$prev_WFTaskID = $dref->{intWFTaskID};
-   		}
+        if ($dref->{intWFTaskID} != $prev_WFTaskID) {
+            if ($prev_WFTaskID != 0) {
+                if ($updateThisTask eq 'YES') {
+                    if(!($prev_WFTaskID ~~ @target_WFTaskID)){
+                        push @target_WFTaskID, $prev_WFTaskID;
+                    }
 
-   		if ($dref->{strTaskStatus} eq 'ACTIVE') {
-   			$updateThisTask = "nope";
-   		}
-   		if ($dref->{strTaskStatus} eq 'PENDING') {
-   			$updateThisTask = "nope";
-   		}
-   		if ($dref->{strTaskStatus} eq 'REJECTED') {
-   			$updateThisTask = "nope";
-   		}
+                    $list_WFTaskID .= $pfx . $prev_WFTaskID;
+                    $pfx = ",";
+                    $update_count ++;
+                }
+            }
+            $updateThisTask = 'YES';
+            $prev_WFTaskID = $dref->{intWFTaskID};
+        }
+
+        if ($dref->{strTaskStatus} eq 'ACTIVE') {
+            $updateThisTask = "nope";
+        }
+        if ($dref->{strTaskStatus} eq 'PENDING') {
+            $updateThisTask = "nope";
+        }
+        if ($dref->{strTaskStatus} eq 'REJECTED') {
+            $updateThisTask = "nope";
+        }
     }
 
-   	if ($prev_WFTaskID != 0) {
-   		if ($updateThisTask eq 'YES') {
-   			$list_WFTaskID .= $pfx . $prev_WFTaskID;
-			$update_count ++;
-		}
-   	}
+    if ($prev_WFTaskID != 0) {
+        if ($updateThisTask eq 'YES') {
+            if(!($prev_WFTaskID ~~ @target_WFTaskID)){
+                push @target_WFTaskID, $prev_WFTaskID;
+            }
+
+            $list_WFTaskID .= $pfx . $prev_WFTaskID;
+            $update_count ++;
+        }
+    }
 
 	my $rc = 0;
 
@@ -1240,6 +1508,40 @@ sub checkForOutstandingTasks {
 		if ($q->errstr) {
 			return $q->errstr . '<br>' . $st
 		}
+
+        foreach my $TID (@target_WFTaskID) {
+            my $emailNotification = new EmailNotifications::WorkFlow();
+            my $task = getTask($Data, $TID);
+
+            my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+            my %notificationData = (
+                'Reason' => '',
+                'WorkTaskType' => $workTaskType,
+                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'Club' => $task->{'strLocalName'},
+                'Venue' => $task->{'strLocalName'},
+                'PersonRegisterTo' => $task->{'registerToEntity'},
+                'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+            );
+
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+            $emailNotification->setSubject($workTaskType);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
+
 		####
   	    auditLog('', $Data, 'Updated Work Task', 'WFTask');
       	###
@@ -1300,7 +1602,8 @@ sub checkForOutstandingTasks {
             $st = qq[
                     UPDATE tblDocuments
                     SET
-                        strApprovalStatus = 'APPROVED'
+                        strApprovalStatus = 'APPROVED',
+                        dtLastUpdated=NOW()
                     WHERE
                         intDocumentID= ?
                 ];
@@ -1333,6 +1636,9 @@ sub checkForOutstandingTasks {
                         $personRegistrationID,
                     );
                 }
+                my $personObject = getInstanceOf($Data, 'person',$personID);
+
+                updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 auditLog($personID, $Data, 'Person Registered', 'Person');
 
         	#}
@@ -1355,6 +1661,7 @@ sub checkForOutstandingTasks {
                         dtFrom = NOW()
 	    	        WHERE
                         PR.intPersonRegistrationID = ?
+                        AND PR.strRegistrationNature NOT IN ('DOMESTIC_LOAN')
                         AND PR.strStatus IN ('PENDING', 'INPROGRESS')
 	        	];
                         #dtTo = IF (dtFrom>dtTo, dtFrom, dtTo)
@@ -1366,22 +1673,23 @@ sub checkForOutstandingTasks {
 		       		$personRegistrationID
 		  			);
 	        	$rc = 1;	# All registration tasks have been completed
-                PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
 				# Do the check
 				$st = qq[SELECT * FROM tblPersonRegistration_$Data->{Realm} WHERE intPersonRegistrationID = ?];
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
-#                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW)    {
+                if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL)    {
+                    PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
+                }
                 {
-                    my %PE = ();
-                    $PE{'personType'} = $ppref->{'strPersonType'} || '';
-                    $PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
-                    $PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
-                    $PE{'sport'} = $ppref->{'strSport'} || '';
+                    #my %PE = ();
+                    #$PE{'personType'} = $ppref->{'strPersonType'} || '';
+                    #$PE{'personLevel'} = $ppref->{'strPersonLevel'} || '';
+                    #$PE{'personEntityRole'} = $ppref->{'strPersonEntityRole'} || '';
+                    #$PE{'sport'} = $ppref->{'strSport'} || '';
                     
-                    my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
-                    addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
+                    #my $peID = doesOpenPEExist($Data, $personID, $ppref->{'intEntityID'}, \%PE);
+                    #addPERecord($Data, $personID, $ppref->{'intEntityID'}, \%PE) if (! $peID);
 
                     my $personObject = getInstanceOf($Data, 'person',$personID);
                     updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
@@ -1434,7 +1742,8 @@ sub setDocumentStatus  {
 
     $st = qq[
         UPDATE tblDocuments
-        SET strApprovalStatus = ?
+        SET strApprovalStatus = ?,
+                        dtLastUpdated=NOW()
         WHERE
             1=1
     ];
@@ -1476,7 +1785,7 @@ sub setDocumentStatus  {
 
 sub updateTaskNotes {
 
-    my( $Data) = @_;
+    my($Data, $selfUserAsEntityID) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $notes= safe_param('notes','words') || '';
@@ -1489,7 +1798,7 @@ sub updateTaskNotes {
     my $targetTemplate = "",
 
     #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = $selfUserAsEntityID || getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
     my $WFRejectCurrentNoteID = $task->{'rejectTaskNoteID'} || 0;
     my $WFToggleCurrentNoteID = $task->{'toggleTaskNoteID'} || 0;
@@ -1723,18 +2032,49 @@ sub verifyDocument {
 
     #my $WFTaskID = safe_param('TID','number') || '';
     #my $documentID = safe_param('did','number') || '';
-	my  $documentID = safe_param('f','number') || 0;
+	my $documentID = safe_param('f','number') || 0;
+	my $regoID = safe_param('regoID','number') || 0;
 	my $documentStatus = param('status') || '';
+
+	my $st;
+	my $q;
+
+
+    if($regoID && $documentID){
+        $st = qq[
+            UPDATE 
+                tblDocuments as D 
+                LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
+                    D.intPersonRegistrationID = PR.intPersonRegistrationID 
+                    AND D.intPersonID=PR.intPersonID
+                ) 
+            SET 
+                D.intPersonRegistrationID = ? ,
+                D.dtLastUpdated=NOW()
+            WHERE 
+                D.intPersonRegistrationID > 0
+                AND (
+                    PR.intPersonID IS NULL 
+                    OR PR.strStatus = 'INPROGRESS'
+                ) 
+                AND D.intUploadFileID= ?
+        ];
+        $q = $Data->{'db'}->prepare($st);
+        $q->execute($regoID,$documentID);
+    }
+
+
 	if($documentID){
-    	my $st = qq[
+    	$st = qq[
         	UPDATE tblDocuments
         	SET
-        	    strApprovalStatus = ?
+        	    strApprovalStatus = ?,
+                dtLastUpdated=NOW()
         	WHERE
         		intUploadFileID = ?
     	];
 
-    	my $q = $Data->{'db'}->prepare($st);
+    	$q = $Data->{'db'}->prepare($st);
     	$q->execute(
 			$documentStatus,
         	$documentID
@@ -1775,7 +2115,9 @@ sub addTaskNotes    {
 sub resolveTask {
     my(
         $Data,
-        $emailNotification
+        $emailNotification,
+        $WFTaskID,
+        $selfUserEntityID
     ) = @_;
 
 	my $st = '';
@@ -1783,12 +2125,45 @@ sub resolveTask {
 	my $db=$Data->{'db'};
 
 	#Get values from the QS
-    my $WFTaskID = safe_param('TID','number') || '';
+    $WFTaskID ||= safe_param('TID','number') || '';
 
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
 
     return if (!$task or ($task eq undef));
+
+    return 0 if($selfUserEntityID
+                and $selfUserEntityID != $task->{'intProblemResolutionEntityID'}
+                and !doesSelfUserHaveAccess($Data, $task->{'intPersonID'}, $selfUserEntityID));
+
+	my $srn = qq[
+        SELECT
+            strNotes
+        FROM tblWFTaskNotes
+        WHERE
+            intWFTaskID = ?
+            AND strType = 'RESOLVE'
+        ORDER BY
+            intTaskNoteID
+        LIMIT 1
+    ];
+
+    my $nq = $db->prepare($srn);
+    $nq->execute($WFTaskID);
+    my $nr = $nq->fetchrow_hashref();
+
+    my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+    my %notificationData = (
+        'Reason' => $nr->{'strNotes'},
+        'WorkTaskType' => $workTaskType,
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+    );
+
 
     #if($task->{strWFRuleFor} eq 'ENTITY') {
     #    #setEntityStatus($Data, $WFTaskID, $Defs::WF_TASK_STATUS_REJECTED);
@@ -1823,7 +2198,7 @@ sub resolveTask {
   	$q = $db->prepare($st);
   	$q->execute(
   		$WFTaskID,
-        getLastEntityID($Data->{'clientValues'}),
+        $selfUserEntityID || getLastEntityID($Data->{'clientValues'}),
         $Data->{'Realm'}
   	);
 	if ($q->errstr) {
@@ -1831,7 +2206,7 @@ sub resolveTask {
 	}
     setDocumentStatus($Data, $WFTaskID, 'PENDING');
 
-    resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
+    #resetRelatedTasks($Data, $WFTaskID, 'ACTIVE');
     ####
   	auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	###
@@ -1844,9 +2219,11 @@ sub resolveTask {
         $emailNotification->setDefsEmail($Defs::admin_email);
         $emailNotification->setDefsName($Defs::admin_email_name);
         $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_RESOLVED);
-        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+        $emailNotification->setSubject($workTaskType);
         $emailNotification->setLang($Data->{'lang'});
         $emailNotification->setDbh($Data->{'db'});
+        $emailNotification->setData($Data);
+        $emailNotification->setWorkTaskDetails(\%notificationData);
 
         my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -1870,6 +2247,7 @@ sub rejectTask {
 
     #FC-144 get current task based on taskid param
     my $task = getTask($Data, $WFTaskID);
+
 
     return if (!$task or ($task eq undef));
 
@@ -1912,31 +2290,49 @@ sub rejectTask {
   	auditLog($WFTaskID, $Data, 'Updated Work Task to Rejected', 'WFTask');
   	###
 
-    if($emailNotification) {
-        $emailNotification->setRealmID($Data->{'Realm'});
-        $emailNotification->setSubRealmID(0);
-        $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-        $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
-        $emailNotification->setDefsEmail($Defs::admin_email);
-        $emailNotification->setDefsName($Defs::admin_email_name);
-        $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
-        $emailNotification->setSubject("Work Task ID " . $WFTaskID);
-        $emailNotification->setLang($Data->{'lang'});
-        $emailNotification->setDbh($Data->{'db'});
-
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
-        $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
-    }
-
-    if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
+    if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER
+        or $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) {
         #check for pending tasks?
 
-        if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
-            PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
-        }
+        #if($Data->{'clientValues'}{'currentLevel'} eq $Defs::LEVEL_NATIONAL) {
+            PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+        #}
     }
     elsif($task->{'intPersonRequestID'} and $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_NEW) {
-        PersonRequest::setRequestStatus($Data, $task->{'intPersonRequestID'}, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_REJECTED);
+    }
+    else {
+        my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+        my $cc = getCCRecipient($Data, $task);
+        my %notificationData = (
+            'Reason' => $task->{'rejectNotes'},
+            'WorkTaskType' => $workTaskType,
+            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'Club' => $task->{'strLocalName'},
+            'Venue' => $task->{'strLocalName'},
+            'PersonRegisterTo' => $task->{'registerToEntity'},
+            'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+            'CC' => $cc || '',
+        );
+
+        if($emailNotification) {
+            $emailNotification->setRealmID($Data->{'Realm'});
+            $emailNotification->setSubRealmID(0);
+            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setDefsEmail($Defs::admin_email);
+            $emailNotification->setDefsName($Defs::admin_email_name);
+            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
+            $emailNotification->setSubject($workTaskType);
+            $emailNotification->setLang($Data->{'lang'});
+            $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
+
+            my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+            $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
+        }
     }
 
     return getNotificationMessage($Data, $task, 'REJECT');
@@ -1973,6 +2369,27 @@ sub getNotificationMessage {
     return $notifPrefix . " " . $message;
 }
 
+sub getWorkTaskType {
+    my ($Data, $task) = @_;
+
+    my $ruleForType;
+
+    if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
+        $ruleForType = $task->{'strRegistrationNature'} . "_CLUB";
+    }
+    elsif($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_VENUE) {
+        $ruleForType = $task->{'strRegistrationNature'} . "_VENUE";
+    }
+    elsif($task->{'strWFRuleFor'} eq "REGO") {
+        $ruleForType = $task->{'strRegistrationNature'} . "_" . $task->{'strPersonType'};
+    }
+    elsif($task->{'strWFRuleFor'} eq "PERSON") {
+        $ruleForType = $task->{'strRegistrationNature'} . "_PERSON";
+    }
+
+    return ($Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}), $ruleForType);
+}
+
 sub getTask {
     my ($Data, $WFTaskID) = @_;
 
@@ -1993,7 +2410,7 @@ sub getTask {
             t.intOnHold,
             t.strRegistrationNature,
             e.*,
-            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', ''))as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', IF(t.strRegistrationNature = 'TRANSFER', 'TRANSFER', ''), ''))as sysConfigApprovalLockRuleFor,
             IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
             pr.intPersonRegistrationID,
             pr.strPersonType,
@@ -2014,12 +2431,19 @@ sub getTask {
             p.strNationalNum,
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
+            p.dtDOB AS DOB_RAW,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
+            rnt.strNotes as rejectNotes,
             tnt.intTaskNoteID as holdTaskNoteID,
+            tnt.strNotes as holdNotes,
             pre.strLocalName as registerToEntity,
-            tnt.intCurrent as holdCurrent
+            tnt.intCurrent as holdCurrent,
+            wr.intApprovalEntityLevel,
+            wr.intProblemResolutionEntityLevel,
+            wr.intOriginLevel,
+            wr.intEntityLevel
         FROM
             tblWFTask t
         LEFT JOIN tblWFTaskNotes rnt ON (t.intWFTaskID = rnt.intWFTaskID AND rnt.strType = "REJECT" AND rnt.intCurrent = 1)
@@ -2030,11 +2454,12 @@ sub getTask {
         LEFT JOIN tblEntity AS pre ON (pre.intEntityID = pr.intEntityID)
         LEFT JOIN tblEntityTypeRoles AS etr ON (etr.strPersonType = pr.strPersonType AND etr.strEntityRoleKey = pr.strPersonEntityRole)
         LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = pr.intNationalPeriodID)
+        LEFT JOIN tblWFRule as wr ON (wr.intWFRuleID = t.intWFRuleID)
 	  	WHERE
             t.intWFTaskID = ?
             AND t.intRealmID = ?
     ];
-
+	
     $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $WFTaskID,
@@ -2042,11 +2467,12 @@ sub getTask {
     );
 
     my $result = $q->fetchrow_hashref();
+    $result->{'currentAge'} = personAge($Data,$result->{'DOB_RAW'});
     return $result || undef;
 }
 
 sub viewTask {
-    my ($Data, $WFTID) = @_;
+    my ($Data, $WFTID, $entityID) = @_;
 
     #TODO
     #retrieve all necessary details here
@@ -2061,8 +2487,8 @@ sub viewTask {
     #   - check strStatus
     #       - if COMPLETED (final approval as per comment in JIRA), display a summary page
 
-    my $WFTaskID = safe_param('TID','number') || $WFTID || '';
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $WFTaskID = $WFTID || safe_param('TID','number') || '';
+    $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
 
@@ -2083,6 +2509,9 @@ sub viewTask {
             pr.intOriginLevel,
             pr.intPaymentRequired as regoPaymentRequired,
             pr.intPersonRequestID,
+            pr.strShortNotes,
+            pr.intOriginLevel,
+            pr.intNewBaseRecord,
             NP.dtFrom as NPdtFrom,
             NP.dtTo as NPdtTo,
             DATE_FORMAT(NP.dtFrom,'%d %b %Y') AS NPdtFromold,
@@ -2114,6 +2543,14 @@ sub viewTask {
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
             p.intInternationalTransfer as InternationalTransfer,
+            p.intInternationalLoan as InternationalLoan,
+            p.strInternationalTransferSourceClub,
+            p.dtInternationalTransferDate,
+            p.strInternationalTransferTMSRef,
+            p.strInternationalLoanSourceClub,
+            p.strInternationalLoanTMSRef,
+            p.dtInternationalLoanFromDate,
+            p.dtInternationalLoanToDate,
             e.strLocalName as EntityLocalName,
             p.intPersonID,
             p.strNationalNum,
@@ -2150,6 +2587,7 @@ sub viewTask {
             e.strFax as entityFax,
             e.strISOCountry as entityCountry,
             e.tTimeStamp as entityCreatedUpdated,
+            e.strBankAccountNumber,
             dPersonRego.intDocumentID as documentID,
             dPersonRego.strApprovalStatus as documentApprovalStatus,
             dPersonRego.strDeniedNotes as documentDeniedNotes,
@@ -2200,11 +2638,12 @@ sub viewTask {
     my $rowCount = 0;
 
     my $dref = $q->fetchrow_hashref();
-
     if(!$dref) {
-        return (undef, "ERROR: no data retrieved/no access.");
+        #return (undef, "ERROR: no data retrieved/no access.");
+        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No data retrieved/no access."));
     }
 
+    $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
     my %TemplateData;
     my %DocumentData;
@@ -2212,7 +2651,6 @@ sub viewTask {
     my %PaymentsData;
     my %ActionsData;
     my %fields;
-	open FH, ">dumpfile.txt";
 	
     switch($dref->{strWFRuleFor}) {
         case 'REGO' {
@@ -2257,7 +2695,7 @@ sub viewTask {
     my $showApprove = 0;
     #$showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
     $showApprove = 1 if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE) and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
-
+	
     my $showResolve = 0;
     $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
@@ -2269,8 +2707,8 @@ sub viewTask {
     %DocumentData = %{$DocumentData};
 
     my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
+	
 
-    #print STDERR Dumper $dref;
     my %TaskAction = (
         'ApprovalEntityLevel' => $dref->{'ApprovalEntityLevel'},
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -2305,7 +2743,7 @@ sub viewTask {
 
 
     $DocumentData{'TotalPending'} = $documentStatusCount->{'PENDING'};
-
+	
     my $documentBlock = runTemplate(
         $Data,
         \%DocumentData,
@@ -2399,8 +2837,8 @@ sub populateRegoViewData {
             Gender => $Data->{'lang'}->txt($Defs::genderInfo{$dref->{'PersonGender'} || 0}) || '',
             DOB => $dref->{'dtDOB'} || '',
             LocalName => $LocalName,
-            LatinName => "$dref->{'strLatinFirstname'} $dref->{'strLatinMiddleName'} $dref->{'strLatinSurname'}" || '',
-            Address => "$dref->{'strAddress1'} $dref->{'strAddress2'} $dref->{'strAddress2'} $dref->{'strSuburb'} $dref->{'strState'} $dref->{'strPostalCode'}" || '',
+            LatinName => join(' ',[$dref->{'strLatinFirstname'} || '', $dref->{'strLatinMiddleName'} || '', $dref->{'strLatinSurname'} || '']),
+            Address => join(' ',[$dref->{'strAddress1'}||'',$dref->{'strAddress2'}||'',$dref->{'strSuburb'}||'',$dref->{'strState'}||'',$dref->{'strPostalCode'} || '']),
             Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
             DateSuspendedUntil => '',
             LastUpdate => '',
@@ -2420,6 +2858,15 @@ sub populateRegoViewData {
             ContactPhone =>$dref->{'strPhoneHome'} || '',
             Email =>$dref->{'strEmail'} || '',
             PostalCode => $dref->{'strPostalCode'} || '',
+            InternationalTransfer => $dref->{'InternationalTransfer'} || 0,
+            InternationalLoan => $dref->{'InternationalLoan'} || 0,
+            strInternationalTransferSourceClub => $dref->{'strInternationalTransferSourceClub'} || '',
+            dtInternationalTransferDate => $dref->{'dtInternationalTransferDate'} || '',
+            strInternationalTransferTMSRef => $dref->{'strInternationalTransferTMSRef'} || '',
+            strInternationalLoanSourceClub => $dref->{'strInternationalLoanSourceClub'} || '',
+            strInternationalLoanTMSRef => $dref->{'strInternationalLoanTMSRef'} || '',
+            dtInternationalLoanFromDate => $dref->{'dtInternationalLoanFromDate'} || '',
+            dtInternationalLoanToDate => $dref->{'dtInternationalLoanToDate'} || '',
         },
         PersonRegoDetails => {
             ID => $dref->{'intPersonRegistrationID'},
@@ -2436,10 +2883,15 @@ sub populateRegoViewData {
             DateTo => $dref->{'dtTo'} || '',
             Certifications => join(', ', @certString),
             strPersonType => $dref->{'strPersonType'},
+            strShortNotes => $dref->{'strShortNotes'} || '',
+            OriginLevel => $dref->{'intOriginLevel'},
+            NewBaseRecord => $dref->{'intNewBaseRecord'} || 0,
         },
         EditDetailsLink => $PersonEditLink,
         ReadOnlyLogin => $readonly,
         PersonSummary => personSummaryPanel($Data, $dref->{intPersonID}) || '',
+        childEntityID => $dref->{'intEntityID'},
+        parentEntityID => $Data->{'clientValues'}{'_intID'},
         WFTaskID => $dref->{'intWFTaskID'},
         ActiveTab => $activeTab
 	);
@@ -2456,12 +2908,32 @@ sub populateRegoViewData {
         );
         my $request = getRequests($Data, \%regFilter);
         $personRequestData = $request->[0];
-        #print STDERR Dumper $personRequestData;
         $TemplateData{'TransferDetails'}{'TransferTo'} = $personRequestData->{'requestFrom'} || '';
         $TemplateData{'TransferDetails'}{'TransferFrom'} = $personRequestData->{'requestTo'} || '';
         $TemplateData{'TransferDetails'}{'RegistrationDateFrom'} = $dref->{'NPdtFrom'};
         $TemplateData{'TransferDetails'}{'RegistrationDateTo'} = $dref->{'NPdtTo'};
         $TemplateData{'TransferDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+	    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.') if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_TRANSFER'} == 1 and $dref->{'regoPaymentRequired'});
+
+
+    }
+    elsif($dref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN){
+        $title = $Data->{'lang'}->txt('Player Loan') . " - $LocalName";;
+        $templateFile = 'workflow/view/loan.templ';
+
+        my %regFilter = (
+            'requestID' => $dref->{'intPersonRequestID'},
+        );
+        my $request = getRequests($Data, \%regFilter);
+        $personRequestData = $request->[0];
+        $TemplateData{'PlayerLoanDetails'}{'PlayerLoanTo'} = $personRequestData->{'requestFrom'} || '';
+        $TemplateData{'PlayerLoanDetails'}{'PlayerLoanFrom'} = $personRequestData->{'requestTo'} || '';
+        $TemplateData{'PlayerLoanDetails'}{'LoanStartDate'} = $personRequestData->{'dtLoanFrom'};
+        $TemplateData{'PlayerLoanDetails'}{'LoanEndDate'} = $personRequestData->{'dtLoanTo'};
+        $TemplateData{'PlayerLoanDetails'}{'TMSReference'} = $personRequestData->{'strTMSReference'};
+        $TemplateData{'PlayerLoanDetails'}{'Summary'} = $personRequestData->{'strRequestNotes'} || '';
+	    $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.') if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_TRANSFER'} == 1 and $dref->{'regoPaymentRequired'});
+
 
     }
     else {
@@ -2501,7 +2973,7 @@ sub populateEntityViewData {
     my $task = getTask($Data, $WFTaskID);
 
     my $activeTab = safe_param('at','number') || 1;
-
+	
 	%TemplateData = (
         EntityDetails => {
             Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
@@ -2520,15 +2992,20 @@ sub populateEntityViewData {
             PostalCode => $dref->{'entityPostalCode'} || '',
             Contact => $dref->{'entityContact'} || '',
             organizationType => $dref->{'strEntityType'},
+            organizationTypeName => $Defs::entityType{$dref->{'strEntityType'}},
             strLegalID => $dref->{'strLegalID'},
             comment => $dref->{'strMANotes'},
             sport => $dref->{'strDiscipline'},
+            sportName => $Defs::entitySportType{$dref->{'strDiscipline'}},
             strCity => $dref->{'strCity'},
             organizationLevel => $dref->{'strOrganisationLevel'},
+            organizationLevelName => $Defs::personLevel{$dref->{'strOrganisationLevel'}},
             legaltype => Club::getLegalTypeName($Data, $dref->{'intLegalTypeID'}),
             intEntityID => $dref->{'intEntityID'},
+            bankAccountDetails => $dref->{'strBankAccountNumber'},
         },
         EditDetailsLink => "$Data->{'target'}?client=$tempClient&amp;dtype=$dref->{'strPersonType'}",
+		AddDetailsLink => "$Data->{'target'}?client=$client",
         ReadOnlyLogin => $readonly,
         intWFTaskID => $dref->{'intWFTaskID'},
         ActiveTab => $activeTab,
@@ -2555,12 +3032,14 @@ sub populateEntityViewData {
             );
 
             $TemplateData{'Notifications'}{'LockApproval'} = $Data->{'lang'}->txt('Locking Approval: Payment required.')
-                if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
-
+            if ($Data->{'SystemConfig'}{'lockApproval_PaymentRequired_VENUE'} == 1 and $dref->{'entityPaymentRequired'});
+			$TemplateData{'VenueDocuments'} = $Data->{'SystemConfig'}{'hasVenueDocuments'};
+			$TemplateData{'ActiveTab'} = $Data->{'SystemConfig'}{'hasVenueDocuments'}?$activeTab: param('at')? param('at') : 2; 
             #TODO: add details specific to VENUE
 
             my $entitySummaryPanel = entitySummaryPanel($Data, $dref->{'intEntityID'});
             $TemplateData{'EntitySummaryPanel'} = $entitySummaryPanel;
+			
         }
         else {
 
@@ -2675,30 +3154,35 @@ sub populateDocumentViewData {
     #since a specific work flow rule can have
     #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
 
+    return ({}, {}, {}) if !$dref->{'strTaskStatus'};
+
 	my @validdocsforallrego = ();
 	my %validdocs = ();
 	my %validdocsStatus = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
-	my $query = qq[
-        SELECT 
-            tblDocuments.strApprovalStatus, 
-            tblDocuments.intDocumentTypeID, 
-            tblDocuments.intUploadFileID 
-        FROM 
-            tblDocuments 
-            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID) 
+
+    my $query = qq[
+        SELECT
+            DISTINCT
+            tblDocuments.strApprovalStatus,
+            tblDocuments.intDocumentTypeID,
+            tblDocumentType.strActionPending,
+            tblDocuments.intUploadFileID
+        FROM
+            tblDocuments
+            INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
             INNER JOIN tblRegistrationItem ON (tblDocumentType.intDocumentTypeID = tblRegistrationItem.intID)
-		WHERE 
-            strApprovalStatus IN('PENDING', 'APPROVED') 
-            AND intPersonID = ? 
-            AND tblRegistrationItem.intRealmID=? 
-            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1) 
+        WHERE
+            strApprovalStatus IN('PENDING', 'APPROVED', 'REJECTED')
+            AND intPersonID = ?
+            AND tblRegistrationItem.intRealmID=?
+            AND (tblRegistrationItem.intUseExistingThisEntity = 1 OR tblRegistrationItem.intUseExistingAnyEntity = 1)
             AND tblRegistrationItem.strItemType='DOCUMENT'
-     AND tblRegistrationItem.strPersonType IN ('', ?)
-     AND tblRegistrationItem.strRegistrationNature IN ('', ?)
-     AND tblRegistrationItem.strAgeLevel IN ('', ?)
-     AND tblRegistrationItem.strPersonLevel IN ('', ?)
-     AND tblRegistrationItem.intEntityLevel = ?
+            AND tblRegistrationItem.strPersonType IN ('', ?)
+            AND tblRegistrationItem.strRegistrationNature IN ('', ?)
+            AND tblRegistrationItem.strAgeLevel IN ('', ?)
+            AND tblRegistrationItem.strPersonLevel IN ('', ?)
+            AND tblRegistrationItem.intEntityLevel = ?
     ];
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
@@ -2706,23 +3190,33 @@ sub populateDocumentViewData {
         $query .= qq[ AND tblRegistrationItem.intOriginLevel = ?  ];
         push @levels, $dref->{'intOriginLevel'};
     }
+    $query .= qq[
+        ORDER BY
+            tblDocuments.tTimeStamp DESC,
+            tblDocuments.intUploadFileID DESC
+    ];
 
-	$query .= qq[GROUP BY intDocumentTypeID];
-
-	my $sth = $Data->{'db'}->prepare($query);
-	$sth->execute($dref->{'intPersonID'}, $Data->{'Realm'},
-      $dref->{'strPersonType'} || '',
-      $dref->{'strRegistrationNature'} || '',
-      $dref->{'strAgeLevel'} || '',
-      $dref->{'strPersonLevel'} || '',
-      @levels
+    my $sth = $Data->{'db'}->prepare($query);
+    $sth->execute(
+        $dref->{'intPersonID'}, $Data->{'Realm'},
+        $dref->{'strPersonType'} || '',
+        $dref->{'strRegistrationNature'} || '',
+        $dref->{'strAgeLevel'} || '',
+        $dref->{'strPersonLevel'} || '',
+        @levels
     );
-	while(my $adref = $sth->fetchrow_hashref()){
-	    $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
-		push @validdocsforallrego, $adref->{'intDocumentTypeID'};
-		$validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
-	}
-	my $fileID = 0;
+    while(my $adref = $sth->fetchrow_hashref()){
+        next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
+        next if exists $validdocs{$adref->{'intDocumentTypeID'}};
+        #if (! exists $validdocs{$adref->{'intDocumentTypeID'}} or $adref->{'strApprovalStatus'} ne 'APPROVED')     {
+        $validdocsStatus{$adref->{'intDocumentTypeID'}} = $adref->{'strApprovalStatus'};
+        #if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
+        push @validdocsforallrego, $adref->{'intDocumentTypeID'};
+        #}
+        $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
+        #}
+    }
+        my $fileID = 0;
 
 	
     my $joinCondition = '';
@@ -2814,6 +3308,8 @@ sub populateDocumentViewData {
                 AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 AND (regoItem.intFilterFromAge = 0 OR regoItem.intFilterFromAge <= $dref->{'currentAge'})
                 AND (regoItem.intFilterToAge = 0 OR regoItem.intFilterToAge >= $dref->{'currentAge'})
+                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = '$dref->{'InternationalTransfer'}')
+                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = '$dref->{'InternationalLoan'}')
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -2833,7 +3329,8 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-   
+
+	 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
@@ -2862,7 +3359,7 @@ sub populateDocumentViewData {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
-        next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
+        #next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
 		$fileID = $tdref->{'intFileID'};
@@ -2973,8 +3470,11 @@ sub populateDocumentViewData {
             my $action = "view";
             $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
 
-           	$viewLink = qq[ <span style="position: relative"> 
-<a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
+			$parameters .= qq[&regoID=$registrationID] if($registrationID); 
+			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
+           	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
+
         }
 
         if($tdref->{'strLockAtLevel'})   {
@@ -3051,12 +3551,16 @@ sub populateRegoPaymentsViewData {
             T.intQty,
             T.curAmount,
             P.strName as ProductName,
+            P.strDisplayName as ProductDisplayName,
             P.strProductType as ProductType,
             T.intStatus,
-            TL.intPaymentType
+            T.intTransactionID,
+            TL.intPaymentType,
+			I.strInvoiceNumber
         FROM
             tblTransactions as T
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
+			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
             T.intID = ?
@@ -3076,6 +3580,9 @@ sub populateRegoPaymentsViewData {
 
     while(my $tdref = $q->fetchrow_hashref()) {
         my %row= (
+            TransactionNumber=> $tdref->{'intTransactionID'},
+			InvoiceNumber => $tdref->{'strInvoiceNumber'},
+            PaymentLogID=> $tdref->{'intTransLogID'},
             ProductName=> $tdref->{'ProductName'},
             ProductType=> $tdref->{'ProductType'},
             Amount=> $tdref->{'curAmount'},
@@ -3131,10 +3638,10 @@ sub populateTaskNotesViewData {
     while(my $tdref = $q->fetchrow_hashref()) {
         my %rowNotes = (
             ParentNote => $tdref->{'parentNote'},
-            ParentNoteType => $tdref->{'parentNoteType'},
+            ParentNoteType => $Defs::wfTaskAction{$tdref->{'parentNoteType'}},
             ParentTimeStamp => $tdref->{'parentTimeStamp'},
             ChildNote => $tdref->{'childNote'},
-            ChildNoteType => $tdref->{'childNoteType'},
+            ChildNoteType => $Defs::wfTaskAction{$tdref->{'childNoteType'}},
             ChildTimeStamp => $tdref->{'childTimeStamp'},
         );
         push @TaskNotes, \%rowNotes;
@@ -3274,6 +3781,27 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
                 
             }
+            if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN){
+                $templateFile = 'workflow/summary/loan.templ';
+                $title = $Data->{'lang'}->txt("Player Loan - Approved");
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                my ($PaymentsData) = populateRegoPaymentsViewData($Data, $task);
+        
+                $TemplateData{'PlayerLoanDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'PlayerLoanDetails'}{'BorrowingClub'} = $request->{'requestFrom'};
+                $TemplateData{'PlayerLoanDetails'}{'LendingClub'} = $request->{'requestTo'};
+                $TemplateData{'PlayerLoanDetails'}{'LoanStartDate'} = $request->{'dtLoanFrom'};
+                $TemplateData{'PlayerLoanDetails'}{'LoanEndDate'} = $request->{'dtLoanTo'};
+                $TemplateData{'PlayerLoanDetails'}{'TMSReference'} = $request->{'strTMSReference'};
+                $TemplateData{'PlayerLoanDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                $TemplateData{'PlayerLoanDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+                
+            }
             elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_AMENDMENT){
                 $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
                 $templateFile = 'workflow/summary/person.templ';
@@ -3383,6 +3911,7 @@ sub viewApprovalPage {
     my $c = Countries::getISOCountriesHash();
 
     $TemplateData{'TaskAction'} = \%TaskAction;
+    my $clubName = $dref->{'strLocalName'};
 
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
@@ -3406,15 +3935,36 @@ sub viewApprovalPage {
                 case "$Defs::LEVEL_CLUB"  {
                     #TODO: add details specific to CLUB
                     $templateFile = 'workflow/result/club.templ';
+                    $title = $Data->{'lang'}->txt('New Club Registration - Approval');
                 }
                 case "$Defs::LEVEL_VENUE" {
                     #TODO: add details specific to VENUE
                     $templateFile = 'workflow/result/venue.templ';
+                    $title = $Data->{'lang'}->txt('New Facility Registration - Approval');
                 }
                 else {
 
                 }
             }
+             %TemplateData = (
+                EntityDetails => {
+                    Status => $Data->{'lang'}->txt($Defs::entityStatus{$dref->{'entityStatus'} || 0}) || '',
+                    LocalShortName => $task->{'strLocalShortName'} || '',
+                    LocalName => $task->{'strLocalName'} || '',
+                    LegalID => $task->{'strLegalID'} || '',
+                    FoundationDate => $task->{'dtFrom'} || '',
+                    ISOCountry => $c->{$task->{'strISOCountry'}} || '',
+                    Discipline => $Defs::entitySportType{$task->{'strDiscipline'}} || '',
+                    ContactPerson => $task->{'strContact'} || '',
+                    Email => $task->{'strEmail'} || '',
+                    Website => $task->{'strWebURL'} || '',
+                    EntityID => $task->{'intCreatedByEntityID'} || '',
+                    ClubName => $clubName,
+                },
+                TaskAction => \%TaskAction,
+            );
+            $TemplateData{'EntitySummaryPanel'} = entitySummaryPanel($Data, $task->{'intEntityID'});
+
         }
         case 'PERSON' {
             $templateFile = 'workflow/result/person.templ';
@@ -3454,10 +4004,10 @@ sub viewApprovalPage {
 }
 
 sub updateTaskScreen {
-    my ($Data, $action) = @_;
+    my ($Data, $action, $selfUserAsEntityID) = @_;
 
     my $WFTaskID = safe_param('TID','number') || '';
-    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'}) || $selfUserAsEntityID;
 
     my $task = getTask($Data, $WFTaskID);
 
@@ -3470,6 +4020,23 @@ sub updateTaskScreen {
     my $body;
     my $status;
     my $TaskType;
+
+    my $st = qq[
+        SELECT 
+            strLocalName 
+        FROM
+            tblEntity 
+        WHERE 
+            intEntityID = ?
+        LIMIT 1
+    ];
+
+    my $qt = $Data->{'db'}->prepare($st) or query_error($st);
+    my $res = $qt->execute(
+        $Data->{'clientValues'}{'regionID'}
+    ) or query_error($st);
+
+    my $raID = $qt->fetchrow_hashref();
 
     if($task->{'strWFRuleFor'} eq "ENTITY" and $task->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
         $titlePrefix = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_CLUB"};
@@ -3490,10 +4057,16 @@ sub updateTaskScreen {
 
    switch($action) {
         case "WF_PR_H" {
+            my $SysConfigOptionSuffix = 'HOLD';
+
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
             
             if($TaskType eq 'TRANSFER_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            if($TaskType eq 'DOMESTIC_LOAN_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_PLAYER') {
@@ -3505,11 +4078,16 @@ sub updateTaskScreen {
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_REFEREE') {
-                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process.");
+                $message = $Data->{'SystemConfig'}{$TaskType . '_' . $SysConfigOptionSuffix};
+                $message = $message ? $message : $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_MAOFFICIAL') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'NEW_RAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting RA resolves the issue, you would be able to verify and continue with the RA Official Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
             elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
@@ -3532,15 +4110,48 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
+            elsif($TaskType eq 'AMENDMENT_CLUB') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Club Details process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType eq 'AMENDMENT_VENUE') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Venue Details process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            elsif($TaskType =~ /^RENEWAL_/) {
+                if($task->{'strTaskStatus'} eq 'HOLD'){
+                    if ($task->{'strPersonType'} eq 'PLAYER') {
+                     $message = $Data->{'lang'}->txt("You have placed this Player Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $status = $Data->{'lang'}->txt("Pending");
+                    }elsif ($task->{'strPersonType'} eq 'CLUBOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have placed this Club Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $status = $Data->{'lang'}->txt("Pending");
+                    }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have placed this MA Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $status = $Data->{'lang'}->txt("Pending");
+                    }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have placed this Team Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $status = $Data->{'lang'}->txt("Pending");
+                    }else{
+                     $message = $Data->{'lang'}->txt("You have placed this ".ucfirst(lc($task->{'strPersonType'}))." Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $status = $Data->{'lang'}->txt("Pending");
+                    }
+                }
+            }
 
         }
         case "WF_PR_R" {
 
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
+            
             if($TaskType eq 'TRANSFER_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the player loan of ") . qq[$task->{'strLocalFirstname'}  $task->{'strLocalSurname'}.];
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
@@ -3557,6 +4168,11 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+            elsif($TaskType eq 'NEW_RAOFFICIAL') {
+                $message = $Data->{'lang'}->txt("You have rejected this RA Official Registration. To proceed with this Registration, start a new Registration.");
+                $status = $Data->{'lang'}->txt("Rejected");
+            }
+
             elsif($TaskType eq 'NEW_CLUBOFFICIAL') {
                 $message = $Data->{'lang'}->txt("You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
@@ -3583,6 +4199,29 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this Amendment of Person Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+            elsif($TaskType =~ /^RENEWAL_/) {
+                if($task->{'strTaskStatus'} eq 'REJECTED'){
+                    if ($task->{'strPersonType'} eq 'PLAYER') {
+                     $message = $Data->{'lang'}->txt("You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }elsif ($task->{'strPersonType'} eq 'CLUBOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have rejected this Club Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }elsif($task->{'strPersonType'} eq 'RAOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have rejected this RA Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
+                     $message = $Data->{'lang'}->txt("You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }else{
+                     $message = $Data->{'lang'}->txt("You have rejected this ".ucfirst(lc($task->{'strPersonType'}))." Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $status = $Data->{'lang'}->txt("Rejected");
+                    }
+                }
+            }
         }
         case "WF_PR_S" {
             $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Resolved');
@@ -3590,6 +4229,8 @@ sub updateTaskScreen {
             $status = $Data->{'lang'}->txt("Resolved");
         }
     }
+
+    my $currentViewLevel = ($Data->{'clientValues'}{'currentLevel'} > 1) ? $Data->{'clientValues'}{'currentLevel'} : 1;
 
     my %TemplateData = (
         'client' => $Data->{'client'},
@@ -3603,8 +4244,12 @@ sub updateTaskScreen {
         },
         'status' => $status,
         'taskType' => $TaskType,
+        'CurrentViewLevel' => $currentViewLevel
     );
 
+    #open (my $FH,">test.txt");
+    #print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
+    #print $FH "Message: \n " . $action;
 	$body = runTemplate(
         $Data,
         \%TemplateData,
@@ -3668,6 +4313,7 @@ sub toggleTask {
             $emailNotification->setSubject("Work Task ID " . $WFTaskID);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
@@ -3684,6 +4330,22 @@ sub holdTask {
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
+
+    my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+    my $cc = getCCRecipient($Data, $task);
+
+    my %notificationData = (
+        'Reason' => $task->{'holdNotes'},
+        'WorkTaskType' => $workTaskType,
+        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'Club' => $task->{'strLocalName'},
+        'Venue' => $task->{'strLocalName'},
+        'PersonRegisterTo' => $task->{'registerToEntity'},
+        'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
+        'CC' => $cc || '',
+    );
+
     my $currentToggle = safe_param('t', 'number') || 0;
     my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
@@ -3735,18 +4397,21 @@ sub holdTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($toEntityID);
             $emailNotification->setFromEntityID($fromEntityID);
+            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
-            $emailNotification->setSubject("Work Task ID " . $WFTaskID);
+            $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
+            $emailNotification->setData($Data);
+            $emailNotification->setWorkTaskDetails(\%notificationData);
 
             my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
             $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
         }
 
-        resetRelatedTasks($Data, $WFTaskID, 'PENDING');
+        #resetRelatedTasks($Data, $WFTaskID, 'PENDING');
 
         return 1;
     }
@@ -3913,6 +4578,261 @@ sub setFlashMessage {
         $message,
         $exp,
     ];
+}
+
+sub displayGenericError {
+    my ($Data, $titleHeader, $message) = @_;
+
+    $titleHeader ||= $Data->{'lang'}->txt("Error");
+    my $body = runTemplate(
+        $Data,
+        {
+            message => $message,
+        },
+        'personrequest/generic/error.templ',
+    );
+
+    return ($body, $titleHeader);
+}
+
+sub getRegistrationWorkTasks {
+    my ($Data, $param) = @_;
+
+    # %param = (
+    #   'type' => (ENTITY|PERSON)
+    #   'registrationid' => 
+    #   'personid' => 
+    #   'entityid' => 
+    # );
+
+    my $cond = '';
+    my @values = ();
+
+    switch($param->{'type'}) {
+        case 'ENTITY' {
+            $cond .= qq[ AND WT.intEntityID = ? ];
+            push @values, $param->{'entityid'} || 0;
+        }
+        case 'PERSON' {
+            $cond .= qq[ AND WT.intPersonID = ? AND WT.intPersonRegistrationID = ? ];
+            push @values, $param->{'personid'} || 0;
+            push @values, $param->{'registrationid'} || 0;
+        }
+    }
+
+    my $st = qq[
+        SELECT
+            WT.intWFTaskID,
+            WT.intApprovalEntityID,
+            WT.intProblemResolutionEntityID,
+            WR.intApprovalEntityLevel,
+            WR.intProblemResolutionEntityLevel,
+            AE.strLocalName AS approvalEntityLocalName,
+            RE.strLocalName AS problemResolutionEntityLocalName,
+
+            IF(WR.intApprovalEntityLevel = 3, 'club', '') as AEgetInstanceType,
+            IF(WR.intApprovalEntityLevel = 20, 'region', '') as AEgetInstanceType,
+            IF(WR.intApprovalEntityLevel = 100, 'national', '') as AEgetInstanceType,
+
+            IF(WR.intProblemResolutionEntityLevel = 100, 'national', '') as REgetInstanceType,
+            IF(WR.intProblemResolutionEntityLevel = 20, 'region', '') as REgetInstanceType,
+            IF(WR.intProblemResolutionEntityLevel = 3, 'club', '') as REgetInstanceType
+        FROM
+            tblWFTask AS WT
+            LEFT JOIN tblWFRule WR ON (WR.intWFRuleID = WT.intWFRuleID)
+            LEFT JOIN tblEntity AE ON (AE.intEntityID = WT.intApprovalEntityID)
+            LEFT JOIN tblEntity RE ON (RE.intEntityID = WT.intProblemResolutionEntityID)
+        WHERE
+            WT.intRealmID = $Data->{'Realm'}
+            $cond
+    ];
+
+    my $q = $Data->{'db'}->prepare($st) or query_error($st);
+	$q->execute(
+        @values
+	) or query_error($st);
+
+	my @TaskNotes = ();
+	my $rowCount = 0;
+
+    my @workTaskHistory = ();
+
+    while(my $tdref = $q->fetchrow_hashref()) {
+        my $approvalEntity;
+        my $problemResolutionEntity;
+        my $taskType;
+
+        switch($tdref->{'intProblemResolutionEntityLevel'}) {
+            case 3 {
+                $problemResolutionEntity = getInstanceOf($Data, 'club', $tdref->{'intProblemResolutionEntityID'});
+            }
+            case 20 {
+                $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
+            }
+            case 100 {
+                $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
+            }
+        }
+
+        switch($tdref->{'intApprovalEntityLevel'}) {
+            case 3 {
+                $approvalEntity = getInstanceOf($Data, 'club', $tdref->{'intApprovalEntityID'});
+                $taskType = $Data->{'lang'}->txt('Approval by Club');
+            }
+            case 20 {
+                $approvalEntity = getInstanceOf($Data, 'entity', $tdref->{'intApprovalEntityID'});
+                $taskType = $Data->{'lang'}->txt('Approval by Regional Association');
+            }
+            case 100 {
+                $approvalEntity = getInstanceOf($Data, 'entity', $tdref->{'intApprovalEntityID'});
+                $taskType = $Data->{'lang'}->txt('Approval by Member Association');
+            }
+        }
+
+        my $workTaskNotes = populateTaskNotesViewData($Data, $tdref);
+        my %TaskNotes = %{$workTaskNotes};
+
+        my $notesBlock = runTemplate(
+            $Data,
+            \%TaskNotes,
+            'workflow/generic/notes.templ'
+        );
+
+        my %taskhistory = (
+            TaskID => $tdref->{'intWFTaskID'},
+            TaskType => $taskType,
+            ApprovalEntity => $approvalEntity ? $approvalEntity->name() : $Data->{'lang'}->txt("N/A"),
+            ProblemResolutionEntity => $problemResolutionEntity ? $problemResolutionEntity->name() : $Data->{'lang'}->txt("N/A"),
+            TaskNotes => $workTaskNotes->{'TaskNotes'},
+            NotesBlock => $notesBlock,
+        );
+
+        push @workTaskHistory, \%taskhistory;
+    }
+
+    return \@workTaskHistory;
+}
+
+sub viewWorkFlowHistory {
+    my ($Data, $WFTID) = @_;
+
+    my $WFTaskID = safe_param('id','number') || $WFTID || '';
+    return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid ID")) if !$WFTaskID;
+
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    my $entityLevel = $Data->{'clientValues'}{'authLevel'};
+    my $task = getTask($Data, $WFTaskID);
+
+    if (
+        ($entityID == $task->{'intProblemResolutionEntityID'} and $entityLevel == $task->{'intProblemResolutionEntityLevel'})
+        or
+        ($entityID == $task->{'intApprovalEntityID'} and $entityLevel == $task->{'intApprovalEntityLevel'})
+    ) {
+
+        my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+        my %params;
+        switch($task->{strWFRuleFor}) {
+            case ['REGO', 'PERSON'] {
+                %params = (
+                    type => 'PERSON',
+                    registrationid => $task->{'intPersonRegistrationID'},
+                    personid => $task->{'intPersonID'},
+                );
+            }
+            case 'ENTITY' {
+                %params = (
+                    type => 'ENTITY',
+                    entityid => $task->{'intEntityID'},
+                );
+            }
+        }
+
+        my $workTaskHistory = getRegistrationWorkTasks($Data, \%params);
+        my $relatedWorkTaskHistory;
+
+        foreach my $worktask (@{$workTaskHistory}) {
+            next if $task->{'intWFTaskID'} != $worktask->{'TaskID'};
+            $relatedWorkTaskHistory = $worktask;
+        }
+
+        $relatedWorkTaskHistory->{'RegistrationType'} = $workTaskType;
+        my %TemplateData = (
+            worktask => $relatedWorkTaskHistory,
+        );
+
+        my $body = runTemplate(
+            $Data,
+            \%TemplateData,
+            'workflow/history.templ',
+        );
+
+        return ($body, $Data->{'lang'}->txt("Work Flow History"));
+    }
+    else {
+        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No data retrieved/no access"))
+    }
+
+}
+
+sub getCCRecipient {
+    my ($Data, $task) = @_;
+
+    my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+
+    if(
+        $task->{'intApprovalEntityID'} == $task->{'intProblemResolutionEntityID'}
+        and $task->{'intEntityLevel'} != $task->{'intOriginLevel'}) {
+
+        switch ($workTaskRule) {
+            case "AMENDMENT_CLUB" {
+                my $clubObj = getInstanceOf($Data, 'club', $task->{'intEntityID'});
+                return $clubObj->getValue('strEmail') || '';
+            }
+            case "AMENDMENT_VENUE" {
+                #TODO: confirm if parent entity's email or venue contact email address
+            }
+        }
+    }
+
+    return;
+}
+
+sub getInitialTaskAssignee {
+     my(
+        $Data,
+        $personID,
+        $registrationID,
+        $entityID
+    ) = @_;
+
+    if($entityID){
+    }
+    elsif($personID and $registrationID){
+        my $st = qq[
+            SELECT tr.*
+            FROM tblWFRule tr
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} tp
+            ON (
+                tp.strPersonType = tr.strPersonType
+                AND tp.strPersonLevel = tr.strPersonLevel
+                AND tp.strSport = tr.strSport
+                AND tp.strAgeLevel = tr.strAgeLevel
+                AND tr.strRegistrationNature = tp.strRegistrationNature
+                AND tr.intOriginLevel = tp.intOriginLevel
+            )
+            WHERE
+                tp.intPersonRegistrationID = ?
+                AND tr.strTaskStatus = 'ACTIVE'
+            ORDER BY
+                tr.intApprovalEntityLevel
+            LIMIT 1
+        ];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute($registrationID);
+
+        my $dref = $q->fetchrow_hashref();
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
+    }
 }
 
 1;

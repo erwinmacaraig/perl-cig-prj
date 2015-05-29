@@ -17,7 +17,7 @@ use Data::Dumper;
 sub getRenewalDetails {
     my ($Data, $regoID) = @_;
 
-    my $rego = getRegistrationDetail($Data, $regoID) || {};
+    my $rego = PersonRegistration::getRegistrationDetail($Data, $regoID) || {};
 
     $rego = $rego->[0];
 
@@ -29,6 +29,7 @@ sub getRenewalDetails {
     $rego->{'newAgeLevel'} = $newAgeLevel;
 
     my %templateData = (
+        'entityLocalName' => $rego->{'strLocalName'} || '',
         'personType' => $Defs::personType{$rego->{'strPersonType'}} || '',
         'sport' => $Defs::sportType{$rego->{'strSport'}} || '',
         'personRole' => $personRoles->{$rego->{'strPersonEntityRole'}} || '-',

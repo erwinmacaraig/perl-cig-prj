@@ -1,5 +1,7 @@
 DELETE FROM tblEntity WHERE intEntityID<>1;
-DELETE FROM tblUserAuth WHERE entityId>1;
+DELETE FROM tblUser;
+DELETE FROM tblUserAuth;
+DELETE FROM tblUserHash;
 DELETE FROM tblPerson;
 DELETE FROM tblPersonRegistration_1;
 DELETE FROM tblPersonEntity_1;
@@ -27,3 +29,10 @@ DELETE FROM tblEntityLinks;
 
 DELETE FROM tblTempEntityStructure;
 DELETE FROM tblTempTreeStructure;
+DELETE FROM tblInvoice;
+DELETE FROM tblWFTaskNotes;
+DELETE FROM tblPayTry;
+DELETE FROM tblITCMessagesLog;
+
+DELETE FROM tblRegoState;
+DELETE FROM tblSavedReports;

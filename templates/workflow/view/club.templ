@@ -37,7 +37,7 @@
             <ul class="nav nav-tabs">
                 <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]><a data-toggle="tab" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i><i class="fa fa-remove documents-rejected documents-approved"></i></span></a></li>
                 <li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" href="#memberdetails">[% Lang.txt('Club Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
-                <li [% IF ActiveTab == 3 %]class="active"[% END %]><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Task Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
+                <li [% IF ActiveTab == 3 %]class="active"[% END %]><a data-toggle="tab" href="#tasknotesdocs">[% Lang.txt('Registration Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></span></a></li>
             </ul>
 
 			<div class="tab-content">
@@ -169,14 +169,14 @@
 	                            [% IF EntityDetails.organizationType %]
 	                                <span class="details-row">
 	                                  <span class="details-left">[% Lang.txt('Organisation type') %]:</span>
-	                                  <span class="details-left detail-value">[% EntityDetails.organizationType %]</span>
+	                                  <span class="details-left detail-value">[% Lang.txt(EntityDetails.organizationTypeName) %]</span>
 	                                </span>
 	                            [% END %]
 
 	                            [% IF EntityDetails.legaltype %]
 	                                <span class="details-row">
 	                                  <span class="details-left">[% Lang.txt('Type of Legal entity') %]:</span>
-	                                  <span class="details-left detail-value">[% EntityDetails.legaltype %]</span>
+	                                  <span class="details-left detail-value">[% Lang.txt(EntityDetails.legaltype) %]</span>
 	                                </span>
 	                            [% END %]
 
@@ -190,14 +190,14 @@
 	                            [% IF EntityDetails.sport %]
 	                                <span class="details-row">
 	                                  <span class="details-left">[% Lang.txt('Sport') %]:</span>
-	                                  <span class="details-left detail-value">[% EntityDetails.sport %]</span>
+	                                  <span class="details-left detail-value">[% Lang.txt(EntityDetails.sportName) %]</span>
 	                                </span>
 	                            [% END %]
 
 	                            [% IF EntityDetails.organizationLevel %]
 	                                <span class="details-row">
 	                                  <span class="details-left">[% Lang.txt('Level') %]:</span>
-	                                  <span class="details-left detail-value">[% EntityDetails.organizationLevel %]</span>
+	                                  <span class="details-left detail-value">[% Lang.txt(EntityDetails.organizationLevelName) %]</span>
 	                                </span>
 	                            [% END %]
 
@@ -205,6 +205,13 @@
 	                                <span class="details-row">
 	                                  <span class="details-left">[% Lang.txt('MA Comment') %]:</span>
 	                                  <span class="details-left detail-value">[% EntityDetails.comment %]</span>
+	                                </span>
+	                            [% END %]
+
+	                            [% IF EntityDetails.bankAccountDetails %]
+	                                <span class="details-row">
+	                                  <span class="details-left">[% Lang.txt('Bank Account Details') %]:</span>
+	                                  <span class="details-left detail-value">[% EntityDetails.bankAccountDetails %]</span>
 	                                </span>
 	                            [% END %]
 

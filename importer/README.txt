@@ -7,17 +7,22 @@ perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import 
 
 from importer/
 ./FIFA_3to2_ISO.pl
-./importer_FixPRs.pl
+./importer_FixPRs.pl ##? Still needed Jervy ??
 ./runAllPlayerPassport.pl
 cd ../automatic -> ./tempEntityStructure.pl
 
-UPDATE tblPerson SET strOtherPersonIdentifier=strPassportNo, intOtherPersonIdentifierTypeID=558019 WHERE (strOtherPersonIdentifier IS NULL or strOtherPersonIdentifier="") and (strPassportNo <> "" and strPassportNo IS NOT NULL) AND intRealmID=1;
+
+#Below are locations of ISO codes that may need adjusting to 2 (in FIFA_3to2_ISO.pl)
+SELECT DISTINCT strISOCountryOfBirth FROM tblPerson WHERE LENGTH(strISOCountryOfBirth) >2;
+SELECT DISTINCT strISONationality FROM tblPerson WHERE LENGTH(strISONationality) >2;
+SELECT DISTINCT strISOCountry FROM tblPerson WHERE LENGTH(strISOCountry) >2;
+
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
+UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
 
 ./importer_AuditLog.pl
-./importer_assignNationalNumber.pl
-./importer_SG_ActiveProducts.pl
+./importer_assignNationalNumber.pl  ## May not be needed
 
 
 ## THEN:

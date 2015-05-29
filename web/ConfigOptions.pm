@@ -359,6 +359,7 @@ sub getFieldsList	{
         strEmergContNo2
         strEmergContRel
         strP1Salutation
+        strGuardianRelationship
         strP1FName
         strP1SName
         intP1Gender
@@ -393,7 +394,6 @@ sub getFieldsList	{
         strOtherPersonIdentifierDesc
         intOtherPersonIdentifierTypeID
         intMinorProtection
-
 
         strNatCustomStr1
         strNatCustomStr2
@@ -440,6 +440,15 @@ sub getFieldsList	{
         intNatCustomBool3
         intNatCustomBool4
         intNatCustomBool5
+
+        strInternationalTransferSourceClub
+        dtInternationalTransferDate
+        strInternationalTransferTMSRef
+        strInternationalLoanSourceClub
+        strInternationalLoanTMSRef
+        dtInternationalLoanFromDate
+        dtInternationalLoanToDate
+
         ));
     return \@memberFields if $fieldtype eq 'Person';
 
@@ -482,6 +491,8 @@ sub getFieldsList	{
         dtTo
         intNotifications
         intFacilityTypeID
+        strBankAccountNumber
+        intAcceptSelfRego
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

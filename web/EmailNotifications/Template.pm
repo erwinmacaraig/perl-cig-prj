@@ -50,54 +50,104 @@ sub retrieve {
     my ($self) = shift;
 
     #LANG should be identified already
-    my $st = qq[
-        SELECT
-            r.strRealmName,
-            ett.strTemplateType,
-            ett.strFileNamePrefix,
-            et.strHTMLTemplatePath,
-            et.strTextTemplatePath,
-            et.strSubjectPrefix,
-            et.intLanguageID,
-            tl.strLocale,
-            toEntity.strEmail as toEntityEmail,
-            toEntity.strContactEmail as toEntityContactEmail,
-            toEntity.strLocalName as toEntityName,
-            toEntity.intNotifications as toEntityNotification,
-            fromEntity.strEmail as fromEntityEmail,
-            fromEntity.strContactEmail as fromEntityContactEmail,
-            fromEntity.strLocalName as fromEntityName,
-            fromEntity.intNotifications as fromEntityNotification,
-            totc.strContactEmail as toClubContactEmail,
-            frtc.strContactEmail as fromClubContactEmail
-        FROM tblEmailTemplateTypes ett
-            INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
-            INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
-            INNER JOIN tblLanguages tl ON (tl.intLanguageID = et.intLanguageID AND tl.intRealmID = ett.intRealmID)
-            INNER JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
-            INNER JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
-            LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
-            LEFT JOIN tblContactRoles tcrp ON (tcrp.intRealmID = ett.intRealmID AND tcrp.strRoleName = 'President')
-            LEFT JOIN tblContacts totc ON (totc.intRealmID = ett.intRealmID AND totc.intClubID = toEntity.intEntityID AND (totc.intContactRoleID = tcrs.intRoleID OR totc.intContactRoleID = tcrp.intRoleID) AND totc.strContactEmail != '')
-            LEFT JOIN tblContacts frtc ON (frtc.intRealmID = ett.intRealmID AND frtc.intClubID = fromEntity.intEntityID AND (frtc.intContactRoleID = tcrs.intRoleID OR frtc.intContactRoleID = tcrp.intRoleID) AND frtc.strContactEmail != '')
-        WHERE
-            ett.intRealmID = ?
-            AND ett.intSubRealmID IN (0, ?)
-            AND ett.strTemplateType = ?
-            AND ett.intActive = 1
-        LIMIT 1
 
-    ];
+    my $st = '';
+    my @params;
+
+    if($self->{_notificationObj}->getToOriginLevel() == 1) {
+        print STDERR Dumper "ORIGIN LEVEL DEFINED";
+        $st = qq[
+            SELECT
+                r.strRealmName,
+                ett.strTemplateType,
+                ett.strFileNamePrefix,
+                ett.strStatus,
+                et.strHTMLTemplatePath,
+                et.strTextTemplatePath,
+                et.strSubjectPrefix,
+                et.intLanguageID,
+                tsu.strEmail as toEntityEmail,
+                CONCAT_WS(' ', tsu.strFirstName, tsu.strFamilyName) as toEntityName,
+                1 as toEntityNotification,
+                fromEntity.strEmail as fromEntityEmail,
+                fromEntity.strContactEmail as fromEntityContactEmail,
+                fromEntity.strLocalName as fromEntityName,
+                fromEntity.intNotifications as fromEntityNotification
+            FROM tblEmailTemplateTypes ett
+                INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
+                INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
+                INNER JOIN tblSelfUser tsu ON (tsu.intSelfUserID = ?)
+                INNER JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
+            WHERE
+                ett.intRealmID = ?
+                AND ett.intSubRealmID IN (0, ?)
+                AND ett.strTemplateType = ?
+                AND ett.intActive = 1
+            LIMIT 1
+        ];
+
+        push @params, $self->{_notificationObj}->getToEntityID();
+        push @params, $self->{_notificationObj}->getFromEntityID();
+        push @params, $self->{_notificationObj}->getRealmID();
+        push @params, $self->{_notificationObj}->getSubRealmID();
+        push @params, $self->{_notificationObj}->getNotificationType();
+
+    }
+    else {
+        print STDERR Dumper "ORIGIN LEVEL NOT DEFINED ";
+        $st = qq[
+            SELECT
+                r.strRealmName,
+                ett.strTemplateType,
+                ett.strFileNamePrefix,
+                ett.strStatus,
+                et.strHTMLTemplatePath,
+                et.strTextTemplatePath,
+                et.strSubjectPrefix,
+                et.intLanguageID,
+                toEntity.strEmail as toEntityEmail,
+                toEntity.strContactEmail as toEntityContactEmail,
+                toEntity.strLocalName as toEntityName,
+                toEntity.intNotifications as toEntityNotification,
+                fromEntity.strEmail as fromEntityEmail,
+                fromEntity.strContactEmail as fromEntityContactEmail,
+                fromEntity.strLocalName as fromEntityName,
+                fromEntity.intNotifications as fromEntityNotification,
+                totc.strContactEmail as toClubContactEmail,
+                frtc.strContactEmail as fromClubContactEmail,
+                CONCAT_WS(' ', tsu.strFirstName, tsu.strFamilyName) as fromSelfUserName
+            FROM tblEmailTemplateTypes ett
+                INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
+                INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
+                LEFT JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
+                LEFT JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
+                LEFT JOIN tblSelfUser tsu ON (tsu.intSelfUserID = ?)
+                LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
+                LEFT JOIN tblContactRoles tcrp ON (tcrp.intRealmID = ett.intRealmID AND tcrp.strRoleName = 'President')
+                LEFT JOIN tblContacts totc ON (totc.intRealmID = ett.intRealmID AND totc.intClubID = toEntity.intEntityID AND (totc.intContactRoleID = tcrs.intRoleID OR totc.intContactRoleID = tcrp.intRoleID) AND totc.strContactEmail != '')
+                LEFT JOIN tblContacts frtc ON (frtc.intRealmID = ett.intRealmID AND frtc.intClubID = fromEntity.intEntityID AND (frtc.intContactRoleID = tcrs.intRoleID OR frtc.intContactRoleID = tcrp.intRoleID) AND frtc.strContactEmail != '')
+            WHERE
+                ett.intRealmID = ?
+                AND ett.intSubRealmID IN (0, ?)
+                AND ett.strTemplateType = ?
+                AND ett.intActive = 1
+            LIMIT 1
+
+        ];
+
+        push @params, $self->{_notificationObj}->getToEntityID();
+        push @params, $self->{_notificationObj}->getFromEntityID();
+        push @params, $self->{_notificationObj}->getFromEntityID();
+        push @params, $self->{_notificationObj}->getRealmID();
+        push @params, $self->{_notificationObj}->getSubRealmID();
+        push @params, $self->{_notificationObj}->getNotificationType();
+    }
+    #tl.strLocale,
+    #INNER JOIN tblLanguages tl ON (tl.intLanguageID = et.intLanguageID AND tl.intRealmID = ett.intRealmID)
 
     #ADD LOCALE CHECK ON tblLanguages or SystemConfig->DefaultLocale or Cookie_Locale
     my $q = $self->{_notificationObj}->getDbh()->prepare($st);
-    $q->execute(
-        $self->{_notificationObj}->getToEntityID(),
-        $self->{_notificationObj}->getFromEntityID(),
-        $self->{_notificationObj}->getRealmID(),
-        $self->{_notificationObj}->getSubRealmID(),
-        $self->{_notificationObj}->getNotificationType()
-    ) or query_error($st);
+    $q->execute(@params) or query_error($st);
 
     my $config = $q->fetchrow_hashref();
     $self->setConfig($config);
@@ -116,37 +166,68 @@ sub build {
         my $realmID = $self->{_notificationObj}->getRealmID() || 'generic';
         my $replace = "__REALMNAME__";
         my $templatePath = (defined $config->{'strHTMLTemplatePath'} and $config->{'strHTMLTemplatePath'}) ? $config->{'strHTMLTemplatePath'} : $config->{'strTextTemplatePath'};
-        $templatePath =~ s/\Q$replace/\E$realmID/g;
-        my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
+        #$templatePath =~ s/\Q$replace/\E$realmID/g;
+        #my $templateFile = $templatePath . '/' . $config->{'strFileNamePrefix'} . '.templ';
+        my $templateFile = $templatePath . $config->{'strFileNamePrefix'} . '.templ';
 
+        #print STDERR Dumper "TEMPLATE FILE " . $templateFile;
         my %Data = (
             lang => $self->{_notificationObj}->getLang(),
             Realm => $self->{_notificationObj}->getRealmID(),
         );
 
+        #print STDERR Dumper $self->{_notificationObj}->getWorkTaskDetails();
         my %TemplateData = (
             To => {
                 email => $config->{'toEntityContactEmail'} ? $config->{'toEntityContactEmail'} : $config->{'toEntityEmail'} ? $config->{'toEntityEmail'} : $config->{'toClubContactEmail'},
                 name => $config->{'toEntityName'},
             },
             From => {
-                email => $self->{_notificationObj}->getDefsEmail() ? $self->{_notificationObj}->getDefsEmail() : $config->{'fromEntityContactEmail'} ? $config->{'fromEntityContactEmail'} : $config->{'fromClubContactEmail'},
+                email => $self->{_notificationObj}->getDefsEmail() ? $self->{_notificationObj}->getDefsEmail() : $config->{'fromEntityEmail'} ? $config->{'fromEntityEmail'} : $config->{'fromEntityContactEmail'},
                 name => $self->{_notificationObj}->getDefsName() ? $self->{_notificationObj}->getDefsName() : $config->{'fromEntityName'},
             },
             CC => {
-                email => undef,
+                email => $self->{_notificationObj}->getWorkTaskDetails()->{'CC'} || '',
                 name => undef,
             },
-            OtherData => {
-            },
+            RecipientName => $config->{'toEntityName'},
+            WorkTaskType => $self->{_notificationObj}->getWorkTaskDetails()->{'WorkTaskType'},
+            Person => $self->{_notificationObj}->getWorkTaskDetails()->{'Person'},
+            Club => $self->{_notificationObj}->getWorkTaskDetails()->{'Club'},
+            Venue => $self->{_notificationObj}->getWorkTaskDetails()->{'Venue'},
+            PersonRegisterTo => $self->{_notificationObj}->getWorkTaskDetails->{'PersonRegisterTo'},
+            ClubRegisterTo => $self->{_notificationObj}->getWorkTaskDetails()->{'ClubRegisterTo'},
+            VenueRegisterTo => $self->{_notificationObj}->getWorkTaskDetails()->{'VenueRegisterTo'},
+
+            Originator => $config->{'fromEntityName'} || $config->{'fromSelfUserName'},
+            SenderName => $config->{'fromEntityName'} || $self->{_notificationObj}->getDefsName() || 'Admin',
+            TemplateFile => $templateFile,
+            Reason => $self->{_notificationObj}->getWorkTaskDetails()->{'Reason'},
+            Status => $config->{'strStatus'},
+            RegistrationType => $self->{_notificationObj}->getWorkTaskDetails->{'RegistrationType'},
+            MA_HeaderName => $self->{_notificationObj}->getData()->{'SystemConfig'}{'EmailNotificationSysName'},
+            SysName => $self->{_notificationObj}->getData()->{'SystemConfig'}{'EmailNotificationSysName'},
+
+            MA_PhoneNumber => $self->{_notificationObj}->getData()->{'SystemConfig'}{'ma_phone_number'},
+            MA_HelpDeskPhone => $self->{_notificationObj}->getData()->{'SystemConfig'}{'help_desk_phone_number'},
+            MA_HelpDeskEmail => $self->{_notificationObj}->getData()->{'SystemConfig'}{'help_desk_email'},
+            MA_Website => $self->{_notificationObj}->getData()->{'SystemConfig'}{'ma_website'},
+
+            #Person Request below
+            CurrentClub => $self->{_notificationObj}->getWorkTaskDetails()->{'CurrentClub'},
+			Requestor => $self->{_notificationObj}->getWorkTaskDetails()->{'Requestor'},
+            RequestingClub => $self->{_notificationObj}->getWorkTaskDetails()->{'RequestingClub'} || $config->{'fromEntityName'},
+            MA => $self->{_notificationObj}->getWorkTaskDetails()->{'MA'} || '',
         );
-	
+
         $content = runTemplate(
-            \%Data,
+            $self->{_notificationObj}->getData(),
             \%TemplateData,
-            $templateFile
+            'emails/' . $templateFile
         );
-        
+
+        $TemplateData{'content'} = $content;
+
         $self->setContent($content);
         $self->setTemplateData(\%TemplateData);
     }

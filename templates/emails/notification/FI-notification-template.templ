@@ -1,0 +1,124 @@
+<html>
+<head>
+  <style type="text/css">
+    /*Email notifications status types*/
+    .status-common{
+
+    }
+    .status-APPROVED{
+      background-color: #009046;
+      background-image: url([% BaseURL %]/images/status-check.png);
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+    .status-CANCELLED{
+      background-color: black;
+      background-image: url([% BaseURL %]/images/status-x.png);
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+    .status-ITCREQUEST{
+      background-color: #0000ff;
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+    .status-PENDING{
+      background-color: #f26522;
+      background-image: url([% BaseURL %]/images/status-gear-white.png);
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+    .status-REASSIGNED{
+      background-image: url([% BaseURL %]/images/status-gear-black.png);
+      color:black;
+      background-color: #00ffff;
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+    .status-REJECTED{
+      background-color: #9e0b0f;
+      background-image: url([% BaseURL %]/images/status-x.png);
+      width: 100px;
+      border-radius: 3px;
+      background-position: 11px center;
+      background-repeat: no-repeat;
+      color: white;
+      padding: 5px 15px 5px 40px;
+    }
+  /*End of Email notifications status types*/
+  </style>
+</head>
+<body leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" bgcolor="#f4f4f4" style="margin:0; padding:0; -webkit-text-size-adjust:none; -ms-text-size-adjust:none;">
+<table cellpadding="0" cellspacing="0" border="0" height="100%" width="100%" bgcolor="#f4f4f4" id="bodyTable" style="border-collapse: collapse;table-layout: fixed;margin:0 auto;"><tr><td>
+
+<!-- CSS Image background in Outlook : BEGIN -->
+<!-- Best used with absolute image paths -->
+<!--[if gte mso 9]>
+  <v:background xmlns:v="urn:schemas-microsoft-com:vml" fill="t">
+    <v:fill type="tile" color="#f4f4f4" src="">
+  </v:background>
+<![endif]-->
+<table border="0" width="680" cellpadding="0" cellspacing="0" align="center" bgcolor="#ffffff" style="border: 1px solid #e5e5e5; margin: auto;" class="email-container">
+<tr style="background-color:#004e7e;"><!--Email header content -->
+</tr>
+<tr style="background-color:#085a8c; ">
+	<td width="50" style="padding-top:8px; padding-bottom:8px; padding-left:40px;">
+	  <h1 style="font-size:25px; font-weight:bold; color:#fff; font-family:arial, sans-serif; top:20px; float:right; margin-top: 35px">[% MA_HeaderName %]</h1>
+	  <img src="[% BaseURL %]/images/emails/img-email-FI-logo.png" border="0" style="width:98px;" />
+	</td>
+<td style="padding-top:8px; padding-bottom:8px;">&nbsp;</td>
+<td style="padding-top:8px; padding-bottom:8px; padding-right: 80px"  width="125">
+  <a href="[% LoginURL || BaseURL %]"><img src="[% BaseURL %]/images/emails/img-email-login-btn.png" border="0" /></a>
+</td>
+</tr>
+
+[% content %]
+
+<tr style="background-color: #085a8c;"><!--Email footer content -->
+  <td valign="top" style="padding-top:30px; padding-bottom:30px; width: 50%">
+    <ul style="font-family:arial, sans-serif; font-size:12px; color:#fff; list-style:none;">
+      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Member Association") %]</strong></li>
+      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Phone") %]:</strong><a href="#" style="color:#fff; text-decoration:none"> [% MA_PhoneNumber %] </a></li>
+      <li style="padding-bottom:8px; color: #fff""><strong>[% Lang.txt("Website") %]:</strong>&nbsp;<a style="color: #fff" href="[% MA_Website %]">[% MA_Website %]</a></li>
+    </ul>
+  </td>
+  <td valign="top" style="padding-top:30px; padding-bottom:30px; width: 50%">
+    <ul style="font-family:arial, sans-serif; font-size:12px; color:#fff; list-style:none;">
+      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Help Desk") %]</strong></li>
+      <li style="padding-bottom:8px;"><strong>[% Lang.txt("Phone") %]:</strong><a href="#" style="color:#fff; text-decoration:none">[% MA_HelpDeskPhone %] </a></li>
+      <li style="padding-bottom:8px; color: #fff""><strong>[% Lang.txt("Email") %]:</strong> <span style="color: #fff"><a style="color: #fff" href="mailto:[% MA_HelpDeskEmail %]">[% MA_HelpDeskEmail %]<a/></span></li>
+    </ul>
+  </td>
+  <td>&nbsp;</td>
+</tr>
+<!--
+<tr style="background-color:#004e7e;">
+<td colspan="3" style="background-color: #004e7e; text-align:center; font-size:11px; color:#95a5a5; font-family:arial; height:23px;">
+  [% Lang.txt("Copyright text goes here") %]
+</td>
+</tr>
+-->
+</table>
+  </table>
+</body>
+</html>

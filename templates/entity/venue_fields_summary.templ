@@ -1,26 +1,26 @@
-    <table class = "table">
-        <thead>
-        <tr>
-            <th>[% Lang.txt('Field Number') %]</th>
-            <th>[% Lang.txt('Field Name') %]</th>
-            <th>[% Lang.txt('Discipline') %]</th>
-            <th>[% Lang.txt('Type of Field') %]</th>
-            <th>[% Lang.txt('Length of Field') %]</th>
-            <th>[% Lang.txt('Width of Field') %]</th>
-            <th>[% Lang.txt('Capacity of Field') %]</th>
-        </tr>
-        </thead>
-        <tbody>
-        [% FOREACH fieldRow IN fieldData %]
-        <tr>
-            <td>[% fieldRow.intFieldOrderNumber %]</td>
-            <td>[% fieldRow.strName %]</td>
-            <td>[% Disciplines.item(fieldRow.strDiscipline) %]</td>
-            <td>[% GroundNature.item(fieldRow.strGroundNature) %]</td>
-            <td>[% fieldRow.dblLength %]</td>
-            <td>[% fieldRow.dblWidth %]</td>
-            <td>[% fieldRow.intCapacity %]</td>
-        </tr>
-        [% END %]
-        </tbody>
-    </table>
+<table class = "table res-table" initial-cols="1-2-3">
+    <thead>
+    <tr class="res-headers">
+        <th>[% Lang.txt('Field Number') %]</th>
+        <th>[% Lang.txt('Field Name') %]</th>
+        <th>[% Lang.txt('Discipline') %]</th>
+        <th>[% Lang.txt('Type of Field') %]</th>
+        <th>[% Lang.txt('Length of Field') %]</th>
+        <th>[% Lang.txt('Width of Field') %]</th>
+        <th>[% Lang.txt('Capacity of Field') %]</th>
+    </tr>
+    </thead>
+    <tbody>
+    [% FOREACH fieldRow IN fieldData %]
+    <tr>
+        <td>[% fieldRow.intFieldOrderNumber %]</td>
+        <td>[% fieldRow.strName %]</td>
+        <td>[% Disciplines.item(fieldRow.strDiscipline) %]</td>
+        <td>[% GroundNature.item(fieldRow.strGroundNature) %]</td>
+        <td>[% fieldRow.dblLength %]</td>
+        <td>[% fieldRow.dblWidth %]</td>
+        <td>[% fieldRow.intCapacity %]</td>
+    </tr>
+    [% END %]
+    </tbody>
+</table>

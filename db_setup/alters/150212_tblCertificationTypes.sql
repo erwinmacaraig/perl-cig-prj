@@ -1,0 +1,1 @@
+ALTER TABLE tblCertificationTypes ADD COLUMN intActiveOrder  TINYINT NOT NULL DEFAULT 0;

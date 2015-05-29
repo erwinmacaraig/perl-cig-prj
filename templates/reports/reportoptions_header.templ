@@ -1,0 +1,57 @@
+<div class = "clearfix report-option-button-row">
+        <div class = "pull-left"><a href = "[% Data.target %]?client=[% Data.client %]&amp;a=REP_CONFIG&amp;RO_SR_load=1&amp;repID=[% SavedReportID %]&amp;rID=[% ReportID %]" class = "btn-inside-panels">[% Lang.txt('Back to Configure') %]</a></div>
+
+        <div class = "pull-right">
+            <a href = "[% Data.target %]?client=[% Data.client %]&amp;a=REP_REPORT&amp;RO_download=1&amp;repID=[% SavedReportID %]&amp;rID=[% ReportID %]" class = "btn-inside-panels">[% Lang.txt('Download CSV') %]</a>
+            <a href = "#" class = "btn-inside-panels btn-saverpt">[% Lang.txt('Save Report') %]</a>
+        </div>
+</div>
+<div id = "savereport-panel" style = "display:none;">
+    <h3 class = "panel-header">[% Lang.txt('Save the report') %]</h3>
+    <div class = "panel-body">
+        <form method = "POST" action = "[% Data.target %]">
+            <div class="form-group">
+                <label class = "col-md-4 control-label txtright" for = "l_repname">[% Lang.txt('Name') %]</label>
+                <div class="col-md-6">
+                    <input type = "text" id = "l_repname" name = "repname">
+                </div>
+            </div>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-md-6">
+              [% Lang.txt('or') %]
+            </div>
+          </div>
+            <div class="form-group">
+                <label class = "col-md-4 control-label txtright" for = "l_replace">[% Lang.txt('Replace Existing Report') %]</label>
+                <div class="col-md-6">
+                    <select id = "l_replace" name = "repreplace">
+                        <option value = ""></option>
+[% FOREACH r = Options.OtherReports %]
+                        <option value = "[% r.0 %]">[% r.1 %]</option>
+[% END %]
+                    </select>
+                </div>
+            </div>
+          <div class="form-group">
+            <div class="col-md-offset-4 col-md-6">
+              <input type = "button" value = "[% Lang.txt('Cancel') %]" class = "btn-inside-panels btn-saverpt">
+              <input type = "submit" value = "[% Lang.txt('Save') %]" class = "btn-inside-panels">
+            </div>
+          </div>
+            <input type = "hidden" name = "client" value = "[% Data.client %]">
+            <input type = "hidden" name = "a" value = "REP_SAVE">
+            <input type = "hidden" name = "repID" value = "[% SavedReportID %]">
+        </form>
+    </div>
+</div>
+<div class = "clearfix"></div>
+<script>
+jQuery(document).ready(function(){
+    jQuery('.btn-saverpt').click(function(e) {
+        jQuery('#savereport-panel').toggle();
+        jQuery('#report-data-wrapper').toggle();
+        e.preventDefault();
+    });
+
+});
+</script>

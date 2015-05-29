@@ -31,6 +31,17 @@ CREATE TABLE tblRegistrationItem (
     strISOCountry_NOTIN varchar(200) DEFAULT NULL,
     intFilterFromAge INT DEFAULT 0,
     intFilterToAge INT DEFAULT 0,
+	intItemNeededITC tinyint default 0 COMMENT 'Was an ITC needed',
+	intItemUsingITCFilter tinyint default 0 COMMENT 'Using ITC filter',
+
+	intItemUsingActiveFilter tinyint default 0 COMMENT 'Using Active Periods filter',
+	strItemActiveFilter varchar(10) default '' COMMENT 'Which Periods to check Active on',
+	intItemActive tinyint default 0 COMMENT 'Active status if Active Periods filter on',
+
+	intItemUsingPaidProductFilter tinyint default 0 COMMENT 'Using Active Products filter',
+	strItemActiveFilterPaidProducts varchar(100) default '' COMMENT 'Which Products to check Active on',
+	intItemPaidProducts tinyint default 0 COMMENT 'Active status if Active Products filter on',
+
     tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 
 
