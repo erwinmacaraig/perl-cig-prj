@@ -677,6 +677,8 @@ sub getRegistrationData	{
             e.intEntityLevel,
 	p.intInternationalTransfer,
 	p.intInternationalLoan,
+	p.dtInternationalLoanFromDate,
+	p.dtInternationalLoanToDate,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
