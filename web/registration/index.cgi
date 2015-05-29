@@ -27,6 +27,7 @@ use AccountProfile;
 
 use SelfUserFlow;
 use SelfUserTransfer;
+use ForgottenPassword;
 use Data::Dumper;
 
 main();
@@ -91,7 +92,7 @@ sub main {
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
 
-    $action = 'LOGIN' if(!$userID and $action ne 'activate');
+    $action = 'LOGIN' if(!$userID and $action ne 'activate' and $action !~/FORGOT/);
     if(!$action and $userID)  {
         $action = 'HOME';
     }
@@ -109,6 +110,9 @@ sub main {
     }
     elsif ($action =~ /activate/) {
         ($resultHTML, $pageHeading) = handleAccountActivation(\%Data, $action);
+    }
+    elsif ($action =~ /FORGOT/) {
+        ($resultHTML, $pageHeading) = handleForgottenPassword(\%Data, $action);
     }
     elsif ($action =~ /P_/) {
         ($resultHTML, $pageHeading) = handleAccountProfile(\%Data, $action);
