@@ -16,11 +16,13 @@ use strict;
 use lib "..","../web","../web/comp", "../web/user", '../web/RegoForm', "../web/dashboard", "../web/RegoFormBuilder",'../web/PaymentSplit', "../web/Clearances";
 
 use Defs;
+use Reg_common;
 use DBI;
 use Utils;
 use ConfigOptions qw(ProcessPermissions);
 use SystemConfig;
 use CGI qw(cookie unescape);
+use AssocTime;
 use ImporterTXNs;
 
 use Log;
@@ -117,15 +119,29 @@ sub insertLOANPersonRequestRecord   {
             )
             AND strRecordType = 'LOAN'
             AND strStatus = 'APPROVED' 
+            ORDER BY dtCommenced DESC
     ];
     ## We only bring in the OPEN "APPROVED" ie: NOT "FINISHED" loans
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
+
+    my %Data;
+    $Data{'db'} = $db;
+    ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+    $Data{'Realm'} ||= 1;
+    getDBConfig( \%Data );
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
+    $Data{'LocalConfig'}  = getLocalConfig( \%Data );
+
+    my $timezone = $Data{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
+
     while (my $dref= $qry->fetchrow_hashref())    {
         my $status = 'COMPLETED';
         my $openLoan = 0;
         if ($dref->{'strStatus'} eq 'APPROVED')   {
-            $status = 'ACTIVE';
+            #$status = 'ACTIVE';
+            #$status = 'ACCEPTED';
             $openLoan = 1;
         }
         
@@ -144,21 +160,24 @@ sub insertLOANPersonRequestRecord   {
             0, #??
             '',
             '0000-00-00',
-            'COMPLETED',
+            'ACCEPTED',
             '',
             0,
-            $status,
+            'COMPLETED',
             $dref->{'dtCommenced'},
             $dref->{'dtExpiry'},
             $openLoan,
             ''
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
-        print STDERR Dumper "ID $ID " . $dref->{'intToPersonRegoID'} . "\n";
+
         if ($ID and $dref->{'intToPersonRegoID'})   {
             my $stUPD = qq[
                 UPDATE tblPersonRegistration_1
-                SET intPersonRequestID = ?, strStatus = IF(dtFrom < NOW() and dtTo>NOW(), 'ACTIVE', 'PASSIVE')
+                SET intPersonRequestID = ?,
+                strPreLoanedStatus = strStatus,
+                strStatus = IF(dtFrom < NOW() and dtTo>NOW(), 'ACTIVE', 'PASSIVE')
+
                 WHERE intPersonRegistrationID = ?
             ];
             my $qryUPD = $db->prepare($stUPD) or query_error($stUPD);

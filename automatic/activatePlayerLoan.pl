@@ -28,11 +28,14 @@ use strict;
         INNER JOIN
             tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
-            pr.strStatus = 'PENDING'
+            pr.strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
             AND DATE_FORMAT(prq.dtLoanFrom, '%Y-%m-%d') <= ?
+            AND DATE_FORMAT(prq.dtLoanFrom, '%Y') = date_format(NOW(), '%Y')
+        ORDER BY
+            prq.intPersonRequestID
     ];
 
     my @personRequestIDs;
