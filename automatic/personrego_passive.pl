@@ -22,13 +22,25 @@ use Data::Dumper;
 
         $st = qq [
             UPDATE
-                tblPersonRegistration_$realm->{'intRealmID'}
+                tblPersonRegistration_$realm->{'intRealmID'} as PR
+		INNER JOIN tblNationalPeriod as NP ON (
+			NP.intNationalPeriodID = PR.intNationalPeriodID
+		)
             SET
-                strStatus = ?
+                PR.strStatus = ?
             WHERE
-                dtTo > '1900-01-01'
-                AND dtTo < DATE(NOW())
-                AND strStatus = 'ACTIVE'
+                (
+			(
+				NP.dtTo > '1900-01-01'
+				AND NP.dtTo < DATE(NOW())
+			)
+			OR
+			(
+				PR.dtTo > '1900-01-01'
+				AND PR.dtTo < DATE(NOW())
+			)
+		)
+                AND PR.strStatus = 'ACTIVE'
         ];
 
         $q = $db->prepare($st);
