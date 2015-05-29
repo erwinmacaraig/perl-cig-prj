@@ -1,6 +1,7 @@
 ## FOR LIVE
 UPDATE tblPaymentConfig SET strGatewayUsername="545178", strGatewayPassword="QbvzGnDAD2qFyywo3SSlEp9D8OiXNsEZK5Mb8EqGCJRi9KMZvZNXbaZPlUjSG2S9rnOcRaY16QtoSdQh" WHERE intPaymentConfigID=3;
 UPDATE tblSystemConfig SET strValue=1 WHERE intSystemConfigID=3955;
+SELECT * FROM tblSystemConfig WHERE strOption  LIKE 'lockAp%'; ##
 
 UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100; 
 
