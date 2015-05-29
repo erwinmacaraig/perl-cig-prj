@@ -993,6 +993,7 @@ sub addRegistration {
             $personRegistrationID,
             'REGO'
         );
+        personInProgressToPending($Data, $Reg_ref->{'personID'});
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -1004,7 +1005,6 @@ sub addRegistration {
             0,
 		$Reg_ref->{'intInternationalTransfer'}
         );
-        personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
   	
  	return ($personRegistrationID, $rc) ;
@@ -1034,18 +1034,18 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-            my $rc = WorkFlow::addWorkFlowTasks(
+        personInProgressToPending($Data, $personID);
+        my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '',
             $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
             0,
-$pr_ref->{'intInternationalTransfer'}
+	    $pr_ref->{'intInternationalTransfer'}
         );
-        personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
         if ($count) {
             my $pr_ref = $regs->[0];

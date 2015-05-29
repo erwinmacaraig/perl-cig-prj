@@ -43,6 +43,9 @@ sub insertCertification {
     $certs{'UEFAA'} = 2;
     $certs{'UEFAB'} = 3;
 
+    $certs{'FAF'} = 33;
+    $certs{'DISTRICT'} = 34;
+
     my $certID = $certs{$personRole} || return;
     $personID || return;
     my $st = qq[
@@ -142,6 +145,10 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
 print "INSER " . $personRole . "\n";
             insertCertification($db, $dref->{'intPersonID'}, $personRole);
             $personRole = ''; ## NEEDS CONFIRMATION
+        }
+        if ($dref->{'strPersonType'} eq 'REFEREE')    {
+            insertCertification($db, $dref->{'intPersonID'}, $personRole);
+            $personRole = '' if ($personRole eq 'FAF' or $personRole eq 'DISTRICT');
         }
 
         

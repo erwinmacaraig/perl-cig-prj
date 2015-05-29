@@ -322,7 +322,7 @@ sub listPersonRecord {
         my $level_list = '""';
         if ($allowedLevels)    {
             my @levels= split /\|/, $allowedLevels;
-            $level_list = join(',',@levels);
+            $level_list = join(",",@levels);
         }
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];

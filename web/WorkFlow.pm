@@ -461,7 +461,9 @@ sub listTasks {
             preqTo.strLocalName as preqToClub,
             pr.intPersonLevelChanged,
             pr.strPreviousPersonLevel,
-            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID
+            IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID,
+            IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', '')) as sysConfigApprovalLockRuleFor,
+            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired
 	    FROM tblWFTask AS t
                 LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
@@ -542,6 +544,10 @@ sub listTasks {
         #FC-409 - don't include in list of taskStatus = REJECTED
         next if ($dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_REJECTED);
 
+        my $sysConfigApprovalLockPaymentRequired = $Data->{'SystemConfig'}{'lockApproval_PaymentRequired_' . $dref->{'sysConfigApprovalLockRuleFor'}};
+        if($sysConfigApprovalLockPaymentRequired and $dref->{'paymentRequired'}){
+            $dref->{'strTaskStatus'} = 'LOCKED';
+        }
         #F-609 - list in dashboard if ON-HOLD and created by == approval entity
         #next if (
         #    $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
@@ -874,15 +880,18 @@ sub addWorkFlowTasks {
         $documentID,
 	$itc
     ) = @_;
-#print STDERR "RRRRRRRRRRRRRR ADD WORK $originLevel E$entityID $personID $personRegistrationID\n";
+
 	
-	$itc ||= 0;
+    $itc ||= 0;
     $entityID ||= 0;
     $personID ||= 0;
     $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
-
+	#
+	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; 
+	# 
+	
 	my $q = '';
 	my $db=$Data->{'db'};
     my $checkOk = 1;
@@ -1003,16 +1012,18 @@ sub addWorkFlowTasks {
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
 			r.strTaskType,
-            r.strWFRuleFor,
+			r.strWFRuleFor,
 			r.intDocumentTypeID,
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			pr.intPersonID,
 			pr.intPersonRegistrationID,
-            pr.intEntityID as RegoEntity,
-            pr.intCreatedByUserID,
-            0 as DocumentID
-		FROM tblPersonRegistration_$Data->{'Realm'} AS pr
+			pr.intEntityID as RegoEntity,
+			pr.intCreatedByUserID,
+			pr.intNewBaseRecord,
+			p.intInternationalLoan,
+			0 as DocumentID
+	FROM tblPersonRegistration_$Data->{'Realm'} AS pr
         INNER JOIN tblPerson as p ON (p.intPersonID = pr.intPersonID)
         INNER JOIN tblEntity as e ON (e.intEntityID = pr.intEntityID)
 		INNER JOIN tblWFRule AS r ON (
@@ -1036,7 +1047,7 @@ sub addWorkFlowTasks {
             AND r.intSubRealmID IN (0, ?)
             AND r.intOriginLevel = ?
             AND r.strEntityType IN ('', e.strEntityType)
-			AND r.strRegistrationNature = ?
+	    AND r.strRegistrationNature = ?
             AND r.strPersonEntityRole IN ('', pr.strPersonEntityRole)
             AND (
                 r.intUsingPersonLevelChangeFilter = 0
@@ -1045,8 +1056,9 @@ sub addWorkFlowTasks {
             )
 		];
 	    $q = $db->prepare($st);
-		$itc ||= 0;
+	    $itc ||= 0;
   	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
+  	   
     }
     if ($ruleFor eq 'ENTITY' and $entityID)  {
         ## APPROVAL FOR ENTITY
@@ -1155,6 +1167,10 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
             my $task = getTask($Data, $qINS->{mysql_insertid});
 			
             my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
+            if($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}){
+		$workTaskType .=  qq[ ($Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'}) ];
+		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT
+            }
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
@@ -1165,14 +1181,14 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'RegistrationType' => $task->{'sysConfigApprovalLockRuleFor'},
             );
-
-            $emailNotification->setRealmID($Data->{'Realm'});
+            
+	    $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
             $emailNotification->setFromEntityID($problemEntityID);
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
-            $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
+            $emailNotification->setNotificationType($notificationType);
             $emailNotification->setSubject($workTaskType);
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
@@ -4132,6 +4148,10 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
+			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the player loan of ") . qq[$task->{'strLocalFirstname'}  $task->{'strLocalSurname'}.];
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration.");
                 $status = $Data->{'lang'}->txt("Rejected");
