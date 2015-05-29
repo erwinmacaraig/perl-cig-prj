@@ -1678,6 +1678,12 @@ sub checkForOutstandingTasks {
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
+
+                my $stp = qq [SELECT * FROM tblPerson WHERE intPersonID = ?];
+                my $qP = $db->prepare($stp); 
+				$qP->execute($personID);
+				my $personref = $qP->fetchrow_hashref();
+
                 if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL)    {
                     PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
                 }
@@ -1701,6 +1707,10 @@ sub checkForOutstandingTasks {
     
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
+                }
+
+                if($ppref->{'intNewBaseRecord'} == 1 and $personref->{'intInternationalLoan'} == 1) {
+                    PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
            ##############################################################################################################

@@ -164,6 +164,8 @@
                                     <span class="details-left detail-value">
                                     [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
                                         [% DateFormat.format(entity.dtFrom,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanFromDate,'MEDIUM') %]
                                     [% ELSE %]
                                         [% DateFormat.format(entity.npdtFrom,'MEDIUM') %]
                                     [% END %]
@@ -177,6 +179,8 @@
                                     <span class="details-left detail-value">
                                     [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
                                         [% DateFormat.format(entity.dtTo,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanToDate,'MEDIUM') %]
                                     [% ELSE %]
                                         [% DateFormat.format(entity.npdtTo,'MEDIUM') %]
                                     [% END %]
