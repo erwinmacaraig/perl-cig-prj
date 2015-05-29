@@ -2356,6 +2356,7 @@ sub activatePlayerLoan {
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
+            PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
             PR.dtFrom = PRQ.dtLoanFrom,
             PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
@@ -2385,8 +2386,9 @@ sub activatePlayerLoan {
         INNER JOIN
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
+            PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = 'PASSIVE',
-            PR.dtTo = NOW(),
+            PR.dtTo = PRQ.dtLoanFrom,
             PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
