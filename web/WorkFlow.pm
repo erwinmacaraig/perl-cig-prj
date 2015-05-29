@@ -2432,6 +2432,7 @@ sub getTask {
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             p.dtDOB AS DOB_RAW,
+            p.intInternationalLoan,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
@@ -3813,7 +3814,7 @@ sub viewSummaryPage {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
             }
-
+	    $TemplateData{'PersonRegistrationDetails'}{'isInternationalPlayerLoan'} = $task->{'intInternationalLoan'};
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
