@@ -197,7 +197,7 @@ sub venue_details   {
        intLocalLanguage => {
           label       => 'Language the name is written in',
           type        => 'lookup',
-          value       => $field->{intLocalLanguage},
+          value       => $field->{intLocalLanguage} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
           options     => \%languageOptions,
           firstoption => [ '', 'Select Language' ],
           compulsory => 1,

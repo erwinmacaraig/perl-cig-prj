@@ -207,7 +207,7 @@ sub personFieldsSetup {
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
-                    value       => $values->{'intLocalLanguage'},
+                    value       => $values->{'intLocalLanguage'} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
                     firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
