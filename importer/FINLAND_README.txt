@@ -1,7 +1,10 @@
 mysql -u root XXX -p < ma_config/cleanDB.sql
 
+
 ### JERVY UPDATE BELOW
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
+
+UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
 
 ###### TEMP TABLE IMPORT SCRIPTS
 ./import_PersonRego.pl
