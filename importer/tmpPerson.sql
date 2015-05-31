@@ -13,6 +13,7 @@ CREATE TABLE tmpPerson(
     strLocalSurname varchar(100) default '',
     strLocalMaidenName varchar(100) default '',
     strLatinFirstname varchar(100) default '',
+    strLatinSurname varchar(100) default '',
     strISONationality varchar(100) default '',
     strISOCountryOfBirth varchar(100) default '',
     strRegionOfBirth varchar(100) default '',
