@@ -11,6 +11,7 @@
                 <td>[% Lang.txt("Gender") %]</td>
                 <td>[% Lang.txt("Nationality") %]</td>
                 <td>[% Lang.txt("Country of Birth") %]</td>
+                <td>[% Lang.txt("Amount Due") %]</td>
             </tr>
         </thead>
     [% FOREACH person IN people %]
@@ -22,6 +23,7 @@
             <td>[% IF person.Gender %] [% person.Gender %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Nationality %] [% person.Nationality %] [% ELSE %] - [% END %]</td>
             <td>[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</td>
+            <td>[% IF person.txnCountPerson and person.AmountDue >= 0 %] [% CurrencyFormat.format(person.AmountDue) %][% ELSE %] - [% END %]</td>
         </tr>
     [% END %]
     </table>
@@ -37,7 +39,22 @@
 		    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
 		    	[% END %]
 		    </ul>
-		    <a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>
+		    <!--<a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>-->
 		  </div>
         </div>
     </div>
+    [% IF DisplayPayment %]
+            <div class="clearfix" style="clear:both;">&nbsp;</div>
+            <div class="col-md-6">
+                <div class="read-only license-details">
+                     <h4>[% Lang.txt('Payment Options') %]</h4>
+                     <div class="read-only-text clearfix">
+                        <ul>
+                            <li><span class="details-left">[% Lang.txt("Total") %]:</span> <span class="detail-value">[% CurrencyFormat.format(payment.totalPaymentDue) %]</span></li>
+                            <li><span class="details-left">[% Lang.txt("Payment Method") %]:</span> <span class="detail-value">[% Lang.txt(payment.paymentMethodText) %]</span></li>
+                        </ul>
+                        <a href="[% editlink %]&amp;rfp=p" class="pull-right">[% Lang.txt('Edit') %]</a>
+                     </div>
+                </div>
+            </div>
+    [% END %]

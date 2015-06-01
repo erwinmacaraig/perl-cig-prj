@@ -178,6 +178,12 @@ sub allowedTo {
     );
     $user->load();
     my $userID = $user->id() || 0;
+
+    if ($userID != $clientValues_ref->{'userID'} and $Data->{'ptry'})   {
+        $Data->{'kickoff'} = 1;
+        $Data->{'db'} = $db;
+        return $db;
+    }
     kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
     my $st = qq[
@@ -564,8 +570,6 @@ sub getDBConfig {
             [ 'Regions',         20,  1, 'Regions'],
             [ 'Zones',           10,  1, "Zone"],
             [ 'Zone',            10,  0, 'Zone'],
-            [ 'Association',     5,   0, 'Assoc'],
-            [ 'Associations',    5,   1, 'Assocs'],
             [ 'Clubs',           3,   1, 'Clubs'],
             [ 'Club',            3,   0, 'Club'],
             [ 'Person',          1,   0, 'Person'],

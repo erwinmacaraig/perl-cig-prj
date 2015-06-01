@@ -54,7 +54,7 @@ sub gatewayTransactions	{
                 $Order{'Status'} = $dref->{'intStatus'};
                 $Order{'TLStatus'} = $dref->{'intStatus'};
                 $Order{'Currency'} = $dref->{'strCurrency'};
-		next if ($dref->{intStatus} >= 1);
+		next if ($dref->{intStatus} == 1 or $dref->{intStatus} == 2);
                 next if ($dref->{TXNStatus} == 1);
                 $Transactions{$count}{'name'} = $dref->{'ProductName'} || next;
                 $Transactions{$count}{'number'} =  Payments::TXNtoTXNNumber($dref->{intTransactionID}); #$dref->{'intTransactionID'};
@@ -77,10 +77,7 @@ sub gatewayTransactions	{
                 $count ++;
         }
         $totalAmount= sprintf("%.2f", $totalAmount);
-warn("TTTTM".$Order{'TotalAmount'} . "--" . $totalAmount);
 		$Order{'Status'}=-1 if ($Order{'TotalAmount'} != $totalAmount);
-warn("STATUS: " . $Order{'Status'});
-#print STDERR "LOGGGGG:$logID $Order{'ClubFormOwner'} | $Data->{'clientValues'}{'authLevel'}\n";
 	return (\%Order, \%Transactions);
 
 }
@@ -90,6 +87,7 @@ sub gatewayTransLog	{
 	my ($Data, $logID) = @_;
 
 	my %Payment=();
+	
 	my $st = qq[
 		SELECT
 			TL.*,
@@ -140,6 +138,7 @@ sub gatewayTransLog	{
 		if ($tref->{'intTableType'} == 3)	{
 			$tref->{'MemberEntityFor'} = $tref->{'EntityName'}
 		}
+        $tref->{'ResponseText'} = $Defs::paymentResponseText{$tref->{'strResponseText'}};
 
 		push @TXNs, $tref;
 	}

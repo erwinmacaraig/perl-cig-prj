@@ -23,8 +23,8 @@ sub savePlayerPassport{
 	my $sth = $Data->{'db'}->prepare($query); 
 	$sth->execute($personID);
 
-	my $query = "SELECT strLocalName FROM tblEntity WHERE intEntityLevel=100 and intRealmID=? LIMIT 1";
-	my $sth = $Data->{'db'}->prepare($query); 
+	$query = "SELECT strLocalName FROM tblEntity WHERE intEntityLevel=100 and intRealmID=? LIMIT 1";
+	$sth = $Data->{'db'}->prepare($query); 
 	$sth->execute($Data->{'Realm'});
     my $MAName = $sth->fetchrow_array() || '';
 	
@@ -55,6 +55,7 @@ sub savePlayerPassport{
             AND PR.strPersonType = 'PLAYER' 
             AND PR.strSport = 'FOOTBALL' 
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
+            AND PR.dtFrom IS NOT NULL
         HAVING
             PRToCalc > When12
         ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom

@@ -1,0 +1,46 @@
+<h2 class="main-heading">[% Lang.txt('Self Registration Dashboard') %]</h2>
+
+<p>[% Lang.txt('Welcome') %] [% Name %] ( <a href = "?a=P_">[% Lang.txt('Update Profile') %]</a>)
+</p>
+
+[% IF PreviousRegistrations.size > 0 %]
+[% Accordion %]
+
+<h2>[% Lang.txt('Add an additional person?') %]</h2>
+[% ELSE %]
+<h2>[% Lang.txt('Who are you registering for?') %]</h2>
+
+[% END %]
+<div class = "row">
+    <div class = "selfreg-regwho col-md-7">
+        [% IF !Found.adult %]
+            <a href = "#" id = "btn-myself" class = "btn-main">[% Lang.txt('Myself') %]</a>
+        [% END %]
+        [% IF !Found.minor %]
+        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
+        [% ELSE %]
+        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+        [% END %]
+    </div>
+    <div class = "col-md-5">&nbsp;</div>
+</div>
+[% IF !Found.adult %]
+    <div id = "selfreg-myselfoptions">
+    <h3>[% Lang.txt('What type of registration do you want?') %]</h3>
+    <div class = "col-md-5">
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=PLAYER" class = "btn-main">[% Lang.txt('Player') %]</a><br>
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=COACH" class = "btn-main">[% Lang.txt('Coach') %]</a><br>
+        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
+    </div>
+[% END %]
+ 
+<script>
+jQuery(document).ready(function()  {
+    jQuery('#btn-myself').click(function()  {
+        jQuery('#selfreg-myselfoptions').show();
+        return false;
+    });
+
+});
+</script>
+

@@ -132,6 +132,7 @@ sub getDefCodes {
     my $assocID    = $params{'assocID'}    || -1;
     my $hideCodes  = $params{'hideCodes'}  || '';
     my $onlyTypes  = $params{'onlyTypes'}  || '';
+    my $locale = $params{'locale'}  || '';
 
     return undef if !$dbh;
     return undef if !$realmID;
@@ -146,11 +147,17 @@ sub getDefCodes {
         SELECT 
             intType, 
             intCodeID, 
-            strName, 
+            COALESCE(LT.strString1,strName) AS strName,
             intSubTypeID,
             intDisplayOrder
         FROM 
             tblDefCodes
+            LEFT JOIN tblLocalTranslations AS LT ON (
+                LT.strType = 'DEFCODES'
+                AND LT.intID = intCodeID
+                AND LT.strLocale = '$locale'
+            )
+
         WHERE 
             intRealmID=?
             AND (intAssocID=? OR intAssocID=0)

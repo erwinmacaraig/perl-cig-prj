@@ -30,6 +30,7 @@ use Log;
 use TTTemplate;
 use Person;
 use Data::Dumper;
+use PersonUtils;
 
 sub bulkPersonRollover {
     my($Data, $nextAction, $bulk_ref, $hidden_ref, $countOnly) = @_;
@@ -93,7 +94,7 @@ sub bulkPersonRollover {
                 AND PRto.strSport = PR.strSport 
                 AND PRto.strPersonLevel= PR.strPersonLevel
                 AND PRto.strPersonEntityRole= PR.strPersonEntityRole
-                AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING")
+                AND PRto.strStatus IN ("$Defs::PERSONREGO_STATUS_ACTIVE", "$Defs::PERSONREGO_STATUS_PASSIVE", "$Defs::PERSONREGO_STATUS_PENDING", "$Defs::PERSONREGO_STATUS_ROLLED_OVER")
                 AND PRto.intEntityID = PR.intEntityID
                 AND PRto.intNationalPeriodID = ?
             )
@@ -122,6 +123,7 @@ sub bulkPersonRollover {
     my @rowdata    = ();
 
     while (my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         next if $newAgeLevel ne $bulk_ref->{'ageLevel'};
         $count++;
@@ -169,7 +171,7 @@ sub bulkPersonRollover {
         },
 
     );
-    my $grid = showGrid(Data=>$Data, columns=>\@headers, rowdata=>\@rowdata, gridid=>'grid', width=>'100%', height=>700);
+    my $grid = showGrid(Data=>$Data, columns=>\@headers, rowdata=>\@rowdata, gridid=>'grid', width=>'100%', height=>700, instanceDestroy=>'true');
 
     my $lang = $Data->{'lang'};
 
@@ -182,6 +184,7 @@ sub bulkPersonRollover {
         target => $Data->{'target'},
         Lang => $lang,
         client => $client,
+        rowcount => scalar(@rowdata),
     );
     $body = runTemplate($Data, \%PageData, 'registration/bulkpersons.templ') || '';
 

@@ -1,6 +1,7 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>[% title %]</title>
 		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="css/spfont.css">
@@ -14,23 +15,26 @@
 }
 </style>
     <![endif]-->
-  <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie.css" />
-  <![endif]-->
-
-  <!--[if lt IE 9]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie_old.css" />
-  <![endif]-->
-
-    
   </head>
-  <body onload="document.loginform.username.focus();" class="membership-login">
+  <body class="membership-login">
     <header>
+<div class="utilities clearfix">
+	<div class="container">
+		<div class="row">
+  			<ul>
+                [% IF LanguageChooser %]
+                <li>[% LanguageChooser %]</li>
+                [% END %]
+  			</ul>
+			</div>
+		</div>
+	</div>
+</div>
       <div class="logo-area clearfix">
         <div class="container">
           <div class="row">
             <div class="col-md-12">
-              <a href="#" title=""><img class="header-logo" src="[% SystemConfig.MA_logo %]" alt="" /></a>[% SystemConfig.HeaderSystemName %]
+              <a href="#" title=""><img class="header-logo" src="[% SystemConfig.MA_logo %]" alt="" /></a><h1>[% SystemConfig.HeaderSystemName %]</h1>
               <ul>
                 <li>
                   <strong>[% Lang.txt('Member Association') %]</strong><br/>
@@ -77,6 +81,7 @@
           <script type="text/javascript" src="js/fc-common.js"></script>
           <script type="text/javascript" src="js/fc-navs.js"></script>
           <script type="text/javascript" src="js/fcToggle.js"></script>
+          <script type="text/javascript" src="js/jscookie.js"></script>
           [% BottomJSFiles %]
           [% BottomJSInline %]
           [% StatsCounter %]

@@ -1,10 +1,10 @@
 package GatewayProcess;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=qw(gatewayProcess payTryRead payTryRedirectBack);
-@EXPORT_OK=qw(gatewayProcess payTryRead payTryRedirectBack);
+@EXPORT=qw(gatewayProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
+@EXPORT_OK=qw(gatewayProcess markTXNSentToGateway markGatewayAsResponded calcPayTryRef);
 
-use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user";
+use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
 use strict;
 use DBI;
@@ -22,83 +22,126 @@ use CGI qw(param unescape escape);
 use ExternalGateway;
 use Gateway_Common;
 use TTTemplate;
+use ClubFlow;
+
 use Data::Dumper;
 
-sub payTryRedirectBack  {
-print STDERR "IN REDIRECT BACK!!\n";
+sub calcPayTryRef	{
+	my ($prefix, $logID) = @_;
 
-    my ($payTry, $client, $logID, $autoRun) = @_;
-
-    $autoRun ||= 0;
-    my $a = $payTry->{'nextPayAction'} || $payTry->{'a'};
-    my $redirect_link = "main.cgi?client=$client&amp;a=$a&amp;run=1&tl=$logID";
-    foreach my $k (keys %{$payTry}) {
-        next if $k eq 'client';
-        next if $k eq 'a';
-        next if $k =~/clubID|teamID|userID|stateID|assocID|intzonID|regionID|zoneID|intregID|authLevel|natID|venueID|authLevel|currentLevel|interID/;
-        next if $k =~/intAmount|dt_end_paid|strComments|paymentType|^act_|dtLog|dt_start_paid|paymentID|dd_|gatewayCount/;
-        next if $k =~/dtype/;
-        next if $k =~/^ss$/;
-        next if $k =~/^cc_submit/;
-        next if $k =~/^pt_submit/;
-        $redirect_link .= "&$k=".$payTry->{$k};
-    }
-    my $body = "HELLO";
-    #print "Content-type: text/html\n\n";
-    #print $body;
-    #print qq[<a href="$redirect_link">LINK</a><br>$redirect_link];
-    return $redirect_link if ! $autoRun;
-
-print STDERR $redirect_link;
-print STDERR "SSSS";
-    print "Status: 302 Moved Temporarily\n";
-    print "Location: $redirect_link\n\n";
-    return;
-
-     print qq[Content-type: text/html\n\n];
-        print qq[
-        <HTML>
-        <BODY>
-        <SCRIPT LANGUAGE="JavaScript1.2">
-            parent.location.href="$redirect_link";
-            noScript = 1;
-        </SCRIPT>
-        </BODY>
-        </HTML>
-        ];
-
+	$prefix ||= '';
+	my $value = $prefix.$logID;
+	
+	return $value;
 }
 
-sub payTryRead  {
+sub markTXNSentToGateway    {
 
-    my ($Data, $logID, $try) = @_;
+    my ($Data, $logID) = @_;
 
-    my $where = qq[intTransLogID = ?];
-    my $id = $logID;
-    if (! $logID and $try)  {
-        $where = qq[intTryID = ?];
-        $id = $try;;
-    }
-    return undef if (! $logID and ! $try);
+    $logID ||= 0;
+    return if (! $logID);
+
+	return if (! $Data->{'SystemConfig'}{'MarkTXN_SentToGateway'});
+
     my $st = qq[
-        SELECT 
-            * 
-        FROM
-            tblPayTry
-        WHERE 
-            $where
+        UPDATE tblTransLog as TL 
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLogs.intTXNID)
+        SET
+            TL.intSentToGateway = 1, 
+            T.intSentToGateway = 1, 
+            TL.intPaymentGatewayResponded = 0, 
+            T.intPaymentGatewayResponded = 0
+        WHERE
+            TL.intLogID = ?
+            AND TL.intStatus=0 
+            AND T.intStatus=0
     ];
+
     my $query = $Data->{'db'}->prepare($st);
-    $query->execute($id);
-    my $href = $query->fetchrow_hashref();
-print STDERR $st;
-    my $values = JSON::from_json($href->{'strLog'});
-    return $values;
+    $query->execute($logID);
+}
+
+sub markGatewayAsResponded  {
+
+    my ($Data, $logID) = @_;
+    return if ! $logID;
+
+    my $stUPD = qq[
+        UPDATE tblTransLog as TL
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as T ON (T.intTransactionID = TXNLogs.intTXNID)
+        SET
+            TL.intPaymentGatewayResponded = 1, T.intPaymentGatewayResponded= 1
+        WHERE
+            TL.intLogID = ?
+	    AND TL.intStatus NOT IN (3)
+    ];
+    my $query = $Data->{'db'}->prepare($stUPD);
+    $query->execute($logID);
+
+
+    my $st = qq[
+        SELECT
+            DISTINCT
+                t.intWFTaskID
+        FROM
+            tblTransLog as TL
+            INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+            INNER JOIN tblTransactions as TXN ON (TXN.intTransactionID = TXNLogs.intTXNID)
+            INNER JOIN tblWFTask as t ON (t.intPersonRegistrationID = TXN.intPersonRegistrationID)
+        WHERE
+            TL.intLogID = ?
+            AND t.intPersonRegistrationID > 0
+            AND TXN.intTableType = $Defs::LEVEL_PERSON
+	    AND TL.intStatus NOT IN (3)
+    ];
+    my $q= $Data->{'db'}->prepare($st);
+    $q->execute($logID);
+    my $dref = $q->fetchrow_hashref();
+    my $taskID = $dref->{'intWFTaskID'} || 0;
+
+    if (! $taskID)  {
+        ## Lets check if its a Club Product
+        $st = qq[
+            SELECT
+                DISTINCT
+                    t.intWFTaskID
+            FROM
+                tblTransLog as TL
+                INNER JOIN tblTXNLogs as TXNLogs ON (TXNLogs.intTLogID = TL.intLogID)
+                INNER JOIN tblTransactions as TXN ON (TXN.intTransactionID = TXNLogs.intTXNID)
+                INNER JOIN tblWFTask as t ON (t.intEntityID= TXN.intID)
+            WHERE
+                TL.intLogID = ?
+                AND TXN.intTableType = $Defs::LEVEL_CLUB
+                AND t.strTaskStatus = 'ACTIVE'
+	    	AND TL.intStatus NOT IN (3)
+        ];
+        $q= $Data->{'db'}->prepare($st);
+        $q->execute($logID);
+        my $dref = $q->fetchrow_hashref();
+        $taskID = $dref->{'intWFTaskID'} || 0;
+    }
+
+    if ($taskID)    {
+        $stUPD = qq[
+            UPDATE tblWFTask
+                SET intPaymentGatewayResponded = 1
+            WHERE
+                intRealmID = ?
+                AND intWFTaskID = ?
+        ];
+        my $qUPD= $Data->{'db'}->prepare($stUPD);
+        $qUPD->execute($Data->{'Realm'}, $taskID);
+    }
+
 }
 
 sub gatewayProcess {
 
-    my ($Data, $logID, $client, $returnVals_ref) = @_;
+    my ($Data, $logID, $client, $returnVals_ref, $check_action) = @_;
 
     my $db = $Data->{'db'};
 	my $action = $returnVals_ref->{'action'} || '';
@@ -115,32 +158,29 @@ sub gatewayProcess {
 
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);
-	 $Order->{'Status'} = $Order->{'TLStatus'} >=1 ? 1 : 0;
+	 $Order->{'Status'} = $Order->{'TLStatus'} ==1 ? 1 : 0;
+print STDERR "ORDER STATUS " . $Order->{'Status'};
   $Data->{'SystemConfig'}{'PaymentConfigID'} = $Data->{'SystemConfig'}{'PaymentConfigUsedID'} ||  $Data->{'SystemConfig'}{'PaymentConfigID'};
 
   my ($paymentSettings, undef) = getPaymentSettings($Data,$Order->{'PaymentType'}, $Order->{'PaymentConfigID'}, $external);
 
-
-    print STDERR $paymentSettings->{'gatewayCode'};
-    ### Might need IF test here per gatewayCode
-  $returnVals_ref->{'ResponseText'} = NABResponseCodes($returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
-  $returnVals_ref->{'ResponseCode'} = $returnVals_ref->{'GATEWAY_RESPONSE_CODE'};
-  if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} =~/^00|08|OK$/)  {
-    $returnVals_ref->{'ResponseCode'} = 'OK';
-  }
-
-
-
+    markGatewayAsResponded($Data, $logID) if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} ne 'HOLD');
+	#return if ($Order->{'Status'} == -1 or $Order->{'Status'} == 1);
 
   {
-    my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
+    #my $chkvalue= param('rescode') . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being sent
+    my $chkvalue= $returnVals_ref->{'GATEWAY_RESPONSE_CODE'} . $Order->{'TotalAmount'}. $logID; ## NOTE: Different to one being senn
     my $m;
     $m = new MD5;
     $m->reset();
+	
+$paymentSettings->{'gatewaySalt'} ||='';
     $m->add($paymentSettings->{'gatewaySalt'}, $chkvalue);
     $chkvalue = $m->hexdigest();
-    warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
-    $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+    #warn "chkv VS. chkvalue :: $chkv :::::  $chkvalue ";
+    unless ($check_action eq 'SUCCESS') {
+        $Order->{'Status'} = -1 if ($chkv ne $chkvalue);
+    }
   }
    my $body='';
 	if ($Order->{'Status'} != 0)	{
@@ -164,9 +204,11 @@ sub gatewayProcess {
 		}
 	}
 	elsif ($action eq '1' or $action eq 'S')	{ ## WAS 'S'
-		$body = ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+
+		$body = ExternalGateway::ExternalGatewayUpdate($Data, $paymentSettings, $client, $returnVals_ref, $logID, $Order->{'AssocID'}); #, $Order, $external, $encryptedID);
+        markGatewayAsResponded($Data, $logID) if ($returnVals_ref->{'GATEWAY_RESPONSE_CODE'} ne 'HOLD');
 	}
-	disconnectDB($db);
+	#disconnectDB($db);
 
  	#print "Content-type: text/html\n\n";
   	#print $body;

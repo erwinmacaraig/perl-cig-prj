@@ -5,7 +5,16 @@
 <input type = "hidden" id = "client" value = "[% client %]">
 <input type = "hidden" id = "eselect" value = "[% EntitySelection %]">
 <input type = "hidden" id = "defvalue_eId" value = "[% DefaultEntity %]">
+<input type = "hidden" id = "clientLevel" value = "[% ClientLevel %]">
+<input type = "hidden" id = "clientID" value = "[% ClientID %]">
+<input type = "hidden" id = "dsport" value = "[% dsport %]">
+<input type = "hidden" id = "dnat" value = "[% dnat %]">
+<input type = "hidden" id = "dentityrole" value = "[% dentityrole %]">
+<input type = "hidden" id = "dlevel" value = "[% dlevel %]">
 
+
+<input type = "hidden" id = "currentoption" value = "">
+<input type = "hidden" id = "optiontrigger" value = "">
 
 <!--We are moving this to the default.templ-->
 <!--<div class = "notavailable" style="display:none;">
@@ -17,7 +26,7 @@
     </div>
 </div>-->
 
-<h3 class="panel-header">Registration</h3>
+<h3 class="panel-header">[% Lang.txt('Registration') %]</h3>
 <div class = "panel-body">
     <div class = "regoptions">
     <fieldset>
@@ -30,7 +39,7 @@
         </div>
         <p class = "existingReg"><a href = "#" class = "btn-inside-panels" id = "reset-btn">[% Lang.txt('Reset Registration') %]</a></p>
 [% END %]
-        <p><span class="notice-error"><span class="compulsory">*</span>Required fields</span></p>
+        <p><span class="notice-error"><span class="compulsory">*</span>[% Lang.txt('Required fields') %]</span></p>
 
         <div class="form-group" id = "l_row_type">
             <label class="col-md-3 control-label txtright" for="l_type"><span class="compulsory">*</span>[% Lang.txt('Role') %]</label>
@@ -68,6 +77,14 @@
             <label class="col-md-3 control-label txtright" for="l_nature"><span class="compulsory">*</span>[% Lang.txt('Nature of Registration') %]</label>
             <div class="col-md-9"><select name = "d_nature" size = "1" id="l_nature" data-type = "nature" class = "fcToggleGroup"></select>[% IF existing.natureName %]<span class = "existingReg">[% existing.natureName %][% END %]</div>
         </div>
+
+        [% IF originLevel == 100 AND AllowMAComment == 1 %]
+        <div class="form-group" id = "l_row_ma_comment">
+            <label class="col-md-3 control-label txtright" for="l_ma_comment">[% Lang.txt('MA Comment') %]</label>
+            <div class="col-md-9"><input name = "d_ma_comment" size = "1" id="l_ma_comment" data-type = "ma_comment" type="text" style="display: none"></input>[% IF existing.natureName %]<span class = "existingReg">[% existing.MAComment %][% END %]</div>
+        </div>
+        [% END %]
+
     </fieldset>
     </div>
     <input type = "hidden" name = "existingReg" value = "[% existingReg %]">
@@ -86,6 +103,7 @@ jQuery(document).ready(function()  {
         jQuery('#ce').val(1);
         jQuery('.existingReg').hide();
         jQuery('#flow-btn-continue').hide();
+        jQuery('#replacedflow-btn-continue').hide();
         update_options('type', '[% dtype %]');
         e.preventDefault();
     });

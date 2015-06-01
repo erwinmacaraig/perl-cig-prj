@@ -537,7 +537,6 @@ sub venue_details   {
       target => $Data->{'target'},
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
       NoHTML => 1, 
       updateSQL => qq[
           UPDATE tblEntity
@@ -1091,7 +1090,7 @@ sub update_venue_fields {
 
     my %flashMessage;
     $flashMessage{'flash'}{'type'} = 'success';
-    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
     #FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 

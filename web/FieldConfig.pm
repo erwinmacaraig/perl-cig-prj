@@ -151,7 +151,7 @@ sub show_fieldconfig {
         my $i;
         for my $f (@$field_list) {
             my $label=$FieldLabels->{$f};
-            $label=$CustomFieldNames->{$f}[0]||'' if !$label;
+            $label=($CustomFieldNames->{$f}[0] || '') if $CustomFieldNames->{$f};
             $label||='';
             $label=$l->txt($label);
             next if !$label;

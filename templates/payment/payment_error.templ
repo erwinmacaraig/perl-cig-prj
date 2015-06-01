@@ -8,25 +8,25 @@
 	<div id="site-wrap" style="padding-left:20px;">
 <br><br>
 		<div id="bodycontent">
-<div style="font-size:14px;color:red;"><b>There was an Error with your Payment.</b></div>
-<div style="font-size:14px;color:red;"><b>See below for details, please close this window and click <b>Pay Now</b> to try again</b></div>
+<div style="font-size:14px;color:red;"><b>[% Lang.txt('There was an Error with your Payment.') %]</b></div>
+<div style="font-size:14px;color:red;"><b>[% Lang.txt('See below for details, please close this window and click Pay Now to try again') %]</b></div>
 <br><br>
 				<table class="confirm-intro">
 				<tbody>
 					<tr>
-						<td>Error:</td>
-						<td><b>[% strResponseText %]</b></td>
+						<td>[% Lang.txt('Error') %]:</td>
+						<td><b>[% ResponseText %]</b></td>
 					</tr>
 					<tr>
-						<td>Amount:</td>
+						<td>[% Lang.txt('Amount') %]:</td>
 						<td>\$[% intAmount %]</td>
 					</tr>
 					<tr>
-						<td>Payment for:</td>
+						<td>[% Lang.txt('Payment for') %]:</td>
 						<td>[% AssocName %] [% ClubName %]</td>
 					</tr>
 					<tr>
-						<td>Payment ID:</td>
+						<td>[% Lang.txt('Payment Reference Number') %]:</td>
 						<td>[% intLogID %]</td>
 					</tr>					
 				</tbody>

@@ -1,0 +1,23 @@
+[% USE Dumper %]
+<!--<div class="row">-->
+    <div class="col-md-3">
+        [% PersonSummaryPanel %]
+        <div class="transfer-denied">[% Lang.txt('Player Loan: Cancelled') %]</div>
+    </div>
+    <div class="col-md-9">
+        <h3 class="panel-header">[% personDetails.firstname %] [% personDetails.surname %]</h3>
+        <div class="panel-body">
+            <br/>
+            <label>[% notifDetails %]</label>
+            <br/>
+            <br/>
+        </div>
+
+        <div class="row top-bottom-spacer">
+            <p style="float: right">
+                <a href="main.cgi?client=[% client %]&amp;a=C_HOME" title="" class="btn-main">[% Lang.txt('Go to your dashboard') %]</a>
+            </p>
+        </div>
+
+    </div>
+<!--</div>-->
