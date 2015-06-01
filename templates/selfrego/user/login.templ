@@ -1,0 +1,32 @@
+    <br /><br />
+    <div class="container">
+        <div class="row">
+            <form method = "POST" action = "user/login.cgi" class="form-signin" role="form" style="border:1px solid #CCC; border-radius:8px; box-shadow: 7px 7px 5px #888888; background-color: #FFF;">
+                <div class="welcomelogin">
+                    <span>[% Lang.txt('Welcome...') %]</span>
+                </div>
+                <hr>
+                <h3 class="form-signin-heading">[% Lang.txt('Sign into Self Registration') %]</h3>
+                <input type = "text" class="form-control" name = "email" placeholder = "[% Lang.txt('Email') %]">
+                <input type = "password" class="form-control" name = "pw" placeholder = "[% Lang.txt('Password') %]">
+                <input type = "hidden" name = "srp" value = "[% srp %]">
+                <input class="btn btn-sm btn-primary pull-right" type = "submit" value = "[% Lang.txt('Sign in') %]">
+                <br /><br />
+                <p><a href = "user/signup.cgi?srp=[% srp %]" >Signup</a></p>
+                <p><a href = "?a=FORGOT&amp;srp=[% srp %]">[% Lang.txt('Forgot your password?')%]</a></p>
+            </form>
+        </div>
+    </div>
+    <br />
+    <center>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                </div>
+                <div class="col-md-12">
+                </div>
+            </div>
+        </div>
+    </center>
+    <br />
+    <br />

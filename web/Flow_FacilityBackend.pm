@@ -31,17 +31,19 @@ use FacilityFieldsSetup;
 use EntitySummaryPanel;
 use UploadFiles;
 use IncompleteRegistrations;
+use Transactions;
 
 sub setProcessOrder {
     my $self = shift;
   
+    my $lang = $self->{'Data'}{'lang'};
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'cd',
             'function' => 'display_core_details',
-            'label'  => 'Venue Details',
             'fieldset'  => 'core',
-            'title'  => 'Facility- Enter Venue Information',
+            'label'  => $lang->txt('Venue Details'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Enter Venue Information'),
         },
         {
             'action' => 'cdu',
@@ -51,9 +53,9 @@ sub setProcessOrder {
         {
             'action' => 'cond',
             'function' => 'display_contact_details',
-            'label'  => 'Contact Details',
             'fieldset'  => 'contactdetails',
-            'title'  => 'Facility - Enter Contact Details',
+            'label'  => $lang->txt('Contact Details'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Enter Contact Details'),
         },
         {
             'action' => 'condu',
@@ -64,8 +66,8 @@ sub setProcessOrder {
             'action' => 'role',
             'function' => 'display_role_details',
             'fieldset' => 'roledetails',
-            'label' => 'Fields',
-            'title'  => 'Facility - Enter Number of Fields',
+            'label'  => $lang->txt('Fields'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Enter Number of Fields'),
         },
         {
             'action' => 'roleu',
@@ -75,8 +77,8 @@ sub setProcessOrder {
         {
             'action' => 'fld',
             'function' => 'display_fields',
-            'title'  => 'Facility - Enter Additional Information',
-            'ShareNav'  => 'Fields',
+            'ShareNav'  => $lang->txt('Fields'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Enter Additional Information'),
         },
         {
             'action' => 'fldu',
@@ -85,8 +87,8 @@ sub setProcessOrder {
         {
             'action' => 'd',
             'function' => 'display_documents',
-            'label'  => 'Documents',
-            'title'  => 'Facility - Upload Documents',
+            'label'  => $lang->txt('Documents'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Upload Documents'),
         },
         {
             'action' => 'du',
@@ -95,14 +97,14 @@ sub setProcessOrder {
         {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => 'Summary',
-            'title'  => 'Facility - Summary',
+            'label'  => $lang->txt('Summary'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Summary'),
         },
         {
             'action' => 'c',
             'function' => 'display_complete',
-            'label'  => 'Complete',
-            'title'  => 'Facility - Submitted',
+            'label'  => $lang->txt('Complete'),
+            'title'  => $lang->txt('Facility') . ' - ' . $lang->txt('Submitted'),
             'NoGoingBack' => 1,
             'NoDisplayInNav' => 1,
         },
@@ -207,7 +209,7 @@ sub validate_core_details {
         $query->execute($entityID, $facilityObj->ID());
 
         $query->finish();
-        createTempEntityStructure($self->{'Data'}); 
+        createTempEntityStructure($self->{'Data'}, 0, $facilityObj->ID()); 
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
@@ -344,7 +346,6 @@ sub display_fields {
 
     my $facilityFieldCount = $self->{'RunParams'}{'facilityFieldCount'} || 0;
 
-print STDERR "SSSS";
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $facilityFields = new EntityFields();
     $facilityFields->setCount($facilityFieldCount);
@@ -482,7 +483,7 @@ sub display_products {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules);
+        $product_body= getRegoProducts($self->{'Data'}, \@prodIDs, 0, $entityID, 0, 0, 0, 0, \%ProductRules, 0, 0);
      }
 
      my %ProductPageData = (

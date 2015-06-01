@@ -197,7 +197,7 @@ sub venue_details   {
        intLocalLanguage => {
           label       => 'Language the name is written in',
           type        => 'lookup',
-          value       => $field->{intLocalLanguage},
+          value       => $field->{intLocalLanguage} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
           options     => \%languageOptions,
           firstoption => [ '', 'Select Language' ],
           compulsory => 1,
@@ -537,7 +537,6 @@ sub venue_details   {
       target => $Data->{'target'},
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
       NoHTML => 1, 
       updateSQL => qq[
           UPDATE tblEntity
@@ -769,7 +768,6 @@ sub listVenues  {
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
     ];
-print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID, $Defs::LEVEL_VENUE);
     my $results=0;
@@ -811,6 +809,7 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
@@ -875,7 +874,7 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
       $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
+      createTempEntityStructure($Data, $Data->{'Realm'}, $id); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
@@ -1091,7 +1090,7 @@ sub update_venue_fields {
 
     my %flashMessage;
     $flashMessage{'flash'}{'type'} = 'success';
-    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
     #FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 

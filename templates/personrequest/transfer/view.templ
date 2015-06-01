@@ -5,21 +5,21 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestFrom %] has requested a transfer for [% personFirstname %] [% personSurname %]. Please approve or reject the request.</p>
+				<p class="transfer-text">[% requestFrom %] [% Lang.txt('[_1] have requested a transfer for [_2]',requestFrom,  personFirstname _ ' ' _ personSurname) %]. [% Lang.txt('Please approve or reject the request') %].</p>
 
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>By approving you are giving access to all of [% personFirstname %] [% personSurname %] player details to [% requestFrom %]</p>
+						<p>[% Lang.txt('By approving you are giving access to all of') %] [% personFirstname %] [% personSurname %] [% Lang.txt ('player details to') %] [% requestFrom %]</p>
 					</div>
 				</div>
 
 
 				<br/>
 		    	<ul class="nav nav-tabs">
-					<li class="active"><a data-toggle="tab" href="#oldclubdetails">Old Club Details</a></li>
-					<li><a data-toggle="tab" href="#playerdetails">Player Details</a></li>
-					<li><a data-toggle="tab" href="#documentsdetails">Documents</a></li>
+					<li class="active"><a data-toggle="tab" href="#oldclubdetails">[% Lang.txt('Old Club Details') %]</a></li>
+					<li><a data-toggle="tab" href="#playerdetails">[% Lang.txt('Player Details') %]</a></li>
+					<li><a data-toggle="tab" href="#documentsdetails">[% Lang.txt('Documents') %]</a></li>
 				</ul>
 				<div class="tab-content">
 					<div id="oldclubdetails" class="tab-pane fade in active">
@@ -154,7 +154,7 @@
                         <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
                         <input type="hidden" name="a" value="[% RequestAction.action %]">
                         <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                        <input class="btn btn-main" type="submit" name="response" value="Accept">
+                        <input class="btn btn-main" type="submit" name="response" value="[% Lang.txt('Accept') $]">
                     </form>
                 
                     <div>
@@ -228,8 +228,8 @@
           </div>
 
           <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">Close</a>
-            <input class="btn-main" type="submit" name="submitb" value="Submit">
+            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
           </div>
       </form>
       
@@ -255,7 +255,7 @@
                 }
             },
             messages: {
-                request_notes: "Please add notes."
+                request_notes: "[% Lang.txt('Please add notes') %]"
             }
         });
     });

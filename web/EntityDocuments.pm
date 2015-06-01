@@ -99,9 +99,9 @@ sub list_entity_docs{
    
     push @rowdata, {  
 	        id => $dref->{'intFileID'} || 0,
-	        strDocumentName => $dref->{'strDocumentName'},
-		    strApprovalStatus => $dref->{'strApprovalStatus'},
-		    ApprovalStatus => $dref->{'ApprovalStatus'},
+	        strDocumentName => $lang->txt($dref->{'strDocumentName'}),
+		    strApprovalStatus => $lang->txt($dref->{'strApprovalStatus'}),
+		    ApprovalStatus => $lang->txt($dref->{'ApprovalStatus'}),
             DateUploaded => $dref->{'DateUploaded'}, 
             ViewDoc => $urlViewButton, 
             ReplaceFile => $replaceLink,              
@@ -111,6 +111,7 @@ sub list_entity_docs{
         {
             name => $lang->txt('Type'),
             field => 'strDocumentName',
+            defaultShow => 1,
         }, 
         {
             name => $lang->txt('Status'),
@@ -124,6 +125,7 @@ sub list_entity_docs{
             name => $lang->txt('View'),
             field => 'ViewDoc',
             type => 'HTML', 
+            defaultShow => 1,
         },
         {
         	name => $lang->txt('Replace'),
@@ -168,13 +170,13 @@ sub list_entity_docs{
 							. qq[
 							  <label>]. $lang->txt('Document Type') . qq[</label>
 		                      <select name="doclisttype" id="doclisttype">
-		                      <option value="0">Misc</option>  
+		                      <option value="0">].$lang->txt('Misc').qq[</option>  
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
         $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
     } 
    $doclisttype .= qq[     </select>                           
-                           <input type="submit" class="btn-inside-panels" value="Add" />
+                           <input type="submit" class="btn-inside-panels" value="].$lang->txt('Add').qq[" />
                            </form>
                     ];
 	
@@ -215,10 +217,13 @@ sub list_entity_docs{
 		{
 			name => $lang->txt('Title'),
 			field => 'Title',
+          defaultShow => 1,
+
 		},
 		{
 			name => $lang->txt('Document Type'),
 			field => 'Name',
+          defaultShow => 1,
 		},
        {
             name => $lang->txt('Size (MB)'),
@@ -236,6 +241,7 @@ sub list_entity_docs{
             name => $lang->txt('View'),
             field => 'View',
             type => 'HTML',
+          defaultShow => 1,
         },
          {
             name => $lang->txt('Delete'),

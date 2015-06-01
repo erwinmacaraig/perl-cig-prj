@@ -8,7 +8,11 @@ require Exporter;
     getRequests
     listRequests
     finaliseTransfer
+    finalisePlayerLoan
     setRequestStatus
+    activatePlayerLoan
+    deactivatePlayerLoan
+    setPlayerLoanValidDate
 );
 
 use lib ".", "..";
@@ -34,8 +38,12 @@ use Switch;
 use SphinxUpdate;
 use InstanceOf;
 use PersonEntity;
+use PersonUtils;
 use TemplateEmail;
 use Flow_DisplayFields;
+use Date::Calc;
+use AssocTime;
+use PlayerPassport;
 
 
 sub handlePersonRequest {
@@ -89,20 +97,44 @@ sub handlePersonRequest {
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
-                'personrequest/generic/search_form.templ',
+                'personrequest/transfer/search_form.templ',
             );
         }
         case 'PRA_R' {
             return;
 
-            $title = $Data->{'lang'}->txt('Request Access to Person Details');
-            $TemplateData{'request_type'} = 'access';
-            $TemplateData{'action'} = 'PRA_getrecord';
+            #$title = $Data->{'lang'}->txt('Request Access to Person Details');
+            #$TemplateData{'request_type'} = 'access';
+            #$TemplateData{'action'} = 'PRA_getrecord';
+            #$body = runTemplate(
+            #    $Data,
+            #    \%TemplateData,
+            #    'personrequest/generic/search_form.templ',
+            #);
+        }
+        case 'PRA_LOAN' {
+            my $loanTypeOption = undef;
+            my $defaultTypeChecked = undef;
+            foreach my $loanType (sort keys %Defs::playerLoanType) {
+                $defaultTypeChecked = 'checked="checked"' if($loanType eq $Defs::LOAN_TYPE_DOMESTIC);
+                $loanTypeOption .= "<input type='radio' name='loan_type' $defaultTypeChecked value='$loanType'>$Defs::playerLoanType{$loanType}</input>";
+                $defaultTypeChecked = '';
+            }
+
+            $title = $Data->{'lang'}->txt('Request/Initiate Player Loan');
+
+            $TemplateData{'action'} = 'PRA_search';
+            $TemplateData{'request_type'} = $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN;
+            $TemplateData{'Lang'} = $Data->{'lang'};
+            $TemplateData{'client'} = $Data->{'client'};
+            $TemplateData{'target'} = $Data->{'target'};
+
             $body = runTemplate(
                 $Data,
                 \%TemplateData,
-                'personrequest/generic/search_form.templ',
+                'personrequest/loan/search_form.templ',
             );
+
         }
         case 'PRA_search' {
             ($body, $title) = listPeople($Data);
@@ -138,6 +170,11 @@ sub handlePersonRequest {
         case 'PRA_F' {
             ($body, $title) = displayCompletedRequest($Data);
         }
+        case 'PRA_CL' {
+            cancelPlayerLoan($Data);
+            my $query = new CGI;
+            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+        }
         else {
         }
     }
@@ -148,14 +185,38 @@ sub handlePersonRequest {
 sub listPeople {
     my ($Data) = @_;
 
+	my $p = new CGI;
+	my %params = $p->Vars();
+    return if !$params{'request_type'};
+
     my $searchKeyword = safe_param('search_keyword','words') || '';
     my $sphinx = Sphinx::Search->new;
     my %results = ();
     my $rawResult = 1;
+    my $searchTemplate = "";
+    my $resultTemplate = "";
+    my $searchType = "";
+
+    switch($params{'request_type'}) {
+        case ['loan', $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN] {
+            $searchType = "loan";
+            $resultTemplate = "personrequest/loan/search_result.templ";
+            $searchTemplate = "personrequest/loan/search_form.templ";
+        }
+        case "transfer" {
+            $searchType = "transfer";
+            $resultTemplate = "personrequest/transfer/search_result.templ";
+            $searchTemplate = "personrequest/transfer/search_form.templ";
+        }
+        else {
+
+        }
+    }
+
 
     my %TemplateData = (
         'action' => 'PRA_search',
-        'request_type' => '',
+        'request_type' => $params{'request_type'},
         'Lang' => $Data->{'lang'},
         'client' => $Data->{'client'},
         'target' => $Data->{'target'},
@@ -169,11 +230,11 @@ sub listPeople {
     $personSearchObj
         ->setRealmID($Data->{'Realm'})
         ->setSubRealmID(0)
-        ->setSearchType("transfer")
+        ->setSearchType($searchType)
         ->setData($Data)
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
-        ->setGridTemplate("personrequest/transfer/search_result.templ");
+        ->setGridTemplate($resultTemplate);
 
     my $resultGrid = $personSearchObj->process();
 
@@ -188,10 +249,10 @@ sub listPeople {
     my $body = runTemplate(
         $Data,
         \%TemplateData,
-        'personrequest/generic/search_form.templ',
+        $searchTemplate,
     );
 
-    return ($body, "Result");
+    return ($body, $Data->{'lang'}->txt("Result"));
 }
 
 sub listPersonRecord {
@@ -257,6 +318,26 @@ sub listPersonRecord {
         ];
         #$limit = qq[ LIMIT 1 ];
     }
+    elsif($requestType eq $Defs::PERSON_REQUEST_LOAN) {
+        my $allowedLevels= $Data->{'SystemConfig'}{'loan_personLevels'};
+        my $level_list = '""';
+        if ($allowedLevels)    {
+            my @levels= split /\|/, $allowedLevels;
+            $level_list = join(",",@levels);
+        }
+        $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
+        $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
+        $orderBy = qq[
+            ORDER BY personLevelWeight
+        ];
+#            ORDER BY
+#                CASE WHEN PR.strPersonType = 'PLAYER' AND PR.strSport = 'FOOTBALL' THEN personLevelWeight END desc,
+#                CASE WHEN PR.strPersonType != 'PLAYER' AND PR.strSport != 'FOOTBALL' THEN PR.dtAdded END asc
+#
+        #$limit = qq[ LIMIT 1 ];
+    }
+
+
 
     my $st = qq[
         SELECT
@@ -481,9 +562,53 @@ sub listPersonRecord {
         $resultHTML = runTemplate(
             $Data,
             \%TemplateData,
-            'personrequest/generic/search_form.templ',
+            'personrequest/transfer/search_form.templ',
             #'personrequest/transfer/selection.templ',
         );
+    }
+    elsif($requestType eq $Defs::PERSON_REQUEST_LOAN) {
+        $resultHTML = ' ';
+        my %TemplateData;
+
+        my $FieldDefinitions= loanRequiredFields($Data);
+        my $obj = new Flow_DisplayFields(
+            Data => $Data,
+            Lang => $Data->{'lang'},
+            SystemConfig => $Data->{'SystemConfig'},
+            Fields =>  $FieldDefinitions,
+        );
+        my ($lReqBody, undef, $lReqHeadJS, undef) = $obj->build({},'edit',1);
+
+        $TemplateData{'groupResult'} = \%groupResult;
+        $TemplateData{'action'} = "PRA_search"; #this uses generic/search_form.templ and action should remain PRA_search
+        #$TemplateData{'action_request'} = "PRA_initRequest";
+        $TemplateData{'action_request'} = "PRA_submit";
+        $TemplateData{'request_type'} = $request_type;
+        $TemplateData{'transfer_type'} = $transferType;
+        $TemplateData{'client'} = $Data->{'client'};
+        $TemplateData{'selectedForLoanDetails'}{'currentClub'} = join(', ', @personCurrentClubs);
+        $TemplateData{'selectedForLoanDetails'}{'loanToClub'} = '';
+        $TemplateData{'selectedForLoanDetails'}{'currentSports'} = join(', ', @personCurrentSports);
+        $TemplateData{'selectedForLoanDetails'}{'currentRegistrations'} = join(', ', @personCurrentRegistrations);
+        $TemplateData{'selectedForLoanDetails'}{'firstName'} = $personFname;
+        $TemplateData{'selectedForLoanDetails'}{'lastName'} = $personLname;
+        $TemplateData{'selectedForLoanDetails'}{'memberID'} = $personMID;
+
+        $lReqBody = qq[
+            <form method="post" action="main.cgi" id = "flowFormID">
+            <div id="hiddenfields" style="display: none"></div>
+            $lReqBody
+            </form>
+        ];
+        $TemplateData{'loanRequiredFields'}{'body'} = $lReqBody;
+
+        $resultHTML = runTemplate(
+            $Data,
+            \%TemplateData,
+            'personrequest/loan/search_form.templ',
+            #'personrequest/transfer/selection.templ',
+        );
+
     }
 
     return ($resultHTML, $title);
@@ -524,7 +649,7 @@ sub initRequestPage {
     $TemplateData{'PersonSummaryPanel'}  = personSummaryPanel($Data, $personID) || '';
 
     if($transferType eq $Defs::TRANSFER_TYPE_INTERNATIONAL) {
-        $title = $Data->{'lang'}->txt("Do you have Player's International Transfer Certificate?");
+        $title = $Data->{'lang'}->txt("Do you have the player's International Transfer Certificate?");
 
         $TemplateData{'noITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PRA_NC">]. $Data->{'lang'}->txt("No") . q[</a></span>];
         $TemplateData{'withITC'} = qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$Data->{'client'}&amp;a=PF_&amp;dtype=PLAYER&amp;itc=1">]. $Data->{'lang'}->txt("Yes") . q[</a></span>];
@@ -572,6 +697,18 @@ sub submitRequestPage {
     my @rowdata = ();
 	my $p = new CGI;
 	my %params = $p->Vars();
+    my $openLoan = ($params{'request_type'} eq 'loan' or $params{'request_type'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) ? 1 : 0;
+
+    my $FieldDefinitions= loanRequiredFields($Data);
+    my $obj = new Flow_DisplayFields(
+        Data => $Data,
+        Lang => $Data->{'lang'},
+        SystemConfig => $Data->{'SystemConfig'},
+        Fields => $FieldDefinitions,
+    );
+
+    my ($userData, $errors) = $obj->gather(\%params, {},'edit');
+
     my @requestIDs;
 
     for my $selectedRego ($p->param()) {
@@ -602,9 +739,11 @@ sub submitRequestPage {
                     (
                         strRequestType,
                         intPersonID,
+                        intExistingPersonRegistrationID,
                         strSport,
                         strPersonType,
                         strPersonLevel,
+                        strNewPersonLevel,
                         strPersonEntityRole,
                         intRealmID,
                         intRequestFromEntityID,
@@ -612,11 +751,21 @@ sub submitRequestPage {
                         intRequestToMAOverride,
                         strRequestNotes,
                         strRequestStatus,
+                        dtLoanFrom,
+                        dtLoanTo,
+                        intOpenLoan,
+                        strTMSReference,
                         dtDateRequest,
                         tTimeStamp
                     )
                     VALUES
                     (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
                         ?,
                         ?,
                         ?,
@@ -641,8 +790,10 @@ sub submitRequestPage {
             $q->execute(
                 $requestType,
                 $personID,
+                $regDetails->{'intPersonRegistrationID'} || 0,
                 $regDetails->{'strSport'},
                 $regDetails->{'strPersonType'},
+                $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonLevel'},
                 $regDetails->{'strPersonEntityRole'},
                 $Data->{'Realm'},
@@ -651,6 +802,10 @@ sub submitRequestPage {
                 $MAOverride,
                 $notes,
                 $Defs::PERSON_REQUEST_STATUS_INPROGRESS,
+                $userData->{'dtLoanStartDate'} || '',
+                $userData->{'dtLoanEndDate'} || '',
+                $openLoan,
+                $userData->{'strTMSReference'} || '',
             );
 
             my $requestID = $db->{mysql_insertid};
@@ -699,7 +854,11 @@ sub submitRequestPage {
 
     my $query = new CGI;
     my $rType = getRequestType();
+		
     print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=PRA_F&rtype=$rType&pr=" . join(',', @requestIDs));
+
+
+
     #my $resultHTML;
     #return ($resultHTML, 'Request Summary');
 }
@@ -717,6 +876,7 @@ sub displayCompletedRequest {
     my $title;
     $title = $Data->{'lang'}->txt("Request a Transfer - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
     $title = $Data->{'lang'}->txt("Request Access (Add Role) - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+    $title = $Data->{'lang'}->txt("Player Loan - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
 
     my %reqFilters = (
         'requestIDs' => \@prids
@@ -735,6 +895,7 @@ sub displayCompletedRequest {
     for my $request (@{$personRequests}) {
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " Request for") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+        $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
         $found = 1;
         if(!$personID) {
             $personID = $request->{'intPersonID'};
@@ -773,6 +934,7 @@ sub displayCompletedRequest {
     $TemplateData{'client'} = $Data->{'client'};
     $TemplateData{'requesttype'} = "Transfer" if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;;
     $TemplateData{'requesttype'} = "Request Access" if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
+    $TemplateData{'requesttype'} = "Player Loan" if $rtype eq $Defs::PERSON_REQUEST_LOAN;
 
     $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
@@ -827,7 +989,7 @@ sub listRequests {
         }
     }
 
-    return ("$found record found.", $title) if !$found;
+    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -932,6 +1094,17 @@ sub viewRequest {
 
             $requestType = $Defs::PERSON_REQUEST_ACCESS;
         }
+        case "$Defs::PERSON_REQUEST_LOAN" {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/loan/new_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/loan/current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_LOAN;
+        }
+
         else {
 
         }
@@ -944,11 +1117,12 @@ sub viewRequest {
     my $maObj = getInstanceOf($Data, 'national');
 
     my $isocountries  = getISOCountriesHash();
+    my $lang = $Data->{'lang'};
     my %TemplateData = (
         'requestID' => $request->{'intPersonRequestID'} || undef,
-        'requestType' => $Defs::personRequest{$request->{'strRequestType'}} || '',
+        'requestType' => $lang->txt($Defs::personRequest{$request->{'strRequestType'}}) || '',
         'requestFrom' => $request->{'requestFrom'} || '',
-        'requestFromDiscipline' => $Defs::entitySportType{$request->{'requestFromDiscipline'}} || '',
+        'requestFromDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestFromDiscipline'}}) || '',
         'requestFromISOCountry' => $isocountries->{$request->{'requestFromISOCountry'}} || '',
         'requestFromAddress' => $request->{'requestFromAddress'} || '',
         'requestFromAddress2' => $request->{'requestFromAddress2'} || '',
@@ -960,7 +1134,7 @@ sub viewRequest {
         'requestFromTo' => $request->{'requestFromTo'} || '',
 
         'requestTo' => $request->{'requestTo'} || '',
-        'requestToDiscipline' => $Defs::entitySportType{$request->{'requestToDiscipline'}} || '',
+        'requestToDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestToDiscipline'}}) || '',
         'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
         'requestToAddress2' => $request->{'requestToAddress2'} || '',
@@ -970,19 +1144,19 @@ sub viewRequest {
         'requestToPhone' => $request->{'requestToPhone'} || '',
 
         'dateRequest' => $request->{'dtDateRequest'} || '',
-        'requestResponse' => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || '',
+        'requestResponse' => $lang->txt($Defs::personRequestResponse{$request->{'strRequestResponse'}}) || '',
         'responseBy' => $request->{'responseBy'} || '',
         'personFirstname' => $request->{'strLocalFirstname'} || '',
         'personSurname' => $request->{'strLocalSurname'} || '',
         'ISONationality' => $isocountries->{$request->{'strISONationality'}} || '',
         'ISOCountryOfBirth' => $isocountries->{$request->{'strISOCountryOfBirth'}} || '',
         'RegionOfBirth' => $request->{'strRegionOfBirth'} || '',
-        'personGender' => $Defs::PersonGenderInfo{$request->{'intGender'} || 0} || '',
+        'personGender' => $lang->txt($Defs::PersonGenderInfo{$request->{'intGender'} || 0}) || '',
         'DOB' => $request->{'dtDOB'} || '',
         'personStatus' => $request->{'personStatus'} || '',
-        'sport' => $Defs::sportType{$request->{'strSport'}} || '',
-        'personType' => $Defs::personType{$request->{'strPersonType'}} || '',
-        'personLevel' => $Defs::personLevel{$request->{'strPersonLevel'}} || '',
+        'sport' => $lang->txt($Defs::sportType{$request->{'strSport'}}) || '',
+        'personType' => $lang->txt($Defs::personType{$request->{'strPersonType'}}) || '',
+        'personLevel' => $lang->txt($Defs::personLevel{$request->{'strPersonLevel'}}) || '',
         'requestNotes' => $request->{'strRequestNotes'} || '',
         'responseNotes' => $request->{'strResponseNotes'} || '',
 
@@ -993,6 +1167,11 @@ sub viewRequest {
 
         'personRegistrationID' => $request->{'intPersonRegistrationID'} || 0,
         'personRegistrationStatus' => $request->{'personRegoStatus'} || 'N/A',
+
+        'loanStartDate' => $request->{'dtLoanFrom'} || '',
+        'loanEndDate' => $request->{'dtLoanTo'} || '',
+        'TMSReference' => $request->{'strTMSReference'} || '',
+
         'MID' => $request->{'strNationalNum'},
 
         'contactAddress1' => $request->{'strAddress1'},
@@ -1046,6 +1225,9 @@ sub viewRequest {
                 $tempClient = setClient( \%tempClientValues );
                 #$action = "PREGF_T";
                 $action = "P_HOME";
+            }
+            case "$Defs::PERSON_REQUEST_LOAN" {
+                $action = "PLF_";
             }
         }
     }
@@ -1194,15 +1376,18 @@ sub setRequestResponse {
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
-            $notifDetails .= $Data->{'lang'}->txt(" You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $notifDetails .= $Data->{'lang'}->txt("You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
         }
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
         }
         elsif($response eq "CANCELLED") {
             $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
+            $templateFile = "personrequest/loan/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;       
         }
 
@@ -1240,6 +1425,10 @@ sub getRequestType {
             return $requestType;
         }
         case 'access' {
+            $requestType = uc($requestType);
+            return $requestType;
+        }
+        case 'loan' {
             $requestType = uc($requestType);
             return $requestType;
         }
@@ -1336,6 +1525,7 @@ sub getRequests {
             pq.strSport,
             pq.strPersonType,
             pq.strPersonLevel,
+            pq.strNewPersonLevel,
             pq.strPersonEntityRole,
             pq.intRealmID,
             pq.intRequestFromEntityID,
@@ -1351,6 +1541,11 @@ sub getRequests {
             pq.strResponseNotes,
             pq.intResponseBy,
             pq.strRequestStatus,
+            pq.dtLoanFrom,
+            pq.dtLoanTo,
+            DATE_FORMAT(pq.dtLoanFrom, '%Y-%m-%d') AS dtLoanFromFormatted,
+            DATE_FORMAT(pq.dtLoanTo, '%Y-%m-%d') AS dtLoanToFormatted,
+            pq.strTMSReference,
             p.strLocalFirstname,
             p.strLocalSurname,
             p.strStatus as personStatus,
@@ -1422,6 +1617,7 @@ sub getRequests {
     my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
         my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         $dref->{'personCurrentAgeLevel'} = $personCurrAgeLevel;
         push @personRequests, $dref;
@@ -1465,18 +1661,16 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel= ?
             AND strSport = ?
             AND intPersonID = ?
             AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
 	];
-            #dtTo= IF(dtTo>NOW(), NOW(), dtTo)
-            #dtFrom = IF(dtFrom>NOW(), NOW(), dtFrom),
+       #AND strPersonLevel= ?
+       #$personRequest->{'strPersonLevel'},
     my $query = $db->prepare($stDates) or query_error($stDates);
     $query->execute(
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($stDates);
@@ -1502,7 +1696,6 @@ sub finaliseTransfer {
             R.intEntityID = ?
             AND R.intNationalPeriodID = ?
             AND R.strPersonType = ?
-            AND R.strPersonLevel= ?
             AND R.strSport = ?
             AND R.intPersonID = ?
             AND R.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
@@ -1512,12 +1705,13 @@ sub finaliseTransfer {
 
     my $qryNP= $db->prepare($stPeriods) or query_error($stPeriods);
     $qryNP->execute($Data->{'Realm'});
+            #AND R.strPersonLevel= ?
+           #$personRequest->{'strPersonLevel'},
     while (my $pref = $qryNP->fetchrow_hashref) {
         $query->execute(
            $personRequest->{'intRequestToEntityID'},
             $pref->{'intNationalPeriodID'},
            $personRequest->{'strPersonType'},
-           $personRequest->{'strPersonLevel'},
            $personRequest->{'strSport'},
            $personRequest->{'intPersonID'}
         ) or query_error($stDates);
@@ -1534,11 +1728,12 @@ sub finaliseTransfer {
         WHERE
             intEntityID = ?
             AND strPersonType = ?
-            AND strPersonLevel = ?
             AND strSport = ?
             AND intPersonID = ?
-            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER', 'PENDING')
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
 	];
+            #AND strPersonLevel = ?
+       #$personRequest->{'strPersonLevel'},
 
 ## Basically Set dtTo = NOW if they left before end of peiod.
 ## If dtFrom is in future (if they never started) that period won't be included in Passport
@@ -1549,20 +1744,66 @@ sub finaliseTransfer {
        $Defs::PERSONREGO_STATUS_TRANSFERRED,
        $personRequest->{'intRequestToEntityID'},
        $personRequest->{'strPersonType'},
-       $personRequest->{'strPersonLevel'},
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
-    my %PE = ();
-    {
-    $PE{'personType'} = $personRequest->{'strPersonType'} || '';
-    $PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
-    $PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
-    $PE{'sport'} = $personRequest->{'strSport'} || '';
-    closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
-    my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
-    addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
-    }
+
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} as PR
+            INNER JOIN tblWFTask as WF ON (WF.intPersonRegistrationID = PR.intPersonRegistrationID)
+        SET
+            WF.strTaskStatus = ?
+        WHERE
+            PR.intEntityID = ?
+            AND WF.strRegistrationNature IN ('NEW', 'RENEWAL')
+            AND PR.strPersonType = ?
+            AND PR.strSport = ?
+            AND PR.intPersonID = ?
+            AND PR.strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       'DELETED',
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+    
+    $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strPreTransferredStatus = strStatus,
+            strStatus = ?
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('PENDING')
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute(
+       $Defs::PERSONREGO_STATUS_DELETED,
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($st);
+
+    #my %PE = ();
+    #{
+    #$PE{'personType'} = $personRequest->{'strPersonType'} || '';
+    #$PE{'personLevel'} = $personRequest->{'strPersonLevel'} || '';
+    #$PE{'personEntityRole'} = $personRequest->{'strPersonEntityRole'} || '';
+    #$PE{'sport'} = $personRequest->{'strSport'} || '';
+    #closePERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestToEntityID'}, '', \%PE);
+    #my $peID = doesOpenPEExist($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE);
+    #addPERecord($Data, $personRequest->{'intPersonID'}, $personRequest->{'intRequestFromEntityID'}, \%PE) if (! $peID)
+    #}
     
 
     if ($personRequest->{'intPersonID'})    {
@@ -1634,7 +1875,7 @@ sub setRequestStatus {
 
         #send to previous club
         $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
     elsif($requestStatus eq $Defs::PERSON_REQUEST_STATUS_COMPLETED) {
@@ -1647,7 +1888,7 @@ sub setRequestStatus {
 
         #send to previous club
         $emailNotification->setToEntityID($request->{'intRequestToEntityID'});
-        my $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
+        $emailTemplate = $emailNotification->initialiseTemplate()->retrieve();
         $emailNotification->send($emailTemplate) if $emailTemplate->getConfig('toEntityNotification') == 1;
     }
 
@@ -1712,7 +1953,7 @@ sub itcFields {
                 	compulsory => 1,  
    		    	},
    		    	strClubName => {   		    	
-   		    		label => 'Club\'s Name',
+   		    		label => 'Club Name',
    		    		type => 'text',
    		    		value => '',
                 	compulsory => 1,  
@@ -1980,6 +2221,334 @@ sub displayGenericError {
     );
 
     return ($body, $titleHeader);
+}
+
+sub loanRequiredFields {
+    my ($Data) = @_;
+
+	my %FieldDefinitions = (		
+        fields => {
+   		    	strSourceClub => {
+   		    		label => $Data->{'lang'}->txt('Source Club'),
+   		    		type => 'text',
+   		    		size  => '50',
+                	compulsory => 1,
+   		    		name => 'strSourceClub',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	dtLoanStartDate => {
+   		    		label => $Data->{'lang'}->txt('Loan Start Date'),
+   		    		type => 'date',
+   		    		size => '20',
+					name => 'dtLoanStartDate',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	dtLoanEndDate => {
+   		    		label => $Data->{'lang'}->txt('Loan End Date'),
+   		    		type => 'date',
+   		    		size => '20',
+					name => 'dtLoanEndDate',
+                    datetype    => 'dropdown',
+                    validate    => 'DATE,DATEMORETHAN:',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+   		    	strTMSReference => {
+   		    		label => $Data->{'lang'}->txt('TMS Reference'),
+   		    		type => 'text',
+   		    		size  => '50',
+                	compulsory => 1,
+   		    		name => 'strSourceClub',
+                	compulsory => 1,  
+                    sectionname => 'loanfields',
+   		    	},
+        },
+        'order' => [qw(
+            dtLoanStartDate
+            dtLoanEndDate
+        )],
+        sections => [
+            [ 'loanfields', 'Loan Information' ],
+        ],
+        client => $Data->{'client'},
+			
+   	); #end of FieldDefinitions
+    return \%FieldDefinitions;
+
+}
+
+sub finalisePlayerLoan {
+    my ($Data, $requestID) = @_;
+
+    my %reqFilters = (
+        'requestID' => $requestID
+    );
+
+    my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
+    my $today = dateatAssoc($timezone);
+    my @requestIDs;
+    my @personIDs;
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my($year_req,$month_req,$day_req) = $personRequest->{'dtLoanFromFormatted'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+    my($year_today,$month_today,$day_today) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+
+    my $validLoanStart = Date::Calc::check_date( $year_req, $month_req, $day_req );
+    my $validToday = Date::Calc::check_date( $year_today, $month_today, $day_today );
+
+    if($validLoanStart and $validToday) {
+        my $deltaDays = Date::Calc::Delta_Days($year_req, $month_req, $day_req, $year_today, $month_today, $day_today);
+        if($deltaDays >= 0) {
+            #activatePlayerLoan must set current loan and record in the previous (lending) club
+            push @requestIDs, $requestID;
+            push @personIDs, $personRequest->{'intPersonID'};
+            activatePlayerLoan($Data, \@requestIDs, \@personIDs);
+        }
+        else {
+            #need to set tblPersonRegistration_ record to PENDING (check WorkFlow::checkForOutstandingTasks)
+            #cron script (activatePlayerLoan must handle other settings)
+
+            my $st = qq [
+                UPDATE tblPersonRegistration_$Data->{'Realm'}
+                SET strStatus = 'PENDING'
+                WHERE
+                    intPersonRequestID = ?
+                    AND strStatus IN ('ACTIVE', 'PENDING')
+            ];
+            #called when dtLoanFrom/dtLoanTo is in the future
+            setPlayerLoanValidDate($Data, $requestID, $personRequest->{'intPersonID'}, undef);
+
+            my $db = $Data->{'db'};
+            my $query = $db->prepare($st) or query_error($st);
+            $query->execute(
+                $personRequest->{'intPersonRequestID'}
+            ) or query_error($st);
+
+            if ($personRequest->{'intPersonID'})    {
+                my $personObject = getInstanceOf($Data, 'person',$personRequest->{'intPersonID'});
+                updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+            }
+        }
+    }
+    else {
+        return;
+    }
+}
+
+sub activatePlayerLoan {
+    my ($Data, $requestIDs, $personIDs) = @_;
+
+
+    #update records for borrowing club
+    my $db = $Data->{'db'};
+    my $idset = join(', ', @{$requestIDs});
+
+    my $bst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+        INNER JOIN
+            tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
+        SET
+            PR.strPreLoanedStatus = PR.strStatus,
+            PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
+            PR.dtFrom = PRQ.dtLoanFrom,
+            PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
+            PR.intNationalPeriodID = NP.intNationalPeriodID
+        WHERE
+            PR.intPersonRequestID = ?
+            AND PRQ.strRequestStatus = 'COMPLETED'
+            AND PR.strStatus IN ('PENDING', 'ACTIVE')
+            AND NP.intDontUseForLoans = 0
+    ];
+
+    foreach my $req (@{$requestIDs})  {
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($req) or query_error($st);
+        if (! $query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($req) or query_error($st);
+        }
+    }
+    
+    #update records for lending club
+    my $lst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+        SET
+            PR.strPreLoanedStatus = PR.strStatus,
+            PR.strStatus = 'PASSIVE',
+            PR.dtTo = PRQ.dtLoanFrom,
+            PR.intIsLoanedOut = 1
+        WHERE
+            PRQ.intPersonRequestID IN ($idset)
+            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+    ];
+
+
+    my $query = $db->prepare($lst) or query_error($lst);
+    $query->execute() or query_error($lst);
+
+
+
+    for my $personID (@{$personIDs}) {
+        savePlayerPassport($Data, $personID);
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
+}
+
+sub deactivatePlayerLoan {
+    my ($Data, $requestIDs, $personIDs) = @_;
+
+    my $db = $Data->{'db'};
+    my $idset = join(', ', @{$requestIDs});
+    my $bst = qq [
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'}
+        SET
+            strStatus = 'PASSIVE',
+            dtTo = IF(NOW() < dtTo, NOW(), dtTo)
+        WHERE
+            intPersonRequestID IN ($idset)
+            AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+    ];
+    my $query = $db->prepare($bst) or query_error($bst);
+    $query->execute() or query_error($bst);
+
+    my $st = qq[
+        UPDATE
+            tblPersonRequest
+        SET 
+            intOpenLoan=0
+        WHERE
+            intPersonRequestID IN ($idset)
+            AND intOpenLoan=1
+    ];
+    $query = $db->prepare($st) or query_error($st);
+    $query->execute() or query_error($st);
+
+    #update records for lending club
+    #my $lst = qq [
+    #    UPDATE
+    #        tblPersonRegistration_$Data->{'Realm'} PR
+    #    INNER JOIN
+    #        tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+    #    SET
+    #        PR.intIsLoanedOut = 0
+    #    WHERE
+    #        PRQ.intPersonRequestID IN ($idset)
+    #        AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+    #];
+
+    #my $query = $db->prepare($lst) or query_error($lst);
+    #$query->execute() or query_error($lst);
+
+    for my $personID (@{$personIDs}) {
+        savePlayerPassport($Data, $personID);
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+    }
+}
+
+sub setPlayerLoanValidDate {
+    my ($Data, $requestID, $personID, $personRegistrationID) = @_;
+    #this function is used by both domestic and international loan
+    #where dtLoanTo and dtLoanFrom are in future
+    my $db = $Data->{'db'};
+
+    if($requestID) {
+        my $bst = qq [
+            UPDATE
+                tblPersonRegistration_$Data->{'Realm'} PR
+            INNER JOIN
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            INNER JOIN
+                tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
+            SET
+                PR.dtFrom = PRQ.dtLoanFrom,
+                PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
+                PR.intNationalPeriodID = NP.intNationalPeriodID
+            WHERE
+                PR.intPersonRequestID = ?
+                AND PR.intPersonID = ?
+                AND PRQ.strRequestStatus = 'COMPLETED'
+                AND PR.strStatus IN ('PENDING', 'ACTIVE')
+                AND NP.intDontUseForLoans = 0
+        ];
+
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport ];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($requestID, $personID) or query_error($st);
+
+        if (!$query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($requestID, $personID) or query_error($st);
+        }
+    }
+    elsif($personRegistrationID) {
+        my $bst = qq [
+            UPDATE
+                tblPersonRegistration_$Data->{'Realm'} PR
+            INNER JOIN
+                tblPerson P ON (P.intPersonID = PR.intPersonID)
+            INNER JOIN
+                tblNationalPeriod NP ON (P.dtInternationalLoanFromDate BETWEEN NP.dtFrom AND NP.dtTo)
+            SET
+                PR.dtFrom = P.dtInternationalLoanFromDate,
+                PR.dtTo = IF(P.dtInternationalLoanToDate <= NP.dtTo, P.dtInternationalLoanToDate, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, P.dtInternationalLoanToDate)),
+                PR.intNationalPeriodID = NP.intNationalPeriodID
+            WHERE
+                PR.intPersonRegistrationID = ?
+                AND PR.intPersonID = ?
+                AND PR.strStatus IN ('PENDING', 'ACTIVE')
+                AND NP.intDontUseForLoans = 0
+        ];
+
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport ];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($personRegistrationID, $personID) or query_error($st);
+
+        if (!$query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($personRegistrationID, $personID) or query_error($st);
+        }
+    }
+}
+
+sub cancelPlayerLoan {
+    my ($Data) = @_;
+
+    my $query = new CGI;
+    my $preqid = safe_param('prqid', 'number') || '';
+
+    my %reqFilters = (
+        'requestID' => $preqid
+    );
+
+    my $personRequest = getRequests($Data, \%reqFilters);
+    $personRequest = $personRequest->[0];
+
+    my @requestIDs;
+    my @personIDs;
+
+    push @requestIDs, $preqid;
+    push @personIDs, $personRequest->{'intPersonID'};
+
+    deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
 }
 
 1;

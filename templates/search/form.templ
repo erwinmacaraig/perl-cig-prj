@@ -1,3 +1,4 @@
+<div id="searchperson-main">
 <div class="search-panel col-md-12">
     [% IF type == 'access' %]
         <p class="subtext">[% Lang.txt('To add a role to a person not at your club, search below') %]</p>
@@ -8,7 +9,7 @@
 	<div class="panel-body">
 		<form id="searchForm" action="main.cgi" method="POST">
 			<span class="formw"><input size="105" type="text" placeholder="[% Lang.txt('Enter a person\'s name or Member ID') %]" name="search_keyword" value="[% search_keyword %]"></span>
-		    <input type="submit" name="submitb" value="Search" class = "btn-inside-panels">   
+		    <input type="submit" name="submitb" value="[% Lang.txt('Search') %]" class = "btn-inside-panels">   
 		    <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
 		    <input type="hidden" value="[% type %]" name="type">
 	    </form>
@@ -31,4 +32,4 @@
         });
     });
 </script>
-
+</div>

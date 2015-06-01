@@ -1,0 +1,18 @@
+							<div class="documents-list">								
+								<table class="table" cellpadding="5" style="width:100%;">
+                                    <thead>
+                                        <tr class="document-table-header">
+                                            <th style="width: 50%">[% Lang.txt('Documents') %]</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>	
+										[% FOREACH doc IN alldocs%]
+											<tr class="task-list">
+                                           	 <td>
+                                                <span class="detail-value">[% doc.strDocumentName %]</span>
+                                             </td>											
+                                       		</tr>
+										[% END %]
+									</tbody>
+								</table>
+							</div>

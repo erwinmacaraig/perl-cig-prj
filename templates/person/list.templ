@@ -1,7 +1,7 @@
 <div class="col-md-12 tasklist-content dashboard-tasklist ">
-    <table id="searchResult" cellpadding="5" class = "table-responsive zebra" style="width: 100%">
+    <table id="searchResult" initial-cols="1-2-3-7" cellpadding="5" class = "res-table table-responsive zebra" style="width: 100%">
         <thead>
-            <tr class="box-header">
+            <tr class="res-headers box-header">
                 <th>[% Lang.txt('MA ID') %]</th>
                 <th>[% Lang.txt('Name') %]</th>
                 <th>[% Lang.txt('Date of Birth') %]</th>
@@ -11,7 +11,7 @@
                 <th>[% Lang.txt('Certificates') %]</th>
                 <th>&nbsp;</th>
             </tr>
-            <tr>
+            <tr class="res-headers">
                 <td>
                     <input style="padding: 5px" class="search-mid" type="text" placeholder="[% Lang.txt('Search MA ID') %]"/>
                 </td>
@@ -103,9 +103,7 @@
     jQuery().ready(function() {
         var table = jQuery("#searchResult").DataTable({
             "dom" : "ilftpr",
-            "language" : {
-                "search": "[% Lang.txt('Filter') %]"
-            },
+            "language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]","infoFiltered":" - [% Lang.txt('filtered from _MAX_ records') %]","infoEmpty":"[% Lang.txt('No entries to show') %]"},
             "aaSorting": [ ]
         });
 

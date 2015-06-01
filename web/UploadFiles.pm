@@ -37,12 +37,29 @@ sub getUploadedFiles	{
 	my $myCurrentLevelValue = $clientValues{'authLevel'};
 	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
+    my $locale = $Data->{'lang'}->getLocale();
 	my $st = qq[
-	SELECT *, tblDocumentType.strDocumentName, UF.strOrigFilename, tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner, DATE_FORMAT(dtUploaded,"%d/%m/%Y %H:%i") AS DateAdded_FMT, tblDocuments.intDocumentTypeID,tblDocuments.intPersonRegistrationID as regoID, tblDocumentType.strLockAtLevel, E.intEntityID as DocoEntityID, E.intEntityLevel as DocoEntityLevel
+	SELECT 
+        *,
+         COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as strDocumentName,
+         UF.strOrigFilename,
+         tblPersonRegistration_$Data->{'Realm'}.intEntityID AS owner,
+         DATE_FORMAT(dtUploaded, "%d/%m/%Y %H:%i") AS DateAdded_FMT,
+         tblDocuments.intDocumentTypeID,
+        tblDocuments.intPersonRegistrationID as regoID,
+         tblDocumentType.strLockAtLevel,
+         E.intEntityID as DocoEntityID,
+         E.intEntityLevel as DocoEntityLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
 	    LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
         LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
         LEFT JOIN tblEntity as E ON (E.intEntityID=tblPersonRegistration_$Data->{'Realm'}.intEntityID)
+        LEFT JOIN tblLocalTranslations AS LT_D ON (
+            LT_D.strType = 'DOCUMENT'
+            AND LT_D.intID = tblDocuments.intDocumentTypeID
+            AND LT_D.strLocale = '$locale'
+        )
+
 	WHERE UF.intEntityTypeID = ? AND UF.intEntityID = ? AND UF.intFileType = ?
 	];
 	
@@ -117,7 +134,7 @@ sub getUploadedFiles	{
 			id => $dref->{'intFileID'} || 0,
 			SelectLink => ' ',
 			Title => $dref->{'strTitle'} || '',
-			DocumentType=> $dref->{'strDocumentName'} || '',
+			DocumentType=> $Data->{'lang'}->txt($dref->{'strDocumentName'}) || '',
 			URL => $url,
 			Delete => $deleteURLButton, 
 			View => $urlViewButton,
@@ -482,10 +499,12 @@ sub deleteFile	{
 		);
 
                 ### DELETE FROM tblDocuments ###
-                $st_d = qq[ DELETE FROM tblDocuments WHERE intUploadFileID = ?]; 
-                $q_d = $Data->{'db'}->prepare($st_d);
-                $q_d->execute( $fileID, );
-                ## END DELETE FROM tblDocuments ### 
+				
+				    $st_d = qq[ DELETE FROM tblDocuments WHERE intUploadFileID = ?]; 
+    	            $q_d = $Data->{'db'}->prepare($st_d);
+    	            $q_d->execute( $fileID, );
+    	            ## END DELETE FROM tblDocuments ### 
+				
 		$q_d->finish();
 		return 1;
 	}

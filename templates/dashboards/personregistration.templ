@@ -1,5 +1,3 @@
-[% USE Dumper %]
-
 <h2 class="section-header">[% Lang.txt('Registrations') %]</h2>
 [% index = 0 %]
 <div class="panel-group" id="accordion">
@@ -14,7 +12,7 @@
                             [% Lang.txt('Registered To') %]
                             [% entity.strLocalName %]
                             [% Lang.txt('as') %]
-                            [% entity.PersonType %]
+                            [% Lang.txt(entity.PersonType) %]
                        
                     [% END %]
                     </a>
@@ -36,14 +34,14 @@
                                         <tr class="document-table-header">
                                             <th style="width: 50%">[% Lang.txt('Document Type') %]</th>
                                             <th style="width: 25%"></th>
-                                            <th style="width: 15%">Status</th>
+                                            <th style="width: 15%">[% Lang.txt('Status') %]</th>
                                         </tr>
                                     </thead>
                                     <tbody>
 									[% FOREACH doc IN entity.alldocs %]	
                                         <tr class="task-list">
                                             <td>
-                                                <span class="detail-value">[%  doc.strDocumentName %]:</span>
+                                                <span class="detail-value">[%  Lang.txt(doc.strDocumentName) %]:</span>
                                             </td>
 											<td class="status-col">
 				
@@ -73,7 +71,7 @@
 													<span class="">[% Lang.txt('Verified') %]</span>
 
 												[% ELSE %]
-													<i><span class="">[% doc.Status %]</span></i>
+													<i><span class="">[% Lang.txt(doc.Status) %]</span></i>
 												[% END %]           
 							                </td>
                                         </tr>
@@ -88,7 +86,7 @@
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Registered To (International Name)') %]:</span>
                                     <span class="details-left detail-value">[% entity.strLatinName %]</span>
-                                </div>
+                                </span>
                             [% END %]
 
                             [% IF entity.intPaymentRequired %]
@@ -100,70 +98,93 @@
                             [% IF entity.strNationalPeriodName %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Registration Period') %]:</span>
-                                    <span class="details-left detail-value">[% entity.strNationalPeriodName %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.strNationalPeriodName) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.RegistrationNature %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Registration Type') %]:</span>
-                                    <span class="details-left detail-value">[% entity.RegistrationNature %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.RegistrationNature) %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt('Lending Club') %]:</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.requestToEntityName) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.Status %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Status') %]:</span>
-                                    <span class="details-left detail-value">[% entity.Status %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.Status) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.Sport %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Sport') %]:</span>
-                                    <span class="details-left detail-value">[% entity.Sport %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.Sport) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.PersonType %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Type') %]:</span>
-                                    <span class="details-left detail-value">[% entity.PersonType %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.PersonType) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.strEntityRoleName %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Role') %]:</span>
-                                    <span class="details-left detail-value">[% entity.strEntityRoleName %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.strEntityRoleName) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.PersonLevel %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Level') %]:</span>
-                                    <span class="details-left detail-value">[% entity.PersonLevel %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.PersonLevel) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.AgeLevel %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Age Level') %]:</span>
-                                    <span class="details-left detail-value">[% entity.AgeLevel %]</span>
+                                    <span class="details-left detail-value">[% Lang.txt(entity.AgeLevel) %]</span>
                                 </span>
                             [% END %]
 
                             [% IF entity.npdtFrom and entity.npdtFrom != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid From') %]:</span>
-                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtFrom,'MEDIUM') %]</span>
+                                    <span class="details-left detail-value">
+                                    [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                        [% DateFormat.format(entity.dtFrom,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanFromDate,'MEDIUM') %]
+                                    [% ELSE %]
+                                        [% DateFormat.format(entity.npdtFrom,'MEDIUM') %]
+                                    [% END %]
+                                    </span>
                                 </span>
                             [% END %]
 
                             [% IF entity.npdtTo and entity.npdtTo != '0000-00-00' %]
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Valid To') %]:</span>
-                                    <span class="details-left detail-value">[% DateFormat.format(entity.npdtTo,'MEDIUM') %]</span>
+                                    <span class="details-left detail-value">
+                                    [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                                        [% DateFormat.format(entity.dtTo,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanToDate,'MEDIUM') %]
+                                    [% ELSE %]
+                                        [% DateFormat.format(entity.npdtTo,'MEDIUM') %]
+                                    [% END %]
+                                    </span>
                                 </span>
                             [% END %]
 
@@ -174,9 +195,24 @@
                                 </span>
                             [% END %]
 
-                            [% IF entity.renew_link and enableRenew %]
+                            [% IF entity.intOriginLevel == 100 %]
+                                <span class="details-row">
+                                    <span class="details-left">[% Lang.txt("MA Comment") %]:</span>
+                                    <span class="details-left detail-value">[% IF entity.strShortNotes %] [% entity.strShortNotes %] [% ELSE %] - [% END %]</span>
+                                </span>
+                            [% END %]
+
+                            [% IF enableRenew %]
                                 <div class="pull-right">
+                                [% IF entity.changelevel_link and enableRenew %]
+                                    <span class=""><a class="btn-inside-panels" href="[% entity.changelevel_link %]">[% entity.changelevel_button %]</a></span>
+                                [% END %]
+                                [% IF entity.renew_link and enableRenew %]
                                     <span class=""><a class="btn-inside-panels" href="[% entity.renew_link %]">[% Lang.txt('Renew Registration') %]</a></span>
+                                [% END %]
+                                [% IF entity.cancel_loan_link and enableRenew %]
+                                    <span class=""><a class="btn-inside-panels" href="[% entity.cancel_loan_link %]">[% Lang.txt('Cancel Player Loan') %]</a></span>
+                                [% END %]
                                 </div>
                             [% END %]
                         </div>

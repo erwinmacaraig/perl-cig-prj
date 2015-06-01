@@ -59,13 +59,17 @@ sub listPersonAuditLog    {
                 OR P.intPersonID=?
             )
             AND AL.strSection NOT IN ('Person Entity')
-            AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration", "WFTask")
+            AND (
+                AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
+                OR (AL.strSection = "WFTask" AND WFT.intPersonID=?)
+            )
         ORDER BY 
             AL.dtUpdated DESC
     
 	];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
+        $personID,
         $personID,
         $personID,
         $personID,
@@ -89,7 +93,7 @@ sub listPersonAuditLog    {
 	};
 	 my $title = '';
 	 my $resultHTML = runTemplate($Data, $PageContent, 'person/auditlog.templ') || '';
-	 $title = 'Audit Trail';
+	 $title = $Data->{'lang'}->txt('Audit Trail');
 	 return ($resultHTML, $title);
 }
 sub listEntityAuditLog {
@@ -120,13 +124,17 @@ sub listEntityAuditLog {
                 OR WFT.intEntityID=? 
                 OR E.intEntityID=?
             )
-            AND AL.strSection IN ("Imported", "Club", "Entity", "Venue", "WFTask")
+            AND (
+                AL.strSection IN ("Imported", "Club", "Entity", "Venue")
+                OR (AL.strSection = "WFTask" AND WFT.intEntityID=?)
+            )
         ORDER BY 
             AL.dtUpdated DESC
     
 	];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
+        $entityID,
         $entityID,
         $entityID,
         $entityID,

@@ -3,6 +3,7 @@ CREATE TABLE `tblProducts` (
   `intProductID` int(11) NOT NULL AUTO_INCREMENT,
    strProductCode varchar(20) default '',
    strProductType varchar(20) default '', /*LICENCE, INSURANCE, OTHER etc..*/
+  `strDisplayName` varchar(100) DEFAULT '',
   `strName` varchar(100) DEFAULT '',
   `curDefaultAmount` decimal(12,2) DEFAULT '0.00',
   `intMinChangeLevel` int(11) DEFAULT '0',
@@ -48,6 +49,8 @@ CREATE TABLE `tblProducts` (
   `strNationality_IN` VARCHAR(200) NULL COMMENT 'Product visibility per IOS Nationality',
   `strNationality_NOTIN` VARCHAR(200) NULL COMMENT 'Product Invisibility',
     intCanResetPaymentRequired TINYINT DEFAULT 0,
+    intMinAddSingleTXNLevel TINYINT DEFAULT 0,
+
   PRIMARY KEY (`intProductID`),
   KEY `index_intEntityID` (`intEntityID`),
   KEY `index_intRealmID` (`intRealmID`),

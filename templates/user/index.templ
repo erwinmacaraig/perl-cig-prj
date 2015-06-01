@@ -1,12 +1,14 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
 <html>
   <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <title>[% title %]</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 		<script src = "https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="css/spfont.css">
-    <link rel="stylesheet" type="text/css" href="css/style.css">
-    <link rel="stylesheet" href="css/fc_styles.css">
-    <link rel="stylesheet" href="css/custom.css">
+		<link rel="stylesheet" type="text/css" href="[% DirPrefix %]css/spfont.css">
+    <link rel="stylesheet" type="text/css" href="[% DirPrefix %]css/style.css">
+    <link rel="stylesheet" href="[% DirPrefix %]css/fc_styles.css">
+    <link rel="stylesheet" href="[% DirPrefix %]css/custom.css">
   <!--[if lt IE 8]>
   <style>
 .membership-login .auth-row input.fields {
@@ -14,23 +16,26 @@
 }
 </style>
     <![endif]-->
-  <!--[if IE]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie.css" />
-  <![endif]-->
-
-  <!--[if lt IE 9]>
-    <link rel="stylesheet" type="text/css" href="css/passport_ie_old.css" />
-  <![endif]-->
-
-    
   </head>
-  <body onload="document.loginform.username.focus();" class="membership-login">
+  <body class="membership-login">
     <header>
+<div class="utilities clearfix">
+	<div class="container">
+		<div class="row">
+  			<ul>
+                [% IF LanguageChooser %]
+                <li>[% LanguageChooser %]</li>
+                [% END %]
+  			</ul>
+			</div>
+		</div>
+	</div>
+</div>
       <div class="logo-area clearfix">
         <div class="container">
           <div class="row">
             <div class="col-md-12">
-              <a href="#" title=""><img class="header-logo" src="[% SystemConfig.MA_logo %]" alt="" /></a>[% SystemConfig.HeaderSystemName %]
+              <a class="logo-container" href="#" title=""><img class="header-logo" src="[% DirPrefix %][% SystemConfig.MA_logo %]" alt="" /></a><h1>[% SystemConfig.HeaderSystemName %]</h1>
               <ul>
                 <li>
                   <strong>[% Lang.txt('Member Association') %]</strong><br/>
@@ -72,11 +77,12 @@
         -->
             </div>
           </div>
-          <script type="text/javascript" src="js/reg.js"></script>
-          <script type="text/javascript" src="js/chosen/chosen.jquery.min.js"></script>
-          <script type="text/javascript" src="js/fc-common.js"></script>
-          <script type="text/javascript" src="js/fc-navs.js"></script>
-          <script type="text/javascript" src="js/fcToggle.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/reg.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/chosen/chosen.jquery.min.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/fc-common.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/fc-navs.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/fcToggle.js"></script>
+          <script type="text/javascript" src="[% DirPrefix %]js/jscookie.js"></script>
           [% BottomJSFiles %]
           [% BottomJSInline %]
           [% StatsCounter %]

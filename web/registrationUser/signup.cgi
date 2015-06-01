@@ -59,8 +59,8 @@ sub signup  {
     my($Data) = @_;
 
     my %fields = (
-        firstname => $Data->{'lang'}->txt('First name'),
-        familyname => $Data->{'lang'}->txt('Family name'),
+        firstname => $Data->{'lang'}->txt('First Name'),
+        familyname => $Data->{'lang'}->txt('Family Name'),
         email => $Data->{'lang'}->txt('Email'),
         password => $Data->{'lang'}->txt('Password 1'),
         password2 => $Data->{'lang'}->txt('Password 2'),

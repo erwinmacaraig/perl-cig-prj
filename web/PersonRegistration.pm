@@ -17,6 +17,8 @@ require Exporter;
     cleanPlayerPersonRegistrations
 );
 use strict;
+use lib "..",".";
+
 use WorkFlow;
 #use Log;
 use RuleMatrix;
@@ -29,6 +31,7 @@ use AuditLog;
 use Reg_common;
 use PersonCertifications;
 use PersonEntity;
+use PersonUtils;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -46,16 +49,16 @@ sub cleanPlayerPersonRegistrations  {
     );
 
     return if (! $count);
-    my %PE = ();
-    {
-        my $entityID = $reg_ref->[0]{'intEntityID'};
-        $PE{'personType'} = $reg_ref->[0]{'strPersonType'} || '';
-        $PE{'personLevel'} = $reg_ref->[0]{'strPersonLevel'} || '';
-        $PE{'personEntityRole'} = $reg_ref->[0]{'strPersonEntityRole'} || '';
-        $PE{'sport'} = $reg_ref->[0]{'strSport'} || '';
-        my $peID = doesOpenPEExist($Data, $personID, $entityID, \%PE);
-        addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
-    }
+    #my %PE = ();
+    #{
+    #    my $entityID = $reg_ref->[0]{'intEntityID'};
+    #    $PE{'personType'} = $reg_ref->[0]{'strPersonType'} || '';
+    #    $PE{'personLevel'} = $reg_ref->[0]{'strPersonLevel'} || '';
+    #    $PE{'personEntityRole'} = $reg_ref->[0]{'strPersonEntityRole'} || '';
+    #    $PE{'sport'} = $reg_ref->[0]{'strSport'} || '';
+    #    my $peID = doesOpenPEExist($Data, $personID, $entityID, \%PE);
+    #    addPERecord($Data, $personID, $entityID, \%PE) if (! $peID)
+    #}
     
 
 
@@ -85,8 +88,8 @@ sub cleanPlayerPersonRegistrations  {
         $Month++;
         $thisRego->{'dtTo'} = "$Year-$Month-$Day" if (! $rego->{'dtTo'} or $rego->{'dtTo'} eq '0000-00-00');
 
-        $PE{'personLevel'} = $thisRego->{'strPersonLevel'} || '';
-        closePERecord($Data, $personID, $thisRego->{'intEntityID'}, '', \%PE);
+        #$PE{'personLevel'} = $thisRego->{'strPersonLevel'} || '';
+        #closePERecord($Data, $personID, $thisRego->{'intEntityID'}, '', \%PE);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
@@ -110,10 +113,10 @@ sub rolloverExistingPersonRegistrations {
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
-        personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
         status=> $Defs::PERSONREGO_STATUS_ACTIVE,
     );
+        #personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
         $Data,
@@ -229,12 +232,15 @@ sub checkRenewalRegoOK  {
         $Data->{'Realm'},
         $Data->{'RealmSubType'},
         $rego_ref->{'originLevel'},
-        '',
+        'RENEWAL',
         $rego_ref->{'personType'} || '',
         '',
         $rego_ref->{'personEntityRole'} || '',
+        '',
         $rego_ref->{'personLevel'} || '',
+        '',
         $rego_ref->{'sport'} || '',
+        '',
         $rego_ref->{'ageLevel'} || '',
         $rego_ref->{'personID'},
         $rego_ref->{'entityID'},
@@ -259,10 +265,10 @@ sub checkRenewalRegoOK  {
         sport=> $rego_ref->{'sport'} || '',
         personType=> $rego_ref->{'personType'} || '',
         personEntityRole=> $rego_ref->{'personEntityRole'} || '',
-        personLevel=> $rego_ref->{'personLevel'} || '',
         statusIN => \@statusIN,
         entityID=> $rego_ref->{'entityID'} || 0,
     );
+        #personLevel=> $rego_ref->{'personLevel'} || '',
 
 
     my ($count, undef) = getRegistrationData(
@@ -626,10 +632,22 @@ sub getRegistrationData	{
         push @values, $regFilters_ref->{'entityID'};
         $where .= " AND pr.intEntityID= ? ";
     }
+    if(exists $regFilters_ref->{'originLevel'})  {
+        push @values, $regFilters_ref->{'originLevel'};
+        $where .= " AND pr.intOriginLevel = ? ";
+    }
 
     my $st= qq[
         SELECT 
             pr.*, 
+            prq.intPersonRequestID,
+            prq.dtLoanFrom,
+            prq.dtLoanTo,
+            prq.strRequestNotes,
+            prq.intOpenLoan,
+            existprq.intPersonRequestID as existPersonRequestID,
+            existprq.intOpenLoan as existOpenLoan,
+            eprq.strLocalName as requestToEntityName,
 			np.strNationalPeriodName,
 			np.dtFrom as npdtFrom,
 			np.dtTo as npdtTo,
@@ -655,13 +673,18 @@ sub getRegistrationData	{
             e.strLocalName,
             e.intEntityLevel,
             e.strLatinName,
+            e.strEntityType,
             e.intEntityLevel,
+	p.intInternationalTransfer,
+	p.intInternationalLoan,
+	p.dtInternationalLoanFromDate,
+	p.dtInternationalLoanToDate,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
             LEFT JOIN tblTransactions as T ON (
                 T.intPersonRegistrationID = pr.intPersonRegistrationID
-                AND T.intStatus = 0
+                AND T.intStatus <> 1
             )
             LEFT JOIN tblNationalPeriod as np ON (
                 np.intNationalPeriodID = pr.intNationalPeriodID
@@ -676,6 +699,16 @@ sub getRegistrationData	{
             INNER JOIN tblPerson as p ON (
                 p.intPersonID = pr.intPersonID
             )	
+            LEFT JOIN tblPersonRequest prq ON (
+                prq.intPersonRequestID = pr.intPersonRequestID
+            )
+            LEFT JOIN tblPersonRequest existprq ON (
+                existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
+            )
+            LEFT JOIN tblEntity eprq ON (
+                eprq.intEntityID = prq.intRequestToEntityID
+            )
+
 			
         WHERE     
             p.intPersonID = ?
@@ -694,7 +727,11 @@ sub getRegistrationData	{
 	
     my @Registrations = ();
     my @reg_docs = ();  
+    my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
+        my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
+        my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
+
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
         $dref->{'personType'} = $dref->{'strPersonType'} || '';
@@ -705,14 +742,33 @@ sub getRegistrationData	{
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'changeLevel'} = $dref->{'intPersonLevelChanged'} || 0;
+        $dref->{'PreviousPersonLevel'} = $Defs::personLevel{$dref->{'strPreviousPersonLevel'}} || '';
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
 		my $sql = qq[
-			SELECT strApprovalStatus,strDocumentName, intFileID, strOrigFilename, pr.intPersonRegistrationID, tblDocumentType.intDocumentTypeID, strLockAtLevel,tblUploadedFiles.dtUploaded as DateUploaded FROM tblUploadedFiles INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
-			INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
-			INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+			SELECT 
+                strApprovalStatus,
+                COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
+                intFileID,
+                strOrigFilename,
+                pr.intPersonRegistrationID,
+                tblDocumentType.intDocumentTypeID,
+                strLockAtLevel,
+                tblUploadedFiles.dtUploaded as DateUploaded 
+            FROM tblUploadedFiles 
+                INNER JOIN tblDocuments ON tblUploadedFiles.intFileID = tblDocuments.intUploadFileID  
+                INNER JOIN tblDocumentType ON tblDocumentType.intDocumentTypeID = tblDocuments.intDocumentTypeID   
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as pr ON pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+                LEFT JOIN tblLocalTranslations AS LT_D ON (
+                    LT_D.strType = 'DOCUMENT'
+                    AND LT_D.intID = tblDocumentType.intDocumentTypeID
+                    AND LT_D.strLocale = '$locale'
+                )
+
 			WHERE pr.intPersonRegistrationID = $dref->{intPersonRegistrationID} AND pr.intPersonID = $personID 
 		];
 
@@ -741,7 +797,7 @@ sub getRegistrationData	{
 				INNER JOIN tblUploadedFiles  ON (tblUploadedFiles.intFileID = tblDocuments.intUploadFileID )
 				INNER JOIN tblPersonRegistration_$Data->{'Realm'}  as pr ON (pr.intPersonRegistrationID = tblDocuments.intPersonRegistrationID )
                 LEFT JOIN tblEntity as E ON (E.intEntityID=pr.intEntityID)
-				WHERE pr.intPersonID = $personID
+				WHERE pr.intPersonID = ?
 				AND pr.intPersonRegistrationID = $dref->{intPersonRegistrationID}
 			) as t ON t.intDocumentTypeID = RI.intID 
         WHERE
@@ -761,12 +817,14 @@ sub getRegistrationData	{
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
+        AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = $internationalTransfer)
+        AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = $internationalLoan)
 ];		
             #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
 
 		my $sth = $Data->{'db'}->prepare($sql);
-		$sth->execute();
+		$sth->execute($personID);
 		while(my $data_ref = $sth->fetchrow_hashref()){
 			#push @reg_docs, $data_ref;	
             $data_ref->{'DateUploaded_RAW'} = $data_ref->{'DateUploaded'};
@@ -802,8 +860,7 @@ sub getRegistrationData	{
 
 sub addRegistration {
     my($Data, $Reg_ref) = @_;
-
-    if ($Reg_ref->{'personEntityRole'} eq '-')  {
+	if ($Reg_ref->{'personEntityRole'} eq '-')  {
         $Reg_ref->{'personEntityRole'}= '';
     }
     my $status = $Reg_ref->{'status'} || 'PENDING';
@@ -815,7 +872,7 @@ sub addRegistration {
         $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
         #$Reg_ref->{'dateFrom'} = $matrix_ref->{'dtFrom'} if (! $Reg_ref->{'dtFrom'});
         #$Reg_ref->{'dateTo'} = $matrix_ref->{'dtTo'} if (! $Reg_ref->{'dtTo'});
-        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;
+        $Reg_ref->{'paymentRequired'} = $matrix_ref->{'intPaymentRequired'} || 0;		
     }
     my ($nationalPeriodID, $npFrom, $npTo) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Reg_ref->{'sport'}, $Reg_ref->{'personType'}, $Reg_ref->{'registrationNature'});
     #$Reg_ref->{'dateFrom'} = $npFrom if (! $Reg_ref->{'dtFrom'});
@@ -865,7 +922,8 @@ sub addRegistration {
             strRegistrationNature,
             intPaymentRequired,
             intClearanceID,
-            intPersonRequestID
+            intPersonRequestID,
+            strShortNotes
 		)
 		VALUES
 		(
@@ -893,6 +951,7 @@ sub addRegistration {
             ?,
             ?,
             ?,
+            ?,
             ?
         )
     ];
@@ -910,7 +969,7 @@ sub addRegistration {
   		$Reg_ref->{'current'} || 0,  		
   		$Reg_ref->{'originLevel'} || 0,  		
   		$Reg_ref->{'originID'} || 0,  		
-        $Data->{'clientValues'}{'userID'} || 0,
+        $Reg_ref->{'originLevel'} == 1 ? $Data->{'User'}{'UserID'} || 0 : $Data->{'clientValues'}{'userID'} || 0,
   		$Reg_ref->{'dateFrom'},  		
   		$Reg_ref->{'dateTo'},  		
   		$Data->{'Realm'},
@@ -922,6 +981,7 @@ sub addRegistration {
   		$Reg_ref->{'paymentRequired'} || 0,
   		$Reg_ref->{'clearanceID'} || 0,
   		$Reg_ref->{'personRequestID'} || 0,
+  		$Reg_ref->{'MAComment'} || '',
   	);
 	
 	if ($q->errstr) {
@@ -940,6 +1000,7 @@ sub addRegistration {
             $personRegistrationID,
             'REGO'
         );
+        personInProgressToPending($Data, $Reg_ref->{'personID'});
   	    $rc = addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -948,9 +1009,9 @@ sub addRegistration {
             $Reg_ref->{'entityID'} || 0,
             $Reg_ref->{'personID'},
             $personRegistrationID, 
-            0
+            0,
+		$Reg_ref->{'intInternationalTransfer'}
         );
-        personInProgressToPending($Data, $Reg_ref->{'personID'});
     }
   	
  	return ($personRegistrationID, $rc) ;
@@ -968,11 +1029,11 @@ sub submitPersonRegistration    {
     if ($count && $pr_ref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS) {
         my $personStatus = $pr_ref->{'personStatus'};
         $pr_ref->{'strStatus'} = 'PENDING';
-        $pr_ref->{'intPaymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
-        $pr_ref->{'paymentRequired'} = 0 if ($rego_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'intPaymentRequired'} = 0 if ($pr_ref->{'CountTXNs'} == 0);
+        $pr_ref->{'paymentRequired'} = 0 if ($pr_ref->{'CountTXNs'} == 0);
 
         updatePersonRegistration($Data, $personID, $personRegistrationID, $pr_ref, $personStatus);
-        cleanTasks(
+        WorkFlow::cleanTasks(
             $Data,
             $personID,
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
@@ -980,17 +1041,18 @@ sub submitPersonRegistration    {
             'REGO'
         );
 
-            my $rc = addWorkFlowTasks(
+        personInProgressToPending($Data, $personID);
+        my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
-            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '', 
+            $pr_ref->{'registrationNature'} || $pr_ref->{'strRegistrationNature'} || '',
             $pr_ref->{'originLevel'} || $pr_ref->{'intOriginLevel'} || 0, 
             $pr_ref->{'entityID'} || $pr_ref->{'intEntityID'} || 0,
             $personID,
             $personRegistrationID, 
-            0
+            0,
+	    $pr_ref->{'intInternationalTransfer'}
         );
-        personInProgressToPending($Data, $personID);
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
         if ($count) {
             my $pr_ref = $regs->[0];
@@ -1074,6 +1136,7 @@ sub getRegistrationDetail {
     my @RegistrationDetail = ();
       
     while(my $dref= $query->fetchrow_hashref()) {
+        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';

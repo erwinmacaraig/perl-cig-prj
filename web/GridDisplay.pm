@@ -340,6 +340,10 @@ sub showGrid {
 	my $groupby                  = $params{'groupby'}                  || '';
 	my $coloredTopClass          = $params{'coloredTop'}               || 'yes';
 	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
+	#
+	my $sortColumn				 = $params{'sortColumn'} || [];
+	my $instanceDestroy			 = $params{'instanceDestroy'} || 'false';
+	#
 	my $display_pager            = exists $params{'display_pager'} 
 		? $params{'display_pager'} 
 		: 1;
@@ -418,15 +422,26 @@ sub showGrid {
 		$tabledata .= "</tr>";
 		$cnt++;
 	}
-	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">Sorry there is no data to return</td></tr>'; }
+	if($tabledata eq '') { $tabledata = '<tr><td colspan="20">'.$Data->{'lang'}->txt('Sorry there is no data to return').'</td></tr>'; }
     my %gridConfig = ();
     if(!$display_pager) {
         $gridConfig{'paging'} = 'false';
     }
     $gridConfig{'dom'} = 'ilftpr';
     $gridConfig{'language'}{'search'} = $Data->{'lang'}->txt('Filter');
+    $gridConfig{'language'}{'sInfo'} = $Data->{'lang'}->txt('Showing _START_ to _END_ of _TOTAL_ entries');
+    $gridConfig{'language'}{'sLengthMenu'} = $Data->{'lang'}->txt('Show _MENU_ entries');
+    $gridConfig{'language'}{'oPaginate'} = {
+        sFirst=>    $Data->{'lang'}->txt("First"),
+        sLast=>     $Data->{'lang'}->txt("Last"),
+        sNext=>     $Data->{'lang'}->txt("Next"),
+        sPrevious=> $Data->{'lang'}->txt("Previous")
+    };
+    $gridConfig{'language'}{'sZeroRecords'} = $Data->{'lang'}->txt("No matching records found");
 	my ($columndefs , $headerInfo) = processFieldHeaders($columninfo);
     $gridConfig{'columns'} = $columndefs;
+	$gridConfig{'order'} =  $sortColumn;
+	$gridConfig{'destroy'} = $instanceDestroy;
 	my $config_str = to_json(\%gridConfig);
 	$config_str =~s/"(false|true)"/$1/g;
     my $js = qq[
@@ -437,10 +452,11 @@ sub showGrid {
     }
 
     my $coloredtop = $coloredTopClass eq 'yes' ? 'tableboxheader' : '';
+    my $initialCols = $headerInfo->{'initialColumns'} || '1';
 	return qq[
-		<table id = "$gridID" class = "table $coloredtop zebra" style = "$width">
+		<table id = "$gridID" initial-cols="$initialCols" class = "res-table table $coloredtop zebra" style = "$width">
 			<thead>
-				<tr class = "">$headers</tr>
+				<tr class = " res-headers ">$headers</tr>
 			</thead>
 			<tbody>
 			$tabledata
@@ -456,10 +472,15 @@ sub processFieldHeaders	{
 
 	my @output_headers = ();
 	my %headerInfo = ();
+    my @initialColumns = ();
+    my $cnt = 0;
+    my $gotSelector = 0;
 	for my $field (@{$headers})	{
 		my $name = $field->{'name'};	
+        my $selector = 0;
 		if($field->{'type'} and $field->{'type'} eq 'Selector')	{
 			$name = ' ';
+            $selector = 1;
 		}
 		next if !$name;
 		next if $field->{'hide'};
@@ -485,15 +506,25 @@ sub processFieldHeaders	{
 			if($field->{'type'} eq 'Selector')	{
 				$row{'sortable'} = 'false';
 				$row{'searchable'} = 'false';
+                push @initialColumns, $cnt;
+                $selector = 1;
 			}
 		}
+        if($field->{'defaultShow'} and !$selector) {
+                push @initialColumns, $cnt;
+        }
+        $gotSelector = 1 if $selector;
 		$row{'className'} = $field->{'class'} if $field->{'class'};
 		$field->{'sorttype'} ||= '';
 		$row{'type'} = 'num' if $field->{'sorttype'} eq 'number';
 		$headerInfo{$fieldname} = \%row;
 		push @output_headers, \%row;
+        $cnt++;
 	}
-
+    if(scalar(@initialColumns) == 1 and $gotSelector)   {
+        unshift @initialColumns, 0;
+    }
+    $headerInfo{'initialColumns'} = join('-',@initialColumns);
 	return (\@output_headers, \%headerInfo);
 }
 

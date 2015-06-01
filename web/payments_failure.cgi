@@ -34,7 +34,7 @@ sub main	{
 	my $body = '';
 	## GENERAL VARIABLES
 
-	processTransLogFailure($db, $clientTransRefID, '', '', '', '', '');
+	processTransLogFailure($db, $clientTransRefID, '', '', '', '', '', '');
 
 disconnectDB($db);
 print qq[Content-type: text/html\n\n] if ! $body;

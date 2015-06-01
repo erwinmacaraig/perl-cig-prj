@@ -4,35 +4,67 @@
             [% PersonSummaryPanel %]
             <!-- DO IF TEST HERE ON registration.strStatus -->
             [% IF registration.strStatus == "PENDING" %]
-                <div class="registration-pending">[% registration.personTypeText %]: [% Lang.txt(registration.personRegoStatus) %]</div>
+                <div class="registration-pending">[% IF registration.personType == 'PLAYER' %][% Lang.txt(registration.PersonLevel) %] [% END %][% Lang.txt(registration.personTypeText) %][% IF registration.Sport %] ([% Lang.txt(registration.Sport) %]) [% END %]<br>[% Lang.txt(registration.personRegoStatus) %]</div>
+
             [% ELSIF registration.strStatus == "ACTIVE" %]
-                <div class="registration-approved">[% registration.personTypeText %]: [% Lang.txt(registration.personRegoStatus) %]</div>
+                <div class="registration-approved">[% Lang.txt(registration.personTypeText) %]: [% Lang.txt(registration.personRegoStatus) %]</div>
             [% END %]
 
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9  result-message">
             <h3 class="panel-header"><b>[% Lang.txt("Thank you") %]</b></h3>
             <div class="panel-body">
                 <div class="reg-complete-wrapper">
-                    <p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong><br /><br />
+                    <p class="reg-complete-text">[% Lang.txt('Registration has been submitted for approval') %]<br /><br />
                      <!--[% Lang.txt('Once processing has taken place, the outcome will be emailed to the ')%][% registration.PersonType %].-->
                     </p>
+                    [% IF registration.changeLevel %]
+                        <p class="reg-complete-text"><strong>[% Lang.txt('Status Change') %]:</strong> [% Lang.txt('New Level/Status') %]: <strong>[% Lang.txt(registration.PersonLevel) %]</strong>, [% Lang.txt('Previous Level/Status') %]:<strong> [% Lang.txt(registration.PreviousPersonLevel) %]</strong>.<br />[% Lang.txt(' Please note that any Level/Status change is subject to') %] [% registration.MA %] [% Lang.txt('approval') %].<br /><br /></p>
+                    [% END %]
+                    [% IF payLaterFlag %]
+                        <br><br><br>
+                        <p>[% Lang.txt("An invoice for this registration has been created.  You can find all your invoices under the 'Payments' Menu.") %]</p>
+                        <p>[% Lang.txt("We would like to remind you that the Member Association will not approve the registration until payment is completed.") %]</p>
+                    [% END %]
                 </div>
             </div>
+                    [% IF payNowFlag and payNowStatus == 1 %]
+                       [% payNowMsg %] 
+                    [% END %]
+                    [% IF payNowFlag and payNowStatus == 3 %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.') %]</div>
+                    [% END %]
+                    [% IF payNowFlag and (payNowStatus != 1 and payNowStatus != 3) %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('We are sorry, there was a problem with your payment.') %]</div>
+                        <div class="panel-body">
+                            <div class="reg-complete-wrapper">
+                                <p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong> [% Lang.txt('and an invoice has been created for this registration.  You can pay anytime by going to the Payments Menu and choose the corresponding invoice') %]<br /><br /></p>
+                            </div>
+                        </div>
+                    [% END %]
+
+
+                     <!--[% Lang.txt('Once processing has taken place, the outcome will be emailed to the ')%][% registration.PersonType %].-->
             <div class="button-row">
                 <ul class="row-btn-complete">
                     <li>
                         [% IF originLevel == 3 %]
-                            <a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a>
+                            <a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                        [% ELSIF originLevel == 20 %]
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
                         [% ELSIF originLevel == 100 %]
-                            <a href="[% url %]/[% target %]?client=[% maclient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your Dashboard") %]</a>
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
                         [% END %]
                     </li>
-                    <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
-                    [% IF dtype %]
-                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+                    [% IF originLevel == 1 %]
+                            <a href="[% url %]/registration/" class="btn-main">[% Lang.txt("Return to your Dashboard") %]</a>
                     [% ELSE %]
-                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
+                        <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+                        [% IF dtype %]
+                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+                        [% ELSE %]
+                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
+                        [% END %]
                     [% END %]
                 </ul>
             </div>

@@ -38,7 +38,7 @@
 
             <tr>
                 <td>[% Lang.txt("Status") %]:</td>
-                <td>
+                <!-- <td>
                     [% IF Status == 'PENDING' %]
                         <img src="[% BaseURL %]/images/emails/img-email-status-pending.png" border="0" />
                     [% ELSIF Status == 'APPROVED' %]
@@ -54,6 +54,9 @@
                     [% ELSE %]
                         <strong>[% Lang.txt("N/A") %]</strong>
                     [% END %]
+                </td> -->
+                <td>
+                    <span class="status-common status-[% Status %]">[% Lang.txt("Status") %]</span>
                 </td>
             </tr>
         </table>

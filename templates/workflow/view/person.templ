@@ -50,7 +50,7 @@
 
                 <div id="memberdetails" class="tab-pane fade">
                     <div class="read-only">
-                        <h4>Personal Information</h4>
+                        <h4>[% Lang.txt('Personal Information') %]</h4>
                         <div class="read-only-text">
                             <div class="clearfix">
 
@@ -117,20 +117,20 @@
                     <div class="clearfix" style="clear:both;">&nbsp;</div>
                     
                     <div class="read-only">
-                        <h4>Contact Details</h4>
+                        <h4>[% Lang.txt('Contact Details') %]</h4>
                         <div class="read-only-text">
                             <div class="clearfix">
 
                             [% IF PersonDetails.Address1 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address1') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 1') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address1 %]</span>
                                 </span>
                             [% END %]
 
                             [% IF PersonDetails.Address2 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address2') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 2') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address2 %]</span>
                                 </span>
                             [% END %]
@@ -292,7 +292,7 @@
     <div class="col-md-3">
         [% PersonSummary %]
         [% IF PersonDetails.ruleForPerson == 'AMENDMENT_PERSON' %]
-        <div class="registration-pending">[% Lang.txt('Amendment: Pending') %]</div>
+        <div class="registration-pending">[% Lang.txt('Amendment') %]: [% Lang.txt('Pending') %]</div>
         [% END %]
     </div>
 </div>

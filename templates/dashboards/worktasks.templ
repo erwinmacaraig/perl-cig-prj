@@ -40,40 +40,31 @@
 			<tr class="order-override">
 				<td><!--Filter by:-->
 					<select class="filter-tasks" style="width: 100%">
-			          <option selected="" value="">-- All --</option>
-                      <!--
-			          <option value="New Registration">New Registration</option>
-			          <option value="Renewal">Renewal</option>
-			          <option value="Transfer">Transfer</option>
-                      -->
+			          <option selected="" value="">-- [% Lang.txt('All') %] --</option>
                       [% FOREACH taskType IN TaskFilters.type %]
                           [% IF taskType %]
-                          <option value="[% taskType %]">[% taskType %]</option>
+                          <option value="[% Lang.txt(taskType) %]">[% Lang.txt(taskType) %]</option>
                           [% END %]
                       [% END %]
 			        </select>
 		        </td>
 				<td>
 					<select class="sort-date">
-			          <option value="asc">-- Sort --</option>
-			          <option value="desc">Latest</option>
-			          <option value="asc">Oldest</option>
+			          <option value="asc">-- [% Lang.txt('Sort') %] --</option>
+			          <option value="desc">[% Lang.txt('Latest') %]</option>
+			          <option value="asc">[% Lang.txt('Oldest') %]</option>
 			        </select>
 				</td>
 				<td>
 					<select class="filter-status" id="u53_input">
-			          <option value="">-- All --</option>
+			          <option value="">-- [% Lang.txt('All') %] --</option>
                       [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
-                      <option value="Ready to Approve">[% Lang.txt('Ready to Approve') %]</option>
+                      <option value="[% Lang.txt('Ready to Approve') %]">[% Lang.txt('Ready to Approve') %]</option>
                       [% END %]
-                      <option value="Task On Hold">[% Lang.txt('Task On Hold') %]</option>
-                      <option value="Accepted">[% Lang.txt('Accepted') %]</option>
-                      <option value="Pending">[% Lang.txt('Pending') %]</option>
-                      <!--
-                      [% FOREACH taskStatus IN TaskFilters.status %]
-                      <option value="[% taskStatus %]">[% taskStatus %]</option>
-                      [% END %]
-                        -->
+                      <option value="[% Lang.txt('Task On Hold') %]">[% Lang.txt('Task On Hold') %]</option>
+                      <option value="[% Lang.txt('Accepted') %]">[% Lang.txt('Accepted') %]</option>
+                      <option value="[% Lang.txt('Pending') %]">[% Lang.txt('Pending') %]</option>
+                      <option value="[% Lang.txt('Locked') %]">[% Lang.txt('Locked') %]</option>
 			        </select>
 				</td>
 				<td class="list-action-filter">
@@ -106,6 +97,18 @@
                             [% END %]
                             </div>
                         </td>
+                    [% ELSIF task.TaskType == 'LOAN' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.personRequestLabel %]<br/>
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] [% Lang.txt('has requested a player loan for') %] [% task.Name %]
+                            [% END %]
+                            </div>
+                        </td>
                     [% ELSIF task.TaskType == 'ACCESS' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
@@ -125,6 +128,18 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% Lang.txt('Review Transfer of') %] [% task.Name %]<br/>
                             From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            [% IF task.changeLevelDescription %]
+                                [% task.changeLevelDescription %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND (task.RegistrationNature == 'DOMESTIC_LOAN' OR task.RegistrationNature == 'INTERNATIONAL_LOAN') %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% Lang.txt('Review Player loan of') %] [% task.Name %]<br/>
+                            From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
@@ -134,6 +149,15 @@
                             [% task.RegistrationNatureLabel %]<br/>
                             [% task.Name %]<br/>
                             [% task.LocalEntityName %]
+                            [% IF task.changeLevelDescription %]
+                                <br/>[% task.changeLevelDescription %]
+                            [% END %]
+                            [% IF task.InternationalTransferDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalTransferDescription %]
+                            [% END %]
+                            [% IF task.InternationalLoanDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalLoanDescription %]
+                            [% END %]
                             </div>
                         </td>
                     [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
@@ -156,9 +180,9 @@
 		            [% ELSE %]
                         <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
 		            [% END %]
-                    <td data-order = "[% task.taskDate %]">[% DateFormat.format(task.taskDate,'MEDIUM') %]</td>
+                    <td data-order = "[% task.taskDate_RAW %]">[% task.taskDate %]</td>
 
-                    <td><span class="fa fa-clock-o"></span>[% task.TaskStatusLabel %]</td>
+                    <td><span class="fa fa-clock-o"></span>[% Lang.txt(task.TaskStatusLabel) %]</td>
 
                     [% IF task.TaskType == 'APPROVAL' %]
 
@@ -168,7 +192,7 @@
                             <td class="just-view-text"><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                         [% END %]
 
-                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' %]
+                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' or task.TaskType == 'LOAN' %]
 
                         [% IF task.currentClubView == 1 %]
                             <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
@@ -194,6 +218,7 @@
 			<li>[% Lang.txt('Renewals') %]: <b>[% IF TaskCounts.RENEWAL %][% TaskCounts.RENEWAL %][% ELSE %]0[% END %]</b></li>
 			<li>[% Lang.txt('Transfers') %]: <b>[% IF TaskCounts.TRANSFER %][% TaskCounts.TRANSFER %][% ELSE %]0[% END %]</b></li>
 			<li>[% Lang.txt('Request Access') %]: <b>[% IF TaskCounts.ACCESS %][% TaskCounts.ACCESS %][% ELSE %]0[% END %]</b></li>
+			<li>[% Lang.txt('Player Loan') %]: <b>[% IF TaskCounts.LOAN %][% TaskCounts.LOAN %][% ELSE %]0[% END %]</b></li>
 			<li>[% Lang.txt('Amendment') %]: <b>[% IF TaskCounts.AMENDMENT %][% TaskCounts.AMENDMENT %][% ELSE %]0[% END %]</b></li>
 		</ul>
 		<ul>
@@ -207,22 +232,22 @@
         <div class="sidebar-box">
             <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus fa-lg"></span>[% Lang.txt('Start a New Player Registration') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
-                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
+                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_&dtype=PLAYER"><span class="fa fa-plus fa-lg"></span><label>[% Lang.txt('Start a New Player Registration') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span><label>[% Lang.txt('Request or Start a Transfer') %]</label></a></li>-->
+                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span><label>[% Lang.txt('List Pending Registrations') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span><label>[% Lang.txt('Reports') %]</label></a></li>-->
             </ul>
         </div>
     [% ELSE %]
         <div class="sidebar-box">
             <h3 class="panel-header">[% Lang.txt('Quick Links') %]</h3>
             <ul class="quick-links">
-                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus fa-lg"></span>[% Lang.txt('Start a New Registration') %]</a></li>
+                <li class="paddingBottom8"><a href="main.cgi?client=[% client %]&a=PF_"><span class="fa fa-plus fa-lg"></span><label>[% Lang.txt('Start a New Registration') %]</label></a></li>
                 [% IF MA_allowTransfer %]
-                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span>[% Lang.txt('Request or Start a Transfer') %]</a></li>-->
+                    <!--<li><a href="main.cgi?client=[% client %]&a=PRA_T"><span class="fa fa-random"></span><label>[% Lang.txt('Request or Start a Transfer') %]</label></a></li>-->
                 [% END %]
-                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span>[% Lang.txt('List Pending Registrations') %]</a></li>
-                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span>[% Lang.txt('Reports') %]</a></li>-->
+                <li class="paddingTop8"><a href="main.cgi?client=[% client %]&a=PENDPR_"><span class="fa fa-newspaper-o fa-lg"></span><label>[% Lang.txt('List Pending Registrations') %]</label></a></li>
+                <!--<li><a href="main.cgi?client=[% client %]&a=REP_SETUP"><span class="fa fa-paste"></span><label>[% Lang.txt('Reports') %]</label></a></li>-->
             </ul>
         </div>
     [% END %]
@@ -282,7 +307,43 @@
             </div>
         </div>
     </div>
-	
+	[% ELSIF CurrentLevel == Levels.REGION %]
+            <div class="advanced-search-fields clearfix">
+                <div>
+                    <span><input type="checkbox" class="role" value="role">[% Lang.txt('Role') %]</span>
+                    <select name="PersonType" id="PersonType" class="chosen">
+                        <option value=""> </option>
+                        [% FOREACH key IN PersonType.keys %]
+							[% NEXT IF key == 'MAOFFICIAL' %]
+                            <option value="[% key %]">[% PersonType.$key %]</option>
+                        [% END %]
+                    </select>
+                </div>
+			    <div>
+                    <span><input type="checkbox" class="task" value="task">[% Lang.txt('Task') %]</span>
+                    <select name="TaskType" id="TaskType" class="chosen">
+                        <option value="">[% Lang.txt('Tasks') %]</option>
+                        <option value="REGO-NEW-COACH">[% Lang.txt('New Coach Registration') %]</option>
+                        <option value="ENTITY-NEW-VENUE">[% Lang.txt('New Facility Registration') %]</option>
+                        <option value="REGO-RENEWAL-COACH">[% Lang.txt('Renewal of Coach Registration') %]</option>
+                    </select>
+                </div>
+
+			<div>
+                <span><input type="checkbox" class="club" value="club">[% Lang.txt('Club') %]</span>
+            </div>
+			<!--
+            <div>
+                <span><input type="checkbox" class="venue" value="venue">[% Lang.txt('Venue') %]</span>
+			</div>
+			-->
+
+           
+				
+
+            </div>
+        </div>
+    </div>
 	[% ELSIF CurrentLevel == Levels.CLUB %]
 	<div class="advanced-search-fields clearfix">
                 <div>
@@ -292,6 +353,7 @@
                         [% FOREACH key IN PersonType.keys %]
 							[% NEXT IF key == 'MAOFFICIAL' %]
 							[% NEXT IF key == 'REFEREE' %]
+							[% NEXT IF key == 'RAOFFICIAL' %]
                             <option value="[% key %]">[% PersonType.$key %]</option>
                         [% END %]
                     </select>
@@ -327,9 +389,9 @@
             "order": [],
             "lengthMenu": [[50, 100, -1], [50, 100, "All"]],
             "dom" : "ilftpr",
-            "language" : {
-                "search": "[% Lang.txt('Filter') %]"
-            }
+            "language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]","infoFiltered":" - [% Lang.txt('filtered from _MAX_ records') %]","infoEmpty":"[% Lang.txt('No entries to show') %]"},
+
+
         });
 
         var api = dttable.api();
