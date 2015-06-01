@@ -13,10 +13,10 @@ use Utils;
 
 sub createTempEntityStructure  {
 
-  my ($Data, $realmID_IN, $id) = @_;
+  my ($Data, $realmID_IN, $eid) = @_;
   my $realmID=1;
-  ## if $id passed then only work on that 1 ID
-  $id ||= 0;
+  ## if $eid passed then only work on that 1 ID
+  $eid ||= 0;
   my $db = $Data->{'db'};
 
   my $ins_st = qq[
@@ -49,9 +49,9 @@ sub createTempEntityStructure  {
     WHERE 
       intRealmID = ?
   ];
-    if ($id)    {
+    if ($eid)    {
         $del_st .= qq[
-            AND (intParentID = $id or intChildID = $id)
+            AND (intParentID = $eid or intChildID = $eid)
         ];
     }
 
@@ -95,10 +95,9 @@ sub createTempEntityStructure  {
           intPrimary
         FROM
           tblEntityLinks
-    ];
-  #      WHERE
-  #          intParentEntityID IN ($entity_list)
-  #    ];
+        WHERE
+            intParentEntityID IN ($entity_list)
+      ];
       my $q_el = $db->prepare($st_el);
       $q_el->execute();
       while (my($parent, $child, $primary) = $q_el->fetchrow_array()) {
@@ -113,10 +112,10 @@ sub createTempEntityStructure  {
               $entityLinksCtoP{$child} = $parent;
           }
           #Insert the direct relationships
-            if ($id)    {
+            if ($eid)    {
                 next if (
-                    $parent != $id 
-                    and ! $child != $id
+                    $parent != $eid 
+                    and ! $child != $eid
                 );
             }
           $ins_qry->execute(
@@ -144,7 +143,7 @@ sub createTempEntityStructure  {
       );
     }
 
-    createTreeStructure($db, $realmID, $id, \%entities, \%entityLinks, \%entityLinksCtoP);
+    createTreeStructure($db, $realmID, $eid, \%entities, \%entityLinks, \%entityLinksCtoP);
   #}
 }
 
@@ -198,7 +197,7 @@ sub createTreeStructure {
     my (
         $db, 
         $realmID, 
-        $id,
+        $eid,
         $entities, 
         $entityLinks,
         $entityLinksCtoP,
@@ -254,9 +253,9 @@ sub createTreeStructure {
       WHERE 
         intRealmID = ?
     ];
-    if ($id)    {
+    if ($eid)    {
         $del_st .= qq[
-            AND (int3_ID = $id or int10_ID = $id or int20_ID = $id or int30_ID = $id or int100_ID = $id)
+            AND (int3_ID = $eid or int10_ID = $eid or int20_ID = $eid or int30_ID = $eid or int100_ID = $eid)
         ];
     }
 
@@ -273,13 +272,13 @@ sub createTreeStructure {
         $row{'t10'} ||= 0;
         $row{'t3'} ||= 0;
 
-        if ($id)    {
+        if ($eid)    {
             next if (
-                $row{'t100'} != $id
-                and $row{'t30'} != $id
-                and $row{'t20'} != $id
-                and $row{'t10'} != $id
-                and $row{'t3'} != $id
+                $row{'t100'} != $eid
+                and $row{'t30'} != $eid
+                and $row{'t20'} != $eid
+                and $row{'t10'} != $eid
+                and $row{'t3'} != $eid
             );
         }
         
