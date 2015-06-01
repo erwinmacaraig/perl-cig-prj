@@ -2,8 +2,12 @@ package AccountProfile;
 
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT = @EXPORT_OK = qw(
+@EXPORT = qw(
     handleAccountProfile
+);
+@EXPORT_OK = qw(
+    handleAccountProfile
+    updatePassword
 );
 
 use strict;

@@ -22,6 +22,7 @@ use TTTemplate;
 use SystemConfig;
 use TemplateEmail;
 use SelfUserObj;
+use AccountProfile qw(updatePassword);
 
 sub handleForgottenPassword {
     my ($Data, $action) = @_;
@@ -31,6 +32,8 @@ sub handleForgottenPassword {
     my $body = '';
     my @errors = ();
     my $sent = 0;
+    my $uID = 0;    
+    $uID = checkPWChangeKey($Data->{'db'}, $key) if $key;
     if($action eq 'FORGOT_RESET')   {
 
         my $userObj = new SelfUserObj(db => $Data->{'db'});
@@ -41,25 +44,50 @@ sub handleForgottenPassword {
             $sent = sendResetEmail($Data, $userObj) || 0;
         }
     }
-    elsif($action eq 'FORGOT_CHANGE')   {
-        my $uID = 0;    
-        $uID = checkPWChangeKey($Data->{'db'}, $key) if $key;
-        if($uID)    {
+    if($action eq 'FORGOT_UPDATE' and $uID)   {
+        my %DataNew = %$Data;
+        $DataNew{'UserID'} = $uID;
+        my($continue, $message) = updatePassword(\%DataNew);
+        if($continue)   {
+            $body .= qq[
+    <div class="alert "> 
+        <div>
+            <span class="fa fa-info fa-exclamation"></span>
+                <p>$message</p>
+        </div>
+    </div>
+    <p><a href = "index.cgi">].$Data->{'lang'}->txt('Proceed to the login page') .qq[</a></p>
+            ];
 
-
-        }   
-        
-
+        }
+        else    {
+            push @errors, $message;
+            $action = 'FORGOT_CHANGE';
+        }
+    }
+    if($action eq 'FORGOT_CHANGE' and $uID)   {
+        $body .= runTemplate(
+            $Data,
+            {
+                PasswordOnly => 1,
+                PasswordAction => 'FORGOT_UPDATE',
+                PWChangeKey => $key,
+                Errors => \@errors,
+            },
+            'selfrego/user/profile.templ',
+        );
     }
 
-    $body = runTemplate(
-        $Data,
-        {
-            'Errors' => \@errors,
-            'sent' => $sent,
-        },
-        'selfrego/user/forgot_password_form.templ',
-    );
+    if(!$body)  {
+        $body = runTemplate(
+            $Data,
+            {
+                'Errors' => \@errors,
+                'sent' => $sent,
+            },
+            'selfrego/user/forgot_password_form.templ',
+        );
+    }
     return ($body, $Data->{'lang'}->txt('Forgotten Password'));
 }
 
@@ -77,7 +105,7 @@ sub sendResetEmail {
         {
             RecipientName => $user->FullName(),
             SenderName => $Defs::admin_email_name,
-            PasswordResetURL => "$Defs::base_url/registration/?a=RESET&k=$key",
+            PasswordResetURL => "$Defs::base_url/registration/?a=FORGOT_CHANGE&k=$key",
             SystemName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
         },
         $templateFileContent,
@@ -105,7 +133,7 @@ sub sendResetEmail {
 
 sub checkPWChangeKey {
     my($db,$key) = @_;
-    my $st = "SELECT userId FROM tblUserHash WHERE strPasswordChangeKey = ?";
+    my $st = "SELECT intSelfUserId FROM tblSelfUserHash WHERE strPasswordChangeKey = ?";
     my $q = $db->prepare($st);
     $q->execute($key);
     my($uId) = $q->fetchrow_array();

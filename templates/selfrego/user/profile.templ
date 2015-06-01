@@ -1,15 +1,17 @@
 <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
 [% IF Errors.size %]
-<div id="form-errors-old">
-  <div class = "warningmsg">
       [% FOREACH error IN Errors %]
-        <div class="error-msg">[% error %]</div>
-      [% END %]
-  </div>
+<div class="alert"> 
+    <div>
+        <span class="fa fa-exclamation"></span>
+        <p>[% error %]</p>
+    </div>
 </div>
-[% ELSE %]
+      [% END %]
+[% END %]
 
     
+[% IF !PasswordOnly %]
 <div>
 <h3>[% Lang.txt('Update your details') %]</h3>
  <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
@@ -37,18 +39,11 @@
 	
   </form>
 </div>
+[% END %]
 
 <div>
     <h3>[% Lang.txt('Change your password') %]</h3>
     <form id = "updatepw-form" action = "[% BaseURL %]/registration/" method ="POST">
-    <p>[% Lang.txt('Passwords must follow these rules') %]:
-        <ul>
-            <li>[% Lang.txt("At least 8 characters long") %]</li>
-            <li>[% Lang.txt("Contain at least one upper-case character") %]</li>
-            <li>[% Lang.txt("Contain at least one lower-case character") %]</li>
-            <li>[% Lang.txt("Contain at least one non-alphabetic character eg a number or special character") %]</li>
-        </ul><br>
-    </p>
     <div class = "form-group">
         <label class="col-md-2" for="password">[% Lang.txt('New password') %]</label>
         <div class="col-md-6 control-fields">
@@ -61,7 +56,6 @@
                 <li>[% Lang.txt("Contain at least one non-alphabetic character eg a number or special character") %]</li>
             </ul>
        	</div>
-
     </div>
     <div class = "form-group">  
         <label class="col-md-2" for="password2">[% Lang.txt('Re-enter new password') %]</label>
@@ -71,8 +65,9 @@
     </div>
 
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Update Password') %] ">
-    <input type = "hidden" name = "a" value = "P_pu">
+    <input type = "hidden" name = "a" value = "[% IF PasswordAction %][% PasswordAction %][% ELSE %]P_pu[% END %]">
     <input type = "hidden" name = "srp" value = "[% srp %]">
+    <input type = "hidden" name = "k" value = "[% PWChangeKey %]">
 	
   </form>
 </div>
@@ -126,6 +121,7 @@
 		});
 	});
     </script>
-[% END %]
 </div>
+[% IF !PasswordOnly %]
 <p><br><a href = "../registration">[% Lang.txt('Return to dashboard') %]</a></p>
+[% END %]
