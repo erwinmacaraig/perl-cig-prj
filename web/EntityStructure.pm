@@ -115,7 +115,7 @@ sub createTempEntityStructure  {
             if ($eid)    {
                 next if (
                     $parent != $eid 
-                    and ! $child != $eid
+                    and $child != $eid
                 );
             }
           $ins_qry->execute(
