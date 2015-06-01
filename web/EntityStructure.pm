@@ -13,27 +13,11 @@ use Utils;
 
 sub createTempEntityStructure  {
 
-  my ($Data, $realmID_IN) = @_;
+  my ($Data, $realmID_IN, $id) = @_;
+  my $realmID=1;
+  ## if $id passed then only work on that 1 ID
+  $id ||= 0;
   my $db = $Data->{'db'};
-
-  $realmID_IN ||= 0;
-  my @realms = ();
-  if($realmID_IN) {
-    push @realms, $realmID_IN;
-  }
-  else  {
-    my $st = qq[
-      SELECT 
-        intRealmID
-      FROM 
-        tblRealms
-    ];
-    my $qry = $db->prepare($st);
-    $qry->execute();
-    while (my($intRealmID) = $qry->fetchrow_array) {
-        push @realms, $intRealmID;
-    }
-  }
 
   my $ins_st = qq[
     INSERT IGNORE INTO tblTempEntityStructure (
@@ -65,6 +49,11 @@ sub createTempEntityStructure  {
     WHERE 
       intRealmID = ?
   ];
+    if ($id)    {
+        $del_st .= qq[
+            AND (intParentID = $id or intChildID = $id)
+        ];
+    }
 
   my $del_qry= $db->prepare($del_st);
 
@@ -82,7 +71,7 @@ sub createTempEntityStructure  {
   my $q_e = $db->prepare($st_e);
 
 
-  foreach my $realmID (@realms) {
+  #foreach my $realmID (@realms) {
     $del_qry->execute($realmID);
     $del_qry->finish();
 
@@ -106,9 +95,10 @@ sub createTempEntityStructure  {
           intPrimary
         FROM
           tblEntityLinks
-        WHERE
-            intParentEntityID IN ($entity_list)
-      ];
+    ];
+  #      WHERE
+  #          intParentEntityID IN ($entity_list)
+  #    ];
       my $q_el = $db->prepare($st_el);
       $q_el->execute();
       while (my($parent, $child, $primary) = $q_el->fetchrow_array()) {
@@ -123,6 +113,12 @@ sub createTempEntityStructure  {
               $entityLinksCtoP{$child} = $parent;
           }
           #Insert the direct relationships
+            if ($id)    {
+                next if (
+                    $parent != $id 
+                    and ! $child != $id
+                );
+            }
           $ins_qry->execute(
               $realmID,
               $parent,
@@ -148,8 +144,8 @@ sub createTempEntityStructure  {
       );
     }
 
-    createTreeStructure($db, $realmID, \%entities, \%entityLinks, \%entityLinksCtoP);
-  }
+    createTreeStructure($db, $realmID, $id, \%entities, \%entityLinks, \%entityLinksCtoP);
+  #}
 }
 
 sub insertRelationships {
@@ -202,6 +198,7 @@ sub createTreeStructure {
     my (
         $db, 
         $realmID, 
+        $id,
         $entities, 
         $entityLinks,
         $entityLinksCtoP,
@@ -257,6 +254,11 @@ sub createTreeStructure {
       WHERE 
         intRealmID = ?
     ];
+    if ($id)    {
+        $del_st .= qq[
+            AND (int3_ID = $id or int10_ID = $id or int20_ID = $id or int30_ID = $id or int100_ID = $id)
+        ];
+    }
 
     my $del_qry= $db->prepare($del_st);
     $del_qry->execute($realmID);
@@ -264,6 +266,21 @@ sub createTreeStructure {
         my %row = ();
         for my $r (@{$pathToNational{$eId}})    {
             $row{'t'.$r->[1]} = $r->[0];
+        }
+        $row{'t100'} ||= 0;
+        $row{'t30'} ||= 0;
+        $row{'t20'} ||= 0;
+        $row{'t10'} ||= 0;
+        $row{'t3'} ||= 0;
+
+        if ($id)    {
+            next if (
+                $row{'t100'} != $id
+                and $row{'t30'} != $id
+                and $row{'t20'} != $id
+                and $row{'t10'} != $id
+                and $row{'t3'} != $id
+            );
         }
         
         $ins_qry->execute(

@@ -218,7 +218,7 @@ sub validate_core_details {
         $query->execute($entityID, $clubObj->ID());
 
         $query->finish();
-        createTempEntityStructure($self->{'Data'}, $clubData->{'intRealmID'}); 
+        createTempEntityStructure($self->{'Data'}, $clubData->{'intRealmID'}, $clubObj->ID()); 
     }
 
 

@@ -15,7 +15,7 @@ my $db=connectDB();
 	my %Data=();
 	$Data{'db'}=$db;
 
-	createTempEntityStructure(\%Data);
+	createTempEntityStructure(\%Data, 0,0);
 }
 1;
 

@@ -874,7 +874,7 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
       $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
+      createTempEntityStructure($Data, $Data->{'Realm'}, $id); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
