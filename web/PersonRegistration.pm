@@ -1040,8 +1040,12 @@ sub submitPersonRegistration    {
             $personRegistrationID,
             'REGO'
         );
-
         personInProgressToPending($Data, $personID);
+
+        my $newBaseRecord = ($personStatus eq $Defs::PERSONREGO_STATUS_INPROGRESS) ? 1 : 0;
+        my $internationalTransfer = ($newBaseRecord and $pr_ref->{'intInternationalTransfer'}) ? 1 : 0;
+        my $internationalLoan = ($newBaseRecord and $pr_ref->{'intInternationalLoan'}) ? 1 : 0;
+
         my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -1051,7 +1055,8 @@ sub submitPersonRegistration    {
             $personID,
             $personRegistrationID, 
             0,
-	    $pr_ref->{'intInternationalTransfer'}
+            #$pr_ref->{'intInternationalTransfer'} || $pr_ref->{'intInternationalLoan'} || 0
+            $internationalTransfer || $internationalLoan || 0
         );
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
         if ($count) {
