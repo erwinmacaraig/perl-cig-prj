@@ -21,6 +21,7 @@ sub _getS3 {
     my $s3 = Net::Amazon::S3->new(
       aws_access_key_id     => $Defs::aws_access_key_id,
       aws_secret_access_key => $Defs::aws_secret_access_key,
+      host                  => $Defs::aws_s3_endpoint || 's3-eu-west-1.amazonaws.com',
       retry                 => 1,
     );
     return undef if !$s3;
