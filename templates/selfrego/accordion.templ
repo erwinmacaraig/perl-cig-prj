@@ -43,12 +43,12 @@
                                         <td>[% rego.PRStatus %]</td>
                                         <td>
                                         [% IF rego.renewlink %]
-                                            <a href = "[% rego.renewlink %]" class = "btn-inside-panels">[% Lang.txt('Renew') %]</a>
+                                            <a href = "[% rego.renewlink %]" class = "center-align btn-inside-panels">[% Lang.txt('Renew') %]</a>
                                         [% ELSE %]
                                             &nbsp;
                                         [% END %]
                                         [% IF rego.allowTransfer %] 
-                                            <a href = "[% rego.transferlink %]" class="btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
+                                            <a href = "[% rego.transferlink %]" class="center-align btn-inside-panels">[% Lang.txt('Transfer') %]</a><br>
                                         [% END %]
                                     </tr>
                                 [% END %]
