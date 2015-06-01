@@ -135,6 +135,7 @@ sub createTempEntityStructure  {
     #Now to generate and insert the indirect relationships
     foreach my $entityID (keys %entities)    {
       insertRelationships(
+            $eid,
           $entityID,
           \%entities,
           \%entityLinks,
@@ -149,6 +150,7 @@ sub createTempEntityStructure  {
 
 sub insertRelationships {
     my  (
+            $eid,
         $entityID,
         $entities,
         $entityLinks,
@@ -165,6 +167,7 @@ sub insertRelationships {
             dataaccess => $entities->{$childID}{'dataaccess'},
           };
           my $ret = insertRelationships(
+            $eid,
             $childID,
             $entities,
             $entityLinks,
@@ -174,6 +177,12 @@ sub insertRelationships {
           push @children, @{$ret} if $ret;
       }
       foreach my $child (@children) {
+             if ($eid)   {
+                next if (
+                    $entityID != $eid
+                    and $child->{'id'} != $eid
+                );
+            }
           $qry->execute(
               $realmID,
               $entityID,
@@ -229,6 +238,7 @@ sub createTreeStructure {
     }
     my $ins_st = qq[
         INSERT INTO tblTempTreeStructure (
+            tTimeStamp,
             intRealmID, 
             int100_ID,
             int30_ID,
@@ -237,6 +247,7 @@ sub createTreeStructure {
             int3_ID
         )
         VALUES (
+            NOW(),
             ?,
             ?,
             ?,
