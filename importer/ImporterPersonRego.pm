@@ -35,10 +35,13 @@ use Data::Dumper;
 ############
 
 sub insertCertification {
-    my ($db, $personID, $personRole) = @_;
+    my ($db, $personID, $personRole, $dtFrom, $dtTo) = @_;
 
     ## From tblCertificationTypes
     my $maCode = getImportMACode($db) || '';
+
+    $dtFrom ||= '';
+    $dtTo ||= '';
 
     my %certs=();
     if ($maCode eq 'HKG')   {
@@ -57,11 +60,11 @@ sub insertCertification {
     my $certID = $certs{$personRole} || return;
     $personID || return;
     my $st = qq[
-        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus)
-        VALUES (?,1,?,'ACTIVE')
+        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus, dtValidFrom, dtValidTo)
+        VALUES (?,1,?,'ACTIVE', ?, ?)
     ];
     my $qry = $db->prepare($st) or query_error($st);
-    $qry->execute($personID, $certID);
+    $qry->execute($personID, $certID, $dtFrom , $dtTo);
 }
     
 sub insertPersonRegoRecord {
@@ -94,13 +97,15 @@ sub insertPersonRegoRecord {
             tmpProductCode,
             tmpProductID,
             tmpAmount,
-            tmpisPaid
+            tmpisPaid,
+            tmpdtPaid
         )
         VALUES (
             1,
             NOW(),
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -157,11 +162,11 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             ## Finland at moment
             if ($dref->{'strPersonType'} eq 'COACH')    {
                 ## INSERT INTO tblPersonCertifications or whatever its called -- need an IMPROT CODE
-                insertCertification($db, $dref->{'intPersonID'}, $personRole);
+                insertCertification($db, $dref->{'intPersonID'}, $personRole, $dref->{'dtFrom'}, $dref->{'dtTo'});
                 $personRole = ''; ## NEEDS CONFIRMATION
             }
             if ($dref->{'strPersonType'} eq 'REFEREE')    {
-                insertCertification($db, $dref->{'intPersonID'}, $personRole);
+                insertCertification($db, $dref->{'intPersonID'}, $personRole, $dref->{'dtFrom'}, $dref->{'dtTo'});
                 $personRole = '' if ($personRole eq 'FAF' or $personRole eq 'DISTRICT');
             }
         }
@@ -187,9 +192,19 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             $dref->{'strProductCode'},
             $dref->{'intProductID'},
             $dref->{'curProductAmount'},
-            $dref->{'strPaid'}
+            $dref->{'strPaid'},
+            $dref->{'dtPaid'}
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
+        if ($dref->{'strProductCode'})  {
+            my $st_up = qq[
+                UPDATE tblPersonRegistration_1
+                SET strShortNotes=CONCAT(IF(tmpPaymentRef, CONCAT(tmpPaymentRef, " "), ""), IF(tmpdtPaid, CONCAT(tmpdtPaid, " "), ""), tmpProductCode, " ",  tmpAmount, " ", tmpisPaid)
+                WHERE intPersonRegistrationID = ?
+            ];
+            my $qry_up = $db->prepare($st_up) or query_error($st_up);
+            $qry_up->execute($ID);
+        }
     }
 }
  sub linkPRNationalPeriods{
@@ -355,12 +370,21 @@ while (<INFILE>)	{
 	    $parts{'PRODUCTCODE'} = $fields[14] || '';
 	    $parts{'PRODUCTAMOUNT'} = $fields[15] || 0;
 	    $parts{'ISPAID'} = $fields[16] || '';
-	    $parts{'TRANSACTIONNO'} = $fields[17] || '';
+	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
+	    $parts{'DATEPAID'} = $fields[17] || '';
         
         $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
         $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
-        $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
-        $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
+        if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        
     }
 	if ($countOnly)	{
 		$insCount++;
@@ -369,8 +393,8 @@ while (<INFILE>)	{
 
 	my $st = qq[
 		INSERT INTO tmpPersonRego
-		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, strProductCode, curProductAmount, strPaid, strTransactionNo)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
@@ -392,7 +416,8 @@ while (<INFILE>)	{
         $parts{'PRODUCTCODE'},
         $parts{'PRODUCTAMOUNT'},
         $parts{'ISPAID'},
-        $parts{'TRANSACTIONNO'}
+        $parts{'TRANSACTIONNO'},
+        $parts{'DATEPAID'}
     ) or print "ERROR";
 }
 $count --;

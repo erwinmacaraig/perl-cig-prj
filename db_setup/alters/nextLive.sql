@@ -138,4 +138,5 @@ ALTER TABLE tblNationalPeriod ADD COLUMN intDontUseForLoans TINYINT DEFAULT 0;
 
 ALTER TABLE tblPersonRegistration_1 ADD COLUMN `intIsLoanedOut` TINYINT NULL DEFAULT 0 COMMENT 'Flag to identify that the person registration record is loaned out' AFTER `intOnLoan`;
 
+ALTER TABLE tblPersonRegistration_1 ADD COLUMN `strPreLoanedStatus` VARCHAR(45) NULL DEFAULT '' COMMENT 'Used as temporary column to save status from imported data' AFTER `intIsLoanedOut`;
 

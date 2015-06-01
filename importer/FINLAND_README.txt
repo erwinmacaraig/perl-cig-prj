@@ -42,6 +42,7 @@ UPDATE tblSystemConfig SET strValue=0 WHERE strOption  LIKE '%Venue%';
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
 UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
+UPDATE tblPersonRegistration_1 SET strShortNotes=CONCAT(IF(tmpPaymentRef, CONCAT(tmpPaymentRef, " "), ""), IF(tmpdtPaid, CONCAT(tmpdtPaid, " "), ""), tmpProductCode, " ",  tmpAmount, " ", tmpisPaid);
 
 
 
