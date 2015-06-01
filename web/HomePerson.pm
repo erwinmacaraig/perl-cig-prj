@@ -187,10 +187,16 @@ sub showPersonHome	{
                 AND tblRegistrationItem.strPersonLevel IN ('', ?)
                 AND tblRegistrationItem.intOriginLevel = ?
                 AND tblRegistrationItem.intEntityLevel = ?
+                AND (tblRegistrationItem.intItemForInternationalTransfer = 0 OR tblRegistrationItem.intItemForInternationalTransfer = ?)
+                AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             ORDER BY 
                 tblDocuments.tTimeStamp DESC, 
                 tblDocuments.intUploadFileID DESC
     ];
+
+    my $internationalTransfer = ($rego->{'intNewBaseRecord'} and $rego->{'intInternationalTransfer'}) ? 1 : 0;
+    my $internationalLoan = ($rego->{'intNewBaseRecord'} and $rego->{'intInternationalLoan'}) ? 1 : 0;
+
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID, 
@@ -201,6 +207,8 @@ sub showPersonHome	{
         $rego->{'strPersonLevel'} || '',
         $rego->{'intOriginLevel'}, 
         $rego->{'intEntityLevel'}, 
+        $internationalTransfer,
+        $internationalLoan,
     );
 
 	while(my $dref = $sth->fetchrow_hashref()){

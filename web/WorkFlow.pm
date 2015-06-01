@@ -2551,6 +2551,8 @@ sub viewTask {
             p.dtSuspendedUntil,
             p.strISOCountryOfBirth,
             p.strISONationality,
+            p.intInternationalTransfer,
+            p.intInternationalLoan,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
             p.intInternationalTransfer as InternationalTransfer,
@@ -3161,6 +3163,7 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
 sub populateDocumentViewData {
     my ($Data, $dref) = @_;
 
+
     #need to retrieve list of documents here
     #since a specific work flow rule can have
     #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
@@ -3171,6 +3174,9 @@ sub populateDocumentViewData {
 	my %validdocs = ();
 	my %validdocsStatus = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+
+    my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
+    my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
 
     my $query = qq[
         SELECT
@@ -3193,6 +3199,8 @@ sub populateDocumentViewData {
             AND tblRegistrationItem.strRegistrationNature IN ('', ?)
             AND tblRegistrationItem.strAgeLevel IN ('', ?)
             AND tblRegistrationItem.strPersonLevel IN ('', ?)
+            AND (tblRegistrationItem.intItemForInternationalTransfer = 0 OR tblRegistrationItem.intItemForInternationalTransfer = ?)
+            AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             AND tblRegistrationItem.intEntityLevel = ?
     ];
     my @levels = ();
@@ -3214,6 +3222,8 @@ sub populateDocumentViewData {
         $dref->{'strRegistrationNature'} || '',
         $dref->{'strAgeLevel'} || '',
         $dref->{'strPersonLevel'} || '',
+        $internationalTransfer,
+        $internationalLoan,
         @levels
     );
     while(my $adref = $sth->fetchrow_hashref()){
@@ -3319,8 +3329,8 @@ sub populateDocumentViewData {
                 AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 AND (regoItem.intFilterFromAge = 0 OR regoItem.intFilterFromAge <= $dref->{'currentAge'})
                 AND (regoItem.intFilterToAge = 0 OR regoItem.intFilterToAge >= $dref->{'currentAge'})
-                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = '$dref->{'InternationalTransfer'}')
-                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = '$dref->{'InternationalLoan'}')
+                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = $internationalTransfer)
+                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = $internationalLoan)
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
