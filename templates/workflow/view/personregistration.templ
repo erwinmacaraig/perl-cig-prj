@@ -15,7 +15,6 @@
 </div>
 [% END %]
 
-
 [% IF Notifications.size %]
 <div class="col-md-12">
     <div class="alert alert-warning" role="alert">
@@ -137,14 +136,14 @@
 
                             [% IF PersonDetails.Address1 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address1') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 1') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address1 %]</span>
                                 </span>
                             [% END %]
 
                             [% IF PersonDetails.Address2 %]
                                 <span class="details-row">
-                                  <span class="details-left">[% Lang.txt('Address2') %]:</span>
+                                  <span class="details-left">[% Lang.txt('Address 2') %]:</span>
                                   <span class="details-left detail-value">[% PersonDetails.Address2 %]</span>
                                 </span>
                             [% END %]
@@ -249,7 +248,7 @@
                     [% IF PersonRegoDetails.Status %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Status") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.Status %]</span>
+                            <span class="details-left detail-value">[% Lang.txt(PersonRegoDetails.Status) %]</span>
                         </span>
                     [% END %]
 
@@ -271,7 +270,7 @@
                     [% IF PersonRegoDetails.Sport %]
                         <span class="details-row">
                             <span class="details-left">[% Lang.txt("Sport") %]:</span>
-                            <span class="details-left detail-value">[% PersonRegoDetails.Sport %]</span>
+                            <span class="details-left detail-value">[% Lang.txt(PersonRegoDetails.Sport) %]</span>
                         </span>
                     [% END %]
 
@@ -295,6 +294,51 @@
                             <span class="details-left detail-value">[% IF PersonRegoDetails.Certifications %] [% PersonRegoDetails.Certifications %] [% ELSE %] - [% END %]</span>
                         </span>
                     [% END %]
+
+                    [% IF PersonRegoDetails.OriginLevel == 100 %]
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("MA Comment") %]:</span>
+                            <span class="details-left detail-value">[% IF PersonRegoDetails.strShortNotes %] [% PersonRegoDetails.strShortNotes %] [% ELSE %] - [% END %]</span>
+                        </span>
+                    [% END %]
+
+                    [% IF PersonDetails.InternationalLoan AND PersonRegoDetails.NewBaseRecord == 1 %]
+                        <span class="details-left" style="margin-top: 20px; margin-bottom: 10px"><strong>[% Lang.txt("International Loan Details") %]</strong></span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Loan Source Club") %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.strInternationalLoanSourceClub %]</span>
+                        </span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("TMS Reference Number") %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.strInternationalLoanTMSRef %]</span>
+                        </span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Loan Start Date") %]:</span>
+                            <span class="details-left detail-value">[% DateFormat.format(PersonDetails.dtInternationalLoanFromDate,'MEDIUM') || '' %]</span>
+                        </span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Loan End Date") %]:</span>
+                            <span class="details-left detail-value">[% DateFormat.format(PersonDetails.dtInternationalLoanToDate,'MEDIUM') || '' %]</span>
+                        </span>
+
+                    [% END %]
+
+                    [% IF PersonDetails.InternationalTransfer AND PersonRegoDetails.NewBaseRecord == 1 %]
+                        <span class="details-left" style="margin-top: 20px; margin-bottom: 10px"><strong>[% Lang.txt("International Transfer Details") %]</strong></span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Transfer Source Club") %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.strInternationalTransferSourceClub || '-' %]</span>
+                        </span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("TMS Reference Number") %]:</span>
+                            <span class="details-left detail-value">[% PersonDetails.strInternationalTransferTMSRef || '-' %]</span>
+                        </span>
+                        <span class="details-row">
+                            <span class="details-left">[% Lang.txt("Transfer Date") %]:</span>
+                            <span class="details-left detail-value">[% DateFormat.format(PersonDetails.dtInternationalTransferDate,'MEDIUM') || '' %]</span>
+                        </span>
+                    [% END %]
+
 
                     <div class="row-padding">
                     <div style="clear: both;">&nbsp;</div>

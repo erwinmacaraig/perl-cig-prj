@@ -23,6 +23,7 @@ $(document).ready(function(){
     }
 
     var param = getUrlparameter("a");
+    if(!param) { param = ''; }
     var pageHeading = $(".pageHeading").text();
 
     console.log(param);

@@ -99,7 +99,8 @@ sub handlePersonEdit {
             $body = 'updated';
             if($back_screen){
                 my %tempClientValues = getClient($Data->{'client'});
-                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                #$tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                $tempClientValues{currentLevel} = getLastEntityLevel($Data->{'clientValues'}) || $tempClientValues{authLevel};
                 my $tempClient= setClient(\%tempClientValues);
 
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&$back_screen";
@@ -169,6 +170,7 @@ sub triggerRule {
                 $personID,
                 0,
                 0,
+		$currPersonObj->getValue('intInternationalTransfer')
             );
         }
 

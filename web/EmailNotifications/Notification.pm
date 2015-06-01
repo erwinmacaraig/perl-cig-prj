@@ -26,6 +26,7 @@ sub new {
         _textTemplatePath   => $args{textTemplatePath} || undef,
         _data               => $args{data} || undef,
         _workTaskDetails    => $args{workTaskDetails} || undef,
+        _toOriginLevel      => $args{OriginLevel} || undef,
     };
 
     $self = bless ($self, $class);
@@ -104,6 +105,10 @@ sub getWorkTaskDetails {
     return $self->{_workTaskDetails};
 }
 
+sub getToOriginLevel {
+    my ($self) = shift;
+    return $self->{_toOriginLevel} || 100;
+}
 
 sub initialise {
     my ($self) = shift;
@@ -139,7 +144,7 @@ sub send {
         $templateData->{'From'}{'email'},
         $templateData->{'CC'}{'email'},
     );
-
+    
     #print STDERR Dumper "SENT STATUS ". $emailsentOK;
     #print STDERR Dumper "MESSAGE ". $message;
 }
@@ -226,6 +231,12 @@ sub setWorkTaskDetails {
     my $self = shift;
     my ($workTaskDetails) = @_;
     $self->{_workTaskDetails} = $workTaskDetails if defined $workTaskDetails;
+}
+
+sub setToOriginLevel {
+    my $self = shift;
+    my ($originLevel) = @_;
+    $self->{_toOriginLevel} = $originLevel if defined $originLevel;
 }
 
 1;

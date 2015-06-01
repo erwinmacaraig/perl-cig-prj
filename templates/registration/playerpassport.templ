@@ -24,11 +24,11 @@
           <td>[% DateFormat.format(p.From,'MEDIUM') %]</td>
           <td>[% DateFormat.format(p.To,'MEDIUM') %]</td>
           <td>[% p.Club %]</td>
-          <td>[% p.Level %]</td> 
+          <td>[% Lang.txt(p.Level) %]</td> 
           <td>[% p.MAName %]</td>
 	[% END %]  
 </table>
 </div>
 [% ELSE %]
-<h4> No Record Found. </h4>
+<h4> [% Lang.txt('No Record Found') %]. </h4>
 [% END %]

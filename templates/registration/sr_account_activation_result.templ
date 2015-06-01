@@ -1,0 +1,17 @@
+<div class="logout-wrap">
+    [% IF Type == "invalidparam" %]
+        <p>[% Lang.txt("An error has been encountered while activating your account. Please check your email for the correct link.") %]</p>
+    [% END %]
+
+    [% IF Type == "invalidkey" %]
+        <p>[% Lang.txt("Your confirmation key is invalid. Please check your email for the correct link.") %]</p>
+    [% END %]
+
+    [% IF Type == "success" %]
+        <p>[% Lang.txt("Your account has been activated successfully.") %]</p>
+        <a href = "index.cgi?srp=[% srp %]">[% Lang.txt('Login to continue') %]</a>
+    [% END %]
+
+</div>
+
+

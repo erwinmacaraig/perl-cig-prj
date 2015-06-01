@@ -160,7 +160,7 @@ sub setupFilters  {
         club => $clubID,
     );
 
-    if($subEntities)  {
+    if($subEntities and scalar(@{$subEntities}))  {
         $filters{'entity'} = $subEntities;
     }
 

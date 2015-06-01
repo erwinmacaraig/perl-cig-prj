@@ -52,7 +52,7 @@ sub checkRegoAgeRestrictions {
             $personAge = $regs->[0]{'currentAge'};
         }
     } else {
-        $personDetails = loadPersonDetails($Data->{'db'}, $personID);
+        $personDetails = Person::loadPersonDetails($Data->{'db'}, $personID);
         #print STDERR Dumper $personDetails;
         $personAge = $personDetails->{'currentAge'} or undef;
     }
@@ -131,7 +131,7 @@ sub checkRegoAgeRestrictions {
         }
         elsif($personAgeLevel eq $_) {
             push @retdata, {
-                name => $Defs::ageLevel{$_},
+                name => $Data->{'lang'}->txt($Defs::ageLevel{$_}),
                 value => $_,
             };
         }

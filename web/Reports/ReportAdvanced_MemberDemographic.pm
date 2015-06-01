@@ -507,7 +507,7 @@ sub _getConfiguration {
                     displaytype => 'lookup',
                     fieldtype   => 'dropdown',
                     dropdownoptions =>
-                      { '' => '&nbsp;', 1 => 'Male', 2 => 'Female' },
+                      { 1 => 'Male', 2 => 'Female' },
                     dropdownorder => [ '', 1, 2 ],
                     size          => 3,
                     multiple      => 1,

@@ -55,7 +55,8 @@ sub handleProdTransactions	{
 		($resultHTML,$heading) = ("FAILURE , do we need to update DB ?", "FAILURE");
   }
 
-	$heading||='Transactions';
+  $heading||='Transactions';
+  $heading = $Data->{'lang'}->txt($heading);
   return ($resultHTML,$heading);
 
 }
@@ -202,7 +203,7 @@ sub displayProdTransaction	{
 				target => $Data->{'target'},
 				formname => 'txn_form',
 				submitlabel => 'Update Member Transaction',
-				introtext => 'auto',
+				introtext => '',
 				buttonloc => 'bottom',
 				updateSQL => $txnupdate,
 				addSQL => $txnadd,

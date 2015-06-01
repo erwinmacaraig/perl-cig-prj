@@ -45,7 +45,10 @@ sub connectDB {
     my $db = DBI->connect($dsn, $Defs::DB_USER, $Defs::DB_PASSWD);
 
     if (!defined $db) { return "Database Error"; }
-    else  { return $db; }
+    else  { 
+        $db->do(qq{SET NAMES 'utf8';});
+        return $db; 
+    }
 
 }
 

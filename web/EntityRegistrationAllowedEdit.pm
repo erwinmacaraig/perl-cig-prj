@@ -156,7 +156,6 @@ sub rule_details   {
           target => $Data->{'target'},
           formname => 'n_form',
           submitlabel => $Data->{'lang'}->txt('Update'),
-          introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
           NoHTML => 1,
           beforeaddFunction => \&isRegoAllowedToSystem,
           beforeaddParams => [$Data, $Data->{'clientValues'}{'authLevel'}, $field->{strRegistrationNature}, $Data->{'clientValues'}{'currentLevel'}],
@@ -327,7 +326,7 @@ sub listRules  {
 
     my @headers = (
         {
-            name  => $Data->{'lang'}->txt('PersonType'),
+            name  => $Data->{'lang'}->txt('Person Type'),
             field => 'PersonType',
         },
         {
@@ -335,11 +334,11 @@ sub listRules  {
             field => 'Sport',
         },
         {
-            name  => $Data->{'lang'}->txt('PersonLevel'),
+            name  => $Data->{'lang'}->txt('Person Level'),
             field => 'PersonLevel',
         },
         {
-            name  => $Data->{'lang'}->txt('AgeLevel'),
+            name  => $Data->{'lang'}->txt('Age Level'),
             field => 'AgeLevel',
         },
         {

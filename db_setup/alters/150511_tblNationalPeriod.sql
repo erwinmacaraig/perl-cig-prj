@@ -1,0 +1,1 @@
+ALTER TABLE tblNationalPeriod ADD COLUMN intDontUseForLoans TINYINT DEFAULT 0;

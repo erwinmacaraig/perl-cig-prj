@@ -34,7 +34,7 @@
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+						<form action="[% url %]/uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
@@ -71,6 +71,9 @@
                                 [% ELSE %]
                                 dictDefaultMessage: "[% Lang.txt('Click here to upload file') %]",
                                 [% END %]
+                                dictCancelUpload: "[% Lang.txt('Cancel Upload') %]",
+                                dictCancelUploadConfirmation: "[% Lang.txt('Are you sure you want to cancel this upload?') %]",
+                                dictRemoveFile: "[% Lang.txt('Remove file') %]",
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
 								init: function(){
@@ -136,7 +139,7 @@
 						</div>
 					</td>
 					<td style="width:50%;">
-						<form action="uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
+						<form action="[% url %]/uploadregofile.cgi" method="POST" class="dropzone" enctype="multipart/form-data" id="myRegoDoc[% doc.ID %]">
 							<input type="hidden" name="client" value="[% client %]" />
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />

@@ -1,22 +1,22 @@
 <div id="content">
-    <div style="font-size:14px;color:red;"><b>There was an Error with your Payment.</b></div>
+    <div style="font-size:14px;color:red;"><b>[% Lang.txt('There was an Error with your Payment.') %]</b></div>
 
     <table class="confirm-intro">
         <tbody>
         <tr>
-            <td>Error:</td>
-            <td>[% strResponseText %]</td>
+            <td>[% Lang.txt('Error') %]:</td>
+            <td>[% ResponseText %]</td>
         </tr>
         <tr>
-            <td>Amount:</td>
+            <td>[% Lang.txt('Amount') %]:</td>
             <td>\$[% intAmount %]</td>
         </tr>
         <tr>
-            <td>Payment for:</td>
+            <td>[% Lang.txt('Payment for') %]:</td>
             <td>[% AssocName %] [% ClubName %]</td>
         </tr>
         <tr>
-            <td>Payment ID:</td>
+            <td>[% Lang.txt('Payment Reference Number') %]:</td>
             <td>[% intLogID %]</td>
         </tr>					
         </tbody>
