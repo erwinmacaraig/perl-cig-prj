@@ -29,12 +29,20 @@
             <p>[% Lang.txt('The following registration has been approved.') %] [% PersonRegistrationDetails.registerTo %] [% Lang.txt('has been notified.') %]</p>
             <br/>
 			<div class="read-only">
-				<h4>[% Lang.txt('Registration Details') %]</h4>
+				<h4>[% Lang.txt('Registration Details') %][% IF PersonRegistrationDetails.isInternationalPlayerLoan %]
+				[% Lang.txt(' (International Player Loan)') %]
+				[% END%]</h4>
 				<div class="read-only-text">
+				  [% IF PersonRegistrationDetails.isInternationalPlayerLoan %]
+					<div class="">
+					  	<span class="paddingsummary">[% Lang.txt('Member ID:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.MID %]</span>
+					</div>
+				  [% END %]
 					<div class="">
 					  	<span class="paddingsummary">[% Lang.txt('Register to:') %]</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.registerTo %]</span>
-				    </div>
+					</div>
 					<div class="">
 					  	<span class="paddingsummary">[% Lang.txt('Register as:') %]</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.personType %]</span>

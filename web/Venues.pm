@@ -197,7 +197,7 @@ sub venue_details   {
        intLocalLanguage => {
           label       => 'Language the name is written in',
           type        => 'lookup',
-          value       => $field->{intLocalLanguage},
+          value       => $field->{intLocalLanguage} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
           options     => \%languageOptions,
           firstoption => [ '', 'Select Language' ],
           compulsory => 1,
@@ -874,7 +874,7 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
       $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
+      createTempEntityStructure($Data, $Data->{'Realm'}, $id); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }

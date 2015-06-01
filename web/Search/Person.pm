@@ -58,7 +58,7 @@ sub getUnique {
 
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -164,7 +164,7 @@ sub getTransfer {
     #exclude persons that are already in the CLUB initiating the transfer
 #    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -311,7 +311,7 @@ sub getPlayerLoan {
     #exclude persons that are already in the CLUB initiating the transfer
 #    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -479,7 +479,7 @@ sub getPersonRegistration {
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
     #my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -631,7 +631,7 @@ sub getPersonAccess {
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {

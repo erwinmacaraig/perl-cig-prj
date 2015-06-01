@@ -1678,6 +1678,12 @@ sub checkForOutstandingTasks {
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
+
+                my $stp = qq [SELECT * FROM tblPerson WHERE intPersonID = ?];
+                my $qP = $db->prepare($stp); 
+				$qP->execute($personID);
+				my $personref = $qP->fetchrow_hashref();
+
                 if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL)    {
                     PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
                 }
@@ -1701,6 +1707,10 @@ sub checkForOutstandingTasks {
     
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
+                }
+
+                if($ppref->{'intNewBaseRecord'} == 1 and $personref->{'intInternationalLoan'} == 1) {
+                    PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
            ##############################################################################################################
@@ -2432,6 +2442,7 @@ sub getTask {
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             p.dtDOB AS DOB_RAW,
+            p.intInternationalLoan,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
@@ -3813,7 +3824,7 @@ sub viewSummaryPage {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
             }
-
+	    $TemplateData{'PersonRegistrationDetails'}{'isInternationalPlayerLoan'} = $task->{'intInternationalLoan'};
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};

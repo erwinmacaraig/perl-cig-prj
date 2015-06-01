@@ -12,6 +12,7 @@ require Exporter;
     setRequestStatus
     activatePlayerLoan
     deactivatePlayerLoan
+    setPlayerLoanValidDate
 );
 
 use lib ".", "..";
@@ -2461,7 +2462,7 @@ sub deactivatePlayerLoan {
     }
 }
 
-sub setPlayerLoanValidDate () {
+sub setPlayerLoanValidDate {
     my ($Data, $requestID, $personID, $personRegistrationID) = @_;
     #this function is used by both domestic and international loan
     #where dtLoanTo and dtLoanFrom are in future
@@ -2498,8 +2499,33 @@ sub setPlayerLoanValidDate () {
         }
     }
     elsif($personRegistrationID) {
-    
-    
+        my $bst = qq [
+            UPDATE
+                tblPersonRegistration_$Data->{'Realm'} PR
+            INNER JOIN
+                tblPerson P ON (P.intPersonID = PR.intPersonID)
+            INNER JOIN
+                tblNationalPeriod NP ON (P.dtInternationalLoanFromDate BETWEEN NP.dtFrom AND NP.dtTo)
+            SET
+                PR.dtFrom = P.dtInternationalLoanFromDate,
+                PR.dtTo = IF(P.dtInternationalLoanToDate <= NP.dtTo, P.dtInternationalLoanToDate, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, P.dtInternationalLoanToDate)),
+                PR.intNationalPeriodID = NP.intNationalPeriodID
+            WHERE
+                PR.intPersonRegistrationID = ?
+                AND PR.intPersonID = ?
+                AND PR.strStatus IN ('PENDING', 'ACTIVE')
+                AND NP.intDontUseForLoans = 0
+        ];
+
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport ];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($personRegistrationID, $personID) or query_error($st);
+
+        if (!$query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($personRegistrationID, $personID) or query_error($st);
+        }
     }
 }
 

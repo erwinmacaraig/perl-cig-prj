@@ -72,7 +72,7 @@ sub process {
 	switch($strWFRuleFor){
 		case ['REGO','PERSON'] {
 		
-			my $keywordsearch = $self->getKeyword();
+			my $keywordsearch = $self->getKeyword(1);
 			$keywordsearch =~ s/[,\-\']+//g;
 			$st = qq[
 					SELECT DISTINCT
@@ -124,7 +124,7 @@ sub process {
 		}
 		case 'ENTITY' {
 			
-			my $keywordsearch = $self->getKeyword();
+			my $keywordsearch = $self->getKeyword(1);
 			$keywordsearch =~ s/[,\-\']+//g;
 			my $intermediateNodes = {};
 		    my $subNodes = [];
@@ -136,7 +136,7 @@ sub process {
 			$self->getSphinx()->ResetFilters();
 			$self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
 			my $indexName = "FIFA_Entities_r".$filters->{'realm'}; #FIFA_Entities_r
-			$results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+			$results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
 
 
  	   		if($results and $results->{'total'})  {
