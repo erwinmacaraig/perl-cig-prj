@@ -27,6 +27,7 @@ CREATE TABLE tmpPersonRego (
     curProductAmount decimal(12,2) default 0.00,
     strPaid varchar(30) default '',
     strTransactionNo varchar(30) default '',
+    dtPaid date,
     
     PRIMARY KEY (intID),
     INDEX index_strFileType (strFileType),
