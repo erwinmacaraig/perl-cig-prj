@@ -281,6 +281,7 @@
 
         jQuery("#personRequestNotes").submit(function(e){
             e.preventDefault();
+
             jQuery("form#flowFormID div#hiddenfields").empty();
 
             jQuery("form#flowFormID div#hiddenfields")
@@ -288,7 +289,12 @@
                 .append(jQuery("form#personRequestNotes").children().clone());
 
             jQuery("div#hiddenfields").find("textarea").val(jQuery("form#personRequestNotes textarea").val());
-            jQuery("form#flowFormID").submit();
+
+            if(jQuery(this).valid()) {
+                jQuery(this).find("input[name='submitb']").attr('disabled', true);
+                jQuery("form#flowFormID").submit();
+            }
+
         });
 
         // validate the comment form when it is submitted
