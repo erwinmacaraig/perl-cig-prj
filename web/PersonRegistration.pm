@@ -729,6 +729,9 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
+        my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
+        my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
+
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
         $dref->{'personType'} = $dref->{'strPersonType'} || '';
@@ -814,6 +817,8 @@ sub getRegistrationData	{
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
+        AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = $internationalTransfer)
+        AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = $internationalLoan)
 ];		
             #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
