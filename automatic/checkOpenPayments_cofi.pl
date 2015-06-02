@@ -66,6 +66,7 @@ print STDERR "IN checkOpenPayments\n";
 	DISTINCT
             TL.intLogID,
             TL.intAmount,
+            TL.strOnlinePayReference,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
             PC.strCurrency,
@@ -115,7 +116,7 @@ print STDERR "IN checkOpenPayments\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
         $APIResponse{'VERSION'} = "0001";
-        $APIResponse{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
+        $APIResponse{'STAMP'} = $dref->{'strOnlinePayReference'}; #Data{'SystemConfig'}{'paymentPrefix'}.$logID;
         $APIResponse{'REFERENCE'} = $logID;
         $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
         $APIResponse{'AMOUNT'} = $cents;

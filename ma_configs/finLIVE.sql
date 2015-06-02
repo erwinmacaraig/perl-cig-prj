@@ -5,10 +5,14 @@ SELECT * FROM tblSystemConfig WHERE strOption  LIKE 'lockAp%'; ##
 UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100; 
 UPDATE tblSystemConfig SET strValue=0 WHERE strOption  LIKE '%Venue%';
 
+UPDATE tblProducts SET curDefaultAmount=2 WHERE intProductID=59;
+
+
+
 ## CHECK THIS
 INSERT INTO tblSystemConfig VALUES (0, 1, 'selfRego_RENEW_PLAYER', 1, NOW(),1,0);
 INSERT INTO tblSystemConfig VALUES (0,1, 'allowFindPaymentMinLevel', 100, NOW(),1,0);
-INSERT INTO tblSystemConfig VALUES (0,1, 'paymentPrefix', 'FAF15-', NOW(),1,0); ###TEST
+INSERT INTO tblSystemConfig VALUES (0,1, 'paymentPrefix', 'FAF', NOW(),1,0); ###TEST
 UPDATE tblGenerate SET intCurrentNum = (SELECT MAX(strNationalNum) + 1 FROM tblPerson) WHERE strGenType='PERSON';
 
 
@@ -18,10 +22,11 @@ UPDATE tblGenerate SET intCurrentNum = (SELECT MAX(strNationalNum) + 1 FROM tblP
 ## FOR TESTING
 UPDATE tblPaymentConfig SET strGatewayUsername="375917", strGatewayPassword="SAIPPUAKAUPPIAS" WHERE intPaymentConfigID=3;
 UPDATE tblSystemConfig SET strValue=0 WHERE intSystemConfigID=3955;
+UPDATE tblProducts SET curDefaultAmount=45 WHERE intProductID=59;
+
+
 UPDATE tblSystemConfig SET strValue=0 WHERE strOption  LIKE '%Venue%';
-
-
 ## Update below per import run
 DELETE FROM tblSystemConfig WHERE strOption = 'paymentPrefix';
-INSERT INTO tblSystemConfig VALUES (0,1,'paymentPrefix', 'FAFUAT2-', NOW(),1,0);
-INSERT INTO tblSystemConfig VALUES (0,1,'paymentPrefix', 'FAFTRN2-', NOW(),1,0);
+INSERT INTO tblSystemConfig VALUES (0,1,'paymentPrefix', 'FAF2UAT2', NOW(),1,0);
+INSERT INTO tblSystemConfig VALUES (0,1,'paymentPrefix', 'FAF2TRN2', NOW(),1,0);
