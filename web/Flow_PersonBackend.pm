@@ -210,7 +210,7 @@ sub display_core_details    {
     }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'', $fieldMessages);
     my $newRegoWarning = '';
     my $bypassduplicate = '';
     if(!$id)    {
