@@ -2439,6 +2439,10 @@ sub getTask {
             p.strISONationality,
             p.intGender,
             p.strNationalNum,
+            p.strInternationalLoanSourceClub,
+	    p.strInternationalLoanTMSRef, 
+	    p.dtInternationalLoanFromDate, 
+	    p.dtInternationalLoanToDate,
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             p.dtDOB AS DOB_RAW,
@@ -3850,6 +3854,12 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'Status'} = $Defs::personStatus{$task->{'personStatus'}};
             $TemplateData{'PersonRegistrationDetails'}{'DateFrom'} = $task->{'dtFrom'};
             $TemplateData{'PersonRegistrationDetails'}{'DateTo'} = $task->{'dtTo'};
+            #
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanSourceClub'} = $task->{'strInternationalLoanSourceClub'} || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanTMSRef'} = $task->{'strInternationalLoanTMSRef'} || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanFromDate'} = $Data->{'l10n'}{'date'}->TZformat($task->{'dtInternationalLoanFromDate'},'MEDIUM') || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanToDate'} =  $Data->{'l10n'}{'date'}->TZformat($task->{'dtInternationalLoanToDate'},'MEDIUM') || '';
+            #
             $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
 
         }

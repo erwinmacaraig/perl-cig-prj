@@ -38,7 +38,32 @@
 					  	<span class="paddingsummary">[% Lang.txt('Member ID:') %]</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.MID %]</span>
 					</div>
+					[% IF PersonRegistrationDetails.InternationalLoanSourceClub %]
+					  <div class="">
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan Source Club:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanSourceClub %]</span>
+					  </div>
+					[% END %]
+					[% IF PersonRegistrationDetails.InternationalLoanFromDate %]
+					  <div class="">
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan Start Date:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanFromDate %]</span>
+					  </div>
+					[% END %]
+					[% IF PersonRegistrationDetails.InternationalLoanToDate %]
+					  <div class="">
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan End Date:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanToDate %]</span>
+					  </div>
+					[% END %]
+					[% IF PersonRegistrationDetails.InternationalLoanTMSRef %]
+					  <div class="">
+					  	<span class="paddingsummary">[% Lang.txt('Player TMS Reference:') %]</span>
+					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanTMSRef %]</span>
+					  </div>
+					[% END %]
 				  [% END %]
+				  
 					<div class="">
 					  	<span class="paddingsummary">[% Lang.txt('Register to:') %]</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.registerTo %]</span>

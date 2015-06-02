@@ -1845,7 +1845,7 @@ form#flowFormID #l_row_type,#l_row_sport label {
 .paddingsummary {
 	float: left;
     /*width: 95px;*/
-    width: 130px;
+    width: 230px;
 }
 #flowFormID .col-md-9 .nav-tabs li a {
     font-size: 13px;
