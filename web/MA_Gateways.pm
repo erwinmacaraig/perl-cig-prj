@@ -50,7 +50,7 @@ sub MAGateway_FI_checkoutFI	{
         $gatewaySpecific{'STAMP'} = $payRef;
         $gatewaySpecific{'AMOUNT'} = $cents;
         my $reference = $logID . calcuatePaymentCheckSum($logID);
-        $gatewaySpecific{'REFERENCE'} = $reference;
+        $gatewaySpecific{'REFERENCE'} = $reference || $logID;
         $gatewaySpecific{'MESSAGE'} = "";
         $gatewaySpecific{'LANGUAGE'} = "FI";
         $gatewaySpecific{'LANGUAGE'} = "EN" if ($currentLang =~ /^en_/);
