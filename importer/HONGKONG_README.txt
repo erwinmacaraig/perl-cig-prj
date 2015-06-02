@@ -1,3 +1,6 @@
+IMPORTANT STEP BEFORE LOADING DB:
+##check latin1 & MyISAM
+
 mysql -u root XXX -p < ma_config/cleanDB.sql
 
 
