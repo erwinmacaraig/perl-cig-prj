@@ -144,10 +144,6 @@ sub queryFindByNumber {
 		field => 'txnnumber', 
 	},
 	{
-		name => $Data->{'lang'}->txt('Reference'),
-		field => 'recref', 
-	},
-	{
       name => $Data->{'lang'}->txt('Payment Date'),
       field => 'paymentDate',
 	  sortdata => 'paymentDateSortColumn',
