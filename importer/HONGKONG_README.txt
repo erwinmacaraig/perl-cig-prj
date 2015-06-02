@@ -1,28 +1,23 @@
+IMPORTANT STEP BEFORE LOADING DB:
+##check latin1 & MyISAM
+
 mysql -u root XXX -p < ma_config/cleanDB.sql
 
 
 ### JERVY UPDATE BELOW
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
 
-UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
-
 ###### TEMP TABLE IMPORT SCRIPTS
+./import_Person.pl
 ./import_PersonRego.pl
 ./import_PersonRegoCoaches.pl
-./import_LoansTransfers.pl
-./import_ExtraPayments.pl
 
 #CLEAN
 ./import_cleanPersonRego.pl
-./import_cleanLoansTransfers.pl
-./import_cleanExtraPayments.pl
 
 #INSERT INTO MAIN TABLES
+./import_insertPerson.pl
 ./import_insertPR.pl
-./import_insertLoansTransfers.pl
-./import_insertEP.pl
-
-./import_PRTXNs.pl
 
 
 from importer/

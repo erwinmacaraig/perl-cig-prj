@@ -20,7 +20,7 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile='PeopleRegistrationsCoaches.csv';
+    my $infile='PeopleRegistrationsCoachesOfficials.csv';
 
     importPRFile($db, $countOnly, 'COACHES', $infile);
 

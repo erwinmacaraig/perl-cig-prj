@@ -46,7 +46,7 @@ sub insertPRTransactions  {
             $dref->{'intEntityID'}, 
             $dref->{'tmpProductID'}, 
             $dref->{'tmpAmount'}, 
-            $dref->{'dtFrom'}, 
+            $dref->{'tmpdtPaid'}, 
             $dref->{'tmpPaymentRef'}, 
             $status, 
             0
