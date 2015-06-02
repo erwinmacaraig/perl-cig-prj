@@ -1859,7 +1859,7 @@ sub viewTransLog	{
 	
         my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
-	return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
+	#return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
     <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
@@ -1932,7 +1932,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		my $taxRateinPercent = $dref->{'dblTaxRate'} * 100;
         my $otherTransLog = ''; 
-        if ($dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} and $intTransLogID and $dref->{'intTransLogID'} != $intTransLogID)   {
+        if ($dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} and $intTransLogID and $dref->{'intTransLogID'} != $intTransLogID and ! $Data->{'SelfRego'})   {
             $otherTransLogCount++;
             $otherTransLog = qq[*];
         }
@@ -1953,6 +1953,10 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
   	$qry_trans->finish;
 
 	$body .= qq[</table>];
+	if ($Data->{'SelfRego'})    {
+	    $body = $count ? $resultHTML.$body: $resultHTML;
+	    return ($body, $lang->txt("Payment Record"));
+    }
     if ($otherTransLogCount)    {
         $body .= qq[<p><b>* ].$lang->txt("TRANSACTION PAID VIA A DIFFERENT PAYMENT RECORD").qq[</b></p>];
     }
