@@ -171,6 +171,18 @@ sub main	{
 
         $gatewaySpecific = MAGateway_FI_checkoutFI(\%MAGateway, $paymentSettings);
         $paymentURL = $gatewaySpecific->{'paymentURL'};
+        $st = qq[
+	        UPDATE tblTransLog
+		    SET strReceiptRef = ?
+		    WHERE intLogID = ?
+		    LIMIT 1
+	    ];
+        my $qryTXNUPD= $db->prepare($st) or query_error($st);
+        my $reference = $gatewaySpecific->{'REFERENCE'} || '';
+        $qryTXNUPD->execute(
+	        $reference,
+	        $logID
+	    );
     }
     if ($paymentSettings->{'gatewayCode'} eq 'hk_paydollar')  {
         my %MAGateway= ();

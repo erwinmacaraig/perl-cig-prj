@@ -1,7 +1,7 @@
 package MA_Gateways;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=@EXPORT_OK=qw(MAGateway_FI_checkoutFI MAGateway_HKPayDollar);
+@EXPORT=@EXPORT_OK=qw(MAGateway_FI_checkoutFI MAGateway_HKPayDollar calcuatePaymentCheckSum);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
@@ -14,6 +14,7 @@ use CGI qw(param unescape escape);
 
 use Digest::SHA1  qw(sha1 sha1_hex); # sha1_hex sha1_base64);
 use MD5;
+#use POSIX;
 
 sub MAGateway_FI_checkoutFI	{
 
@@ -48,7 +49,8 @@ sub MAGateway_FI_checkoutFI	{
         $gatewaySpecific{'VERSION'} = "0001";
         $gatewaySpecific{'STAMP'} = $payRef;
         $gatewaySpecific{'AMOUNT'} = $cents;
-        $gatewaySpecific{'REFERENCE'} = $logID;
+        my $reference = $logID . calcuatePaymentCheckSum($logID);
+        $gatewaySpecific{'REFERENCE'} = $reference;
         $gatewaySpecific{'MESSAGE'} = "";
         $gatewaySpecific{'LANGUAGE'} = "FI";
         $gatewaySpecific{'LANGUAGE'} = "EN" if ($currentLang =~ /^en_/);
@@ -148,7 +150,53 @@ print STDER "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
 
 
         return \%gatewaySpecific;
-
-
-
 }
+
+
+sub calcuatePaymentCheckSum{
+    my ($logID) = @_;
+
+    my $len = length($logID);
+    my $num = reverse($logID);
+
+    my $total = 0;
+    my @key = ();
+    $key[1] = 7;
+    $key[2] = 3;
+    $key[3] = 1;
+    my $keyCount = 1;
+    for my $n (0 .. $len-1) {
+        my $digit = substr $num, $n, 1;
+        $keyCount = 1 if ($keyCount>3);
+        my $calcDigit= $digit* $key[$keyCount];
+#print "DIGIT $digit - ";
+#print "MULTIPLIER $key[$keyCount] - ";
+#print "equals $calcDigit\n";
+        $keyCount++;
+        $total = $total +  $calcDigit;
+    }
+#print "TOTAL $total\n";
+    my $ceiling = round_up_tens($total);
+    my $checksum = $ceiling - $total;
+    return $checksum;
+} 
+
+sub round_up_tens {
+        my $n = int shift;
+
+        if(($n % 10) == 0) {
+                return($n);
+        } else {
+                my $sign = 1;
+                if($n < 0) { $sign = 0; }
+
+                $n = int ($n / 10);
+                $n *= 10;
+                if($sign) {
+                        $n += 10;
+                }
+                return($n);
+        }
+        return(-1);
+}
+
