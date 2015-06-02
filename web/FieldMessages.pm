@@ -30,7 +30,7 @@ sub getFieldMessages {
             tblFieldMessages
         WHERE 
             strFieldType = ?
-            strLocale = ?
+            AND strLocale = ?
       ];
       my $q = $Data->{'db'}->prepare($sql);
 

@@ -109,12 +109,12 @@ sub build {
         my $is_editable_field =
           ( $type eq 'hidden' or not $f->{'readonly'} or ($f->{'readonly'} and  $f->{'Save_readonly'})) ? 1 : 0;
 
+        # Field Messages
+        my $premessage = '';
+        my $postmessage = '';
+        my $infomessage = '';
         if ( ( $edit or $add ) and $is_editable_field ) {
 
-            # Field Messages
-            my $premessage = '';
-            my $postmessage = '';
-            my $infomessage = '';
             if($self->{'FieldMessages'} and $self->{'FieldMessages'}{$fieldname}) {
                 my $ft =  $self->{'FieldMessages'}{$fieldname}{'type'} || 'info';
                 my $val =  $self->{'FieldMessages'}{$fieldname}{'msg'} || '';
@@ -124,7 +124,7 @@ sub build {
             }
             if($infomessage)    {
                 $infomessage =~ s/"/&quote;/g;
-                $infomessage = qq[<a tabindex="0" class="btn btn-lg fields-info-btn" role="button" data-toggle="popover" data-trigger="focus" title="$label" data-content="$infomessage"></a>];
+                $infomessage = qq[<a tabindex="0" class="btn fields-info-btn" role="button" data-toggle="popover" data-placement="auto" data-trigger="focus" title="$label" data-content="$infomessage" data-container="body"></a>];
             }
             my $disabled =
               $f->{'disabled'} ? 'readonly class="HTdisabled"' : '';

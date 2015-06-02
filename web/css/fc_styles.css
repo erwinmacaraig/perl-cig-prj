@@ -2755,3 +2755,13 @@ header .navbar-brand {
 .navbar-default .navbar-toggle .icon-bar{
     background-color:#fff;
 }
+.fields-info-btn {
+  padding:0px;
+  position: absolute;
+  right: -8px;
+}
+.fields-info-btn:after {
+  font-family: FontAwesome;
+  content: "\f059";
+  font-size:20px;
+}

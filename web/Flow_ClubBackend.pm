@@ -32,6 +32,7 @@ use UploadFiles;
 use EntitySummaryPanel;
 use IncompleteRegistrations;
 use Transactions;
+use FieldMessages;
 
 use PersonRegistrationFlow_Common;
 use Payments;
@@ -141,7 +142,9 @@ sub display_core_details {
         }
 
     }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'club', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm,'', $fieldMessages);
+
 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -241,7 +244,8 @@ sub display_contact_details {
     }
 
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Club',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'club', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm,'', $fieldMessages);
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
@@ -305,7 +309,8 @@ sub display_role_details {
     }
     my $clubperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'roledetails'}, 'Club',);
 
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'club', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($clubperm,'',$fieldMessages);
    
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $id);
 
