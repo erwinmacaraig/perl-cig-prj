@@ -87,7 +87,7 @@
 		"Country" : "strISOCountry",
 		"Region" : "strRegion",
 		"PostalCode" : "strPostalCode",
-		"State" : "strTown",
+		"City" : "strCity",
 		"Address1" : "strAddress",
 		"Address2" : "strAddress2",
 		"WebURL" : "strWebURL",
