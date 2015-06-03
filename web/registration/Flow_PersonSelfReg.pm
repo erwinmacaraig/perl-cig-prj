@@ -1167,8 +1167,15 @@ sub display_summary {
     my $content = '';
     my $gatewayConfig = undef;
     if($regoID) {
+	my $valid =0;
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
         $regoID = 0 if !$entityID;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'}, 
+            $personID, 
+            $regoID, 
+            $entityID
+        );
     }
 
     my $payMethod = '';
