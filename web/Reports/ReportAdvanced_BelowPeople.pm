@@ -301,6 +301,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personLevel,
                     optiongroup     => 'regos',
+                    allowsort   => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -312,7 +313,8 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::registrationNature,
                     optiongroup     => 'regos',
-                    allowgrouping   => 1
+                    allowsort   => 1,
+                    allowgrouping   => 1,
                 }
             ],
 
@@ -324,7 +326,8 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personRegoStatus,
                     optiongroup     => 'regos',
-                    allowgrouping   => 1
+                    allowgrouping   => 1,
+                    allowsort   => 1,
                 }
             ],
             PRstrSport=> [
@@ -335,7 +338,8 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::sportType,
                     optiongroup     => 'regos',
-                    allowgrouping   => 1
+                    allowgrouping   => 1,
+                    allowsort   => 1,
                 }
             ],
             PRstrPersonEntityRole=> [
@@ -344,7 +348,9 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     dbfield     => 'ETR.strEntityRoleName',
-                    optiongroup => 'regos'
+                    optiongroup => 'regos',
+                    allowsort   => 1,
+                    allowgrouping => 1,
                 }
             ],
             PRdtFrom=> [
@@ -380,7 +386,9 @@ sub _getConfiguration {
                     defaultcomp   => 'equal',
                     defaultvalue  => '0',
                     active        => 1,
-                    optiongroup   => 'regos'
+                    optiongroup   => 'regos',
+                    allowsort   => 1,
+                    allowgrouping => 1,
                 }
             ],
 
@@ -391,9 +399,27 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     dbfield     => 'E.strLocalName',
-                    optiongroup => 'regos'
+                    optiongroup => 'regos',
+                    allowsort   => 1,
+                    allowgrouping => 1,
                 }
             ],
+              strClubName => [
+                (
+                      $currentLevel > $Defs::LEVEL_CLUB
+                    ? $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} . ' Name'
+                    : ''
+                ),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield => 'tblClub.strLocalName',
+                    allowsort   => 1,
+                    allowgrouping => 1,
+                    #optiongroup   => 'affiliations'
+                    optiongroup => 'regos'
+                }
+              ],
 
 
 
@@ -1273,11 +1299,11 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
+                    dbfield => 'tblRegion.strLocalName',
                     allowsort   => 1,
-                    dbfield =>
-"IF(tblRegion.intStatusID = $Defs::NODE_SHOW, tblRegion.strName,'')",
                     allowgrouping => 1,
-                    optiongroup   => 'affiliations'
+                    #optiongroup   => 'affiliations'
+                    optiongroup => 'regos'
                 }
               ],
 
@@ -1371,7 +1397,8 @@ sub _getConfiguration {
                     active          => 0,
                     multiple        => 1,
                     size            => 3,
-                    disable         => $hideSeasons
+                    disable         => $hideSeasons,
+                    allowgrouping => 1,
                 }
               ],
               intProductID => [
@@ -1615,6 +1642,8 @@ sub _getConfiguration {
                 PRstrRegistrationNature
                 PRintPaymentRequired
                 PRstrLocalName
+                strClubName 
+                strRegionName 
 
               strAddress1
               strAddress2
@@ -1691,7 +1720,6 @@ sub _getConfiguration {
               intNatCustomBool3
               intNatCustomBool4
               intNatCustomBool5
-
 
               intPhoto
               intTransactionID
