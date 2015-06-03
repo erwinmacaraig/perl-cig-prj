@@ -23,6 +23,6 @@ sub main	{
     my $infileLoans='Loans.csv';
     my $infileTransfers='Transfers.csv';
     importLTFile($db, $countOnly, 'LOAN', $infileLoans);
-    #importLTFile($db, $countOnly, 'TRANSFER', $infileTransfers);
+    importLTFile($db, $countOnly, 'TRANSFER', $infileTransfers);
 };
 
