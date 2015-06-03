@@ -38,7 +38,7 @@ from importer/
 ./FIFA_3to2_ISO.pl
 ./importer_FixPRs.pl ##? Still needed Jervy ??
 ./runAllPlayerPassport.pl
-cd ../automatic -> ./tempEntityStructure.pl ### Do we need this ?
+cd ../automatic -> ./tempEntityStructure.pl ###  we need to run this for the search module to work
 
 
 #Below are locations of ISO codes that may need adjusting to 2 (in FIFA_3to2_ISO.pl)
