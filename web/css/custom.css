@@ -374,6 +374,8 @@ th {
 }
 .autoAccordian .panel-heading a{
   display:block;
+  padding: 20px;
+  margin: -20px;
 }
 * .js-tabcollapse-panel-heading:after {
   font-family: FontAwesome;
