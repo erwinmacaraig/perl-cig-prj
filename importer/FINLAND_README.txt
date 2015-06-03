@@ -2,6 +2,15 @@ mysql -u root XXX -p < ma_config/cleanDB.sql
 
 
 ### JERVY UPDATE BELOW
+# NOTES before running CSVReader.pl
+# - clean Organisations.csv and People.csv
+# - convert url-encoded string for Latin characters;
+# - double-up double quotes in csv file for allow_loose_quotes option to work;
+# - when splitting data using excel, use Text as conversion for postal code or any fields with leading zeros
+# - convert Gender, LocalLanguage etc depending on the system's value e.g. MALE - 1, FEMALE - 2
+# - make sure csv/finland/tblEntity.organisation.csv and csv/finland/tblPerson.csv files exist
+# - let me know if you need copies of the csv files as we cannot upload to Google Drive for confidentiality reasons - JE
+
 perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
 
 UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
