@@ -2759,6 +2759,7 @@ header .navbar-brand {
   padding:0px;
   position: absolute;
   right: -8px;
+  top: 0px;
 }
 .fields-info-btn:after {
   font-family: FontAwesome;
