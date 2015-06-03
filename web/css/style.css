@@ -4546,6 +4546,7 @@ div#content div.member-home-page div.task-actions {
     height:100%;
     background-color: rgba(0,0,0,0.8);
     overflow:none;
+    position: fixed;
 }
 #docViewerContent {
     padding: 30px;

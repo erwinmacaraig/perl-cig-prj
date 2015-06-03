@@ -2681,17 +2681,17 @@ header .navbar-brand {
   #docViewerPanel {
     display:table-footer-group;
   }
-  #docViewerFileBlock {
+  /*#docViewerFileBlock {
     display:table-header-group;
     width:100%;
     height:auto;
     margin-top:-200px;
-  }
+  }*/
   .docViewer-imgBlock img {
     width:100%;
   }
   #docViewerContent {
-    display:table;
+    /*display:table;*/
   }
   #docViewerHeader {
     font-size:12px;
