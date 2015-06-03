@@ -29,6 +29,8 @@ UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
 #INSERT INTO MAIN TABLES
 ./import_insertPR.pl
 ./import_insertLoansTransfers.pl
+cd ../automatic -> ./activatePlayerLoan.pl
+cd ../automatic -> ./deactivatePlayerLoan.pl
 ./import_insertEP.pl
 
 ./import_PRTXNs.pl
