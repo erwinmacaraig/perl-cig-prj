@@ -176,6 +176,7 @@ function updateRegoProductsTotal(chkb,id_cost,id_total,client,formatter){
 
 $(document).ready(function(){
     calculateProducts();
+    $('[data-toggle="popover"]').popover()
 	
     $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){        
 		
