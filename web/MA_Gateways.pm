@@ -124,7 +124,7 @@ sub MAGateway_HKPayDollar	{
         $gatewaySpecific{'amount'} = $amount;
         $gatewaySpecific{'lang'} = "C";
         $gatewaySpecific{'lang'} = "E" if ($currentLang =~ /^en_/);
-print STDER "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
+print STDERR "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
 
         $gatewaySpecific{'cancelUrl'} = $gatewaySpecific{'cancelUrl'};
         $gatewaySpecific{'failUrl'} = $gatewaySpecific{'failUrl'};
