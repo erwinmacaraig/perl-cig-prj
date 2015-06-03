@@ -325,8 +325,15 @@ sub isPersonRegistered {
 	my ( $Data, $personID, $regFilters_ref)=@_;
 
 ## Are there any "current" registration records for the member in the system
-    $regFilters_ref->{'current'} = 1;
-    my ($count, $refs) = getRegistrationData($Data, $personID, $regFilters_ref);
+## Changed to ACTIVE/PASSIVE
+    my %Reg=();
+    for my $k (keys %{$regFilters_ref})  {
+        $Reg{$k} = $regFilters_ref->{$k};
+    }
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+    $Reg{'statusIN'} = \@statusIN;
+    
+    my ($count, $refs) = getRegistrationData($Data, $personID, \%Reg);
 
     my $ok = 0;
     foreach my $reg (@{$refs})  {
