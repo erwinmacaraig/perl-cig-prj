@@ -11,7 +11,7 @@ mysql -u root XXX -p < ma_config/cleanDB.sql
 # - make sure csv/finland/tblEntity.organisation.csv and csv/finland/tblPerson.csv files exist
 # - let me know if you need copies of the csv files as we cannot upload to Google Drive for confidentiality reasons - JE
 
-perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
+perl CSVReader.pl -directory=csv/finland -format=csv -realmid=1 -notes=import test -national=0
 
 UPDATE tblEntity SET strImportEntityCode='1248' WHERE intEntityLevel=100;
 
