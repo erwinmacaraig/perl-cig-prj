@@ -694,7 +694,7 @@ sub postClubAdd {
       $query->finish();
 
     ### A call TO createTempEntityStructure FROM EntityStructure   ###
-    createTempEntityStructure($Data);
+    createTempEntityStructure($Data, $Data->{'Realm'}, 0);
     ### End call to createTempEntityStructure FROM EntityStructure###
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }

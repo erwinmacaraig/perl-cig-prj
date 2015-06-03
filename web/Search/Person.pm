@@ -58,7 +58,7 @@ sub getUnique {
 
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -164,7 +164,7 @@ sub getTransfer {
     #exclude persons that are already in the CLUB initiating the transfer
 #    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -311,7 +311,7 @@ sub getPlayerLoan {
     #exclude persons that are already in the CLUB initiating the transfer
 #    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -479,7 +479,7 @@ sub getPersonRegistration {
     $self->getSphinx()->SetFilter('intentityid', $filters->{'entity'}) if $filters->{'entity'};
     #my $results = $self->getSphinx()->Query($self->getKeyword(), 'FIFA_Persons_r'.$filters->{'realm'});
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {
@@ -531,7 +531,7 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+                AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -546,7 +546,7 @@ sub getPersonRegistration {
                 tblPerson.strNationalNum
             LIMIT 100
         ];
-
+	#print STDERR "SELECT DISTINCT tblPerson.intPersonID, tblPerson.strLocalFirstname, tblPerson.strLocalSurname, tblPerson.strNationalNum, tblPerson.strFIFAID, tblPerson.dtDOB, tblPerson.strStatus as PersonStatus, PR.intPersonRegistrationID, PR.strPersonType, PR.strSport, E.strLocalName AS EntityName, E.intEntityID, E.intEntityLevel FROM tblPerson INNER JOIN tblPersonRegistration_$realmID AS PR ON ( tblPerson.intPersonID = PR.intPersonID AND PR.strStatus IN ('ACTIVE', 'PASSIVE') AND PR.intEntityID IN ($entity_list) ) INNER JOIN tblEntity AS E ON ( PR.intEntityID = E.intEntityID ) WHERE tblPerson.intPersonID IN ($person_list) AND tblPerson.strStatus IN ('REGISTERED', 'PENDING') $personTypeFilter ORDER BY tblPerson.strLocalSurname, tblPerson.strLocalFirstname, tblPerson.strNationalNum LIMIT 100";
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -631,7 +631,7 @@ sub getPersonAccess {
     #exclude persons that are already in the CLUB initiating the transfer
     $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
-    my $results = $self->getSphinx()->Query($self->getKeyword(), $indexName);
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
 
     if($results and $results->{'total'})  {

@@ -20,6 +20,7 @@ use ConfigOptions qw(ProcessPermissions);
 use SystemConfig;
 use CGI qw(cookie unescape);
 use ImporterTXNs;
+use ImporterCommon;
 
 use Log;
 use Data::Dumper;
@@ -34,30 +35,42 @@ use Data::Dumper;
 ############
 
 sub insertCertification {
-    my ($db, $personID, $personRole) = @_;
+    my ($db, $personID, $personRole, $dtFrom, $dtTo) = @_;
 
     ## From tblCertificationTypes
+    my $maCode = getImportMACode($db) || '';
+
+    $dtFrom ||= '';
+    $dtTo ||= '';
 
     my %certs=();
-    $certs{'UEFAPRO'} = 1;
-    $certs{'UEFAA'} = 2;
-    $certs{'UEFAB'} = 3;
+    if ($maCode eq 'HKG')   {
+        ## HKG Mapping
+    }
+    else    {
+        ## Finland at moment
+        $certs{'UEFAPRO'} = 1;
+        $certs{'UEFAA'} = 2;
+        $certs{'UEFAB'} = 3;
 
-    $certs{'FAF'} = 33;
-    $certs{'DISTRICT'} = 34;
+        $certs{'FAF'} = 33;
+        $certs{'DISTRICT'} = 34;
+    }
 
     my $certID = $certs{$personRole} || return;
     $personID || return;
     my $st = qq[
-        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus)
-        VALUES (?,1,?,'ACTIVE')
+        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus, dtValidFrom, dtValidTo)
+        VALUES (?,1,?,'ACTIVE', ?, ?)
     ];
     my $qry = $db->prepare($st) or query_error($st);
-    $qry->execute($personID, $certID);
+    $qry->execute($personID, $certID, $dtFrom , $dtTo);
 }
     
 sub insertPersonRegoRecord {
     my ($db) = @_;
+
+    my $maCode = getImportMACode($db) || '';
 
     my $stINS = qq[
         INSERT INTO tblPersonRegistration_1 (
@@ -84,13 +97,15 @@ sub insertPersonRegoRecord {
             tmpProductCode,
             tmpProductID,
             tmpAmount,
-            tmpisPaid
+            tmpisPaid,
+            tmpdtPaid
         )
         VALUES (
             1,
             NOW(),
             NOW(),
             NOW(),
+            ?,
             ?,
             ?,
             ?,
@@ -140,15 +155,20 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             $dtTo = $dref->{'dtTransferred'};
         }
         my $personRole = $dref->{'strPersonRole'};
-        if ($dref->{'strPersonType'} eq 'COACH')    {
-            ## INSERT INTO tblPersonCertifications or whatever its called -- need an IMPROT CODE
-print "INSER " . $personRole . "\n";
-            insertCertification($db, $dref->{'intPersonID'}, $personRole);
-            $personRole = ''; ## NEEDS CONFIRMATION
+        if ($maCode eq 'HKG')   {
+            ## Config here for HKG
         }
-        if ($dref->{'strPersonType'} eq 'REFEREE')    {
-            insertCertification($db, $dref->{'intPersonID'}, $personRole);
-            $personRole = '' if ($personRole eq 'FAF' or $personRole eq 'DISTRICT');
+        else    {
+            ## Finland at moment
+            if ($dref->{'strPersonType'} eq 'COACH')    {
+                ## INSERT INTO tblPersonCertifications or whatever its called -- need an IMPROT CODE
+                insertCertification($db, $dref->{'intPersonID'}, $personRole, $dref->{'dtFrom'}, $dref->{'dtTo'});
+                $personRole = ''; ## NEEDS CONFIRMATION
+            }
+            if ($dref->{'strPersonType'} eq 'REFEREE')    {
+                insertCertification($db, $dref->{'intPersonID'}, $personRole, $dref->{'dtFrom'}, $dref->{'dtTo'});
+                $personRole = '' if ($personRole eq 'FAF' or $personRole eq 'DISTRICT');
+            }
         }
 
         
@@ -172,9 +192,19 @@ print "INSER " . $personRole . "\n";
             $dref->{'strProductCode'},
             $dref->{'intProductID'},
             $dref->{'curProductAmount'},
-            $dref->{'strPaid'}
+            $dref->{'strPaid'},
+            $dref->{'dtPaid'}
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
+        if ($dref->{'strProductCode'})  {
+            my $st_up = qq[
+                UPDATE tblPersonRegistration_1
+                SET strShortNotes=CONCAT(IF(tmpPaymentRef, CONCAT(tmpPaymentRef, " "), ""), IF(tmpdtPaid, CONCAT(tmpdtPaid, " "), ""), tmpProductCode, " ",  tmpAmount, " ", tmpisPaid)
+                WHERE intPersonRegistrationID = ?
+            ];
+            my $qry_up = $db->prepare($st_up) or query_error($st_up);
+            $qry_up->execute($ID);
+        }
     }
 }
  sub linkPRNationalPeriods{
@@ -289,6 +319,8 @@ sub linkPRClubs {
 
 sub importPRFile  {
     my ($db, $countOnly, $type, $infile) = @_;
+    
+    my $maCode = getImportMACode($db) || '';
 
 open INFILE, "<$infile" or die "Can't open Input File";
 
@@ -316,29 +348,44 @@ while (<INFILE>)	{
 	my @fields=split /;/,$line;
 
     #:PersonCode;OrganisationCode;Status;RegistrationNature;PersonType;Role;Level;Sport;AgeLevel;DateFrom;DateTo;Transferred;IsLoan;NationalSeason;ProductCode;Amount;IsPaid;PaymentReference
-	$parts{'PERSONCODE'} = $fields[0] || '';
-	$parts{'ENTITYCODE'} = $fields[1] || '';
-	$parts{'STATUS'} = $fields[2] || '';
-	$parts{'REGNATURE'} = $fields[3] || '';
-	$parts{'PERSONTYPE'} = $fields[4] || '';
-	$parts{'PERSONROLE'} = $fields[5] || '';
-	$parts{'PERSONLEVEL'} = $fields[6] || '';
-	$parts{'SPORT'} = $fields[7] || '';
-	$parts{'AGELEVEL'} = $fields[8] || '';
-	$parts{'DATEFROM'} = $fields[9] || '0000-00-00';
-	$parts{'DATETO'} = $fields[10] || '0000-00-00';
-	$parts{'DATETRANSFERRED'} = $fields[11] || '0000-00-00';
-	$parts{'ISLOAN'} = $fields[12] || '';
-	$parts{'NATIONALPERIOD'} = $fields[13] || '';
-	$parts{'PRODUCTCODE'} = $fields[14] || '';
-	$parts{'PRODUCTAMOUNT'} = $fields[15] || 0;
-	$parts{'ISPAID'} = $fields[16] || '';
-	$parts{'TRANSACTIONNO'} = $fields[17] || '';
+    if ($maCode eq 'HKG')   {
+        ## Update field mapping for HKG 
+    }
+    else    {
+        ## Finland at moment
+    	$parts{'PERSONCODE'} = $fields[0] || '';
+	    $parts{'ENTITYCODE'} = $fields[1] || '';
+	    $parts{'STATUS'} = $fields[2] || '';
+	    $parts{'REGNATURE'} = $fields[3] || '';
+	    $parts{'PERSONTYPE'} = $fields[4] || '';
+	    $parts{'PERSONROLE'} = $fields[5] || '';
+	    $parts{'PERSONLEVEL'} = $fields[6] || '';
+	    $parts{'SPORT'} = $fields[7] || '';
+	    $parts{'AGELEVEL'} = $fields[8] || '';
+	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
+	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
+	    $parts{'DATETRANSFERRED'} = $fields[11] || '0000-00-00';
+	    $parts{'ISLOAN'} = $fields[12] || '';
+	    $parts{'NATIONALPERIOD'} = $fields[13] || '';
+	    $parts{'PRODUCTCODE'} = $fields[14] || '';
+	    $parts{'PRODUCTAMOUNT'} = $fields[15] || 0;
+	    $parts{'ISPAID'} = $fields[16] || '';
+	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
+	    $parts{'DATEPAID'} = $fields[17] || '';
         
-    $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
-    $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
-    $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
-    $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
+        $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
+        $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
+        if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        
+    }
 	if ($countOnly)	{
 		$insCount++;
 		next;
@@ -346,8 +393,8 @@ while (<INFILE>)	{
 
 	my $st = qq[
 		INSERT INTO tmpPersonRego
-		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, strProductCode, curProductAmount, strPaid, strTransactionNo)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
@@ -369,7 +416,8 @@ while (<INFILE>)	{
         $parts{'PRODUCTCODE'},
         $parts{'PRODUCTAMOUNT'},
         $parts{'ISPAID'},
-        $parts{'TRANSACTIONNO'}
+        $parts{'TRANSACTIONNO'},
+        $parts{'DATEPAID'}
     ) or print "ERROR";
 }
 $count --;

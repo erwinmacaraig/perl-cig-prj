@@ -70,6 +70,9 @@ sub showHome {
             Found => $found,
             srp => $srp,	
 			Accordion => $accordion,
+            OldSystemLinkage => $Data->{'SystemConfig'}{'OldSystemLinkage'} || 0,
+            OldSystemUsername => $Data->{'SystemConfig'}{'OldSystemUsername'} || '',
+            OldSystemPassword => $Data->{'SystemConfig'}{'OldSystemPassword'} || '',
         },
         'selfrego/home.templ',
     );    

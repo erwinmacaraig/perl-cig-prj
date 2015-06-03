@@ -1678,6 +1678,12 @@ sub checkForOutstandingTasks {
                 my $qPR = $db->prepare($st);
 				$qPR->execute($personRegistrationID);
 				my $ppref = $qPR->fetchrow_hashref();
+
+                my $stp = qq [SELECT * FROM tblPerson WHERE intPersonID = ?];
+                my $qP = $db->prepare($stp); 
+				$qP->execute($personID);
+				my $personref = $qP->fetchrow_hashref();
+
                 if ($ppref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_RENEWAL)    {
                     PersonRegistration::rolloverExistingPersonRegistrations($Data, $personID, $personRegistrationID);
                 }
@@ -1701,6 +1707,10 @@ sub checkForOutstandingTasks {
     
                 if( ($ppref->{'strPersonType'} eq 'PLAYER') && ($ppref->{'strSport'} eq 'FOOTBALL'))    {
                 	savePlayerPassport($Data, $personID);
+                }
+
+                if($ppref->{'intNewBaseRecord'} == 1 and $personref->{'intInternationalLoan'} == 1) {
+                    PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
            ##############################################################################################################
@@ -2429,9 +2439,14 @@ sub getTask {
             p.strISONationality,
             p.intGender,
             p.strNationalNum,
+            p.strInternationalLoanSourceClub,
+	    p.strInternationalLoanTMSRef, 
+	    p.dtInternationalLoanFromDate, 
+	    p.dtInternationalLoanToDate,
             p.strStatus as personStatus,
             DATE_FORMAT(p.dtDOB, "%d/%m/%Y") as DOB,
             p.dtDOB AS DOB_RAW,
+            p.intInternationalLoan,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             rnt.intTaskNoteID as rejectTaskNoteID,
             rnt.intCurrent as rejectCurrent,
@@ -2540,6 +2555,8 @@ sub viewTask {
             p.dtSuspendedUntil,
             p.strISOCountryOfBirth,
             p.strISONationality,
+            p.intInternationalTransfer,
+            p.intInternationalLoan,
             TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             p.intGender as PersonGender,
             p.intInternationalTransfer as InternationalTransfer,
@@ -3150,6 +3167,7 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
 sub populateDocumentViewData {
     my ($Data, $dref) = @_;
 
+
     #need to retrieve list of documents here
     #since a specific work flow rule can have
     #multiple entries in tblWFRuleDocuments (1:n cardinality of task to document rules)
@@ -3160,6 +3178,9 @@ sub populateDocumentViewData {
 	my %validdocs = ();
 	my %validdocsStatus = ();
 ## BAFF: Below needs WHERE tblRegistrationItem.strPersonType = XX AND tblRegistrationItem.strRegistrationNature=XX AND tblRegistrationItem.strAgeLevel = XX AND tblRegistrationItem.strPersonLevel=XX AND tblRegistrationItem.intOriginLevel = XX
+
+    my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
+    my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
 
     my $query = qq[
         SELECT
@@ -3182,6 +3203,8 @@ sub populateDocumentViewData {
             AND tblRegistrationItem.strRegistrationNature IN ('', ?)
             AND tblRegistrationItem.strAgeLevel IN ('', ?)
             AND tblRegistrationItem.strPersonLevel IN ('', ?)
+            AND (tblRegistrationItem.intItemForInternationalTransfer = 0 OR tblRegistrationItem.intItemForInternationalTransfer = ?)
+            AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             AND tblRegistrationItem.intEntityLevel = ?
     ];
     my @levels = ();
@@ -3203,6 +3226,8 @@ sub populateDocumentViewData {
         $dref->{'strRegistrationNature'} || '',
         $dref->{'strAgeLevel'} || '',
         $dref->{'strPersonLevel'} || '',
+        $internationalTransfer,
+        $internationalLoan,
         @levels
     );
     while(my $adref = $sth->fetchrow_hashref()){
@@ -3308,8 +3333,8 @@ sub populateDocumentViewData {
                 AND (regoItem.strISOCountry_NOTIN ='' OR regoItem.strISOCountry_NOTIN IS NULL OR regoItem.strISOCountry_NOTIN NOT LIKE CONCAT('%|','$dref->{'strISONationality'}','|%'))
                 AND (regoItem.intFilterFromAge = 0 OR regoItem.intFilterFromAge <= $dref->{'currentAge'})
                 AND (regoItem.intFilterToAge = 0 OR regoItem.intFilterToAge >= $dref->{'currentAge'})
-                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = '$dref->{'InternationalTransfer'}')
-                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = '$dref->{'InternationalLoan'}')
+                AND (regoItem.intItemForInternationalTransfer = 0 OR regoItem.intItemForInternationalTransfer = $internationalTransfer)
+                AND (regoItem.intItemForInternationalLoan = 0 OR regoItem.intItemForInternationalLoan = $internationalLoan)
                 )
         LEFT JOIN tblRegistrationItem as entityItem
             ON (
@@ -3813,7 +3838,7 @@ sub viewSummaryPage {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
             }
-
+	    $TemplateData{'PersonRegistrationDetails'}{'isInternationalPlayerLoan'} = $task->{'intInternationalLoan'};
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
@@ -3829,6 +3854,12 @@ sub viewSummaryPage {
             $TemplateData{'PersonRegistrationDetails'}{'Status'} = $Defs::personStatus{$task->{'personStatus'}};
             $TemplateData{'PersonRegistrationDetails'}{'DateFrom'} = $task->{'dtFrom'};
             $TemplateData{'PersonRegistrationDetails'}{'DateTo'} = $task->{'dtTo'};
+            #
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanSourceClub'} = $task->{'strInternationalLoanSourceClub'} || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanTMSRef'} = $task->{'strInternationalLoanTMSRef'} || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanFromDate'} = $Data->{'l10n'}{'date'}->TZformat($task->{'dtInternationalLoanFromDate'},'MEDIUM') || '';
+            $TemplateData{'PersonRegistrationDetails'}{'InternationalLoanToDate'} =  $Data->{'l10n'}{'date'}->TZformat($task->{'dtInternationalLoanToDate'},'MEDIUM') || '';
+            #
             $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $task->{'intPersonID'});
 
         }

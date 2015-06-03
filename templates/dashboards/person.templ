@@ -80,15 +80,19 @@
 					[% IF Details.Address1 %]
 					<div class="">
 					  	<span class="details-left">[% Lang.txt('Address 1') %]:</span>
-					  	<span class="detail-value">[% Details.Address1 %]</span>
-				    </div>
+					  	<span class="detail-value">[% Details.Address1 %]
+					  	[% IF !Details.Address2 %]
+					  	&nbsp;[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]
+					  	[% END %]
+					  	</span>
+					</div>
 				    <div class="">
 				    	[% IF Details.Address2 %]
-				    	<span class="details-left">[% Lang.txt('Address 2') %]:</span>
-                        <span class="detail-value">[% Details.Address2 %]</span>
-                        <span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
-                        [% END %]
-                    </div>
+					  <span class="details-left">[% Lang.txt('Address 2') %]:</span>
+					  <span class="detail-value">[% Details.Address2 %]</span>
+					  <span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
+				      [% END %]
+				</div>
 					[% END %]
 
 

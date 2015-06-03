@@ -325,8 +325,15 @@ sub isPersonRegistered {
 	my ( $Data, $personID, $regFilters_ref)=@_;
 
 ## Are there any "current" registration records for the member in the system
-    $regFilters_ref->{'current'} = 1;
-    my ($count, $refs) = getRegistrationData($Data, $personID, $regFilters_ref);
+## Changed to ACTIVE/PASSIVE
+    my %Reg=();
+    for my $k (keys %{$regFilters_ref})  {
+        $Reg{$k} = $regFilters_ref->{$k};
+    }
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+    $Reg{'statusIN'} = \@statusIN;
+    
+    my ($count, $refs) = getRegistrationData($Data, $personID, \%Reg);
 
     my $ok = 0;
     foreach my $reg (@{$refs})  {
@@ -677,6 +684,8 @@ sub getRegistrationData	{
             e.intEntityLevel,
 	p.intInternationalTransfer,
 	p.intInternationalLoan,
+	p.dtInternationalLoanFromDate,
+	p.dtInternationalLoanToDate,
             e.intEntityID
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
@@ -727,6 +736,9 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
+        my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
+        my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
+
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
         $dref->{'personType'} = $dref->{'strPersonType'} || '';
@@ -812,6 +824,8 @@ sub getRegistrationData	{
         AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|$dref->{'strISONationality'}|%'))
         AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= $dref->{'currentAge'})
         AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= $dref->{'currentAge'})
+        AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = $internationalTransfer)
+        AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = $internationalLoan)
 ];		
             #AND RI.intEntityLevel IN (0, $myCurrentLevelValue)
             #AND RI.intOriginLevel = $Data->{'clientValues'}{'authLevel'}
@@ -1033,8 +1047,12 @@ sub submitPersonRegistration    {
             $personRegistrationID,
             'REGO'
         );
-
         personInProgressToPending($Data, $personID);
+
+        my $newBaseRecord = ($personStatus eq $Defs::PERSONREGO_STATUS_INPROGRESS) ? 1 : 0;
+        my $internationalTransfer = ($newBaseRecord and $pr_ref->{'intInternationalTransfer'}) ? 1 : 0;
+        my $internationalLoan = ($newBaseRecord and $pr_ref->{'intInternationalLoan'}) ? 1 : 0;
+
         my $rc = WorkFlow::addWorkFlowTasks(
             $Data,
             'REGO', 
@@ -1044,7 +1062,8 @@ sub submitPersonRegistration    {
             $personID,
             $personRegistrationID, 
             0,
-	    $pr_ref->{'intInternationalTransfer'}
+            #$pr_ref->{'intInternationalTransfer'} || $pr_ref->{'intInternationalLoan'} || 0
+            $internationalTransfer || $internationalLoan || 0
         );
         ($count, $regs) = getRegistrationData($Data, $personID, \%Reg);
         if ($count) {

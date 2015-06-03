@@ -49,7 +49,7 @@ sub handle {
 	my %SearchData = ();
 
     if($render){
-        if($params{'submitb'} eq 'Search') {
+        if($params{'submitb'}) {
             $searchObj->setKeyword($params{'search_keyword'});
             $SearchData{'searchForm'} = $searchObj->displaySearchForm();
 

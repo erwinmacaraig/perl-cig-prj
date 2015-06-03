@@ -176,6 +176,7 @@ function updateRegoProductsTotal(chkb,id_cost,id_total,client,formatter){
 
 $(document).ready(function(){
     calculateProducts();
+    $('[data-toggle="popover"]').popover()
 	
     $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){        
 		
@@ -418,7 +419,7 @@ jQuery(document).ready(function(){
         var text = jQuery(this).val();
         var id = 'replaced' + jQuery(this).attr('id');
         var classes = jQuery(this).attr('class');
-        jQuery(this).after('<a href = "#" class = "' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
+        jQuery(this).after('<a href = "#" class = "btn ' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
         if(!jQuery(this).is(':visible')) {
             jQuery('#' + id).hide(); 
         }
