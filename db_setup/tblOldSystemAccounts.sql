@@ -6,4 +6,4 @@ CREATE TABLE tblOldSystemAccounts (
 
     PRIMARY KEY(intPersonID),
     UNIQUE KEY index_un (strUsername)
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
