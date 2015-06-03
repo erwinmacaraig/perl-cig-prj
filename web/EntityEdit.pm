@@ -15,6 +15,7 @@ use EntityFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
 use AuditLog;
+use FieldMessages;
 
 sub handleEntityEdit {
     my ($action, $Data) = @_;
