@@ -24,6 +24,7 @@ use Flow_PersonSelfReg;
 use SelfUserWorkFlow;
 use AccountActivation;
 use AccountProfile;
+use OldSystemAccounts;
 
 use SelfUserFlow;
 use SelfUserTransfer;
@@ -109,6 +110,10 @@ sub main {
     }
     elsif ($action =~ /activate/) {
         ($resultHTML, $pageHeading) = handleAccountActivation(\%Data, $action);
+    }
+    elsif ($action eq 'link') {
+        $resultHTML .= linkOldAccount(\%Data, $user);
+        $resultHTML .= showHome(\%Data, $user, $srp);
     }
     elsif ($action =~ /P_/) {
         ($resultHTML, $pageHeading) = handleAccountProfile(\%Data, $action);
