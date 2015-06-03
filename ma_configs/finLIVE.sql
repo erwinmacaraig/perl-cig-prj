@@ -15,6 +15,8 @@ INSERT INTO tblSystemConfig VALUES (0,1, 'allowFindPaymentMinLevel', 100, NOW(),
 INSERT INTO tblSystemConfig VALUES (0,1, 'paymentPrefix', 'FAF', NOW(),1,0); ###TEST
 UPDATE tblGenerate SET intCurrentNum = (SELECT MAX(strNationalNum) + 1 FROM tblPerson) WHERE strGenType='PERSON';
 
+## CHECK THIS:
+SELECT DISTINCT strPersonType, strPersonEntityRole FROM tblPersonRegistration_1;
 
 
 
