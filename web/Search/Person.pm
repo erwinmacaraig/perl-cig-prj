@@ -540,7 +540,9 @@ sub getPersonRegistration {
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
                 $personTypeFilter
+            GROUP BY PR.strPersonType, E.intEntityID
             ORDER BY 
+                PR.dtFrom DESC,
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
                 tblPerson.strNationalNum
