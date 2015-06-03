@@ -22,7 +22,8 @@ SELECT DISTINCT strPersonType, strPersonEntityRole FROM tblPersonRegistration_1;
 UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType ='REFEREE';
 UPDATE tblPersonRegistration_1 SET intCurrent=1 WHERE strStatus IN ('ACTIVE', 'PASSIVE');
 UPDATE tblPersonRegistration_1 SET strPersonEntityRole='' WHERE strPersonType ='REFEREE';
-
+UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType='MAOFFICIAL';
+UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strSport ='NULL';
 
 
 
