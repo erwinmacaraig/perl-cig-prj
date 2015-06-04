@@ -42,8 +42,8 @@ sub insertLTTransactions  {
             intPersonID>0 
             AND intProductID >0 
             AND intEntityToID > 0
-            AND strRecordType = 'LOAN'
     ];
+    #AND strRecordType = 'LOAN'
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     while (my $dref= $qry->fetchrow_hashref())    {

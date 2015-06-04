@@ -21,6 +21,6 @@ sub main	{
     my $db=connectDB();
     insertLOANPersonRequestRecord($db);
     insertTRANSFERPersonRequestRecord($db);
-    #insertLTTransactions($db);
+    insertLTTransactions($db);
 }
 

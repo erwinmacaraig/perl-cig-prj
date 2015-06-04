@@ -723,7 +723,7 @@ sub getRegistrationData	{
         GROUP BY
             pr.intPersonRegistrationID
         ORDER BY
-          pr.dtAdded DESC
+          pr.dtApproved DESC
     ];	
 	
     my $db=$Data->{'db'};

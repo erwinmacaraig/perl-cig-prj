@@ -49,11 +49,24 @@ SELECT DISTINCT strISONationality FROM tblPerson WHERE LENGTH(strISONationality)
 SELECT DISTINCT strISOCountry FROM tblPerson WHERE LENGTH(strISOCountry) >2;
 
 ### EXTRA SQL
+insert into tblOldSystemAccounts (intPersonID, strUsername, strPassword) select intPersonID, strNationalNum, DATE_FORMAT(dtDOB,"%y%m%d") from tblPerson where strNationalNum <> '';
+
 UPDATE tblSystemConfig SET strValue=0 WHERE strOption  LIKE '%Venue%';
 UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NULL;
 UPDATE tblPerson SET intSystemStatus =1;
 UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
 UPDATE tblPersonRegistration_1 SET strShortNotes=CONCAT(IF(tmpPaymentRef, CONCAT(tmpPaymentRef, " "), ""), IF(tmpdtPaid, CONCAT(tmpdtPaid, " "), ""), tmpProductCode, " ",  tmpAmount, " ", tmpisPaid);
+
+SELECT DISTINCT strPersonLevel FROM tblPersonRegistration_1 WHERE strPersonType='PLAYER'; -- update to AMATEUR if there's empty string
+UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType ='REFEREE'; ## They have AMATEUR but we need it blank
+UPDATE tblPersonRegistration_1 SET strPersonEntityRole='' WHERE strPersonType ='REFEREE'; ## They have Some but we need it blank
+
+UPDATE tblPersonRegistration_1 SET intCurrent=1 WHERE strStatus IN ('ACTIVE', 'PASSIVE');
+#The above one I have changed so its not as important, but that could isn't live.  So best to run this for now.
+
+UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType='MAOFFICIAL';
+
+UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strSport ='NULL'; # Bruce, do we need this?
 
 
 
