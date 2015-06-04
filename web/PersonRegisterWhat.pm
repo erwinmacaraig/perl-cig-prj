@@ -90,17 +90,17 @@ sub displayPersonRegisterWhat   {
             entity => $existing->{'intEntityID'} || '',
             entityName => $existing->{'strLocalName'} || '',
             type => $existing->{'strPersonType'} || '',
-            typeName => $existing->{'PersonType'} || '',
+            typeName => $Data->{'lang'}->txt($existing->{'PersonType'} || ''),
             sport => $existing->{'strSport'} || '',
-            sportName => $existing->{'Sport'} || '',
+            sportName => $Data->{'lang'}->txt($existing->{'Sport'}) || '',
             role => $existing->{'strPersonEntityRole'} || '',
-            roleName => $role_ref->{$existing->{'strPersonEntityRole'}} || '',
+            roleName => $Data->{'lang'}->txt($role_ref->{$existing->{'strPersonEntityRole'}} || ''),
             level => $existing->{'strPersonLevel'} || '',
-            levelName => $existing->{'PersonLevel'} || '',
+            levelName => $Data->{'lang'}->txt($existing->{'PersonLevel'} || ''),
             age => $existing->{'strAgeLevel'} || '',
-            ageName => $existing->{'AgeLevel'} || '',
+            ageName => $Data->{'lang'}->txt($existing->{'AgeLevel'} || ''),
             nature => $existing->{'strRegistrationNature'} || '',
-            natureName => $existing->{'RegistrationNature'} || '',
+            natureName => $Data->{'lang'}->txt($existing->{'RegistrationNature'} || ''),
             MAComment => $existing->{'strShortNotes'} || '',
             dnat=>$defaultNature,
         );
@@ -383,7 +383,7 @@ sub optionsPersonRegisterWhat {
 
     if (! checkMatrixOK($Data, $MATRIXwhere, \@MATRIXvalues, $bulk))   {
     #    return (\@retdata, '');
-        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not available.'));
+        return (\@retdata, $Data->{'lang'}->txt('This type of registration is not available'));
     }
 
     #if(!checkPersonRegistrationWindow($Data, \@regWindowFields, \%regWindowFieldValues)) {

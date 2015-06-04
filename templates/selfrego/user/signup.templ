@@ -6,10 +6,13 @@
 <div id="register-wrap">
 <div id="register-form">
 [% IF Errors.size %]
-<div id="form-errors-old">
-  <div class = "warningmsg">
       [% FOREACH error IN Errors %]
-        <div class="error-msg">[% error %]</div>
+<div class="alert"> 
+    <div>
+        <span class="fa fa-exclamation"></span>
+        <p>[% error %]</p>
+    </div>
+</div>
       [% END %]
   </div>
 </div>

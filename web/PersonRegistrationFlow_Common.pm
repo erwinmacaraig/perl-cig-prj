@@ -592,7 +592,7 @@ sub displayRegoFlowComplete {
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
             dtype => $hidden_ref->{'dtype'} || '',
-            dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
+            dtypeText => $Data->{'lang'}->txt($Defs::personType{$hidden_ref->{'dtype'}}) || '',
             client=>$clm,
             clientrego=>$tempClient,
             #maclient => $mlm,

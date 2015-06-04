@@ -9,10 +9,7 @@
                     <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
                     [% IF entity.strLocalName %]
                        
-                            [% Lang.txt('Registered To') %]
-                            [% entity.strLocalName %]
-                            [% Lang.txt('as') %]
-                            [% Lang.txt(entity.PersonType) %]
+                            [% Lang.txt('Registered to [_1] as [_2]', entity.strLocalName, Lang.txt(entity.PersonType)) %]
                        
                     [% END %]
                     </a>

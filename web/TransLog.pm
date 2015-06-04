@@ -403,7 +403,7 @@ sub step2 {
 				<div id="secmain2" class="panel-body fieldSectionGroup member-home-page" style="background-color: #fff; padding: 30px 20px;">
 					<div class="clearfix">
 						<span class="details-row">
-							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</span>
+							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount').qq[</label>:</span>
 							<span class="details-left detail-value">] . $Data->{'l10n'}{'currency'}->format($Data->{params}{intAmount}) . qq[</span>
 						</span>
 						<span class="details-row">
@@ -1958,7 +1958,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	    return ($body, $lang->txt("Payment Record"));
     }
     if ($otherTransLogCount)    {
-        $body .= qq[<p><b>* ].$lang->txt("TRANSACTION PAID VIA A DIFFERENT PAYMENT RECORD").qq[</b></p>];
+        $body .= qq[<p><b>* ].$lang->txt("Transaction paid via a different payment record").qq[</b></p>];
     }
 	
 	$body = $count ? $resultHTML.$body: $resultHTML;

@@ -30,61 +30,61 @@
             <br/>
 			<div class="read-only">
 				<h4>[% Lang.txt('Registration Details') %][% IF PersonRegistrationDetails.isInternationalPlayerLoan %]
-				[% Lang.txt(' (International Player Loan)') %]
+				 ([% Lang.txt('International Player Loan') %])
 				[% END%]</h4>
 				<div class="read-only-text">
 				  [% IF PersonRegistrationDetails.isInternationalPlayerLoan %]
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Member ID:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Member ID') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.MID %]</span>
 					</div>
 					[% IF PersonRegistrationDetails.InternationalLoanSourceClub %]
 					  <div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Player Loan Source Club:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan Source Club') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanSourceClub %]</span>
 					  </div>
 					[% END %]
 					[% IF PersonRegistrationDetails.InternationalLoanFromDate %]
 					  <div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Player Loan Start Date:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan Start Date') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanFromDate %]</span>
 					  </div>
 					[% END %]
 					[% IF PersonRegistrationDetails.InternationalLoanToDate %]
 					  <div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Player Loan End Date:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Player Loan End Date') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanToDate %]</span>
 					  </div>
 					[% END %]
 					[% IF PersonRegistrationDetails.InternationalLoanTMSRef %]
 					  <div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Player TMS Reference:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Player TMS Reference') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.InternationalLoanTMSRef %]</span>
 					  </div>
 					[% END %]
 				  [% END %]
 				  
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Register to:') %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Register to') %]:</span>
 					  	<span class="detail-value">[% PersonRegistrationDetails.registerTo %]</span>
 					</div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Register as:') %]</span>
-					  	<span class="detail-value">[% PersonRegistrationDetails.personType %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Register as') %]:</span>
+					  	<span class="detail-value">[% Lang.txt(PersonRegistrationDetails.personType) %]</span>
 				    </div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Sport:') %]</span>
-					  	<span class="detail-value">[% IF PersonRegistrationDetails.sport %][% PersonRegistrationDetails.sport %][% ELSE %] - [% END %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Sport') %]:</span>
+					  	<span class="detail-value">[% IF PersonRegistrationDetails.sport %][% Lang.txt(PersonRegistrationDetails.sport) %][% ELSE %] - [% END %]</span>
 				    </div>
 					<div class="">
-					  	<span class="paddingsummary">[% Lang.txt('Level:') %]</span>
-					  	<span class="detail-value">[% IF PersonRegistrationDetails.personLevel %][% PersonRegistrationDetails.personLevel %][% ELSE %] - [% END %]</span>
+					  	<span class="paddingsummary">[% Lang.txt('Level') %]:</span>
+					  	<span class="detail-value">[% IF PersonRegistrationDetails.personLevel %][% Lang.txt(PersonRegistrationDetails.personLevel) %][% ELSE %] - [% END %]</span>
 				    </div>
 				</div>
 			</div>
 
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
+            <label>[% Lang.txt("The [_1] request (ID: [_2]) -- [_3]/[_4] has been sent to [_5].",request.requestType, request.id, request.personType, request.sport, [% request.requestTo) %]</label>
             <br/>
             [% END %]
             <div class="top-bottom-spacer">

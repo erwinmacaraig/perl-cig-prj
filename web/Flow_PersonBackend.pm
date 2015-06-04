@@ -1454,7 +1454,7 @@ sub display_summary {
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
 

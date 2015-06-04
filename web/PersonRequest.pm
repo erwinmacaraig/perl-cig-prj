@@ -1371,8 +1371,8 @@ sub setRequestResponse {
 	
         #print STDERR Dumper $request;
         my $templateFile = "";
-        $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
-        my $notifDetails = $Data->{'lang'}->txt("You have " . lc $requestResponseSuffix . " the " . $Defs::personRequest{$request->{'strRequestType'}} . " of ") . $request->{'strLocalFirstname'} . " " . $request->{'strLocalSurname'} . ".";
+        $title = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}) . ' - ' . $Data->{'lang'}->txt($requestResponseSuffix);
+        my $notifDetails = $Data->{'lang'}->txt("You have [_1] the [_2] of [_3] [_4]." . lc($Data->{'lang'}->txt($requestResponseSuffix)), $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}), $request->{'strLocalFirstname'}, $request->{'strLocalSurname'});
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;

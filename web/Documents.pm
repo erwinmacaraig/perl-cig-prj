@@ -306,9 +306,9 @@ sub new_doc_form {
     my $fileToReplace = param('f') || 0;    
 	#my $currentLevelName = $Data->{'LevelNames'}{$Data->{'clientValues'}{'authLevel'}} || 'organisation';
 	#my %permoptions = (
-	#    1 => $Data->{'lang'}->txt('All organisations to which this member is linked'),
-	#    2 => $Data->{'lang'}->txt("Only to this $currentLevelName"),
-	#    3 => $Data->{'lang'}->txt("Organisations ( $currentLevelName and above) to which this member is linked"),
+	#    1 => $Data->{'lang'}->txtA('All organisations to which this member is linked'),
+	#    2 => $Data->{'lang'}->txtA("Only to this $currentLevelName"),
+	#    3 => $Data->{'lang'}->txtA("Organisations ( $currentLevelName and above) to which this member is linked"),
 	#);
 	#	my $perms = drop_down("docperms",\%permoptions,undef,0,1,0);
 		my $title = $l->txt('New Document');

@@ -330,7 +330,7 @@ sub showPersonHome	{
         }
         $rego->{'changelevel_link'} = $changelevel;
         my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
-        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
+        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change [_1] Level", $pType);
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
         next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID and $rego->{'intIsLoanedOut'} == 0);

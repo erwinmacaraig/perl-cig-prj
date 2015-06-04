@@ -1122,11 +1122,11 @@ sub add_venue_fields {
 
     my @err;
     if (!$params{'field_count'}) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: required");
+        push @err, $Data->{'lang'}->txt("Number of Fields") . " : " . $Data->{'lang'}->txt("required");
     }
 
     if ($params{'field_count'} !~ /^\d+$/) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: invalid input");
+        push @err, $Data->{'lang'}->txt("Number of Fields"). " : " .$Data->{'lang'}->txt("invalid input");
     }
 
     return pre_add_venue_fields($action, $Data, $venueID, \@err) if scalar(@err);
