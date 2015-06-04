@@ -56,7 +56,15 @@ sub main	{
                 $lineNum++;
             #my $filecontents = join('',@lines);
                 #my @matches =  $filecontents =~ /\btxt\(['"]([^\)]+)['"]\)/gs;
-                my @matches =  $line=~ /\btxt\(['"]([^\)]+)['"]\)/gs;
+                #my @matches =  $line=~ /\btxt\(['"]([^'"]+)['"]/gs;
+                my @matchesRaw =  $line=~ /\btxt\((["'])((?:\\?+.)*?)\1/gs;
+                my @matches =();
+                for my $m (@matchesRaw) {
+                    next if $m eq "'";
+                    next if $m eq '"';
+                    push @matches, $m;
+                }
+
                 if(scalar(@matches))    {
                     foreach my $i (@matches)    {
                         next if $i =~ /^\s+$/;
