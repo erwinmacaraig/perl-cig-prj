@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-06-04 11:00+1000\n"
+"POT-Creation-Date: 2015-06-04 12:59+1000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
 "Language-Team: \n"
@@ -693,6 +693,7 @@ msgid "International First name"
 msgstr "International Zone"
 
 #: Defs::registrationNature web/WorkFlow.pm Line:674
+#: templates/workflow/summary/personregistration.templ Line:33
 #, fuzzy
 msgid "International Player Loan"
 msgstr "International Region"
@@ -723,7 +724,7 @@ msgstr "Identification Number"
 
 #: Club Field Labels web/Person.pm Line:310 web/PendingRegistrations.pm
 #: Line:220 Line:325 web/IncompleteRegistrations.pm Line:183
-#: templates/dashboards/personregistration.templ Line:149
+#: templates/dashboards/personregistration.templ Line:146
 #: templates/selfrego/transfer_init.templ Line:56
 #: templates/selfrego/selfregohistorybody.templ Line:54
 #: templates/registration/what.templ Line:69
@@ -763,7 +764,7 @@ msgstr "National Number"
 msgid "MA Academy"
 msgstr ""
 
-#: Club Field Labels templates/dashboards/personregistration.templ Line:200
+#: Club Field Labels templates/dashboards/personregistration.templ Line:197
 #: templates/registration/what.templ Line:83
 #: templates/workflow/view/club.templ Line:206
 #: templates/workflow/view/personregistration.templ Line:300
@@ -1122,7 +1123,7 @@ msgstr "Offline Number"
 #: Line:4106 Line:4110 Line:4115 Line:4119 Line:4123 Line:4127 Line:4131
 #: Line:4135 Line:4139 Line:4143 Line:4147 Line:4151 Line:4157 Line:4160
 #: Line:4163 Line:4166 Line:4169 templates/dashboards/personregistration.templ
-#: Line:60 templates/dashboards/worktasks.templ Line:66
+#: Line:57 templates/dashboards/worktasks.templ Line:66
 #: templates/workflow/result/club.templ Line:3
 #: templates/workflow/result/personregistration.templ Line:5
 #: templates/workflow/view/person.templ Line:295
@@ -1326,7 +1327,7 @@ msgstr ""
 #: Line:4201 Line:4205 Line:4210 Line:4214 Line:4224 Line:4228 Line:4232
 #: Line:4238 Line:4241 Line:4244 Line:4247 Line:4250 Line:4253
 #: web/PersonRequest.pm Line:1282
-#: templates/dashboards/personregistration.templ Line:65
+#: templates/dashboards/personregistration.templ Line:62
 #: templates/workflow/generic/document.templ Line:58
 #: templates/personrequest/transfer/request_denied.templ Line:5
 msgid "Rejected"
@@ -1369,7 +1370,7 @@ msgstr "International"
 #: Line:305 web/PendingRegistrations.pm Line:215
 #: web/IncompleteRegistrations.pm Line:178
 #: web/EntityRegistrationAllowedEdit.pm Line:333
-#: templates/dashboards/personregistration.templ Line:128
+#: templates/dashboards/personregistration.templ Line:125
 #: templates/selfrego/transfer_init.templ Line:44
 #: templates/selfrego/selfregohistorybody.templ Line:32
 #: templates/registration/what.templ Line:61
@@ -1425,10 +1426,10 @@ msgstr ""
 #: Line:160 web/Venues.pm Line:815 web/TransLog.pm Line:657 Line:1631
 #: Line:1917 Line:2079 Line:2125 Line:2222 templates/dashboards/entity.templ
 #: Line:53 templates/dashboards/club.templ Line:76
-#: templates/dashboards/personregistration.templ Line:37 Line:121
-#: templates/dashboards/worktasks.templ Line:80
+#: templates/dashboards/personregistration.templ Line:34 Line:118
+#: templates/dashboards/worktasks.templ Line:37 Line:80
 #: templates/selfrego/transfer_init.templ templates/selfrego/accordion.templ
-#: Line:34 templates/selfrego/selfregohistorybody.templ Line:25
+#: templates/selfrego/selfregohistorybody.templ Line:25
 #: templates/registration/certifications.templ Line:8
 #: templates/registration/certificate_flow_backend.templ Line:21
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:40
@@ -1464,6 +1465,7 @@ msgstr ""
 #: templates/workflow/view/person.templ Line:234
 #: templates/workflow/view/personregistration.templ Line:250
 #: templates/workflow/generic/document.templ Line:23
+#: templates/personrequest/generic/completed.templ
 msgid "Status"
 msgstr "Status"
 
@@ -1579,7 +1581,7 @@ msgstr ""
 
 #: Person FieldLabels Club Field Labels web/PersonCertifications.pm Line:125
 #: web/EntityIdentifier.pm Line:351
-#: templates/dashboards/personregistration.templ Line:163
+#: templates/dashboards/personregistration.templ Line:160
 #: templates/selfrego/selfregohistorybody.templ Line:70
 #: templates/registration/certifications.templ Line:9
 #: templates/workflow/view/person.templ Line:261
@@ -1655,7 +1657,6 @@ msgid ""
 msgstr ""
 
 #: web/regoformphoto.cgi Line:76 web/productphoto.cgi Line:60
-#: web/ProductPhoto.pm Line:167 Line:592 web/Photo.pm Line:113 Line:498
 msgid "Photo"
 msgstr ""
 
@@ -1760,7 +1761,7 @@ msgstr "Add"
 #: web/PersonRegistrationDetail.pm Line:309 web/Person.pm Line:314
 #: web/PendingRegistrations.pm Line:225 web/IncompleteRegistrations.pm
 #: Line:188 web/EntityRegistrationAllowedEdit.pm Line:341
-#: templates/dashboards/personregistration.templ Line:156
+#: templates/dashboards/personregistration.templ Line:153
 #: templates/selfrego/transfer_init.templ Line:62
 #: templates/selfrego/selfregohistorybody.templ
 #: templates/payment/bulk_invoice_query_fields.templ Line:61
@@ -1774,7 +1775,7 @@ msgstr ""
 msgid "An error has been encountered."
 msgstr ""
 
-#: web/WorkFlow.pm Line:3839
+#: web/WorkFlow.pm Line:3839 Line:3951
 #, fuzzy
 msgid "Approval"
 msgstr "Approvals"
@@ -1794,7 +1795,7 @@ msgid "Approval by Regional Association"
 msgstr ""
 
 #: web/WorkFlow.pm Line:3791 web/PersonRequest.pm Line:1290
-#: templates/dashboards/personregistration.templ Line:68
+#: templates/dashboards/personregistration.templ Line:65
 #: templates/workflow/generic/document.templ Line:63
 msgid "Approved"
 msgstr ""
@@ -1870,6 +1871,11 @@ msgstr ""
 #, fuzzy
 msgid "Field Information"
 msgstr "Update Information"
+
+#: web/WorkFlow.pm Line:673
+#, fuzzy
+msgid "International Transfer"
+msgstr "Other Details"
 
 #: web/WorkFlow.pm Line:4752 web/IncompleteRegistrations.pm Line:373 Line:416
 #, fuzzy
@@ -1950,6 +1956,11 @@ msgstr "New Registration"
 msgid "New Facility Registration - Approval"
 msgstr "New Registration"
 
+#: web/WorkFlow.pm Line:3839 Line:3951
+#, fuzzy
+msgid "New [_1] Registration"
+msgstr "New Registration"
+
 #: web/ListNotifications.pm Line:37
 msgid "No Notifications can be found in the database."
 msgstr ""
@@ -2005,7 +2016,7 @@ msgid "Registration"
 msgstr ""
 
 #: web/PersonRegistrationDetail.pm Line:294
-#: templates/dashboards/personregistration.templ Line:107
+#: templates/dashboards/personregistration.templ Line:104
 #: templates/selfrego/transfer_init.templ Line:32
 #: templates/selfrego/selfregohistorybody.templ Line:18
 #: templates/workflow/history.templ Line:14
@@ -2077,10 +2088,9 @@ msgid ""
 msgstr ""
 
 #: web/PersonRegistrationDetail.pm Line:125 web/Notifications.pm Line:344
-#: web/Club.pm Line:536 web/Entity.pm Line:287 web/Welcome.pm Line:137
-#: web/PersonCertifications.pm Line:230 web/Venues.pm Line:539
-#: web/EntityIdentifier.pm Line:151 web/EntityRegistrationAllowedEdit.pm
-#: Line:158 web/dashboard/DashboardConfig.pm Line:95
+#: web/Club.pm Line:536 web/Entity.pm Line:287 web/PersonCertifications.pm
+#: Line:230 web/Venues.pm Line:539 web/EntityIdentifier.pm Line:151
+#: web/EntityRegistrationAllowedEdit.pm Line:158
 #: templates/selfrego/user/profile.templ Line:36
 msgid "Update"
 msgstr "Update"
@@ -2128,8 +2138,8 @@ msgstr ""
 msgid "Work Flow task updated."
 msgstr ""
 
-#: web/WorkFlow.pm Line:2104
-msgid "Work task Notes"
+#: web/WorkFlow.pm Line:2104 templates/workflow/generic/actions.templ Line:59
+msgid "Work task notes"
 msgstr ""
 
 #: web/WorkFlow.pm Line:1804
@@ -2142,6 +2152,31 @@ msgstr ""
 
 #: web/WorkFlow.pm Line:696
 msgid "You have Transfers to view"
+msgstr ""
+
+#: web/WorkFlow.pm Line:4159
+msgid ""
+"You have placed this Club Official Renewal On Hold, the [_1] will be "
+"informed."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4162
+msgid ""
+"You have placed this MA Official Renewal On Hold, the [_1] will be informed."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4156
+msgid "You have placed this Player Renewal On Hold, the [_1] will be informed."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4165
+msgid ""
+"You have placed this Team Official Renewal On Hold, the [_1] will be "
+"informed."
+msgstr ""
+
+#: web/WorkFlow.pm Line:4168
+msgid "You have placed this [_1] Renewal On Hold, the [_1] will be informed."
 msgstr ""
 
 #: web/WorkFlow.pm Line:4142
@@ -2239,6 +2274,11 @@ msgid ""
 "process."
 msgstr ""
 
+#: web/WorkFlow.pm Line:4184
+#, fuzzy
+msgid "You have rejected the player loan of [_1] [_2]"
+msgstr "Transfer"
+
 #: web/WorkFlow.pm Line:4231
 msgid "You have rejected this Amendment of Person Registration."
 msgstr ""
@@ -2335,6 +2375,12 @@ msgid ""
 "start a new Registration."
 msgstr ""
 
+#: web/WorkFlow.pm Line:4252
+msgid ""
+"You have rejected this [_1] Renewal. To proceed with this Renewal, start a "
+"new Renewal."
+msgstr ""
+
 #: web/WorkFlow.pm Line:4180
 msgid ""
 "You have rejected this transfer, the clubs will be informed. To proceed with "
@@ -2350,7 +2396,7 @@ msgid "has been rejected."
 msgstr ""
 
 #: web/WorkFlow.pm Line:637
-msgid "to"
+msgid "with Level change from [_1] to [_2]"
 msgstr ""
 
 #: web/PersonEntity.pm Line:175
@@ -2367,7 +2413,7 @@ msgid "Add a new document to this registration"
 msgstr ""
 
 #: web/HomePerson.pm Line:333
-msgid "Change $pType Level"
+msgid "Change [_1] Level"
 msgstr ""
 
 #: web/PersonEntity.pm Line:64
@@ -2387,7 +2433,7 @@ msgstr ""
 
 #: web/Person.pm Line:535 web/EntityDocuments.pm Line:171 Line:224
 #: web/Documents.pm Line:202 templates/dashboards/personregistration.templ
-#: Line:35 templates/workflow/generic/document.templ Line:21
+#: Line:32 templates/workflow/generic/document.templ Line:21
 #, fuzzy
 msgid "Document Type"
 msgstr "Payment Type"
@@ -2426,8 +2472,7 @@ msgstr ""
 msgid "Problem updating Fields"
 msgstr ""
 
-#: web/Person.pm Line:294 templates/dashboards/personregistration.templ
-#: Line:12 templates/personrequest/transfer/view.templ Line:29
+#: web/Person.pm Line:294 templates/personrequest/transfer/view.templ Line:29
 msgid "Registered To"
 msgstr ""
 
@@ -2472,7 +2517,7 @@ msgstr ""
 #: web/PendingRegistrations.pm Line:191 Line:204 web/PersonRequest.pm
 #: Line:1012 web/EntityIdentifier.pm Line:343 web/IncompleteRegistrations.pm
 #: Line:162 Line:168 Line:287 web/TransLog.pm Line:653
-#: templates/dashboards/personregistration.templ Line:135
+#: templates/dashboards/personregistration.templ Line:132
 #: templates/selfrego/transfer_init.templ Line:50
 #: templates/selfrego/selfregohistorybody.templ Line:39
 #: templates/entity/auditlog.templ Line:9
@@ -2501,6 +2546,10 @@ msgstr "Apr"
 #: web/Flow_DisplayFields.pm Line:960 templates/translation/outstanding.templ
 #: Line:9
 msgid "Aug"
+msgstr ""
+
+#: web/Club.pm Line:946
+msgid "Clubs in [_1]"
 msgstr ""
 
 #: web/Club.pm Line:819 Line:883 web/Entity.pm Line:423 Line:485
@@ -2542,10 +2591,6 @@ msgstr "Details"
 #: templates/flow/facility_summary.templ Line:19 Line:40 Line:95
 msgid "Edit"
 msgstr "Edit"
-
-#: web/Welcome.pm Line:111
-msgid "Edit Welcome Message"
-msgstr "Edit Welcome Message"
 
 #: web/Flow_DisplayFields.pm Line:954 templates/translation/outstanding.templ
 #: Line:3
@@ -2595,6 +2640,11 @@ msgstr "Month"
 msgid "Nov"
 msgstr "Nov"
 
+#: web/Flow_DisplayFields.pm Line:1216
+#, fuzzy
+msgid "Number is invalid"
+msgstr "Other Fields"
+
 #: web/Flow_DisplayFields.pm Line:962 templates/translation/outstanding.templ
 #: Line:11
 msgid "Oct"
@@ -2630,9 +2680,24 @@ msgstr "is not a valid date"
 msgid "Please enter a valid email address"
 msgstr "is not a valid email address"
 
+#: web/Flow_DisplayFields.pm Line:1189
+#, fuzzy
+msgid "Please enter a valid number"
+msgstr "is not a valid date"
+
+#: web/Flow_DisplayFields.pm Line:1179
+#, fuzzy
+msgid "Please enter a value between [_1] and [_2]"
+msgstr "is not between [_1] and [_2]"
+
 #: web/Flow_DisplayFields.pm Line:1184
 msgid "Please enter only digits"
 msgstr ""
+
+#: web/Entity.pm Line:517
+#, fuzzy
+msgid "Regions in [_1]"
+msgstr "Regions"
 
 #: web/Flow_DisplayFields.pm Line:629
 #, fuzzy
@@ -2674,17 +2739,10 @@ msgstr "Identifications"
 msgid "Sep"
 msgstr "Sep"
 
-#: web/Welcome.pm Line:181
-msgid "There was a problem changing the welcome message"
-msgstr "There was a problem changing the welcome message"
-
-#: web/Welcome.pm Line:95
-msgid "WELCOME"
-msgstr ""
-
-#: web/Welcome.pm Line:184
-msgid "Welcome Message Updated"
-msgstr "Welcome Message Updated"
+#: web/Flow_DisplayFields.pm Line:1168
+#, fuzzy
+msgid "This must be [_1] characters long"
+msgstr "must be [_1] characters long"
 
 #: web/Flow_DisplayFields.pm Line:969 templates/translation/outstanding.templ
 #: Line:16
@@ -2725,6 +2783,11 @@ msgstr "All Records"
 msgid "Amount"
 msgstr "Amount"
 
+#: web/PayInvoice.pm Line:393 Line:686 web/TransLog.pm Line:1078
+#, fuzzy
+msgid "Amount (ddd.cc)"
+msgstr "Amount"
+
 #: web/PersonCertifications.pm Line:309
 #, fuzzy
 msgid "Certificate Added Successfully"
@@ -2746,7 +2809,7 @@ msgid "Certification Type"
 msgstr "Identification Type"
 
 #: web/PersonCertifications.pm Line:162 web/Flow_PersonBackend.pm Line:92
-#: templates/dashboards/personregistration.templ Line:193
+#: templates/dashboards/personregistration.templ Line:190
 #: templates/selfrego/selfregohistorybody.templ Line:84
 #: templates/registration/summary.templ Line:58
 #: templates/workflow/view/person.templ Line:269
@@ -2798,7 +2861,7 @@ msgstr "Delete"
 #: web/Flow_PersonBackend.pm Line:107 web/Flow_ClubBackend.pm Line:85
 #: web/Flow_TransferBackend.pm Line:89 web/Flow_FacilityBackend.pm Line:90
 #: web/FacilityEdit.pm Line:204 templates/dashboards/personregistration.templ
-#: Line:25 templates/selfrego/accordion.templ Line:10
+#: Line:22 templates/selfrego/accordion.templ Line:10
 #: templates/selfrego/selfregodocsbody.templ Line:5
 #: templates/registration/summary.templ Line:87
 #: templates/workflow/view/loan.templ Line:74
@@ -2810,7 +2873,7 @@ msgstr "Delete"
 #: templates/flow/facility_summary.templ
 #: templates/personrequest/access/requesting_club_view.templ Line:26
 #: templates/personrequest/transfer/new_club_view.templ Line:21
-#: templates/personrequest/transfer/view.templ Line:22
+#: templates/personrequest/transfer/view.templ
 #: templates/personrequest/loan/new_club_view.templ
 msgid "Documents"
 msgstr ""
@@ -2917,6 +2980,10 @@ msgstr "Identifications"
 
 #: web/RecordTypeFilter.pm Line:83
 msgid "Showing"
+msgstr ""
+
+#: web/EntityDocuments.pm Line:229
+msgid "Size (MB)"
 msgstr ""
 
 #: web/PersonCertifications.pm Line:310
@@ -3058,9 +3125,8 @@ msgstr ""
 msgid "Return to Transaction"
 msgstr ""
 
-#: web/EntityEdit.pm Line:150 web/ProductPhoto.pm Line:168 web/Photo.pm
-#: Line:499 web/PersonEdit.pm Line:128 web/FacilityEdit.pm Line:133
-#: templates/entity/venue_fields.templ Line:113
+#: web/EntityEdit.pm Line:150 web/PersonEdit.pm Line:128 web/FacilityEdit.pm
+#: Line:133 templates/entity/venue_fields.templ Line:113
 #: templates/reports/reportoptions_header.templ Line:38
 msgid "Save"
 msgstr ""
@@ -3113,19 +3179,11 @@ msgstr "Update Information"
 msgid "edit"
 msgstr ""
 
-#: web/ProductPhoto.pm Line:612 web/Photo.pm Line:133
-msgid "Add Photo"
-msgstr ""
-
 #: web/PendingRegistrations.pm Line:245 web/IncompleteRegistrations.pm
 #: Line:193 Line:292
 #, fuzzy
 msgid "Added"
 msgstr "Added By"
-
-#: web/ProductPhoto.pm Line:398 web/Photo.pm Line:170
-msgid "Approx. Time"
-msgstr ""
 
 #: web/ListAuditLog.pm Line:96 web/Navbar.pm Line:751 Line:930 Line:1189
 #: web/FacilityEdit.pm Line:236 Line:237 Line:240
@@ -3133,29 +3191,13 @@ msgstr ""
 msgid "Audit Trail"
 msgstr "Audit Log"
 
-#: web/ProductPhoto.pm Line:400 web/Photo.pm Line:172
-msgid "Cable"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:397 web/Photo.pm Line:169
-msgid "Connection"
-msgstr ""
-
 #: web/PendingRegistrations.pm Line:235
 #, fuzzy
 msgid "Current Task"
 msgstr "Current Level"
 
-#: web/ProductPhoto.pm Line:570 web/Photo.pm Line:105
-msgid "Delete Photo"
-msgstr ""
-
 #: web/RegoProducts.pm Line:374
 msgid "In order to continue, you must select the following mandatory items"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:166 web/Photo.pm Line:497
-msgid "Modify Photo"
 msgstr ""
 
 #: web/PendingRegistrations.pm Line:380
@@ -3163,39 +3205,19 @@ msgstr ""
 msgid "No Pending Registrations"
 msgstr "New Registration"
 
-#: web/ProductPhoto.pm Line:611 web/Photo.pm Line:132
-msgid "No Photo Found"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:170 web/Photo.pm Line:501
-msgid "Original Photo"
-msgstr ""
-
 #: web/PendingRegistrations.pm Line:348 Line:382 web/Navbar.pm Line:284
 #: Line:734
 #, fuzzy
 msgid "Pending Registrations"
 msgstr "New Registration"
 
-#: web/ProductPhoto.pm Line:402 web/Photo.pm Line:174
-msgid "Please be Patient"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:169 web/Photo.pm Line:500
-msgid "Preview"
-msgstr ""
-
 #: web/PendingRegistrations.pm Line:42
 #, fuzzy
 msgid "Registration Detail"
 msgstr "Registration Number"
 
-#: web/ProductPhoto.pm Line:569
-msgid "Replace Photo"
-msgstr ""
-
 #: web/PendingRegistrations.pm Line:210 web/IncompleteRegistrations.pm
-#: Line:173 templates/dashboards/personregistration.templ Line:142
+#: Line:173 templates/dashboards/personregistration.templ Line:139
 #: templates/dashboards/worktasks.templ Line:267 Line:313 Line:350
 #: templates/search/grid/personregistration.templ Line:10
 #: templates/selfrego/selfregohistorybody.templ Line:46
@@ -3206,40 +3228,12 @@ msgstr ""
 msgid "Role"
 msgstr ""
 
-#: web/ProductPhoto.pm Line:171 web/Photo.pm Line:502
-msgid "Rotate Left"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:172 web/Photo.pm Line:503
-msgid "Rotate Right"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:388 web/Photo.pm Line:160
-msgid "Save Photo"
-msgstr ""
-
 #: web/Documents.pm Line:207
 msgid "Size"
 msgstr ""
 
-#: web/ProductPhoto.pm Line:395 web/Photo.pm Line:167
-msgid "The estimated time to upload a 400Kb image is"
-msgstr ""
-
 #: web/Documents.pm Line:281
 msgid "There are no documents"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:401 web/Photo.pm Line:173
-msgid "Under 1 minute"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:389 web/Photo.pm Line:161
-msgid "Uploading"
-msgstr ""
-
-#: web/ProductPhoto.pm Line:399 web/Photo.pm Line:171
-msgid "minutes"
 msgstr ""
 
 #: web/Navbar.pm Line:408
@@ -3351,10 +3345,6 @@ msgstr "Clubs"
 msgid "Duplicate Resolution"
 msgstr "Duplicate Resolution"
 
-#: web/Photo.pm Line:104
-msgid "Edit Photo"
-msgstr ""
-
 #: web/Navbar.pm Line:445 Line:799
 #, fuzzy
 msgid "Find Payment"
@@ -3435,10 +3425,6 @@ msgstr "Payment Type"
 #, fuzzy
 msgid "Payments History"
 msgstr "Transfer"
-
-#: web/Navbar.pm Line:348
-msgid "Pending Registration"
-msgstr ""
 
 #: web/Navbar.pm Line:481 templates/translation/outstanding.templ Line:27
 msgid "People"
@@ -3604,6 +3590,7 @@ msgstr ""
 #: web/EntityFields.pm Line:272 templates/entity/venue_fields.templ Line:55
 #: templates/entity/venue_fields_summary.templ Line:8
 #: templates/workflow/generic/facility_fields.templ Line:15
+#: templates/flow/facility_summary.templ Line:57
 msgid "Length of Field"
 msgstr ""
 
@@ -3629,11 +3616,19 @@ msgstr ""
 msgid "Organisation Details"
 msgstr "Personal Details"
 
+msgid ""
+"Player and Player's Parents moved to [_1] for reasons not linked to football"
+msgstr ""
+
 #: web/MinorProtection.pm Line:24
 msgid ""
 "Player lives no further than 50km from the national border and the club with "
 "which the player wishes to be registered is also within 50km from the "
 "national border."
+msgstr ""
+
+#: web/MinorProtection.pm Line:31
+msgid "Player was already living in [_1] prior to this request."
 msgstr ""
 
 #: web/Products.pm Line:332 web/Payments.pm Line:316
@@ -3690,9 +3685,17 @@ msgstr ""
 msgid "Third Child"
 msgstr ""
 
+msgid ""
+"Transfer takes place within the territory of the European Union (EU) or "
+"European Economic Area (EEA) and the player is aged between 16 and 18. In "
+"this case the registering Club commits to fulfill FIFA's obligations (from "
+"FIFA International Transfers Regulations Art. 19b)"
+msgstr ""
+
 #: web/EntityFields.pm Line:265 templates/entity/venue_fields.templ Line:54
 #: templates/entity/venue_fields_summary.templ Line:7
 #: templates/workflow/generic/facility_fields.templ Line:14
+#: templates/flow/facility_summary.templ Line:56
 #: templates/flow/facility_fields_grid.templ Line:11
 msgid "Type of Field"
 msgstr ""
@@ -3700,6 +3703,7 @@ msgstr ""
 #: web/EntityFields.pm Line:276 templates/entity/venue_fields.templ Line:56
 #: templates/entity/venue_fields_summary.templ Line:9
 #: templates/workflow/generic/facility_fields.templ Line:16
+#: templates/flow/facility_summary.templ Line:58
 #, fuzzy
 msgid "Width of Field"
 msgstr "Other Fields"
@@ -3872,7 +3876,7 @@ msgstr ""
 
 #: web/Flow_PersonBackend.pm Line:164 web/PersonRequest.pm Line:514
 #: web/registration/Flow_PersonSelfReg.pm Line:502
-#: templates/dashboards/personregistration.templ Line:247
+#: templates/dashboards/personregistration.templ Line:244
 msgid "No record found."
 msgstr ""
 
@@ -3888,6 +3892,11 @@ msgstr ""
 msgid "Personal Details"
 msgstr "Personal Details"
 
+#: web/ListPersons.pm Line:287
+#, fuzzy
+msgid "Persons in [_1]"
+msgstr "Personal Details"
+
 #: web/Flow_PersonBackend.pm Line:227 web/registration/Flow_PersonSelfReg.pm
 #: Line:181
 msgid ""
@@ -3898,6 +3907,12 @@ msgstr ""
 #: web/Flow_BulkRenewalsBackend.pm Line:407
 #, fuzzy
 msgid "Proceed to Payment and Submit to Member Association"
+msgstr "Registration Authorisation"
+
+#: web/Flow_PersonBackend.pm Line:1457 web/Flow_TransferBackend.pm Line:1282
+#: web/registration/Flow_PersonSelfReg.pm Line:1236
+#, fuzzy
+msgid "Proceed to Payment and Submit to [_1]"
 msgstr "Registration Authorisation"
 
 #: web/ListTransactions.pm Line:43 templates/workflow/generic/payment.templ
@@ -3933,6 +3948,11 @@ msgstr "Run Report"
 
 #: web/ListPersons.pm Line:145
 msgid "SUSPENDED"
+msgstr ""
+
+#: web/Flow_PersonBackend.pm Line:1450 web/Flow_TransferBackend.pm Line:1275
+#: web/registration/Flow_PersonSelfReg.pm Line:1263
+msgid "Submit to "
 msgstr ""
 
 #: web/Flow_ClubBackend.pm Line:734 web/Flow_LoanBackend.pm Line:1263
@@ -4015,6 +4035,11 @@ msgstr "New Registration"
 #: web/PersonRequest.pm Line:652
 msgid "Do you have the player's International Transfer Certificate?"
 msgstr ""
+
+#: web/EditMemberClubs.pm Line:231
+#, fuzzy
+msgid "Edit "
+msgstr "Edit"
 
 #: web/GridDisplay.pm Line:435 templates/dashboards/worktasks.templ Line:392
 #: templates/personrequest/transfer/search_result.templ Line:67
@@ -4124,6 +4149,11 @@ msgstr ""
 msgid "Records found"
 msgstr ""
 
+#: web/PersonRequest.pm Line:878
+#, fuzzy
+msgid "Request Access (Add Role) - Submitted to Current Club"
+msgstr "Access"
+
 #: web/PersonRequest.pm Line:522
 msgid "Request Access cannot continue until re-approved by MA."
 msgstr ""
@@ -4160,6 +4190,8 @@ msgstr ""
 
 #: web/PersonRequest.pm Line:918 Line:985 Line:2194
 #: templates/personrequest/transfer/current_club_view.templ Line:196
+#: templates/personrequest/generic/completed.templ Line:5
+#: templates/personrequest/loan/current_club_view.templ Line:210
 #, fuzzy
 msgid "Requested"
 msgstr "Access"
@@ -4181,6 +4213,11 @@ msgstr ""
 #, fuzzy
 msgid "Result"
 msgstr "Search Results"
+
+#: web/EditMemberClubs.pm Line:51 Line:223
+#, fuzzy
+msgid "Save "
+msgstr "Status Reports"
 
 #: web/Flow_LoanBackend.pm Line:250 Line:345 Line:915 Line:1072
 #: web/Flow_TransferBackend.pm Line:251 Line:346 Line:919 Line:1077
@@ -4218,13 +4255,17 @@ msgstr "Current Level"
 #: web/PersonRequest.pm Line:2004 templates/selfrego/transfer_init.templ
 #: Line:106 templates/entity/venue_fields.templ Line:150
 #: templates/workflow/generic/actions.templ Line:75
+#: templates/personrequest/access/current_club_view.templ Line:244
+#: templates/personrequest/access/requesting_club_view.templ Line:277
 #: templates/personrequest/access/personregistration_summary.templ Line:82
 #: templates/personrequest/transfer/current_club_view.templ Line:250
 #: templates/personrequest/transfer/search_form.templ Line:249
 #: templates/personrequest/transfer/new_club_view.templ Line:279
 #: templates/personrequest/transfer/view.templ Line:232
 #: templates/personrequest/generic/search_form.templ Line:248
+#: templates/personrequest/loan/current_club_view.templ Line:264
 #: templates/personrequest/loan/search_form.templ Line:239
+#: templates/personrequest/loan/new_club_view.templ Line:293
 msgid "Submit"
 msgstr ""
 
@@ -4260,6 +4301,10 @@ msgstr ""
 #, fuzzy
 msgid "View pending"
 msgstr "Descending"
+
+#: web/PersonRequest.pm Line:1375
+msgid "You have [_1] the [_2] of [_3] [_4]."
+msgstr ""
 
 #: web/PersonRequest.pm Line:1381
 msgid "You will be notified once the transfer is effective and approved by "
@@ -4438,6 +4483,10 @@ msgstr "Update Information"
 #, fuzzy
 msgid "Facility"
 msgstr "National Body"
+
+#: web/Venues.pm Line:1004
+msgid "Facility Field(s) not found."
+msgstr ""
 
 #: web/Venues.pm Line:1093 Line:1218 Line:1314
 msgid "Facility fields have been updated."
@@ -4786,10 +4835,6 @@ msgstr ""
 msgid "Select People to Renew"
 msgstr "Personal Details"
 
-#: web/TransLog.pm Line:1961
-msgid "TRANSACTION PAID VIA A DIFFERENT PAYMENT RECORD"
-msgstr ""
-
 #: web/TransLog.pm Line:1629 Line:1915 templates/txn_receipt/receiptbody.templ
 #: Line:38
 msgid "Tax Price"
@@ -4803,6 +4848,12 @@ msgstr ""
 
 #: web/TransLog.pm Line:381
 msgid "The total of the transactions"
+msgstr ""
+
+#: web/TransLog.pm Line:372
+msgid ""
+"This Payment includes transactions of multiple currencies (this makes it "
+"impossible to compare the payment amount to the total of the transactions)."
 msgstr ""
 
 #: web/registration/OldSystemAccounts.pm Line:63
@@ -4832,6 +4883,10 @@ msgstr ""
 msgid "Total Amount"
 msgstr ""
 
+#: web/TransLog.pm Line:1961
+msgid "Transaction paid via a different payment record"
+msgstr ""
+
 #: web/registration/AccountProfile.pm Line:31
 msgid "User Profile"
 msgstr ""
@@ -4847,6 +4902,10 @@ msgstr "View Receipt"
 #: web/registration/OldSystemAccounts.pm Line:67
 msgid "We can't seem to find your old account"
 msgstr ""
+
+#: web/CheckOnLogin.pm Line:123
+msgid "You have [_1] duplicate to resolve."
+msgstr "You have [quant,_1,duplicate,duplicates] to resolve."
 
 #: web/registration/OldSystemAccounts.pm Line:29
 msgid "You must supply both credentials to link to your old system account"
@@ -4883,16 +4942,8 @@ msgstr ""
 msgid "Change your password"
 msgstr ""
 
-#: web/dashboard/DashboardConfig.pm Line:45
-msgid "Configure Dashboard"
-msgstr ""
-
 #: web/registration/user/ConfirmationEmail.pm Line:62
 msgid "Confirm your email with "
-msgstr ""
-
-#: web/dashboard/DashboardConfig.pm Line:168
-msgid "Dashboard Updated"
 msgstr ""
 
 #: web/registration/user/ForgottenPassword.pm Line:91
@@ -4951,8 +5002,8 @@ msgstr ""
 msgid "Start Transfer"
 msgstr "Transfer"
 
-#: web/dashboard/DashboardConfig.pm Line:165
-msgid "There was a problem updating your Dashboard"
+#: web/registration/Flow_PersonSelfReg.pm Line:1228
+msgid "Submit to [_1]"
 msgstr ""
 
 #: web/registration/user/SelfUserLogin.pm Line:38
@@ -5317,13 +5368,13 @@ msgstr "Personal Details"
 msgid "Another minor in my care"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:229
+#: templates/dashboards/personregistration.templ Line:226
 #: templates/workflow/history.templ Line:6
 #, fuzzy
 msgid "Approving Entity"
 msgstr "Search Entity"
 
-#: templates/dashboards/personregistration.templ Line:214
+#: templates/dashboards/personregistration.templ Line:211
 #: templates/personrequest/loan/new_club_view.templ Line:229
 #, fuzzy
 msgid "Cancel Player Loan"
@@ -5355,6 +5406,7 @@ msgstr ""
 #: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
 #: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
 #: templates/personrequest/access/personregistration_summary.templ Line:26
+#: templates/personrequest/generic/search_form.templ Line:207
 #: templates/personrequest/generic/reg_summary.templ Line:5
 #, fuzzy
 msgid "Current Club"
@@ -5375,6 +5427,15 @@ msgstr ""
 msgid "Enter a person's name or Member ID"
 msgstr ""
 
+#: templates/dashboards/person.templ Line:15
+#, fuzzy
+msgid "Family Name (Latin Characters)"
+msgstr "Family Name"
+
+#: templates/dashboards/person.templ Line:27
+msgid "First name (Latin Characters)"
+msgstr ""
+
 #: templates/dashboards/person.templ Line:101
 #, fuzzy
 msgid "Home Phone"
@@ -5387,7 +5448,7 @@ msgstr "Phone"
 msgid "Latest"
 msgstr "States"
 
-#: templates/dashboards/personregistration.templ Line:114
+#: templates/dashboards/personregistration.templ Line:111
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:24
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
@@ -5470,7 +5531,7 @@ msgstr "New Registration"
 msgid "New task"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:241
+#: templates/dashboards/personregistration.templ Line:238
 #: templates/workflow/history.templ Line:22
 msgid "No available work task notes."
 msgstr ""
@@ -5529,7 +5590,7 @@ msgstr ""
 msgid "Organisation"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:233
+#: templates/dashboards/personregistration.templ Line:230
 msgid "Originating Entity"
 msgstr ""
 
@@ -5549,7 +5610,7 @@ msgstr ""
 msgid "Other2"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:94
+#: templates/dashboards/personregistration.templ Line:91
 msgid "Payment Still Required"
 msgstr ""
 
@@ -5576,6 +5637,7 @@ msgid "Personal Information"
 msgstr "Update Information"
 
 #: templates/selfrego/transfer_init.templ Line:129
+#: templates/personrequest/access/current_club_view.templ Line:270
 #: templates/personrequest/transfer/current_club_view.templ Line:276
 #: templates/personrequest/transfer/search_form.templ Line:310
 #: templates/personrequest/transfer/new_club_view.templ Line:305
@@ -5598,6 +5660,11 @@ msgstr "Search"
 msgid "Register"
 msgstr ""
 
+#: templates/dashboards/personregistration.templ Line:84
+#, fuzzy
+msgid "Registered To (International Name)"
+msgstr "International"
+
 #: templates/search/grid/people.templ Line:9
 #, fuzzy
 msgid "Registered as"
@@ -5607,7 +5674,12 @@ msgstr "Deregistered"
 msgid "Registered but Inactive"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:100
+#: templates/dashboards/personregistration.templ Line:12
+#, fuzzy
+msgid "Registered to [_1] as [_2]"
+msgstr "Deregistered"
+
+#: templates/dashboards/personregistration.templ Line:97
 #: templates/selfrego/transfer_init.templ Line:25
 #: templates/selfrego/selfregohistorybody.templ Line:11
 #: templates/workflow/view/person.templ Line:224
@@ -5615,13 +5687,13 @@ msgstr ""
 msgid "Registration Period"
 msgstr "Registration Number"
 
-#: templates/dashboards/personregistration.templ Line:26
+#: templates/dashboards/personregistration.templ Line:23
 #: templates/selfrego/accordion.templ Line:9
 #, fuzzy
 msgid "Registration details"
 msgstr "Registration Number"
 
-#: templates/dashboards/personregistration.templ Line:211
+#: templates/dashboards/personregistration.templ Line:208
 #, fuzzy
 msgid "Renew Registration"
 msgstr "New Registration"
@@ -5802,13 +5874,13 @@ msgstr "Transfer"
 msgid "Update Profile"
 msgstr "Update Club"
 
-#: templates/dashboards/personregistration.templ Line:178
+#: templates/dashboards/personregistration.templ Line:175
 #: templates/workflow/view/person.templ Line:265
 msgid "Valid To"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:71
-#: templates/workflow/generic/document.templ Line:68
+#: templates/dashboards/personregistration.templ Line:68
+#: templates/workflow/generic/document.templ
 msgid "Verified"
 msgstr ""
 
@@ -5841,7 +5913,7 @@ msgstr ""
 msgid "Who are you registering for?"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:27
+#: templates/dashboards/personregistration.templ Line:24
 #, fuzzy
 msgid "Work task history"
 msgstr "Transfer"
@@ -5857,10 +5929,6 @@ msgstr ""
 msgid "Youngest"
 msgstr ""
 
-#: templates/dashboards/personregistration.templ Line:14
-msgid "as"
-msgstr ""
-
 #: templates/dashboards/worktasks.templ Line:392
 #: templates/personrequest/transfer/search_result.templ Line:67
 #: templates/person/list.templ Line:106
@@ -5872,12 +5940,10 @@ msgid "has accepted request for"
 msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:108
-#: templates/personrequest/loan/current_club_view.templ Line:8
 msgid "has requested a player loan for"
 msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:96
-#: templates/personrequest/transfer/current_club_view.templ Line:8
 msgid "has requested a transfer for"
 msgstr ""
 
@@ -5899,6 +5965,18 @@ msgstr "Player"
 #, fuzzy
 msgid "Add Referee Role"
 msgstr "Referee"
+
+#: templates/registration/product_flow_backend.templ Line:25
+msgid ""
+"After you submit the registration to the [_1], the system will connect you "
+"to the payment portal"
+msgstr ""
+
+#: templates/registration/product_flow_backend.templ Line:32
+msgid ""
+"After you submit the registration to the [_1], the system will create an "
+"invoice for you to pay later"
+msgstr ""
 
 #: templates/registration/sr_account_activation_result.templ Line:3
 msgid ""
@@ -6363,6 +6441,11 @@ msgstr ""
 msgid "Register another Person"
 msgstr "Registration Authorisation"
 
+#: templates/registration/complete.templ Line:64
+#, fuzzy
+msgid "Register another [_1]"
+msgstr "Registration Number"
+
 #: templates/registration/summary.templ Line:52
 #: templates/registration/summarybulk.templ Line:36
 #: templates/workflow/result/personregistration.templ Line:37
@@ -6461,7 +6544,8 @@ msgid "Status Change"
 msgstr "Bulk Change"
 
 #: templates/registration/what.templ Line:65
-#: templates/registration/whatbulk.templ Line:30
+#: templates/registration/whatbulk.templ Line:30 templates/person/list.templ
+#: Line:9
 msgid "Sub Role"
 msgstr ""
 
@@ -6766,6 +6850,7 @@ msgstr ""
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:29
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
+#: templates/personrequest/loan/search_form.templ Line:195
 #, fuzzy
 msgid "Borrowing Club"
 msgstr "Current Level"
@@ -6943,7 +7028,7 @@ msgid "REQUEST FOR AN INTERNATIONAL TRANSFER CERTIFICATE"
 msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
-#: Line:9
+#: Line:9 templates/personrequest/access/current_club_view.templ Line:225
 #, fuzzy
 msgid "Request Access Rejected"
 msgstr "Access"
@@ -7016,6 +7101,7 @@ msgstr ""
 #: templates/entity/venue_fields.templ Line:57
 #: templates/entity/venue_fields_summary.templ Line:10
 #: templates/workflow/generic/facility_fields.templ Line:17
+#: templates/flow/facility_summary.templ Line:59
 #: templates/flow/facility_fields_grid.templ Line:14
 #, fuzzy
 msgid "Capacity of Field"
@@ -7026,15 +7112,19 @@ msgstr "Custom Fields"
 msgid "Click here to download the file"
 msgstr "Click here to resolve [quant2,_1,it,them]."
 
-#: templates/entity/venue_fields.templ Line:149
+#: templates/entity/venue_fields.templ Line:128 Line:139 Line:149
 #: templates/workflow/generic/actions.templ Line:58 Line:74
-#: templates/personrequest/access/personregistration_summary.templ Line:81
-#: templates/personrequest/transfer/current_club_view.templ Line:249
-#: templates/personrequest/transfer/search_form.templ Line:234 Line:248
-#: templates/personrequest/transfer/new_club_view.templ Line:278
-#: templates/personrequest/transfer/view.templ Line:231
+#: templates/personrequest/access/current_club_view.templ Line:224 Line:243
+#: templates/personrequest/access/requesting_club_view.templ Line:257 Line:276
+#: templates/personrequest/access/personregistration_summary.templ Line:63
+#: Line:81 templates/personrequest/transfer/current_club_view.templ Line:230
+#: Line:249 templates/personrequest/transfer/search_form.templ Line:234
+#: Line:248 templates/personrequest/transfer/new_club_view.templ Line:259
+#: Line:278 templates/personrequest/transfer/view.templ Line:212 Line:231
 #: templates/personrequest/generic/search_form.templ Line:233 Line:247
+#: templates/personrequest/loan/current_club_view.templ Line:244 Line:263
 #: templates/personrequest/loan/search_form.templ Line:227 Line:238
+#: templates/personrequest/loan/new_club_view.templ Line:273 Line:292
 msgid "Close"
 msgstr ""
 
@@ -7151,34 +7241,10 @@ msgstr ""
 msgid "Thank You"
 msgstr ""
 
-#: templates/team/invite_teammates.templ Line:11
-msgid "Choose competition"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:19
-#, fuzzy
-msgid "Choose form"
-msgstr "Choose a Sport"
-
-#: templates/team/invite_teammates.templ Line:3
-#, fuzzy
-msgid "Choose season"
-msgstr "Choose a Sport"
-
 #: templates/reports/default_adv.templ Line:13
 #, fuzzy
 msgid "Count"
 msgstr "Country"
-
-#: templates/team/invite_teammates.templ Line:29
-msgid ""
-"Enter the email addresses of all your proposed teammates. Put a comma after "
-"each email address"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:27
-msgid "Invite teammates"
-msgstr ""
 
 #: templates/team/team_staff.templ Line:26
 msgid "Position"
@@ -7194,38 +7260,19 @@ msgstr ""
 msgid "Report Run"
 msgstr "Reports"
 
-#: templates/team/invite_teammates.templ Line:13
-msgid ""
-"Select the competition that you would like to invite your teammates to join"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:22
-msgid "Select the registration form that should be used"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:5
-msgid ""
-"Select the season of the competition that you would like to invite your "
-"teammates to join"
-msgstr ""
-
 #: templates/team/team_staff.templ Line:28
 #, fuzzy
 msgid "Staff Member"
 msgstr "Member"
 
+#: templates/reports/email_confirmation.templ Line:5
+msgid ""
+"The attached file is a comma seperated text file that can be opened in most "
+"spreadsheet applications (including Microsoft Excel)"
+msgstr ""
+
 #: templates/reports/email_confirmation.templ Line:7
 msgid "The data contains"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:21
-msgid ""
-"The email that will be sent to your teammates, will contain a link to a "
-"registration form"
-msgstr ""
-
-#: templates/team/invite_teammates.templ Line:31
-msgid "When you have finished click 'Invite Teammates Now'"
 msgstr ""
 
 #: templates/reports/email_confirmation.templ Line:2
@@ -7348,6 +7395,14 @@ msgstr "There was a problem changing the welcome message"
 #, fuzzy
 msgid "Advanced Club"
 msgstr "Club"
+
+#: templates/translation/outstanding.templ Line:31
+msgid "Advanced People (Below my level)"
+msgstr ""
+
+#: templates/translation/outstanding.templ Line:30
+msgid "Advanced People (My level)"
+msgstr ""
 
 #: templates/translation/outstanding.templ Line:34
 #, fuzzy
@@ -7530,6 +7585,11 @@ msgstr ""
 msgid "Transaction Details"
 msgstr "Personal Details"
 
+#: templates/translation/outstanding.templ Line:35
+#, fuzzy
+msgid "Transactions (My People)"
+msgstr "National Number"
+
 #: templates/translation/outstanding.templ Line:33
 #, fuzzy
 msgid "Transfers Below Report"
@@ -7644,6 +7704,10 @@ msgstr "Other Details"
 msgid "Member ID"
 msgstr "Member"
 
+#: templates/workflow/result/person.templ Line:9
+msgid "Name (Latin Characters)"
+msgstr ""
+
 #: templates/workflow/view/club.templ Line:171
 #: templates/flow/club_summary.templ Line:41
 #, fuzzy
@@ -7725,6 +7789,13 @@ msgstr ""
 #, fuzzy
 msgid "Suspended Until"
 msgstr "Date Suspended Until"
+
+#: templates/workflow/result/page.templ Line:21
+#: templates/workflow/summary/loan.templ Line:51
+#: templates/workflow/summary/transfer.templ Line:48
+#: templates/workflow/summary/personregistration.templ Line:87
+msgid "The [_1] request (ID: [_2]) -- [_3]/[_4] has been sent to [_5]."
+msgstr ""
 
 #: templates/workflow/result/personregistration.templ Line:27
 msgid ""
@@ -7936,23 +8007,14 @@ msgstr "Postal Code"
 msgid "Transfer fee"
 msgstr "Transfer"
 
-#: templates/workflow/generic/actions.templ Line:59
-msgid "Work task notes"
-msgstr ""
-
 #: templates/workflow/summary/loan.templ Line:13
 #: templates/workflow/summary/transfer.templ
-msgid "and"
+msgid "[_1] and [_2] have been notified."
 msgstr ""
 
 #: templates/workflow/summary/loan.templ Line:13
 #: templates/workflow/summary/transfer.templ
 msgid "approved"
-msgstr ""
-
-#: templates/workflow/summary/loan.templ Line:13
-#: templates/workflow/summary/transfer.templ
-msgid "have been notified"
 msgstr ""
 
 #: templates/user/globalnav.templ Line:56
@@ -8007,6 +8069,11 @@ msgstr ""
 msgid "Your password has successfully been updated."
 msgstr ""
 
+#: templates/user/update_password_msg.templ Line:3
+msgid ""
+"Your password modification was unsuccessful due to the following reason(s)"
+msgstr ""
+
 #: templates/user/signup.templ Line:74 Line:78
 #: templates/user/modify_user_password.templ Line:45 Line:49
 msgid "must be at least 6 characters long"
@@ -8039,20 +8106,14 @@ msgid "Back to Dashboard"
 msgstr ""
 
 #: templates/personrequest/access/current_club_view.templ Line:16
-#: templates/personrequest/transfer/current_club_view.templ Line:13
-#: templates/personrequest/transfer/view.templ
-#: templates/personrequest/loan/current_club_view.templ
-msgid "By approving you are giving access to all of"
+msgid ""
+"By approving you are giving access to all of the details of [_1] [_2] to [_3]"
 msgstr ""
 
 #: templates/personrequest/access/requesting_club_view.templ Line:202
 #, fuzzy
 msgid "Cancel Access"
 msgstr "Access"
-
-#: templates/flow/facility_summary.templ Line:59
-msgid "Capactity of field"
-msgstr ""
 
 #: templates/personrequest/access/requesting_club_view.templ Line:24 Line:31
 #, fuzzy
@@ -8078,15 +8139,10 @@ msgstr "Offline Number"
 msgid "Language"
 msgstr ""
 
-#: templates/flow/facility_summary.templ Line:57
-msgid "Length of field"
-msgstr ""
-
-#: templates/personrequest/access/requesting_club_view.templ Line:16
-#: templates/personrequest/transfer/new_club_view.templ Line:12
-#: templates/personrequest/loan/new_club_view.templ
-msgid "Member Association for final approval."
-msgstr ""
+#: templates/flow/facility_fields_grid.templ Line:12
+#, fuzzy
+msgid "Length of Field (m)"
+msgstr "Other Fields"
 
 #: templates/flow/club_summary.templ Line:13
 msgid "Organisation dissolution date"
@@ -8108,10 +8164,11 @@ msgstr "Registration Number"
 msgid "Player Loan Status: Released"
 msgstr "Status Reports"
 
-#: templates/personrequest/access/current_club_view.templ Line:8
-#: templates/personrequest/transfer/current_club_view.templ
-#: templates/personrequest/loan/current_club_view.templ
-msgid "Please approve or reject the request."
+#: templates/personrequest/access/requesting_club_view.templ Line:303
+#: templates/personrequest/access/personregistration_summary.templ Line:110
+#: templates/personrequest/loan/current_club_view.templ Line:290
+#: templates/personrequest/loan/new_club_view.templ Line:319
+msgid "Please add notes."
 msgstr ""
 
 #: templates/flow/loan.templ Line:8 templates/flow/transfer.templ
@@ -8121,7 +8178,9 @@ msgid ""
 msgstr ""
 
 #: templates/personrequest/access/requesting_club_view.templ Line:16
-msgid "Please continue with the Add Role process and submit to"
+msgid ""
+"Please continue with the Add Role process and submit to the Member "
+"Association for final approval."
 msgstr ""
 
 #: templates/personrequest/access/requesting_club_view.templ Line:263
@@ -8159,10 +8218,6 @@ msgstr "Transfer"
 msgid "Released"
 msgstr "Deceased?"
 
-#: templates/personrequest/access/current_club_view.templ Line:225
-msgid "Request Access rejected"
-msgstr ""
-
 #: templates/personrequest/access/request_accepted.templ Line:5
 #: templates/personrequest/access/requesting_club_view.templ Line:247
 msgid "Request Access: Approved"
@@ -8180,6 +8235,12 @@ msgstr ""
 #, fuzzy
 msgid "Request Added"
 msgstr "Access"
+
+#: templates/personrequest/access/current_club_view.templ Line:109
+#: templates/personrequest/access/view.templ Line:150
+#, fuzzy
+msgid "Request Details"
+msgstr "Personal Details"
 
 #: templates/personrequest/history.templ Line:26
 #: templates/personrequest/access/view.templ Line:80 Line:227
@@ -8230,6 +8291,11 @@ msgstr "Response Code"
 msgid "Save and Exit"
 msgstr ""
 
+#: templates/personrequest/access/current_club_view.templ Line:14
+#: templates/personrequest/access/requesting_club_view.templ
+msgid "The add role process cannot continue until re-approved by [_1]"
+msgstr ""
+
 #: templates/flow/flow_cancelsave.templ Line:20
 #, fuzzy
 msgid "This registration has been cancelled"
@@ -8240,39 +8306,33 @@ msgstr "Registration Number"
 msgid "This registration has been saved"
 msgstr "Registration Number"
 
-#: templates/flow/facility_summary.templ Line:56
-msgid "Type of field"
-msgstr ""
-
 #: templates/personrequest/history.templ Line:29
 #, fuzzy
 msgid "Updated"
 msgstr "Update"
 
-#: templates/flow/facility_summary.templ Line:58
-msgid "Width of field"
-msgstr ""
-
-#: templates/personrequest/access/current_club_view.templ Line:16
+#: templates/flow/facility_fields_grid.templ Line:13
 #, fuzzy
-msgid "details to"
-msgstr "Details"
+msgid "Width of Field (m)"
+msgstr "Other Fields"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:8
-#, fuzzy
-msgid "details."
-msgstr "Details"
-
-#: templates/personrequest/access/requesting_club_view.templ Line:8
-msgid "has approved access of"
+msgid "[_1] has approved access to the details of [_2] [_3]"
 msgstr ""
 
 #: templates/personrequest/access/current_club_view.templ Line:8
-msgid "has requested data access for"
+msgid ""
+"[_1] has requested data access for [_2] [_3], requestFrom, personFirstname, "
+"personSurname) %]. [% Lang.txt("
 msgstr ""
 
-#: templates/personrequest/history.templ Line:2
-msgid "of"
+#: templates/personrequest/transfer/view.templ Line:13
+msgid "By approving you are giving access to all of"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:13
+msgid ""
+"By approving, you are giving access to all the details of [_1] [_2] to [_3]"
 msgstr ""
 
 #: templates/personrequest/transfer/new_club_view.templ Line:215
@@ -8290,8 +8350,27 @@ msgid "Current Registrations"
 msgstr "New Registration"
 
 #: templates/personrequest/access/personregistration_summary.templ Line:36
+#: templates/personrequest/generic/search_form.templ Line:219
 #, fuzzy
 msgid "Current Sport"
+msgstr "Current Level"
+
+#: templates/personrequest/transfer/search_form.templ Line:208
+#: templates/personrequest/loan/search_form.templ Line:201
+#, fuzzy
+msgid "Current club(s)"
+msgstr "Current Level"
+
+#: templates/personrequest/transfer/search_form.templ Line:214
+#: templates/personrequest/loan/search_form.templ Line:207
+#, fuzzy
+msgid "Current registration(s)"
+msgstr "New Registration"
+
+#: templates/personrequest/transfer/search_form.templ Line:220
+#: templates/personrequest/loan/search_form.templ Line:213
+#, fuzzy
+msgid "Current sport(s)"
 msgstr "Current Level"
 
 #: templates/personrequest/transfer/view.templ Line:162
@@ -8317,6 +8396,11 @@ msgstr ""
 #, fuzzy
 msgid "Last Name"
 msgstr "First Name"
+
+#: templates/personrequest/transfer/new_club_view.templ Line:12
+#: templates/personrequest/loan/new_club_view.templ
+msgid "Member Association for final approval."
+msgstr ""
 
 #: templates/personrequest/transfer/current_club_view.templ Line:21 Line:136
 #: templates/personrequest/loan/current_club_view.templ Line:150
@@ -8349,12 +8433,12 @@ msgstr "Personal Details"
 msgid "Player Details"
 msgstr "Other Details"
 
-#: templates/personrequest/access/personregistration_summary.templ Line:110
-msgid "Please add notes."
-msgstr ""
-
 #: templates/personrequest/transfer/view.templ Line:8
 msgid "Please approve or reject the request"
+msgstr ""
+
+#: templates/personrequest/transfer/current_club_view.templ Line:8
+msgid "Please approve or reject the request."
 msgstr ""
 
 #: templates/personrequest/transfer/new_club_view.templ Line:12
@@ -8392,10 +8476,10 @@ msgstr ""
 msgid "Registration Summary"
 msgstr "Registration Number"
 
-#: templates/personrequest/access/view.templ Line:150
+#: templates/personrequest/access/personregistration_summary.templ Line:64
 #, fuzzy
-msgid "Request Details"
-msgstr "Personal Details"
+msgid "Request Access (Add Role) notes"
+msgstr "Access"
 
 #: templates/personrequest/access/view.templ Line:32 Line:172
 msgid "Request Response"
@@ -8458,7 +8542,6 @@ msgid "Transfer rejected"
 msgstr "Transfer"
 
 #: templates/personrequest/transfer/search_form.templ Line:202
-#: templates/personrequest/generic/search_form.templ Line:201
 #, fuzzy
 msgid "Transfer to club"
 msgstr "Transfer"
@@ -8486,16 +8569,18 @@ msgstr ""
 msgid "Your transfer request has been submitted for final approval."
 msgstr "Registration Number"
 
+#: templates/personrequest/transfer/current_club_view.templ Line:8
+msgid "[_1] has requested a transfer for [_2] [_3]."
+msgstr ""
+
+#: templates/personrequest/transfer/view.templ Line:8
+msgid "[_1] have requested a transfer for [_2]"
+msgstr ""
+
 #: templates/personrequest/transfer/new_club_view.templ Line:7
 #: templates/personrequest/loan/new_club_view.templ
 msgid "has released"
 msgstr ""
-
-#: templates/personrequest/transfer/current_club_view.templ Line:13
-#: templates/personrequest/loan/current_club_view.templ
-#, fuzzy
-msgid "player details to"
-msgstr "Display details for [_1]"
 
 #: templates/personrequest/loan/current_club_view.templ Line:194
 #, fuzzy
@@ -8507,25 +8592,15 @@ msgstr "Approvals"
 msgid "Borrowing Club Details"
 msgstr "Contact Details"
 
-#: templates/personrequest/loan/search_form.templ Line:195
-#, fuzzy
-msgid "Borrowing club"
-msgstr "Current Level"
-
-#: templates/personrequest/generic/search_form.templ Line:207
-#, fuzzy
-msgid "Current club"
-msgstr "Current Level"
+#: templates/personrequest/loan/current_club_view.templ Line:13
+msgid ""
+"By approving, you are giving access to all details of [_1] [_2] to [_3]."
+msgstr ""
 
 #: templates/personrequest/generic/search_form.templ Line:213
 #, fuzzy
-msgid "Current registration"
+msgid "Current Registration"
 msgstr "New Registration"
-
-#: templates/personrequest/generic/search_form.templ Line:219
-#, fuzzy
-msgid "Current sport"
-msgstr "Current Level"
 
 #: templates/personrequest/generic/itc_confirmation.templ Line:2
 msgid "ITC Request submitted to MA"
@@ -8556,8 +8631,8 @@ msgstr "Personal Details"
 
 #: templates/personrequest/loan/current_club_view.templ Line:210
 #, fuzzy
-msgid "Player Loan Status: Requested"
-msgstr "Status Reports"
+msgid "Player Loan Status"
+msgstr "Other Details"
 
 #: templates/personrequest/loan/search_form.templ Line:172
 #, fuzzy
@@ -8621,34 +8696,69 @@ msgstr "Personal Details"
 msgid "Review Role Renewal Details"
 msgstr "Personal Details"
 
-#: templates/personrequest/generic/completed.templ Line:5
+#: templates/personrequest/generic/completed.templ Line:11
+msgid "The [_1] for [_2] has been sent to [_3]"
+msgstr ""
+
+#: templates/personrequest/generic/search_form.templ Line:201
 #, fuzzy
-msgid "Status: Requested"
-msgstr "Status Reports"
+msgid "Transfer to Club"
+msgstr "Transfer"
 
 #: templates/personrequest/generic/itc_confirmation.templ Line:19
 #, fuzzy
 msgid "Your ITC Request has been submitted"
 msgstr "Registration Number"
 
-#: templates/person/list.templ Line:9
-msgid "Sub-Role"
+#: templates/personrequest/loan/current_club_view.templ Line:8
+msgid ""
+"[_1] has requested a player loan for [_2] [_3]., requestFrom, "
+"personFirstname, personSurname) %] [% Lang.txt("
 msgstr ""
 
+#~ msgid "Edit Welcome Message"
+#~ msgstr "Edit Welcome Message"
+
+#~ msgid "There was a problem changing the welcome message"
+#~ msgstr "There was a problem changing the welcome message"
+
+#~ msgid "Welcome Message Updated"
+#~ msgstr "Welcome Message Updated"
+
 #, fuzzy
-#~ msgid "You have rejected the player loan of "
-#~ msgstr "Transfer"
+#~ msgid "Choose form"
+#~ msgstr "Choose a Sport"
+
+#, fuzzy
+#~ msgid "Choose season"
+#~ msgstr "Choose a Sport"
+
+#, fuzzy
+#~ msgid "details to"
+#~ msgstr "Details"
+
+#, fuzzy
+#~ msgid "details."
+#~ msgstr "Details"
+
+#, fuzzy
+#~ msgid "player details to"
+#~ msgstr "Display details for [_1]"
+
+#, fuzzy
+#~ msgid "Borrowing club"
+#~ msgstr "Current Level"
+
+#, fuzzy
+#~ msgid "Player Loan Status: Requested"
+#~ msgstr "Status Reports"
+
+#, fuzzy
+#~ msgid "Status: Requested"
+#~ msgstr "Status Reports"
 
 #, fuzzy
 #~ msgid "This type of registration is not available."
-#~ msgstr "Registration Number"
-
-#, fuzzy
-#~ msgid "Amount."
-#~ msgstr "Amount"
-
-#, fuzzy
-#~ msgid "Register another "
 #~ msgstr "Registration Number"
 
 #, fuzzy
@@ -8942,9 +9052,6 @@ msgstr ""
 #~ msgid "cannot have spaces"
 #~ msgstr "cannot have spaces"
 
-#~ msgid "You have [_1] duplicate to resolve."
-#~ msgstr "You have [quant,_1,duplicate,duplicates] to resolve."
-
 #~ msgid "Database Error in Addition"
 #~ msgstr "Database Error in Addition"
 
@@ -8965,9 +9072,6 @@ msgstr ""
 
 #~ msgid "Parent/Guardian 1 Phone"
 #~ msgstr "Parent/Guardian 1 Phone"
-
-#~ msgid "is not between [_1] and [_2]"
-#~ msgstr "is not between [_1] and [_2]"
 
 #~ msgid "Nickname"
 #~ msgstr "Nickname"

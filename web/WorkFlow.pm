@@ -634,7 +634,7 @@ sub listTasks {
         if ($dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'})    {
             my $fromLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPreviousPersonLevel'}});
             my $newLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}});
-            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);# . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
+            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);
         }
 
 	 my %single_row = (
@@ -670,7 +670,7 @@ sub listTasks {
             newTask => $newTask,
             changeLevelDescription => $changeLevelDescription,
             NewBaseRecord => $dref->{'intNewBaseRecord'},
-            InternationalTransferDescription => ($dref->{'intInternationalTransfer'} and $dref->{'intNewBaseRecord'}) ? $Data->{'lang'}->txt("(International Transfer)") : "",
+            InternationalTransferDescription => ($dref->{'intInternationalTransfer'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Transfer").')' : "",
             InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Player Loan").')' : "",
 		);
         #print STDERR Dumper \%single_row;
@@ -2101,7 +2101,7 @@ sub addTaskNotes    {
     my $WFCurrentNoteID = safe_param('NID','number') || '';
 
     my $lang = $Data->{'lang'};
-    my $title = $lang->txt('Work task Notes');
+    my $title = $lang->txt('Work task notes');
 
     my %TemplateData = (
         TaskID=> $WFTaskID,
@@ -3948,7 +3948,7 @@ sub viewApprovalPage {
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/result/personregistration.templ';
-            $title = $Data->{'lang'}->txt("New [_1] Registration - Approval",$typeName);
+            $title = $Data->{'lang'}->txt("New [_1] Registration",$typeName) . ' - ' . $Data->{'lang'}->txt('Approval');
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $typeName;
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};

@@ -345,7 +345,7 @@ sub getEntityMenuData {
 
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
-                name => $lang->txt('Pending Registration'),
+                name => $lang->txt('Pending Registrations'),
                 url => $baseurl."a=P_PRS_L",
             };
         }

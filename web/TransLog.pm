@@ -1958,7 +1958,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	    return ($body, $lang->txt("Payment Record"));
     }
     if ($otherTransLogCount)    {
-        $body .= qq[<p><b>* ].$lang->txt("TRANSACTION PAID VIA A DIFFERENT PAYMENT RECORD").qq[</b></p>];
+        $body .= qq[<p><b>* ].$lang->txt("Transaction paid via a different payment record").qq[</b></p>];
     }
 	
 	$body = $count ? $resultHTML.$body: $resultHTML;

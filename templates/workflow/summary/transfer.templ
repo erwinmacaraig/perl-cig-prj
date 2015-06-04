@@ -10,7 +10,7 @@
         </h3>
         <div class="panel-body">
             <br/>
-            <p>[% Lang.txt('The following transfer has been') %] <strong>[% Lang.txt('approved') %].</strong> [% TransferDetails.TransferTo %] [% Lang.txt('and') %]  [% TransferDetails.TransferFrom %] [% Lang.txt('have been notified') %].</p>
+            <p>[% Lang.txt('The following transfer has been') %] <strong>[% Lang.txt('approved') %].</strong> [% Lang.txt('[_1] and [_2] have been notified.', TransferDetails.TransferTo, TransferDetails.TransferFrom) %]</p>
             <br/>
 			<div class="read-only">
 				<h4>[% Lang.txt('Transfer Details') %]</h4>

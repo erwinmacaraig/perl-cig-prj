@@ -33,8 +33,13 @@ sub main	{
         'web/RegoFormBuilder/RegoForm.pm' => 1,
         'web/RegoForm/RegoFormBaseObj.pm' => 1,
         'web/RegoForm/RegoForm_Member.pm' => 1,
+        'web/dashboard/DashboardConfig.pm' => 1,
+        'web/ProductPhoto.pm' => 1,
+        'web/Photo.pm' => 1,
+        'web/Welcome.pm' => 1,
         'templates/user/login_orgs.templ' => 1,
         'templates/user/linkmember.templ' => 1,
+        'templates/team/invite_teammates.templ' => 1,
     );
     my @params = @ARGV;
     my $outputfilepath = shift @params;

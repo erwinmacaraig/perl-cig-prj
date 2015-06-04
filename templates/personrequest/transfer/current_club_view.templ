@@ -5,12 +5,12 @@
             <h3 class = "panel-header">[% personFirstname %] [% personSurname %]</h3>
 				<div class="panel-body">
 
-				<p class="transfer-text">[% requestFrom %] [% Lang.txt('has requested a transfer for') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please approve or reject the request.') %]</p>
+				<p class="transfer-text">[% Lang.txt('[_1] has requested a transfer for [_2] [_3].', requestFrom, personFirstname, personSurname) %] [% Lang.txt('Please approve or reject the request.') %]</p>
 
 				<div class="alert" style="border: 1px solid #cccccc">
 					<div>
 						<span class="fa fa-exclamation"></span>
-						<p>[% Lang.txt('By approving you are giving access to all of') %] [% personFirstname %] [% personSurname %] [% Lang.txt('player details to') %] [% requestFrom %]</p>
+						<p>[% Lang.txt('By approving, you are giving access to all the details of [_1] [_2] to [_3]', personFirstname, personSurname, requestFrom) %]</p>
 					</div>
 				</div>
 
@@ -227,7 +227,7 @@
   <div class="modal-dialog" style="z-index:9999;">
     <div class="modal-content">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
         <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Transfer rejected') %]</h4>
       </div>
       

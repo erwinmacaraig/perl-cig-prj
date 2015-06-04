@@ -10,7 +10,7 @@
         </h3>
         <div class="panel-body">
             <br/>
-            <p>[% Lang.txt('The following Player loan has been') %] <strong>[% Lang.txt('approved') %].</strong> [% PlayerLoanDetails.BorrowingClub %] [% Lang.txt('and') %]  [% PlayerLoanDetails.LendingClub %] [% Lang.txt('have been notified') %].</p>
+            <p>[% Lang.txt('The following Player loan has been') %] <strong>[% Lang.txt('approved') %].</strong> [% Lang.txt('[_1] and [_2] have been notified.',PlayerLoanDetails.BorrowingClub, PlayerLoanDetails.LendingClub) %]</p>
             <br/>
 			<div class="read-only">
 				<h4>[% Lang.txt('Player Loan Details') %]</h4>
