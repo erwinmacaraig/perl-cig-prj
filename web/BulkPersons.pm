@@ -156,7 +156,7 @@ sub bulkPersonRollover {
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
         {
-            name => "Check",
+            name => $Data->{'lang'}->txt("Check"),
             field => 'intPersonID',
             type => 'RowCheckbox',
         },

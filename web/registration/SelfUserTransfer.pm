@@ -56,14 +56,14 @@ sub initTransfer {
 
     my $userid ||= $user->id();
     return (
-        $Data->{'lang'}->txt("Invalid parameters."),
+        $Data->{'lang'}->txt("Invalid parameters"),
         $Data->{'lang'}->txt("Error"),
     ) if (!$userid or !$personID or !$personRegistrationID);
 
 
     my $dref = _getValidRegistration($Data, $user, $personID, $personRegistrationID);
 
-    return ( qq[<div class="alert"> <h1>Error</h1>
+    return ( qq[<div class="alert"> <h1>].$Data->{'lang'}->txt('Error').qq[</h1>
                <div>				
                <span class="fa fa-exclamation"></span>
                <p> ] . $Data->{'lang'}->txt("It's either the record does not exist or you have a pending request for the same person registration record.") . qq[
@@ -97,7 +97,7 @@ sub initTransfer {
 	);
 
     if($action eq "TRANSFER_S" and (!$transferTo or !$notes)) {
-        $TemplateData{'error'} = $Data->{'lang'}->txt("Please select from the list of Clubs.");
+        $TemplateData{'error'} = $Data->{'lang'}->txt("Please select from the list of Clubs");
         $TemplateData{'displayMessage'} = 1;
     }
 
@@ -125,7 +125,7 @@ sub submitRequest {
     else {
         my $dref = _getValidRegistration($Data, $user, $personID, $personRegistrationID);
 
-        return ( qq[<div class="alert"> <h1>Error</h1>
+        return ( qq[<div class="alert"> <h1>].$Data->{'lang'}->txt('Error').qq[</h1>
                <div>				
                <span class="fa fa-exclamation"></span>
                <p> ] . $Data->{'lang'}->txt("It's either the record does not exist or you have a pending request for the same person registration record.") . qq[

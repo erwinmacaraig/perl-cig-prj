@@ -125,7 +125,7 @@ sub sendResetEmail {
         $templateWrapper,
         \%emailTemplateContent,
         $user->Email(),
-        $Data->{'SystemConfig'}{'EmailNotificationSysName'} . ": " . $Data->{'lang'}->txt("Change you password with "),
+        $Data->{'SystemConfig'}{'EmailNotificationSysName'} . ": " . $Data->{'lang'}->txt("Change your password"),
         '',#$email_from,
     );
     return $emailsentOK;

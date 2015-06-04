@@ -331,7 +331,7 @@ sub getEntityMenuData {
                 !$SystemConfig->{'clrHideSearchAll'}
             ) {
                 $menuoptions{'clearancesAll'} = {
-                    name => $lang->txt("Search ALL Online $txt_Clr"."s"),
+                    name => $lang->txt("Search ALL Online Transfers"),
                     url => $baseurl."a=CL_list&amp;showAll=1",
                 };
             }
