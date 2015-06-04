@@ -54,7 +54,7 @@
                                 [% END %]
                                 </table>
 
-                            </div>
+                            </div><!-- end selfreg-details -->
                             <div class = "selfreg-actions col-md-4 text-center">
                                 [% IF person.intMinor %]
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;minor=1&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a>
@@ -63,7 +63,7 @@
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
                                 [% END %]
-                            </div>
+                            </div><!-- end selfreg-actions -->
 
                         </div><!-- regtab -->
                         <div id="doctab[% count %]" class="tab-pane fade "><!-- Docs Tab -->
