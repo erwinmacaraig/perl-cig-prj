@@ -531,7 +531,7 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+                AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -540,13 +540,15 @@ sub getPersonRegistration {
             WHERE tblPerson.intPersonID IN ($person_list)
                 AND tblPerson.strStatus IN ('REGISTERED', 'PENDING')
                 $personTypeFilter
+            GROUP BY PR.strPersonType, E.intEntityID
             ORDER BY 
+                PR.dtFrom DESC,
                 tblPerson.strLocalSurname,
                 tblPerson.strLocalFirstname,
                 tblPerson.strNationalNum
             LIMIT 100
         ];
-
+	#print STDERR "SELECT DISTINCT tblPerson.intPersonID, tblPerson.strLocalFirstname, tblPerson.strLocalSurname, tblPerson.strNationalNum, tblPerson.strFIFAID, tblPerson.dtDOB, tblPerson.strStatus as PersonStatus, PR.intPersonRegistrationID, PR.strPersonType, PR.strSport, E.strLocalName AS EntityName, E.intEntityID, E.intEntityLevel FROM tblPerson INNER JOIN tblPersonRegistration_$realmID AS PR ON ( tblPerson.intPersonID = PR.intPersonID AND PR.strStatus IN ('ACTIVE', 'PASSIVE') AND PR.intEntityID IN ($entity_list) ) INNER JOIN tblEntity AS E ON ( PR.intEntityID = E.intEntityID ) WHERE tblPerson.intPersonID IN ($person_list) AND tblPerson.strStatus IN ('REGISTERED', 'PENDING') $personTypeFilter ORDER BY tblPerson.strLocalSurname, tblPerson.strLocalFirstname, tblPerson.strNationalNum LIMIT 100";
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};

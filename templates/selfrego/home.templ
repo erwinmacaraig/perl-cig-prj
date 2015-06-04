@@ -4,11 +4,10 @@
 </p>
 
 [% IF PreviousRegistrations.size > 0 %]
-[% Accordion %]
-
-<h2>[% Lang.txt('Add an additional person?') %]</h2>
+    [% Accordion %]
+    <h2>[% Lang.txt('Add an additional person?') %]</h2>
 [% ELSE %]
-<h2>[% Lang.txt('Who are you registering for?') %]</h2>
+    <h2>[% Lang.txt('Who are you registering for?') %]</h2>
 
 [% END %]
 <div class = "row additional-person">
@@ -24,6 +23,36 @@
     </div>
     <div class = "col-md-5">&nbsp;</div>
 </div>
+
+<div class = "row additional-person">
+    <div class = "selfreg-regwho col-md-7">
+[% IF OldSystemLinkage %]
+    <div class = "col-md-12">
+        <h2>[% Lang.txt('or') %]</h2>
+
+        <p>[% Lang.txt('You can link an account from your old system into your new self registration account.') %]</p>
+         <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
+            <div class = "form-group">
+                <label class="col-md-2" for="link-un">[% Lang.txt(OldSystemUsername) %]</label>
+                <div class="col-md-6 control-fields">
+                    <input type = "text" name = "un" value = "" id = "link-un"  class="form-control fields required" title="[% Lang.txt(OldSystemUsername) %]">
+                </div>
+            </div>
+            <div class = "form-group">
+                <label class="col-md-2" for="link-pw">[% Lang.txt(OldSystemPassword) %]</label>
+                <div class="col-md-6 control-fields">
+                    <input type = "text" name = "pw" value = "" size = "50" id = "link-pw"  class="form-control fields required" title="[% Lang.txt(OldSystemPassword) %]">
+                </div>
+            </div>
+            <input type = "submit" class = "btn-main" value =" [% Lang.txt('Link Account') %] ">
+            <input type = "hidden" name = "a" value = "link">
+            <input type = "hidden" name = "srp" value = "[% srp %]">
+          </form>
+        </div>
+    </div>
+</div>
+[% END %]
+
 [% IF !Found.adult %]
     <div id = "selfreg-myselfoptions">
     <h3>[% Lang.txt('What type of registration do you want?') %]</h3>

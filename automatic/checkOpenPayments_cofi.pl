@@ -66,10 +66,12 @@ print STDERR "IN checkOpenPayments\n";
 	DISTINCT
             TL.intLogID,
             TL.intAmount,
+            TL.strOnlinePayReference,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
             PC.strCurrency,
 			PC.intProcessPreGateway	,
+            TL.strReceiptRef,
 		PT.strPayReference
         FROM
             tblTransLog as TL
@@ -115,8 +117,8 @@ print STDERR "IN checkOpenPayments\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
         $APIResponse{'VERSION'} = "0001";
-        $APIResponse{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
-        $APIResponse{'REFERENCE'} = $logID;
+        $APIResponse{'STAMP'} = $dref->{'strOnlinePayReference'}; #Data{'SystemConfig'}{'paymentPrefix'}.$logID;
+        $APIResponse{'REFERENCE'} = $dref->{'strReceiptRef'}; #$logID;
         $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
         $APIResponse{'AMOUNT'} = $cents;
         $APIResponse{'CURRENCY'} = $dref->{'strCurrency'};

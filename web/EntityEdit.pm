@@ -15,6 +15,7 @@ use EntityFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
 use AuditLog;
+use FieldMessages;
 
 sub handleEntityEdit {
     my ($action, $Data) = @_;
@@ -69,11 +70,14 @@ sub handleEntityEdit {
 
     if($action eq 'EE_U')    {
           my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, $permissionType,);
+          my $fieldMessages = getFieldMessages($Data, lc($permissionType), $Data->{'lang'}->getLocale());
+
           my $obj = new Flow_DisplayFields(
               Data => $Data,
               Lang => $Data->{'lang'},
               SystemConfig => $Data->{'SystemConfig'},
               Fields => $fieldset->{$e_action},
+              FieldMessages => $fieldMessages,
           );
           my $p = new CGI;
           my %params = $p->Vars();

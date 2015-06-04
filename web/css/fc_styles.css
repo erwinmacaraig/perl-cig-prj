@@ -1845,7 +1845,7 @@ form#flowFormID #l_row_type,#l_row_sport label {
 .paddingsummary {
 	float: left;
     /*width: 95px;*/
-    width: 130px;
+    width: 230px;
 }
 #flowFormID .col-md-9 .nav-tabs li a {
     font-size: 13px;
@@ -2681,17 +2681,17 @@ header .navbar-brand {
   #docViewerPanel {
     display:table-footer-group;
   }
-  #docViewerFileBlock {
+  /*#docViewerFileBlock {
     display:table-header-group;
     width:100%;
     height:auto;
     margin-top:-200px;
-  }
+  }*/
   .docViewer-imgBlock img {
     width:100%;
   }
   #docViewerContent {
-    display:table;
+    /*display:table;*/
   }
   #docViewerHeader {
     font-size:12px;
@@ -2754,4 +2754,15 @@ header .navbar-brand {
 }
 .navbar-default .navbar-toggle .icon-bar{
     background-color:#fff;
+}
+.fields-info-btn {
+  padding:0px;
+  position: absolute;
+  right: -8px;
+  top: 0px;
+}
+.fields-info-btn:after {
+  font-family: FontAwesome;
+  content: "\f059";
+  font-size:20px;
 }

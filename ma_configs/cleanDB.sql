@@ -16,6 +16,7 @@ DELETE FROM tblPersonNotes;
 DELETE FROM tblPlayerPassport;
 DELETE FROM tblTransLog_Retry;
 DELETE FROM tblTransLog_Counts;
+DELETE FROM tblOldSystemAccounts;
 
 DELETE FROM tblWFTask;
 DELETE FROM tblAuditLog;

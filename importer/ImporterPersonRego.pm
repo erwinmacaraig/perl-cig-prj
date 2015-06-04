@@ -60,7 +60,7 @@ sub insertCertification {
     my $certID = $certs{$personRole} || return;
     $personID || return;
     my $st = qq[
-        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus, dtValidFrom, dtValidTo)
+        INSERT INTO tblPersonCertifications (intPersonID, intRealmID, intCertificationTypeID, strStatus, dtValidFrom, dtValidUntil)
         VALUES (?,1,?,'ACTIVE', ?, ?)
     ];
     my $qry = $db->prepare($st) or query_error($st);

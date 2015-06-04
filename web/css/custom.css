@@ -374,6 +374,8 @@ th {
 }
 .autoAccordian .panel-heading a{
   display:block;
+  padding: 20px;
+  margin: -20px;
 }
 * .js-tabcollapse-panel-heading:after {
   font-family: FontAwesome;
@@ -562,19 +564,49 @@ th {
 /*If Monitor > Show subs on hover
   If Tablet/Mobile > Show subs on Click
 */
+
 @media only screen and (max-width:992px){
-.navbar-nav>li>a{
+  .navbar-nav>li>a{
     font-size: 13px;
   }
 }
+@media (min-width:768px) and (max-width:992px){
+  #docViewerPanel{
+    float: right;
+    width: 36%;
+    left: 50%;;
+  }
+  #docViewerFileBlock {
+    width: 63%;
+    height: 90%;
+    vertical-align: middle;
+    float: left;
+  }
+}
+@media only screen and (max-width:768px){
+  #docViewerPanel{
+    float: left;
+    width: 69%;
+    position: relative;
+    left: 50%;
+    margin-left: -34.5%;
+  }
+  #docViewerFileBlock {
+    width: 66%;
+    height: 90%;
+    vertical-align: middle;
+    position: relative;
+    left: 50%;
+    margin-left: -33%;
+  } 
+}
 @media only screen and (min-width:768px){
   li.subnav:hover .dropdown-menu {
-      display: block;
+    display: block;
   }
   ul#menu li:hover > ul {
     display: block;
   }
-  
 }
 @media only screen and (max-width:768px){
   header nav.navbar-default .container ul li a.selected {

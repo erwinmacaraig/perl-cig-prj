@@ -78,6 +78,7 @@ sub queryFindByNumber {
             intRealmID = ?
             AND (
                 strOnlinePayReference = ?
+                OR strReceiptRef = ?
                 OR strTXN= ?
                 OR intLogID= ?
             )
@@ -103,6 +104,7 @@ sub queryFindByNumber {
         $Data->{'Realm'},
         $findNumber,
         $findNumber,
+        $findNumber,
         $findNumber
     );
 	my $cl=setClient($Data->{'clientValues'}) || '';
@@ -115,6 +117,7 @@ sub queryFindByNumber {
 			id => $dref->{'intLogID'},
 			SelectLink => qq[$Data->{'target'}?client=$clm&amp;a=TXN_FIND_VIEW&tlID=$dref->{intLogID}],
 			txnnumber=> $dref->{'strTXN'} || '-',
+			recref=> $dref->{'strReceiptRef'} || '-',
             otherref => $dref->{'strOtherRef2'},
 			paymentDate =>  $Data->{'l10n'}{'date'}->TZformat($dref->{'dtLog'},'MEDIUM','SHORT'), 
 			amount => $Data->{'l10n'}{'currency'}->format($dref->{'intAmount'}),

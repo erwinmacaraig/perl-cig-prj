@@ -37,6 +37,7 @@ use IncompleteRegistrations;
 use RegoProducts;
 use Entity;
 use PersonRegisterWhat;
+use FieldMessages;
 
 sub setProcessOrder {
     my $self = shift;
@@ -210,7 +211,8 @@ sub display_core_details    {
     }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'', $fieldMessages);
     my $newRegoWarning = '';
     my $bypassduplicate = '';
     if(!$id)    {
@@ -365,7 +367,8 @@ sub display_minor_fields {
     }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'minor'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'', $fieldMessages);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -428,7 +431,8 @@ sub display_contact_details    {
         $self->setupValues($objectValues);
     }
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'',$fieldMessages);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -484,7 +488,8 @@ sub display_person_identifier {
         $self->setupValues($objectValues);
     }
     
-	my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+	my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields('','',$fieldMessages);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -923,7 +928,8 @@ sub display_certifications {
         $objectValues->{'certificationTypesOrdered'} = \@certOrder;
         $self->setupValues($objectValues);
     }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields('','',$fieldMessages);
 
     my $certifications = getPersonCertifications(
         $self->{'Data'},

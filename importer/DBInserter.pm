@@ -77,14 +77,25 @@ sub insertRow {
 		    $valstr
 		)
 	];
-    #print STDERR Dumper $valstr;
+    print STDERR Dumper $valstr;
+    my @cleanValues;
+    foreach my $val (@values) {
+        $val =~ s/^\s+//;
+        $val =~ s/\s+$//;
+
+        push @cleanValues, $val;
+    }
+
+    #print STDERR Dumper @values;
+    #print STDERR Dumper @cleanValues;
 	# write log for each insert
-	writeLog("INFO: INSERT INTO $table ($keystr) VALUES(". join(', ', @values).")");
+    writeLog("INFO: INSERT INTO $table ($keystr) VALUES(". join(', ', @cleanValues).")");
+    #return;
 	try {
         my $sth = $db->prepare($query) or die "Can't prepare insert: ".$db->errstr()."\n";
-	    my $result = $sth->execute(@values) or die "Can't execute insert: ".$db->errstr()."\n";
-		print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @values),"'\n";
-	    writeLog("INFO: INSERT SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @values).")");
+	    my $result = $sth->execute(@cleanValues) or die "Can't execute insert: ".$db->errstr()."\n";
+		print "INSERT SUCCESS :: TABLE:: '",$table,"' ID:: ",$sth->{mysql_insertid},"' RECORDS:: '",join(', ', @cleanValues),"'\n";
+	    writeLog("INFO: INSERT SUCCESS :: TABLE:: '".$table."' ID:: ".$sth->{mysql_insertid}."' RECORDS:: '". join(', ', @cleanValues).")");
 		return $sth->{mysql_insertid};
 	
 	} catch {

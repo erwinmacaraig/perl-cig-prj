@@ -26,5 +26,7 @@ sub main	{
     linkLOANBorrowingPR($db);
     linkLOANLendingPR($db);
 
+    linkTRANSFERTargetPR($db);
+    linkTRANSFERSourcePR($db);
 }
 

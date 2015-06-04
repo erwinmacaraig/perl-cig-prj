@@ -347,15 +347,17 @@ sub display {
 
 sub displayFields {
   my $self = shift;
-  my($permissions, $fieldSet) = @_;
+  my($permissions, $fieldSet, $fieldMessages) = @_;
   $fieldSet ||= $self->{'ProcessOrder'}[$self->{'CurrentIndex'}]{'fieldset'};
   $permissions ||= {};
+  $fieldMessages ||= '';
   return '' if !$fieldSet;
   my $obj = new Flow_DisplayFields(
     Data => $self->{'Data'},
     Lang => $self->{'Lang'},
     SystemConfig => $self->{'SystemConfig'},
     Fields => $self->{'FieldSets'}{$fieldSet},
+    FieldMessages => $fieldMessages,
   );
   my $action = $self->ID() ? 'edit' : 'add';
   return $obj->build($permissions,$action,1);

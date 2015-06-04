@@ -1,6 +1,6 @@
 <script type="text/javascript" src="//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
     <div class="fieldSectionGroupWrapper " id="">
-    <h3 class="panel-header sectionheader">Personal Details</h3><div class="panel-body fieldSectionGroup"><fieldset>
+    <h3 class="panel-header sectionheader">[% Lang.txt('Personal Details') %]</h3><div class="panel-body fieldSectionGroup"><fieldset>
 <div id="signup-page-wrap">
 
 <div id="register-wrap">
@@ -13,9 +13,11 @@
       [% END %]
   </div>
 </div>
+<a href = "#" onclick = "window.history.back()">[% Lang.txt('Return to signup page') %]</a>
 [% ELSE %]
 
- <form id = "signup-form self-reg" class="self-reg-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
+ <form id = "self-reg-signup" class="self-reg-form" action = "[% BaseURL %]/registration/user/signup.cgi" method ="POST">
+    <h4>[% Lang.txt('Enter your details') %]</h4>
     <div class = "signup_prompt">[% Lang.txt('') %]</div>
     <div id = "signup-email-div form-group" class = "formfield form-group">
 		<label class="col-md-4 " for="email"><span class="compulsory">*</span>[% Lang.txt('Email') %]</label>
@@ -23,12 +25,6 @@
 			<input type = "text" name = "email" value = "[% email%]" id = "signup-email" class="fields required col-md-6 control-fields" title="[% Lang.txt('Email Address') %]">
 		</div>
 	</div>
-    <div id = "signup-fname-div form-group" class = "formfield form-group">
-			<label class="col-md-4" for="firstname"><span class="compulsory">*</span>[% Lang.txt('First Name') %]</label>
-			<div class="col-md-6 control-fields">
-				<input type = "text" name = "firstname" value = "[% strFirstName %]" size = "50" id = "signup-fname" class="fields required" title="[% Lang.txt('First name') %]">
-			</div>
-		</div>
     <div id = "signup-sname-div form-group" class = "formfield form-group">
 			<label class="col-md-4" for="familyname"><span class="compulsory">*</span>[% Lang.txt('Family Name') %]</label>
 			<div class="col-md-6 control-fields">
@@ -36,12 +32,26 @@
 
 			</div>
 	</div>
+    <div id = "signup-fname-div form-group" class = "formfield form-group">
+			<label class="col-md-4" for="firstname"><span class="compulsory">*</span>[% Lang.txt('First Name') %]</label>
+			<div class="col-md-6 control-fields">
+				<input type = "text" name = "firstname" value = "[% strFirstName %]" size = "50" id = "signup-fname" class="fields required" title="[% Lang.txt('First name') %]">
+			</div>
+		</div>
 
+    <h4>[% Lang.txt('Choose a password') %]</h4>
 	<div id = "signup-password-div form-group" class = "formfield form-group">	
 
 		<label class="col-md-4" for="password"><span class="compulsory">*</span>[% Lang.txt('Password') %]</label>
 		<div class="col-md-6 control-fields">
 			<input type = "password" name = "password" value = "" size = "50"  id = "signup-password" class="fields required" title="[% Lang.txt('password') %]">
+            <p class = "help-block">[% Lang.txt('Passwords must follow these rules') %]:</p>
+            <ul class = "help-block">
+                <li>[% Lang.txt("At least 8 characters long") %]</li>
+                <li>[% Lang.txt("Contain at least one upper-case character") %]</li>
+                <li>[% Lang.txt("Contain at least one lower-case character") %]</li>
+                <li>[% Lang.txt("Contain at least one non-alphabetic character eg a number or special character") %]</li>
+            </ul>
 		</div>
 	</div>
 
@@ -62,7 +72,7 @@
 </div>
 <script type="text/javascript">
 	jQuery(document).ready(function(){
-		jQuery("#signup-form").validate({
+		jQuery("#self-reg-signup").validate({
 			rules: {
 				email : {
 					required: true,
@@ -78,26 +88,26 @@
 				},
 				password : {
 					required: true,
-					minlength: 6
+					minlength: 8
 				},
 				password2 : {
 					required: true,
-					minlength: 6,
+					minlength: 8,
 					equalTo: "#signup-password"
-				},
+				}
 			},
 			messages: {
 				firstname: "[% Lang.txt('Please enter your First Name') %]",
 				familyname: "[% Lang.txt('Please enter your Family Name') %]",
 				password: {
 					required: "[% Lang.txt('Please provide a password') %]",
-					minlength: "[% Lang.txt('must be at least 6 characters long') %]"
+					minlength: "[% Lang.txt('must be at least 8 characters long') %]"
 				},
 				password2 : {
 					required: "[% Lang.txt('Please provide a password') %]",
-					minlength: "[% Lang.txt('must be at least 6 characters long') %]",
+					minlength: "[% Lang.txt('must be at least 8 characters long') %]",
 					equalTo: "[% Lang.txt('Passwords do not match') %]"
-				},
+				}
 			}
 		});
 	});
