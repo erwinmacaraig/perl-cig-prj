@@ -100,9 +100,11 @@ sub bulkPersonRollover {
             )
             LEFT JOIN tblPersonRequest prq ON (
                 prq.intPersonRequestID = PR.intPersonRequestID
+                AND prq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblPersonRequest existprq ON (
                 existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+                AND existprq.strRequestType = 'LOAN'
             )
         WHERE 
             P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")

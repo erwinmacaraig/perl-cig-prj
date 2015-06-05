@@ -49,10 +49,7 @@ UPDATE  tblPersonRegistration_1 SET strPersonEntityRole='MAREFOBFAF' WHERE strPe
 UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType IN ('RAOFFICIAL', 'MAOFFICIAL');
 
 
+UPDATE tblProducts SET intRealmID=-99 WHERE strProductType ='insurance' and intRealmID=1;
+UPDATE tblRegistrationItem SET intRealmID=-99 WHERE strItemType ='PRODUCT' AND intID IN (100,99,98,97,96,95,94, 93,92,91,90,89,88,87,86,84);
 
-
-
-ALTER TABLE tblPersonRequest add index index_pr (intExistingPersonRegistrationID);
-UPDATE tblPersonRegistration_1 SET strStatus='ROLLED_OVER' WHERE strPersonType ='REFEREE' AND strStatus='PASSIVE' AND strRegistrationNature='RENEWAL';
-alter table tblPersonCertifications ADD INDEX index_personID (intPersonID, strStatus);
 
