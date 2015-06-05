@@ -2388,14 +2388,13 @@ sub activatePlayerLoan {
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
-            PR.strStatus = 'PASSIVE',
+            PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
             PR.dtTo = PRQ.dtLoanFrom,
             PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
-            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+            AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
     ];
-
 
     my $query = $db->prepare($lst) or query_error($lst);
     $query->execute() or query_error($lst);
