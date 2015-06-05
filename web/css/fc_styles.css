@@ -743,6 +743,7 @@ table tr.new-task {
 
 .read-only, .fieldSectionGroupWrapper-DisplayOnly {
 	position: relative;
+	margin-bottom: 20px
 }
 
 .read-only h4, .fieldSectionGroupWrapper-DisplayOnly h3.panel-header {
@@ -765,7 +766,7 @@ table tr.new-task {
 	margin-left:-40px;
 	padding-top: 5px;
 	padding-bottom: 5px;
-	border-bottom:1px solid #ccc;
+	/*border-bottom:1px solid #ccc;*/
 	font-size: 14px;
 }
 
@@ -782,6 +783,7 @@ table tr.new-task {
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
+	height: 345px;
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color: transparent;

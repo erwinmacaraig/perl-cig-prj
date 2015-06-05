@@ -404,6 +404,15 @@ th {
   margin-bottom: 9px;
   text-align: center;
 }
+/*read only fixes*/
+.document-upload.summary ul li span.details-left:nth-child(1) {
+  text-align: right;
+  float: left;
+  margin-right: 10px;
+  position: relative;
+  width: 50%;
+}
+
 @media only screen and (min-width:275px) and (max-width:313px){
   body{
     top:0!important;
