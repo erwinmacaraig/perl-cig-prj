@@ -529,9 +529,9 @@ sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
-	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
+	#if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
 		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getEntityID($Data->{'clientValues'});
-	}
+	#}
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
