@@ -2313,7 +2313,7 @@ header .navbar-brand {
   .dashboard-tasklist td { padding: 10px; }
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
-  #worktasks #toggleGd_intTaskType a { font-size: 11px; width: 116px;margin-left: calc(50% - 58px);}
+  #worktasks #toggleGd_intTaskType a { font-size: 11px; width: 116px;/*margin-left: calc(50% - 58px);*/}
   .progressFlow .col-md-2.previous.step.step-3 { width: 100%; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
