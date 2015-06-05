@@ -109,13 +109,16 @@ sub rolloverExistingPersonRegistrations {
     );
     
     return if (! $count);
+    
+    my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);#, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_INPROGRESS);
     my %ExistingReg = (
         sport=> $reg_ref->[0]{'strSport'} || '',
         personType=> $reg_ref->[0]{'strPersonType'} || '',
         personEntityRole=> $reg_ref->[0]{'strPersonEntityRole'} || '',
         entityID=> $reg_ref->[0]{'intEntityID'} || 0,
-        status=> $Defs::PERSONREGO_STATUS_ACTIVE,
+        statusIN => \@statusIN,
     );
+        #status=> $Defs::PERSONREGO_STATUS_ACTIVE,
         #personLevel=> $reg_ref->[0]{'strPersonLevel'} || '',
         #ageLevel=> $reg_ref->[0]{'strAgeLevel'} || '',
     my ($countRecords, $regs_ref) = getRegistrationData(
@@ -708,9 +711,11 @@ sub getRegistrationData	{
             )	
             LEFT JOIN tblPersonRequest prq ON (
                 prq.intPersonRequestID = pr.intPersonRequestID
+                AND prq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblPersonRequest existprq ON (
                 existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
+                AND existprq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblEntity eprq ON (
                 eprq.intEntityID = prq.intRequestToEntityID

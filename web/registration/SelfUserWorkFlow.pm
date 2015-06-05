@@ -49,7 +49,7 @@ sub handleSelfUserWorkFlow {
                     my $actionMessage = selfUserResolveTask($Data, $user, $WFTaskID);
 
                     if(!$actionMessage) {
-                        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid access."));
+                        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid access"));
                     }
                     else {
                         $Data->{'RedirectTo'} = "$Defs::base_url/registration/" . $Data->{'target'} . "?a=WF_PR_S&TID=$WFTaskID";

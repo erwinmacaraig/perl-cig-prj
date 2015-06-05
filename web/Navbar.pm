@@ -331,7 +331,7 @@ sub getEntityMenuData {
                 !$SystemConfig->{'clrHideSearchAll'}
             ) {
                 $menuoptions{'clearancesAll'} = {
-                    name => $lang->txt("Search ALL Online $txt_Clr"."s"),
+                    name => $lang->txt("Search ALL Online Transfers"),
                     url => $baseurl."a=CL_list&amp;showAll=1",
                 };
             }
@@ -345,7 +345,7 @@ sub getEntityMenuData {
 
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
-                name => $lang->txt('Pending Registration'),
+                name => $lang->txt('Pending Registrations'),
                 url => $baseurl."a=P_PRS_L",
             };
         }

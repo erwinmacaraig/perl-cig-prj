@@ -231,7 +231,7 @@ select#languageChooser {
     transition: all .1s ease-in-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
 }
 .step{
-  min-width: 150px;
+  min-width: 130px;
 }
 form#searchForm{
   text-align: center;
@@ -404,6 +404,15 @@ th {
   margin-bottom: 9px;
   text-align: center;
 }
+/*read only fixes*/
+.document-upload.summary ul li span.details-left:nth-child(1) {
+  text-align: right;
+  float: left;
+  margin-right: 10px;
+  position: relative;
+  width: 50%;
+}
+
 @media only screen and (min-width:275px) and (max-width:313px){
   body{
     top:0!important;
@@ -642,4 +651,12 @@ th {
   #ROallfields {
     width:100%;
   }
+}
+@media only screen and (max-width:991px) {
+  .progressFlow .col-md-2{ width: 100%; }
+}
+@media (min-width: 991px) and (max-width: 1199px) {
+    #worktasks_filter input {
+        width:150px;
+    }
 }

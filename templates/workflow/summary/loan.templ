@@ -10,7 +10,7 @@
         </h3>
         <div class="panel-body">
             <br/>
-            <p>[% Lang.txt('The following Player loan has been') %] <strong>[% Lang.txt('approved') %].</strong> [% PlayerLoanDetails.BorrowingClub %] [% Lang.txt('and') %]  [% PlayerLoanDetails.LendingClub %] [% Lang.txt('have been notified') %].</p>
+            <p>[% Lang.txt('The following Player loan has been') %] <strong>[% Lang.txt('approved') %].</strong> [% Lang.txt('[_1] and [_2] have been notified.',PlayerLoanDetails.BorrowingClub, PlayerLoanDetails.LendingClub) %]</p>
             <br/>
 			<div class="read-only">
 				<h4>[% Lang.txt('Player Loan Details') %]</h4>
@@ -48,7 +48,7 @@
 
             <!--
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
+            <label>[% Lang.txt('The [_1] request (ID: [_2]) -- [_3]/[_4] has been sent to [_5].',request.requestType, request.id, request.personType, request.sport, request.requestTo) %]</label>
             <br/>
             [% END %]
             -->

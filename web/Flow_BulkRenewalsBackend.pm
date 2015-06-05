@@ -43,14 +43,17 @@ sub setProcessOrder {
   
     my $dtype = param('dtype') || '';
     my $typename = $Defs::personType{$dtype} || '';
-    my $regname = $typename ? $typename .' Registration' : 'Registration';
+    my $lang = $self->{'Data'}{'lang'};
+    my $regname = $typename
+        ? $lang->txt($typename .' Registration')
+        : $lang->txt('Registration');
 
     $self->{'ProcessOrder'} = [       
         {
             'action' => 'r',
             'function' => 'display_registration',
-            'label'  => 'Registration',
-            'title'  => "$regname - Choose Registration Type",
+            'label'  => $lang->txt('Registration'),
+            'title'  => $regname . ' - ' .$lang->txt('Choose Registration Type'),
         },
         {
             'action' => 'ru',
@@ -59,8 +62,8 @@ sub setProcessOrder {
         {
             'action' => 'r',
             'function' => 'display_person_select',
-            'label'  => 'Person Selection',
-            'title'  => "$regname - Select People to Renew",
+            'label'  => $lang->txt('Person Selection'),
+            'title'  => $regname . ' - ' .$lang->txt('Select People to Renew'),
         },
         {
             'action' => 'spu',
@@ -69,8 +72,8 @@ sub setProcessOrder {
          {
             'action' => 'p',
             'function' => 'display_products',
-            'label'  => 'License',
-            'title'  => "$regname - Confirm License",
+            'label'  => $lang->txt('License'),
+            'title'  => $regname . ' - ' .$lang->txt('Confirm License'),
         },
         {
             'action' => 'pu',
@@ -79,14 +82,14 @@ sub setProcessOrder {
        {
             'action' => 'summ',
             'function' => 'display_summary',
-            'label'  => 'Summary',
-            'title'  => "$regname - Summary",
+            'label'  => $lang->txt('Summary'),
+            'title'  => $regname . ' - ' .$lang->txt('Summary'),
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
-            'label'  => 'Complete',
-            'title'  => "$regname - Submitted",
+            'label'  => $lang->txt('Complete'),
+            'title'  => $regname . ' - ' .$lang->txt('Submitted'),
             'NoGoingBack' => 1,
             'NoDisplayInNav' => 1,
         },

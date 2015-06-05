@@ -1371,8 +1371,8 @@ sub setRequestResponse {
 	
         #print STDERR Dumper $request;
         my $templateFile = "";
-        $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
-        my $notifDetails = $Data->{'lang'}->txt("You have " . lc $requestResponseSuffix . " the " . $Defs::personRequest{$request->{'strRequestType'}} . " of ") . $request->{'strLocalFirstname'} . " " . $request->{'strLocalSurname'} . ".";
+        $title = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}) . ' - ' . $Data->{'lang'}->txt($requestResponseSuffix);
+        my $notifDetails = $Data->{'lang'}->txt("You have [_1] the [_2] of [_3] [_4]." . lc($Data->{'lang'}->txt($requestResponseSuffix)), $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}), $request->{'strLocalFirstname'}, $request->{'strLocalSurname'});
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -2388,14 +2388,13 @@ sub activatePlayerLoan {
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
-            PR.strStatus = 'PASSIVE',
+            PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
             PR.dtTo = PRQ.dtLoanFrom,
             PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
-            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+            AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
     ];
-
 
     my $query = $db->prepare($lst) or query_error($lst);
     $query->execute() or query_error($lst);

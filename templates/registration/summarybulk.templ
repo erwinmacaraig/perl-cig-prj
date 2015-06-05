@@ -34,9 +34,9 @@
 		    <ul>
 		    	<li><span class="details-left">[% Lang.txt("Register to") %]:</span> <span class="detail-value">[% registration.strLocalName %]</span></li>
 		    	<li><span class="details-left">[% Lang.txt("Register as") %]:</span> <span class="detail-value">[% registration.PersonType %][% IF registration.roleName %] - [% Lang.txt(registration.roleName ) %][% END %]</span></li>
-		    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% registration.Sport %] [% ELSE %] - [% END %]</span></li>
+		    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% Lang.txt(registration.Sport) %] [% ELSE %] - [% END %]</span></li>
 		    	[% IF registration.PersonLevel %]
-		    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
+		    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% Lang.txt(registration.PersonLevel) %]</span></li>							
 		    	[% END %]
 		    </ul>
 		    <!--<a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>-->

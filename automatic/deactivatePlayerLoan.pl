@@ -28,7 +28,7 @@ use strict;
         INNER JOIN
             tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
-            pr.strStatus IN ('ACTIVE', 'PASSIVE')
+            pr.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
@@ -52,7 +52,6 @@ use strict;
     $q->execute($today) or query_error($st);
 
     while(my $personRequest = $q->fetchrow_hashref()) {
-        print STDERR Dumper $personRequest;
         push @personRequestIDs, $personRequest->{'intPersonRequestID'};
         push @personIDs, $personRequest->{'intPersonID'};
     }

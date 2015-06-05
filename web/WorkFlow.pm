@@ -634,7 +634,7 @@ sub listTasks {
         if ($dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'})    {
             my $fromLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPreviousPersonLevel'}});
             my $newLevel = $Data->{'lang'}->txt($Defs::personLevel{$dref->{'strPersonLevel'}});
-            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);# . $fromLevel . " " . $Data->{'lang'}->txt("to") . " " . $newLevel;
+            $changeLevelDescription = $Data->{'lang'}->txt("with Level change from [_1] to [_2]", $fromLevel, $newLevel);
         }
 
 	 my %single_row = (
@@ -670,8 +670,8 @@ sub listTasks {
             newTask => $newTask,
             changeLevelDescription => $changeLevelDescription,
             NewBaseRecord => $dref->{'intNewBaseRecord'},
-            InternationalTransferDescription => ($dref->{'intInternationalTransfer'} and $dref->{'intNewBaseRecord'}) ? $Data->{'lang'}->txt("(International Transfer)") : "",
-            InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? $Data->{'lang'}->txt("(International Player Loan)") : "",
+            InternationalTransferDescription => ($dref->{'intInternationalTransfer'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Transfer").')' : "",
+            InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Player Loan").')' : "",
 		);
         #print STDERR Dumper \%single_row;
    
@@ -2101,7 +2101,7 @@ sub addTaskNotes    {
     my $WFCurrentNoteID = safe_param('NID','number') || '';
 
     my $lang = $Data->{'lang'};
-    my $title = $lang->txt('Work task Notes');
+    my $title = $lang->txt('Work task notes');
 
     my %TemplateData = (
         TaskID=> $WFTaskID,
@@ -2657,7 +2657,7 @@ sub viewTask {
     my $dref = $q->fetchrow_hashref();
     if(!$dref) {
         #return (undef, "ERROR: no data retrieved/no access.");
-        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No data retrieved/no access."));
+        return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("No data retrieved/no access"));
     }
 
     $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
@@ -3788,7 +3788,7 @@ sub viewSummaryPage {
         case ['REGO', 'PERSON'] {
             if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER){
                 $templateFile = 'workflow/summary/transfer.templ';
-                $title = $Data->{'lang'}->txt("Transfer - Approved");
+                $title = $Data->{'lang'}->txt("Transfer") . " : " .$Data->{'lang'}->txt("Approved");
                 my %regFilter = (
                     'requestID' => $task->{'intPersonRequestID'},
                 );
@@ -3836,7 +3836,7 @@ sub viewSummaryPage {
             }
             else {
                 $templateFile = 'workflow/summary/personregistration.templ';
-                $title = $Data->{'lang'}->txt('New' . ' ' . $Defs::personType{$task->{'strPersonType'}} . " " . "Registration - Approval");
+                $title = $Data->{'lang'}->txt('New [_1] Registration', $Data->{'lang'}->txt($Defs::personType{$task->{'strPersonType'}})) . " - " . $Data->{'lang'}->txt('Approval');
             }
 	    $TemplateData{'PersonRegistrationDetails'}{'isInternationalPlayerLoan'} = $task->{'intInternationalLoan'};
             $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
@@ -3944,11 +3944,12 @@ sub viewApprovalPage {
     $TemplateData{'TaskAction'} = \%TaskAction;
     my $clubName = $dref->{'strLocalName'};
 
+    my $typeName = $Data->{'lang'}->txt($Defs::personType{$task->{'strPersonType'}});
     switch($task->{'strWFRuleFor'}) {
         case 'REGO' {
             $templateFile = 'workflow/result/personregistration.templ';
-            $title = $Data->{'lang'}->txt('New ' . $Defs::personType{$task->{'strPersonType'}} . " Registration - Approval");
-            $TemplateData{'PersonRegistrationDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+            $title = $Data->{'lang'}->txt("New [_1] Registration",$typeName) . ' - ' . $Data->{'lang'}->txt('Approval');
+            $TemplateData{'PersonRegistrationDetails'}{'personType'} = $typeName;
             $TemplateData{'PersonRegistrationDetails'}{'personLevel'} = $Defs::personLevel{$task->{'strPersonLevel'}};
             $TemplateData{'PersonRegistrationDetails'}{'sport'} = $Defs::sportType{$task->{'strSport'}};
             $TemplateData{'PersonRegistrationDetails'}{'currentAge'} = $task->{'currentAge'};
@@ -4090,7 +4091,7 @@ sub updateTaskScreen {
         case "WF_PR_H" {
             my $SysConfigOptionSuffix = 'HOLD';
 
-            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'On-Hold');
+            $title = $Data->{'lang'}->txt($titlePrefix) . ' - ' . $Data->{'lang'}->txt('On-Hold');
             
             if($TaskType eq 'TRANSFER_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process.");
@@ -4152,19 +4153,19 @@ sub updateTaskScreen {
             elsif($TaskType =~ /^RENEWAL_/) {
                 if($task->{'strTaskStatus'} eq 'HOLD'){
                     if ($task->{'strPersonType'} eq 'PLAYER') {
-                     $message = $Data->{'lang'}->txt("You have placed this Player Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Player Renewal On Hold, the [_1] will be informed.",$raID->{'strLocalName'});
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif ($task->{'strPersonType'} eq 'CLUBOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have placed this Club Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Club Official Renewal On Hold, the [_1] will be informed.",$raID->{'strLocalName'});
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif($task->{'strPersonType'} eq 'MAOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have placed this MA Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this MA Official Renewal On Hold, the [_1] will be informed.",$raID->{'strLocalName'});
                      $status = $Data->{'lang'}->txt("Pending");
                     }elsif($task->{'strPersonType'} eq 'TEAMOFFICIAL'){
-                     $message = $Data->{'lang'}->txt("You have placed this Team Official Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this Team Official Renewal On Hold, the [_1] will be informed.",$raID->{'strLocalName'});
                      $status = $Data->{'lang'}->txt("Pending");
                     }else{
-                     $message = $Data->{'lang'}->txt("You have placed this ".ucfirst(lc($task->{'strPersonType'}))." Renewal On Hold, the ".$raID->{'strLocalName'}." will be informed.");
+                     $message = $Data->{'lang'}->txt("You have placed this [_1] Renewal On Hold, the [_1] will be informed.",ucfirst(lc($Data->{'lang'}->txt($task->{'strPersonType'}))), $raID->{'strLocalName'});
                      $status = $Data->{'lang'}->txt("Pending");
                     }
                 }
@@ -4173,14 +4174,14 @@ sub updateTaskScreen {
         }
         case "WF_PR_R" {
 
-            $title = $Data->{'lang'}->txt($titlePrefix . ' - ' . 'Rejected');
+            $title = $Data->{'lang'}->txt($titlePrefix) . ' - ' . $Data->{'lang'}->txt('Rejected');
             
             if($TaskType eq 'TRANSFER_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer.");
                 $status = $Data->{'lang'}->txt("Rejected");
             }
 			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
-				$message = $Data->{'lang'}->txt("You have rejected the player loan of ") . qq[$task->{'strLocalFirstname'}  $task->{'strLocalSurname'}.];
+				$message = $Data->{'lang'}->txt("You have rejected the player loan of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
 				$status = $Data->{'lang'}->txt("Rejected");
 			}
             elsif($TaskType eq 'NEW_PLAYER') {
@@ -4248,7 +4249,7 @@ sub updateTaskScreen {
                      $message = $Data->{'lang'}->txt("You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal.");
                      $status = $Data->{'lang'}->txt("Rejected");
                     }else{
-                     $message = $Data->{'lang'}->txt("You have rejected this ".ucfirst(lc($task->{'strPersonType'}))." Renewal. To proceed with this Renewal, start a new Renewal.");
+                     $message = $Data->{'lang'}->txt("You have rejected this [_1] Renewal. To proceed with this Renewal, start a new Renewal.",ucfirst(lc($Data->{'lang'}->txt($task->{'strPersonType'}))));
                      $status = $Data->{'lang'}->txt("Rejected");
                     }
                 }

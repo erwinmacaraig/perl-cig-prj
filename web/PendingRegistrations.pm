@@ -377,7 +377,7 @@ sub listPendingRegistrations    {
         ];
     }
     if(! @rowdata and ! @fielddata){
-    	$resultHTML = 'No Pending Registrations';
+    	$resultHTML = $Data->{'lang'}->txt('No Pending Registrations');
     }
     $title = $Data->{'lang'}->txt('Pending Registrations');
            

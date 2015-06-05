@@ -1229,7 +1229,7 @@ print STDERR "SUMM$regoID\n";
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to [_1]' , $initialTaskAssigneeLevel),
     );
     $gatewayConfig->{'Target'} = "$Defs::base_url/".$gatewayConfig->{'Target'};
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
@@ -1237,7 +1237,7 @@ print STDERR "SUMM$regoID\n";
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
 

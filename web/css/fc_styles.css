@@ -743,6 +743,7 @@ table tr.new-task {
 
 .read-only, .fieldSectionGroupWrapper-DisplayOnly {
 	position: relative;
+	margin-bottom: 20px
 }
 
 .read-only h4, .fieldSectionGroupWrapper-DisplayOnly h3.panel-header {
@@ -765,7 +766,7 @@ table tr.new-task {
 	margin-left:-40px;
 	padding-top: 5px;
 	padding-bottom: 5px;
-	border-bottom:1px solid #ccc;
+	/*border-bottom:1px solid #ccc;*/
 	font-size: 14px;
 }
 
@@ -782,6 +783,7 @@ table tr.new-task {
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
+	height: 345px;
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color: transparent;
@@ -2311,7 +2313,7 @@ header .navbar-brand {
   .dashboard-tasklist td { padding: 10px; }
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
-  #worktasks #toggleGd_intTaskType a { font-size: 11px; width: 116px;margin-left: calc(50% - 58px);}
+  #worktasks #toggleGd_intTaskType a { font-size: 11px; width: 116px;/*margin-left: calc(50% - 58px);*/}
   .progressFlow .col-md-2.previous.step.step-3 { width: 100%; }
   div#content div.member-home-page div.task-actions.txtright {
   	margin-bottom: 10px;
@@ -2347,8 +2349,13 @@ header .navbar-brand {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
     color:#000; 
   }
+  .responsiveTablesDropDown button{margin: 6px!important;}
 }
-.responsiveTablesDropDown button{margin: 6px!important;}
+@media (min-width: 480px) and (max-width: 619px) {
+    .alert div p {
+        width:70%;
+    }
+}
 @media (min-width: 250px) and (max-width: 480px) {
    #content .steps{padding: 0}
    table.table.tableboxheader thead tr th { font-size: 11px; }

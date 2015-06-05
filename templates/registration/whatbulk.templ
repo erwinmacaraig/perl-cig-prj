@@ -4,7 +4,7 @@
 <input type = "hidden" id = "rID" value = "[% realmID %]">
 <input type = "hidden" id = "srID" value = "[% realmSubTypeID %]">
 <input type = "hidden" id = "client" value = "[% client %]">
-<h3 class="panel-header">Bulk Renewal Registration</h3>
+<h3 class="panel-header">[% Lang.txt('Bulk Renewal Registration') %]</h3>
 <div class = "panel-body">
     <div class = "regoptions">
     <fieldset>
@@ -17,7 +17,7 @@
         </div>
         <p class = "existingReg"><a href = "#" class = "btn-inside-panels" id = "reset-btn">[% Lang.txt('Reset Registration') %]</a></p>
 [% END %]
-        <p><span class="notice-error"><span class="compulsory">*</span>Required fields</span></p>
+        <p><span class="notice-error"><span class="compulsory">*</span>[% Lang.txt('Required fields') %]</span></p>
         <div class="form-group" id = "l_row_type">
             <label class="col-md-3 control-label txtright" for="l_type"><span class="compulsory">*</span>[% Lang.txt('Role') %]</label>
             <div class="col-md-9"><select name = "d_type" size = "1" id="l_type" data-type = "type" class = "fcToggleGroup"></select>[% IF existing.typeName %]<span class = "existingReg">[% existing.typeName %][% END %]</div>
