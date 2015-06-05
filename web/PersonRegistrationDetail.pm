@@ -294,11 +294,13 @@ sub personRegistrationWorkTasks {
             name   => $Data->{'lang'}->txt('Registration Type'),
             field  => 'RegistrationNature',
             width  => 30,
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Name'),
             field  => 'LocalLatinName',
             width  => 30,
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Sport'),
@@ -314,6 +316,7 @@ sub personRegistrationWorkTasks {
             name  => $Data->{'lang'}->txt('Task Status'),
             field => 'Status',
             width  => 40,
+            defaultShow => 1,
         },
         {
             name  => $Data->{'lang'}->txt('Assigned To'),
@@ -329,6 +332,7 @@ sub personRegistrationWorkTasks {
             name  => $Data->{'lang'}->txt('Task Type'),
             field => 'SelectLink',
             width  => 50,
+            defaultShow => 1,
         },
         #{
         #    name  => $Data->{'lang'}->txt('Task Assigned To'),

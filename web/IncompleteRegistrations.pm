@@ -262,7 +262,11 @@ sub listIncompleteRegistrations    {
             ];
 
         }
-        my $type = $dref->{'regoType'} eq 'VENUE'
+        if($Data->{'clientValues'}{'authLevel'} != $Data->{'clientValues'}{'currentLevel'})    {
+            $resume = '';
+            $delete = '';
+        }
+    my $type = $dref->{'regoType'} eq 'VENUE'
             ? $Data->{'lang'}->txt('Venue')
             : $Data->{'lang'}->txt('Club');
         push @fielddata, {

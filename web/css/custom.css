@@ -231,7 +231,7 @@ select#languageChooser {
     transition: all .1s ease-in-out;  /* Chrome 26, Firefox 16+, IE 10+, Opera 12.10+ */
 }
 .step{
-  min-width: 150px;
+  min-width: 130px;
 }
 form#searchForm{
   text-align: center;
@@ -642,4 +642,7 @@ th {
   #ROallfields {
     width:100%;
   }
+}
+@media only screen and (max-width:991px) {
+  .progressFlow .col-md-2{ width: 100%; }
 }

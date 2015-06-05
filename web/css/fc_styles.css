@@ -2347,8 +2347,13 @@ header .navbar-brand {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
     color:#000; 
   }
+  .responsiveTablesDropDown button{margin: 6px!important;}
 }
-.responsiveTablesDropDown button{margin: 6px!important;}
+@media (min-width: 480px) and (max-width: 619px) {
+    .alert div p {
+        width:70%;
+    }
+}
 @media (min-width: 250px) and (max-width: 480px) {
    #content .steps{padding: 0}
    table.table.tableboxheader thead tr th { font-size: 11px; }
