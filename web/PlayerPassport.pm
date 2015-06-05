@@ -38,6 +38,7 @@ sub savePlayerPassport{
             PR.dtFrom, 
             IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), PR.dtFrom, DATE_ADD(dtDOB,INTERVAL 12 YEAR)) as WhenFrom,
             IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), DATE_FORMAT(PR.dtFrom, "%Y%m%d"), DATE_FORMAT(DATE_ADD(dtDOB,INTERVAL 12 YEAR), "%Y%m%d")) as WhenFrom_,
+            IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo) as orderdtTo,
             PR.dtTo,
             DATE_FORMAT(PR.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(PR.dtFrom, "%Y%m%d") as dtFrom_,
@@ -58,8 +59,10 @@ sub savePlayerPassport{
             AND PR.dtFrom IS NOT NULL
         HAVING
             PRToCalc > When12
-        ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom
+            ORDER BY PR.dtFrom, orderdtTo
     ];	
+    #ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom
+
             #YEAR(IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW())) as yrDtTo,
             #YEAR(PR.dtTo) as yrDtTo,
             #AND PR.dtFrom<>PR.dtTo
