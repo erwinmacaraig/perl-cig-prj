@@ -1,0 +1,25 @@
+
+#Check for PASSIVE that should be TRANSFERRED
+SELECT T.* FROM tmpPersonRego as T INNER JOIN tmpPersonRego as T2 ON (T.intID<>T2.intID AND T.strFileType=T2.strFileType AND T.strPersonCode=T2.strPersonCode AND T.strEntityCode=T2.strEntityCode AND T.strStatus='PASSIVE' AND T.strPersonType=T2.strPersonType AND T.strPersonLevel=T2.strPersonLevel AND T.strSport = T2.strSport AND T.strAgeLevel=T2.strAgeLevel AND T.dtFrom=T2.dtFrom AND T.dtTo = T2.dtTo and T.dtTransferred = T2.dtTransferred and T.strNationalPeriodCode=T2.strNationalPeriodCode) WHERE T2.strStatus='TRANSFERRED' and T.dtTransferred<>'0000-00-00' AND T.isLoan='' and T2.isLoan='';
+
+SELECT T.intID FROM tmpPersonRego02 as T INNER JOIN tmpPersonRego02 as T2 ON (T.intID<>T2.intID AND T.strFileType=T2.strFileType AND T.strPersonCode=T2.strPersonCode AND T.strEntityCode=T2.strEntityCode AND T.strStatus='PASSIVE' AND T.strPersonType=T2.strPersonType AND T.strPersonLevel=T2.strPersonLevel AND T.strSport = T2.strSport AND T.strAgeLevel=T2.strAgeLevel AND T.dtFrom=T2.dtFrom AND T.dtTo = T2.dtTo and T.dtTransferred = T2.dtTransferred and T.strNationalPeriodCode=T2.strNationalPeriodCode) WHERE T2.strStatus='TRANSFERRED' and T.dtTransferred<>'0000-00-00' AND T.isLoan='' and T2.isLoan='';
+
+
+#2374 - 30 seconds.
+
+UPDATE tmpPersonRego as T INNER JOIN tmpPersonRego as T2 ON (T.intID<>T2.intID AND T.strFileType=T2.strFileType AND T.strPersonCode=T2.strPersonCode AND T.strEntityCode=T2.strEntityCode AND T.strStatus='PASSIVE' AND T.strPersonType=T2.strPersonType AND T.strPersonLevel=T2.strPersonLevel AND T.strSport = T2.strSport AND T.strAgeLevel=T2.strAgeLevel AND T.dtFrom=T2.dtFrom AND T.dtTo = T2.dtTo and T.dtTransferred = T2.dtTransferred and T.strNationalPeriodCode=T2.strNationalPeriodCode) SET T.strStatus='TRANSFERRED' WHERE T2.strStatus='TRANSFERRED' and T.dtTransferred<>'0000-00-00' AND T.isLoan='' and T2.isLoan='';
+
+
+
+
+ALTER TABLE tmpPersonRego02 ADD COLUMN intPRID int default 0;
+
+UPDATE tmpPersonRego02 as T INNER JOIN tblPersonRegistration_1 as PR ON (PR.strPersonType=T.strPersonType AND PR.intPersonID=T.intPersonID AND PR.intEntityID=T.intEntityID AND PR.strPersonLevel=T.strPersonLevel AND PR.strSport=T.strSport AND PR.strAgeLevel=T.strAgeLevel AND PR.dtFrom=T.dtFrom AND PR.tmpAmount=T.curProductAmount AND PR.tmpisPaid = T.strPaid AND PR.tmpProductCode = T.strProductCode AND PR.intNationalPeriodID = T.intNationalPeriodID) SET T.intPRID = PR.intPersonRegistrationID;
+
+
+UPDATE tmpPersonRego02 as T INNER JOIN tblPersonRegistration_1 as PR ON (PR.strPersonType=T.strPersonType AND PR.intPersonID=T.intPersonID AND PR.intEntityID=T.intEntityID  AND PR.strSport=T.strSport AND PR.strAgeLevel=T.strAgeLevel AND PR.dtFrom=T.dtFrom AND PR.tmpAmount=T.curProductAmount AND PR.tmpisPaid = T.strPaid AND PR.tmpProductCode = T.strProductCode AND PR.intNationalPeriodID = T.intNationalPeriodID AND T.strPersonType='REFEREE') SET T.intPRID = PR.intPersonRegistrationID;
+
+findExistingPR_150606.sql
+
+
+SELECT strStatus, intPersonRegistrationID FROM tblPersonRegistration_1;
