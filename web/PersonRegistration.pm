@@ -759,7 +759,7 @@ sub getRegistrationData	{
         $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
         $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         $dref->{'RegistrationNature'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
-        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
+        #$dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
 
 		my $sql = qq[
 			SELECT 
@@ -1153,7 +1153,7 @@ sub getRegistrationDetail {
     my @RegistrationDetail = ();
       
     while(my $dref= $query->fetchrow_hashref()) {
-        $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
+        #$dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'PersonLevel'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
