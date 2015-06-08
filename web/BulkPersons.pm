@@ -98,11 +98,25 @@ sub bulkPersonRollover {
                 AND PRto.intEntityID = PR.intEntityID
                 AND PRto.intNationalPeriodID = ?
             )
+            LEFT JOIN tblPersonRequest prq ON (
+                prq.intPersonRequestID = PR.intPersonRequestID
+                AND prq.strRequestType = 'LOAN'
+            )
+            LEFT JOIN tblPersonRequest existprq ON (
+                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+                AND existprq.strRequestType = 'LOAN'
+            )
         WHERE 
             P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")
             AND P.strStatus IN ("$Defs::PERSON_STATUS_REGISTERED")
             AND P.intRealmID = ?
             AND PRto.intPersonRegistrationID IS NULL
+            AND (
+                (PR.intIsLoanedOut = 0 and PR.intOnLoan = 0)
+                OR (PR.intIsLoanedOut = 1 AND (existprq.intPersonRequestID IS NULL OR existprq.intOpenLoan = 0))
+                OR (PR.intOnLoan = 1 AND prq.intOpenLoan= 1)
+            )
+                
         ORDER BY strLocalSurname, strLocalFirstname
     ];
 
@@ -144,7 +158,7 @@ sub bulkPersonRollover {
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
         {
-            name => "Check",
+            name => $Data->{'lang'}->txt("Check"),
             field => 'intPersonID',
             type => 'RowCheckbox',
         },

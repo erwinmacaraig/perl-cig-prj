@@ -592,7 +592,7 @@ sub displayRegoFlowComplete {
             Lang => $Data->{'lang'},
             url => $Defs::base_url,
             dtype => $hidden_ref->{'dtype'} || '',
-            dtypeText => $Defs::personType{$hidden_ref->{'dtype'}} || '',
+            dtypeText => $Data->{'lang'}->txt($Defs::personType{$hidden_ref->{'dtype'}}) || '',
             client=>$clm,
             clientrego=>$tempClient,
             #maclient => $mlm,
@@ -605,7 +605,8 @@ sub displayRegoFlowComplete {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }
         else {
-            my $template = 'registration/complete.templ';
+            #my $template = 'registration/complete.templ';
+            my $template = $Data->{'SystemConfig'}{'regoFlow_ApprovalMessage'} || 'registration/complete.templ';            
             $template = 'registration/complete_sr.templ' if ($Data->{'SelfRego'});
             $body = runTemplate($Data, \%PageData, $template) || '';
         }

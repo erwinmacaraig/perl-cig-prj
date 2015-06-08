@@ -28,15 +28,17 @@ use strict;
         INNER JOIN
             tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
-            pr.strStatus = 'ACTIVE'
+            pr.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'
             AND prq.intOpenLoan= 1
             AND (
-                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') = ?
+                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') <= ?
                 )
+            AND DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') != '0000-00-00'
     ];
+# Changed to < so its "yesterday"
 #        LEFT JOIN
 #            tblNationalPeriod np ON (np.intNationalPeriodID = pr.intNationalPeriodID)
 

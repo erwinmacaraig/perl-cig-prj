@@ -207,7 +207,7 @@ sub personFieldsSetup {
                 },                
                 intLocalLanguage => {
                     label       => $FieldLabels->{'intLocalLanguage'},
-                    value       => $values->{'intLocalLanguage'},
+                    value       => $values->{'intLocalLanguage'} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
                     type        => 'lookup',
                     options     => \%languageOptions,
                     firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
@@ -637,7 +637,7 @@ sub personFieldsSetup {
                     label       => $FieldLabels->{'strGuardianRelationship'},
                     value       => $values->{strGuardianRelationship},
                     type        => 'lookup',
-                    options     => {'Parent'=>'Parent','Legal Guardian' => 'Legal Guardian'},
+                    options     => {'Parent'=>$Data->{'lang'}->txt('Parent'),'Legal Guardian' => $Data->{'lang'}->txt('Legal Guardian')},
                     firstoption => [ '', " " ],
                     class       => 'chzn-select',
                     sectionname => 'parent',
@@ -701,7 +701,7 @@ sub personFieldsSetup {
                 strInternationalLoanTMSRef
             )],
             sections => [
-                [ 'parent',      'Parent/Guardian Details' ],
+                [ 'parent',      $Data->{'lang'}->txt('Parent/Guardian Details') ],
                 [ 'core',        $Data->{'lang'}->txt('Personal Details') ],
                 [ 'minor',       $Data->{'lang'}->txt('FIFA Minor Protection'),'','dynamic-panel' ],
                 [ 'other',       $Data->{'lang'}->txt('Additional Information') ],

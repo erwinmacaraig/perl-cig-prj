@@ -441,12 +441,12 @@ sub _getConfiguration {
                 }
             ],
 
-            strCountry => [
+            strISOCountry => [
                 'Country',
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
-                    dbfield       => 'tblPerson.strCountry',
+                    dbfield       => 'tblPerson.strISOCountry',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -1621,7 +1621,7 @@ sub _getConfiguration {
               strSuburb
 
               strState
-              strCountry
+              strISOCountry
               strPostalCode
               strPhoneHome
               strEmail

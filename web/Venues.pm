@@ -197,7 +197,7 @@ sub venue_details   {
        intLocalLanguage => {
           label       => 'Language the name is written in',
           type        => 'lookup',
-          value       => $field->{intLocalLanguage},
+          value       => $field->{intLocalLanguage} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
           options     => \%languageOptions,
           firstoption => [ '', 'Select Language' ],
           compulsory => 1,
@@ -768,7 +768,6 @@ sub listVenues  {
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
     ];
-print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID, $Defs::LEVEL_VENUE);
     my $results=0;
@@ -810,6 +809,7 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
@@ -874,7 +874,7 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
       $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
+      createTempEntityStructure($Data, $Data->{'Realm'}, $id); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
@@ -1122,11 +1122,11 @@ sub add_venue_fields {
 
     my @err;
     if (!$params{'field_count'}) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: required");
+        push @err, $Data->{'lang'}->txt("Number of Fields") . " : " . $Data->{'lang'}->txt("required");
     }
 
     if ($params{'field_count'} !~ /^\d+$/) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: invalid input");
+        push @err, $Data->{'lang'}->txt("Number of Fields"). " : " .$Data->{'lang'}->txt("invalid input");
     }
 
     return pre_add_venue_fields($action, $Data, $venueID, \@err) if scalar(@err);

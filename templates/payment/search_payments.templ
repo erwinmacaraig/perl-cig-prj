@@ -1,0 +1,18 @@
+<div class="search-panel col-md-12">
+	<form action="main.cgi" method="POST">
+		<h3 class="panel-header">[% Lang.txt('Find a Payment') %]</h3>
+		<div class="panel-body">
+			<p class="introtext">[% Lang.txt('Please enter the Payment Reference number of Bank Reference number for payment you wish to find.') %]</p> 
+			<span class="formw">
+			<input type="text" name="strNumber" value="" id="l_strNumber" size="30" maxlength="50" size="105" placeholder="[% Lang.txt('Payment or Bank Reference number') %]" /></span>		
+		</div>
+
+		<div class="button-row">
+					<div class="txtright">
+						<input id = "flow-btn-continue" type = "submit" value = "[% Lang.txt('Continue') %] "  class = "btn-main btn-proceed">
+						<input type="hidden" name="a" value="[% a %]">
+						<input type="hidden" name="client" value="[% client %]"> 
+					</div>
+		</div>
+</form>             
+</div>

@@ -16,6 +16,7 @@ use FieldLabels;
 use Data::Dumper;
 use WorkFlow;
 use AuditLog;
+use FieldMessages;
 
 sub handlePersonEdit {
     my ($action, $Data) = @_;
@@ -55,12 +56,14 @@ sub handlePersonEdit {
 
     my $body = '';
     if($fieldsetType)   {
+        my $fieldMessages = getFieldMessages($Data, 'person', $Data->{'lang'}->getLocale());
         my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}, 'Person',);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
           Lang => $Data->{'lang'},
           SystemConfig => $Data->{'SystemConfig'},
           Fields => $fieldset->{$fieldsetType},
+          FieldMessages => $fieldMessages,
         );
         if($action eq 'PE_U')    {
           my $p = new CGI;

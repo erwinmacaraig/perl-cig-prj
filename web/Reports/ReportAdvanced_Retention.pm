@@ -303,12 +303,12 @@ sub _getConfiguration {
         }
       ],
 
-      strCountry => [
+      strISOCountry => [
         'Country',
         {
           displaytype=>'text',
           fieldtype=>'text',
-          dbfield=>'tblMember.strCountry',
+          dbfield=>'tblMember.strISOCountry',
           allowsort=>1,
           optiongroup=>'contactdetails',
           allowgrouping=>1
@@ -553,7 +553,7 @@ sub _getConfiguration {
 			strSuburb
 			strCityOfResidence
 			strState
-			strCountry
+			strISOCountry
 			strPostalCode
 			strPhoneHome
 			strPhoneWork

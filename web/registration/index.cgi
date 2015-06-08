@@ -24,9 +24,11 @@ use Flow_PersonSelfReg;
 use SelfUserWorkFlow;
 use AccountActivation;
 use AccountProfile;
+use OldSystemAccounts;
 
 use SelfUserFlow;
-#use WorkFlow;
+use SelfUserTransfer;
+use ForgottenPassword;
 use Data::Dumper;
 
 main();
@@ -91,7 +93,7 @@ sub main {
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
 
-    $action = 'LOGIN' if(!$userID and $action ne 'activate');
+    $action = 'LOGIN' if(!$userID and $action ne 'activate' and $action !~/FORGOT/);
     if(!$action and $userID)  {
         $action = 'HOME';
     }
@@ -110,11 +112,21 @@ sub main {
     elsif ($action =~ /activate/) {
         ($resultHTML, $pageHeading) = handleAccountActivation(\%Data, $action);
     }
+    elsif ($action =~ /FORGOT/) {
+        ($resultHTML, $pageHeading) = handleForgottenPassword(\%Data, $action);
+    }
+    elsif ($action eq 'link') {
+        $resultHTML .= linkOldAccount(\%Data, $user);
+        $resultHTML .= showHome(\%Data, $user, $srp);
+    }
     elsif ($action =~ /P_/) {
         ($resultHTML, $pageHeading) = handleAccountProfile(\%Data, $action);
         if($action eq 'P_u')    {
             $resultHTML .= showHome(\%Data, $user, $srp);
         }
+    }
+ 	elsif ($action =~ /TRANSFER_/) {
+        ($resultHTML, $pageHeading) = handleSelfUserTransfer(\%Data, $user, $action);
     }
     else {
         # Display login page

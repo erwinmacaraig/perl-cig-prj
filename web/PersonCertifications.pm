@@ -114,10 +114,12 @@ sub handleCertificates {
             {
                 name =>   $lang->txt('Certification Type'),
                 field =>  'strCertificationType',
+                defaultShow => 1,
             },
             {
                 name =>   $lang->txt('Certification Name'),
                 field =>  'strCertificationName',
+                defaultShow => 1,
            },
            {
                name =>   $lang->txt('Valid From'),

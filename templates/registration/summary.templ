@@ -41,7 +41,6 @@
 				    </div>
 				</div>
 			</div>
-	<div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 				<div class="read-only registration-details">
 					 <h4>[% Lang.txt('Registration Details') %]</h4>
@@ -63,7 +62,6 @@
 			</div>
     [% IF DisplayPayment %]
 		[% IF payment.totalPaymentDue %]
-	        <div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 				<div class="read-only license-details">
 					 <h4>[% Lang.txt('Payment Options') %]</h4>
@@ -77,10 +75,11 @@
 				</div>
 			</div>
 		[% END %]
-    [% END %]
+    	[% END %]
 
-	[% IF registration.documents.size %]
-	<div class="col-md-6">
+		[% IF registration.documents.size %]
+			<div class="clearfix" style="clear:both;">&nbsp;</div>
+			<div class="col-md-6">
 		<div class="read-only">
 			 <h4>[% Lang.txt('Documents') %]</h4>
 			 <div class="read-only-text documents-list clearfix">
@@ -94,8 +93,8 @@
                 <a href="[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt('Edit') %]</a>
 		     </div>
 		</div>
-	</div>
-	[% END %]
+			</div>
+		[% END %]
 
 	<!--<form action="[% target %]" method="POST">
 	    <input type="hidden" name="a" value="c">

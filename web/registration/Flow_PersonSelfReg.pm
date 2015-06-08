@@ -34,6 +34,7 @@ use PersonRegistration;
 use PersonSummaryPanel;
 use RenewalDetails;
 use RegoProducts;
+use FieldMessages;
 
 
 sub setProcessOrder {
@@ -166,7 +167,8 @@ sub display_core_details    {
     }
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'PersonRegoForm',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'', $fieldMessages);
     my $newRegoWarning = '';
     my $bypassduplicate = '';
     if(!$id)    {
@@ -332,7 +334,8 @@ sub display_contact_details    {
         $self->setupValues($objectValues);
     }
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'PersonRegoForm',);
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm,'',$fieldMessages);
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -702,7 +705,8 @@ sub display_certifications {
         $objectValues->{'certificationTypesOrdered'} = \@certOrder;
         $self->setupValues($objectValues);
     }
-    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields();
+    my $fieldMessages = getFieldMessages($self->{'Data'}, 'person', $self->{'Data'}->{'lang'}->getLocale());
+    my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields(undef,'',$fieldMessages);
 
     my $certifications = getPersonCertifications(
         $self->{'Data'},
@@ -1167,8 +1171,15 @@ sub display_summary {
     my $content = '';
     my $gatewayConfig = undef;
     if($regoID) {
+	my $valid =0;
         ($entityID, $entityLevel) = $self->getRegoEntity($regoID, $personID);
         $regoID = 0 if !$entityID;
+        ($valid, $rego_ref) = validateRegoID(
+            $self->{'Data'}, 
+            $personID, 
+            $regoID, 
+            $entityID
+        );
     }
 
     my $payMethod = '';
@@ -1218,7 +1229,7 @@ print STDERR "SUMM$regoID\n";
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to [_1]' , $initialTaskAssigneeLevel),
     );
     $gatewayConfig->{'Target'} = "$Defs::base_url/".$gatewayConfig->{'Target'};
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
@@ -1226,7 +1237,7 @@ print STDERR "SUMM$regoID\n";
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to '. $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
 

@@ -165,7 +165,7 @@ sub display_old_club {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my %regFilter = (
         'entityID' => $entityID,
-        'requestID' => $self->{'RunParams'}{'rid'},
+        'requestID' => $self->{'RunParams'}{'prid'},
     );
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
@@ -1279,7 +1279,7 @@ sub display_summary {
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to ' . $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
     my %PageData = (

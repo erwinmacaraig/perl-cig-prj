@@ -17,6 +17,7 @@ use AddToPage;
 use SystemConfig;
 use TemplateEmail;
 use ConfirmationEmail;
+use PasswordFormat;
 
 main();
 
@@ -90,6 +91,9 @@ sub signup  {
         push @errors, $Data->{'lang'}->txt('You must fill in the following fields:').qq[<ul>$missing_fields</ul>];
     }
     if(scalar(@errors)) { return \@errors }
+    if(!isValidPasswordFormat($Data,$inputs{'password'}))   {
+        push @errors, $Data->{'lang'}->txt('The password does not obey the password rules');
+    }
     if($inputs{'password'} ne $inputs{'password2'})   {
         push @errors, $Data->{'lang'}->txt('Password and Password 2 do not match');
     }

@@ -1,0 +1,135 @@
+[% USE Dumper %]
+        [% IF displayMessage %]
+				<div class="alert">
+					<div>
+						<span class="fa fa-exclamation"></span>
+                        [% error %]
+					</div>
+				</div>
+		[% END %]
+<div>
+	<div class="fieldSectionGroupWrapper">		
+		<form id="selftransferrequest" action="" method="POST">
+			<h3 class="panel-header">[% Lang.txt('Transfer Details') %]</h3>
+				<div class="panel-body fieldSectionGroup">
+                    <br/>
+				
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="Name" style="margin-top: 6px;">[% Lang.txt('Name') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</strong>
+						</div>
+					</div>	
+
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="RegistrationPeriod" style="margin-top: 6px;">[% Lang.txt('Registration Period') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.strNationalPeriodName %]</strong>
+						</div>
+					</div>	
+
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="RegistrationType" style="margin-top: 6px;">[% Lang.txt('Registration Type') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.RegistrationNature %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="Status" style="margin-top: 6px;">[% Lang.txt('Status') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.RegistationStatus %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="Sport" style="margin-top: 6px;">[% Lang.txt('Sport') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.Sport %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="Type" style="margin-top: 6px;">[% Lang.txt('Type') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.PersonType %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="Level" style="margin-top: 6px;">[% Lang.txt('Level') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.PersonLevel %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="AgeLevel" style="margin-top: 6px;">[% Lang.txt('Age Level') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.AgeLevel %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="ValidUntil" style="margin-top: 6px;">[% Lang.txt('Valid Until') %]</label>
+						<div class="col-md-4">
+                            <strong>[% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="CurrentClub" style="margin-top: 6px;">[% Lang.txt('Current Club') %]</label>
+						<div class="col-md-4">
+                            <strong>[% rego.EntityName %]</strong>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="TransferTo" style="margin-top: 6px;"><span class="compulsory">*</span>[% Lang.txt('Transfer To') %]</label>
+						<div class="col-md-4">
+                            <select name="transferto" class="chzn-select" data-placeholder="[% Lang.txt('Select Club') %]">
+                                <option value=""></option>
+                                [% FOREACH entity IN entityList.sort %]
+								    <option value="[% entity.value %]">[% Lang.txt(entity.name) %]</option>
+                                [% END %]
+                            </select>
+						</div>
+					</div>	
+					<div id="" class="form-group">
+						<label class="col-md-4 control-label txtright" for="request_notes" style="margin-top: 6px;"><span class="compulsory">*</span>[% Lang.txt('Request notes') %]</label>
+						<div class="col-md-4">
+                            <input type="text" name="request_notes" value=""/>
+						</div>
+					</div>	
+
+
+				</div>
+
+                <input type="hidden" name="a" value="[% action %]" />
+                <input type="hidden" name="rtargetid" value="[% rtargetid %]" />
+                <input type="hidden" name="pID" value="[% pid %]" />
+				<div style="width: 100%; float: left">
+                	<a style="float: left" class="btn-main" href="[% url %]">Back to Dashboard</a>
+					<div style="float: right">
+<input id = "flow-btn-continue" type = "submit" value = "[% Lang.txt('Submit') %] "  class = "btn-main btn-proceed">
+
+
+				</div>
+				
+
+		</form>
+	</div>
+</div>
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        jQuery("#selftransferrequest").validate({
+            rules: {
+                request_notes: {
+                    required: true
+                },
+                transferto: {
+                    required: true
+                },
+            },
+            messages: {
+                request_notes: "[% Lang.txt('Please add notes') %]",
+                transferto: "[% Lang.txt('Please select from the list of Clubs') %]"
+            }
+        });
+    });
+</script>
+

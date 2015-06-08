@@ -50,12 +50,7 @@ sub activateAccount {
 
     if($user->Status() eq 2) {
         $Data->{'RedirectTo'} = "$Defs::base_url/registration/index.cgi";
-        my $redirect = runTemplate(
-            $Data,
-            {},
-            '',
-        );
-        return ($redirect, ' ');
+        return displayResult($Data, "success", $Data->{'lang'}->txt('Your account has already been confirmed'));
     }
     elsif($user->ConfirmKey() eq $confirmationKey) {
         my %userdata = (

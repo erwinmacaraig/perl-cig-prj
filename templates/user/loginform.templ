@@ -1,4 +1,3 @@
-    <br /><br />
     <div class="container">
         <div class="row">
             <form method = "POST" action = "user/login.cgi" class="form-signin" role="form" style="border:1px solid #CCC; border-radius:8px; box-shadow: 7px 7px 5px #888888; background-color: #FFF;">
@@ -7,8 +6,8 @@
                 </div>
                 <hr>
                 <h3 class="form-signin-heading"><!--<img src="images/img-logo.png" width="33px" alt=""/>--> [% SystemConfig.loginWelcomeMessage %]</h3>
-                <input type = "text" class="form-control" name = "email">
-                <input type = "password" class="form-control" name = "pw">
+                <input type = "text" class="form-control" name = "email" placeholder = "[% Lang.txt('Username') %]">
+                <input type = "password" class="form-control" name = "pw" placeholder = "[% Lang.txt('Password') %]">
                 <div class="checkbox">
                     <label>
                         <input type="checkbox" value="remember-me"> [% Lang.txt('Remember me on this computer') %]

@@ -20,7 +20,7 @@ function docViewer(id, params) {
     jQuery('#docViewerOverlay').remove();
     var url = 'viewer.cgi?' + params + '&f=' + id;
     window.scrollTo(0,0);
-    var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="no"></iframe>');
+    var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="yes"></iframe>');
 	jQuery('body').append(d);
 }
          

@@ -12,6 +12,7 @@ require Exporter;
     setRequestStatus
     activatePlayerLoan
     deactivatePlayerLoan
+    setPlayerLoanValidDate
 );
 
 use lib ".", "..";
@@ -322,7 +323,7 @@ sub listPersonRecord {
         my $level_list = '""';
         if ($allowedLevels)    {
             my @levels= split /\|/, $allowedLevels;
-            $level_list = join(',',@levels);
+            $level_list = join(",",@levels);
         }
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
@@ -1370,8 +1371,8 @@ sub setRequestResponse {
 	
         #print STDERR Dumper $request;
         my $templateFile = "";
-        $title = $Defs::personRequest{$request->{'strRequestType'}} . ' - ' . $requestResponseSuffix;
-        my $notifDetails = $Data->{'lang'}->txt("You have " . lc $requestResponseSuffix . " the " . $Defs::personRequest{$request->{'strRequestType'}} . " of ") . $request->{'strLocalFirstname'} . " " . $request->{'strLocalSurname'} . ".";
+        $title = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}) . ' - ' . $Data->{'lang'}->txt($requestResponseSuffix);
+        my $notifDetails = $Data->{'lang'}->txt("You have [_1] the [_2] of [_3] [_4]." . lc($Data->{'lang'}->txt($requestResponseSuffix)), $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}), $request->{'strLocalFirstname'}, $request->{'strLocalSurname'});
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -2269,7 +2270,6 @@ sub loanRequiredFields {
         'order' => [qw(
             dtLoanStartDate
             dtLoanEndDate
-            strTMSReference
         )],
         sections => [
             [ 'loanfields', 'Loan Information' ],
@@ -2357,6 +2357,7 @@ sub activatePlayerLoan {
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
+            PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(NP.dtTo <= DATE(NOW()), 'PASSIVE', IF(NP.dtTo = '' OR NP.dtTo IS NULL, 'PENDING', 'ACTIVE')),
             PR.dtFrom = PRQ.dtLoanFrom,
             PR.dtTo = IF(PRQ.dtLoanTo <= NP.dtTo, PRQ.dtLoanTo, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, PRQ.dtLoanTo)),
@@ -2386,14 +2387,14 @@ sub activatePlayerLoan {
         INNER JOIN
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
         SET
-            PR.strStatus = 'PASSIVE',
-            PR.dtTo = NOW(),
+            PR.strPreLoanedStatus = PR.strStatus,
+            PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
+            PR.dtTo = PRQ.dtLoanFrom,
             PR.intIsLoanedOut = 1
         WHERE
             PRQ.intPersonRequestID IN ($idset)
-            AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+            AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
     ];
-
 
     my $query = $db->prepare($lst) or query_error($lst);
     $query->execute() or query_error($lst);
@@ -2460,7 +2461,7 @@ sub deactivatePlayerLoan {
     }
 }
 
-sub setPlayerLoanValidDate () {
+sub setPlayerLoanValidDate {
     my ($Data, $requestID, $personID, $personRegistrationID) = @_;
     #this function is used by both domestic and international loan
     #where dtLoanTo and dtLoanFrom are in future
@@ -2497,8 +2498,33 @@ sub setPlayerLoanValidDate () {
         }
     }
     elsif($personRegistrationID) {
-    
-    
+        my $bst = qq [
+            UPDATE
+                tblPersonRegistration_$Data->{'Realm'} PR
+            INNER JOIN
+                tblPerson P ON (P.intPersonID = PR.intPersonID)
+            INNER JOIN
+                tblNationalPeriod NP ON (P.dtInternationalLoanFromDate BETWEEN NP.dtFrom AND NP.dtTo)
+            SET
+                PR.dtFrom = P.dtInternationalLoanFromDate,
+                PR.dtTo = IF(P.dtInternationalLoanToDate <= NP.dtTo, P.dtInternationalLoanToDate, IF(NP.dtTo <= DATE(NOW()), NP.dtTo, P.dtInternationalLoanToDate)),
+                PR.intNationalPeriodID = NP.intNationalPeriodID
+            WHERE
+                PR.intPersonRegistrationID = ?
+                AND PR.intPersonID = ?
+                AND PR.strStatus IN ('PENDING', 'ACTIVE')
+                AND NP.intDontUseForLoans = 0
+        ];
+
+        my $st = $bst . qq[ AND NP.strSport = PR.strSport ];
+        my $query = $db->prepare($st) or query_error($st);
+        $query->execute($personRegistrationID, $personID) or query_error($st);
+
+        if (!$query->rows) {
+            $st = $bst . qq[ AND NP.strSport = ''];
+            $query = $db->prepare($st) or query_error($st);
+            $query->execute($personRegistrationID, $personID) or query_error($st);
+        }
     }
 }
 

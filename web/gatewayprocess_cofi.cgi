@@ -28,6 +28,7 @@ use GatewayProcess;
 use PayTry;
 use Localisation;
 use MCache;
+use MA_Gateways;
 
 use Digest::SHA qw(hmac_sha256_hex);
 
@@ -107,8 +108,12 @@ print STDERR "$Vals{'MAC'} $str $digest |  $paymentSettings->{'gatewayPassword'}
         }
 print STDERR "MAC ACTION IS $chkAction\n";
 
-        $returnVals{'GATEWAY_TXN_ID'}= param('PAYMENT') || '';
-        $returnVals{'GATEWAY_AUTH_ID'}= param('REFERENCE') || '';
+        my $txnID = param('PAYMENT') || '';
+        my $checksum = '';
+        $checksum = calcuatePaymentCheckSum($txnID) if ($txnID);
+        $txnID .= $checksum;
+        $returnVals{'GATEWAY_TXN_ID'}= $txnID;
+        $returnVals{'GATEWAY_AUTH_ID'}= param('PAYMENT') || '';
         my $co_status = param('STATUS') || '';
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
         $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
@@ -148,6 +153,7 @@ print STDERR "MAC ACTION IS $chkAction\n";
         $returnVals{'ResponseText'}= $respTextCode; #$Defs::paymentResponseText{$respTextCode} || '';
         $returnVals{'Other1'} = $co_status || '';
         $returnVals{'Other2'} = param('MAC') || '';
+        $returnVals{'Other3'} = param('PAYMENT') || '';
         gatewayProcess(\%Data, $logID, $client, \%returnVals, $chkAction);
         #print "Content-type: text/html\n\n" if (! $display_action);
     }

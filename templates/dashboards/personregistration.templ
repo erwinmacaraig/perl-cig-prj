@@ -9,10 +9,7 @@
                     <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
                     [% IF entity.strLocalName %]
                        
-                            [% Lang.txt('Registered To') %]
-                            [% entity.strLocalName %]
-                            [% Lang.txt('as') %]
-                            [% Lang.txt(entity.PersonType) %]
+                            [% Lang.txt('Registered to [_1] as [_2]', entity.strLocalName, Lang.txt(entity.PersonType)) %]
                        
                     [% END %]
                     </a>
@@ -86,7 +83,7 @@
                                 <span class="details-row">
                                     <span class="details-left">[% Lang.txt('Registered To (International Name)') %]:</span>
                                     <span class="details-left detail-value">[% entity.strLatinName %]</span>
-                                </div>
+                                </span>
                             [% END %]
 
                             [% IF entity.intPaymentRequired %]
@@ -164,6 +161,8 @@
                                     <span class="details-left detail-value">
                                     [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
                                         [% DateFormat.format(entity.dtFrom,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanFromDate,'MEDIUM') %]
                                     [% ELSE %]
                                         [% DateFormat.format(entity.npdtFrom,'MEDIUM') %]
                                     [% END %]
@@ -177,6 +176,8 @@
                                     <span class="details-left detail-value">
                                     [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
                                         [% DateFormat.format(entity.dtTo,'MEDIUM') %]
+                                    [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                        [% DateFormat.format(entity.dtInternationalLoanToDate,'MEDIUM') %]
                                     [% ELSE %]
                                         [% DateFormat.format(entity.npdtTo,'MEDIUM') %]
                                     [% END %]
