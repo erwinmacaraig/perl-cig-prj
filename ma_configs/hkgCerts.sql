@@ -1,0 +1,13 @@
+UPDATE tblCertificationTypes SET intRealmID=0, strCertificationType = '.COACHOLD' WHERE strCertificationType='COACH';
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 12 12 'AFC Pro');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 11 11 'AFC A');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 10 10 'AFC B');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 9, 9, 'AFC C');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 8, 8, 'AFC Futsal 1');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 7, 7, 'AFC Futsal 2');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 6, 6, 'AFC Futsal 3');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 5, 5, 'HKFA D');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 4, 4, 'HKFA Futsal');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 3, 3, 'HKFA Youth Football Leader 1');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 2, 2, 'HKFA Youth Football Leader 2');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 1, 1, 'Overseas certificate');
