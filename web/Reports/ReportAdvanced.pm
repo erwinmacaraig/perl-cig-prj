@@ -137,7 +137,7 @@ sub displayOptions {
     next if !$displayname;
 		my $perms_type = $self->{'Config'}->{'DefaultPermType'} 
 			|| $options->{'permissionType'}
-			|| 'Member';
+			|| 'Person';
 		if (
 			$perms_ref 
 			and exists $perms_ref->{$perms_type} 
@@ -442,7 +442,7 @@ sub displayOptions {
             <input type="radio" name="RO_OutputType" value="email" class="ROnb" id="RO_Output_email"><label for="RO_Output_email"> <b>].$lang->txt('Email').qq[</b></label>
             <div style="margin-left:20px;">
               <i>].$lang->txt('Email the report in a format suitable to be imported into another product.').qq[</i><br>
-              <b>].$lang->txt('Email Address').qq[</b> <input type="text" size="45" name="RO_OutputEmail">
+              <b>].$lang->txt('Email Address').qq[</b> <input type="text" name="RO_OutputEmail" style = "max-width:250px;width:100%;">
             </div>
           </div>
     ];

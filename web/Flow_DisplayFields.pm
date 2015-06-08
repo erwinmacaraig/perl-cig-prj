@@ -28,6 +28,7 @@ sub new {
     $self->{'SystemConfig'}   = $params{'SystemConfig'};
 
     $self->{'Fields'}      = $params{'Fields'};
+    $self->{'FieldMessages'}      = $params{'FieldMessages'};
 
     return $self;
 }
@@ -108,7 +109,23 @@ sub build {
         my $is_editable_field =
           ( $type eq 'hidden' or not $f->{'readonly'} or ($f->{'readonly'} and  $f->{'Save_readonly'})) ? 1 : 0;
 
+        # Field Messages
+        my $premessage = '';
+        my $postmessage = '';
+        my $infomessage = '';
         if ( ( $edit or $add ) and $is_editable_field ) {
+
+            if($self->{'FieldMessages'} and $self->{'FieldMessages'}{$fieldname}) {
+                my $ft =  $self->{'FieldMessages'}{$fieldname}{'type'} || 'info';
+                my $val =  $self->{'FieldMessages'}{$fieldname}{'msg'} || '';
+                $premessage = $val if $ft eq 'pre';
+                $postmessage = $val if $ft eq 'post';
+                $infomessage = $val if $ft eq 'info';
+            }
+            if($infomessage)    {
+                $infomessage =~ s/"/&quote;/g;
+                $infomessage = qq[<a tabindex="0" class="btn fields-info-btn" role="button" data-toggle="popover" data-placement="auto" data-trigger="focus" title="$label" data-content="$infomessage" data-container="body"></a>];
+            }
             my $disabled =
               $f->{'disabled'} ? 'readonly class="HTdisabled"' : '';
 
@@ -298,6 +315,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             $f->{'compulsory'}
           ? $compulsory
           : '';
+        $pretext = $premessage. $pretext;
+        $posttext = $postmessage. $posttext;
         $pretext =~ s /XXXCOMPULSORYICONXXX/$compulsory_replace/g;
         $posttext =~ s /XXXCOMPULSORYICONXXX/$compulsory_replace/g;
 
@@ -314,7 +333,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
         {
             $sections{$sname} .= qq[
             <tr class="$row_class"><td class="label HTvertform-l" colspan="2">$label</td></tr>
-            <tr><td class="value HTvertform-v" colspan="3">$pretext$field_html$posttext</td> </tr>
+            <tr><td class="value HTvertform-v" colspan="3">$pretext$field_html$infomessage$posttext</td> </tr>
             ];
         }
         else {
@@ -324,7 +343,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
             if($f->{'swapLabels'})  {
                 $sections{$sname} .= qq[
                 <div class="form-group" id = "l_row_$fieldname">
-                    <div class="col-md-4 txtright">$pretext$field_html$posttext</div>
+                    <div class="col-md-4 txtright">$pretext$field_html$infomessage$posttext</div>
                     <label class="col-md-6 control-label" for="l_$fieldname">$label</label>
                 </div>
                 ];
@@ -333,7 +352,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 $sections{$sname} .= qq[
                 <div class="form-group" id = "l_row_$fieldname">
                     <label class="col-md-4 control-label txtright" for="l_$fieldname">$label</label>
-                    <div class="col-md-6">$pretext$field_html$posttext</div>
+                    <div class="col-md-6">$pretext$field_html$infomessage$posttext</div>
                 </div>
                 ];
             }
@@ -992,7 +1011,7 @@ qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0
     $field_html .= $daysfield;
     $field_html .= $monthsfield;
     $field_html .= $yearsfield;
-
+    $field_html = qq[ <div class = "dateselection-group">$field_html</div> ];
     return $field_html;
 }
 

@@ -29,6 +29,7 @@ sub navBar {
         $DataAccess_ref, 
         $SystemConfig
     ) = @_;
+#develop
 
     my $clientValues_ref=$Data->{'clientValues'};
     my $currentLevel = $clientValues_ref->{INTERNAL_tempLevel} ||  $clientValues_ref->{currentLevel};
@@ -330,7 +331,7 @@ sub getEntityMenuData {
                 !$SystemConfig->{'clrHideSearchAll'}
             ) {
                 $menuoptions{'clearancesAll'} = {
-                    name => $lang->txt("Search ALL Online $txt_Clr"."s"),
+                    name => $lang->txt("Search ALL Online Transfers"),
                     url => $baseurl."a=CL_list&amp;showAll=1",
                 };
             }
@@ -344,7 +345,7 @@ sub getEntityMenuData {
 
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
-                name => $lang->txt('Pending Registration'),
+                name => $lang->txt('Pending Registrations'),
                 url => $baseurl."a=P_PRS_L",
             };
         }
@@ -439,7 +440,13 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             };
         }
     }
-    if ($SystemConfig->{'allowPayInvoice'}) {
+    if ($SystemConfig->{'allowFindPaymentMinLevel'} and $Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'allowFindPaymentMinLevel'}) {
+		$menuoptions{'findpayment'} = { 
+			name => $lang->txt('Find Payment'),
+			url => $baseurl."a=TXN_FIND",
+		}; 
+    }
+	if ($SystemConfig->{'allowPayInvoice'}) {
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
 			url => $baseurl."a=TXN_PAY_INV",
@@ -497,6 +504,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
         'myAssociation',
         ]],
         [ $lang->txt('Payments'), 'menu',[
+		    'findpayment',
 		    'payinvoice',
 		    'bulkpayment',
 		    'paymenthistory',
@@ -762,7 +770,7 @@ sub getClubMenuData {
         };
     }
 
-    if ($SystemConfig->{'allowPersonRequest'}) {
+    if ($SystemConfig->{'allowPersonLoans'}) {
         $menuoptions{'requestloan'} = {
             name => $lang->txt('Request a Player loan'),
             url => $baseurl."a=PRA_LOAN",
@@ -785,6 +793,12 @@ sub getClubMenuData {
                 name => $lang->txt('Bulk Renewals'),
                 url => $baseurl."a=PFB_", #PREGFB_T",
             };
+        }
+        if ($SystemConfig->{'allowFindPaymentMinLevel'} and $Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'allowFindPaymentMinLevel'}) {
+		    $menuoptions{'findpayment'} = { 
+			    name => $lang->txt('Find Payment'),
+			    url => $baseurl."a=TXN_FIND",
+		    }; 
         }
         if ($SystemConfig->{'allowPayInvoice'}) {
 		    $menuoptions{'bulkpayment'} = { 
@@ -917,6 +931,7 @@ sub getClubMenuData {
             'auditlog'
         ]],
          [ $lang->txt('Payments'), 'menu',[
+		    'findpayment',
 		    'payinvoice',
 		    'bulkpayment',
 		    'paymenthistory',

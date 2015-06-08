@@ -22,8 +22,13 @@ use Data::Dumper;
 
 sub importTXN   {
 
-    my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $status) = @_;
+    my ($db, $personID, $personRegistrationID, $entityID, $productID, $amountPaid, $dtPaid, $payRef, $status, $paymentType) = @_;
 
+    my $responseText = 'PAYMENT_SUCCESSFUL';
+    my $responseCode= 'OK';
+
+    $payRef ||= '';
+    $paymentType ||= 20;
     $personID || return;
     $personRegistrationID || return;
     $entityID || return;
@@ -37,7 +42,7 @@ sub importTXN   {
             NP.dtTo as NPTo
         FROM
             tblPersonRegistration_1 as PR
-            INNER JOIN tblNationalPeriod as NP (
+            INNER JOIN tblNationalPeriod as NP ON (
                 NP.intNationalPeriodID = PR.intNationalPeriodID
             )
         WHERE
@@ -68,20 +73,22 @@ sub importTXN   {
             intTransLogID,
             intPersonRegistrationID,
             dtStart,
-            dtEnd
+            dtEnd,
+            curPerItem
         )
         VALUES (
             ?,
             ?,
             1,
-            NOW(),
-            NOW(),
+            ?,
+            ?,
             ?,
             ?,
             1,
             ?,
             ?,
             0,
+            ?,
             ?,
             ?,
             ?
@@ -95,12 +102,22 @@ sub importTXN   {
             intAmount,
             intRealmID,
             intStatus,
+            strResponseCode,
+            strResponseText,
+            intPaymentType,
+            strTXN,
+            strOtherRef2
         )
         VALUES (
-            NOW(),
             ?,
             ?,
-            ?
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            'Imported'
         )
     ];
     my $qryTL= $db->prepare($stTL);
@@ -130,6 +147,8 @@ sub importTXN   {
     $qryTXN->execute(
         $status,
         $amountPaid,
+        $dtPaid,
+        $dtPaid,
         1,
         $personID,
         $entityID,
@@ -137,16 +156,23 @@ sub importTXN   {
         $personRegistrationID,
         $dref->{'NPFrom'},
         $dref->{'NPTo'},
+        $amountPaid
     );
     my $txnID = $qryTXN->{mysql_insertid} || 0;
-    next if ! $txnID;
+    return if ! $txnID;
+    return if ! $status;
     $qryTL->execute(
+        $dtPaid,
         $amountPaid,
         1,
-        $status
+        $status,
+        $responseCode,
+        $responseText,
+        $paymentType,
+        $payRef
     );
     my $TLogID= $qryTL->{mysql_insertid} || 0;
-    next if ! $TLogID;
+    return if ! $TLogID;
     $qryTXNLogs->execute(
         $txnID,
         $TLogID
@@ -154,6 +180,18 @@ sub importTXN   {
     $qryTXNUpdate->execute(
         $TLogID,
         $txnID
+    );
+    my $stRef = qq[
+        UPDATE tblTransLog
+        SET strOnlinePayReference = ?
+        WHERE intLogID = ?
+    ];
+
+    my $ref = $TLogID;
+    my $qryRef= $db->prepare($stRef);
+    $qryRef->execute(
+        $ref,
+        $TLogID
     );
 }
 

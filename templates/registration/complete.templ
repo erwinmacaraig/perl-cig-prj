@@ -11,7 +11,7 @@
             [% END %]
 
         </div>
-        <div class="col-md-9">
+        <div class="col-md-9  result-message">
             <h3 class="panel-header"><b>[% Lang.txt("Thank you") %]</b></h3>
             <div class="panel-body">
                 <div class="reg-complete-wrapper">
@@ -61,7 +61,7 @@
                     [% ELSE %]
                         <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
                         [% IF dtype %]
-                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt("Register another ")%][% dtypeText %]</a></li>        
+                            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;dtype=[% dtype %]" class="btn-main">[% Lang.txt('Register another [_1]', dtypeText) %]</a></li>        
                         [% ELSE %]
                             <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PF_&amp;" class="btn-main">[% Lang.txt("Register another Person") %]</a></li>        
                         [% END %]

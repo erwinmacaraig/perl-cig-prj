@@ -403,7 +403,7 @@ sub step2 {
 				<div id="secmain2" class="panel-body fieldSectionGroup member-home-page" style="background-color: #fff; padding: 30px 20px;">
 					<div class="clearfix">
 						<span class="details-row">
-							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount.').qq[</label>:</span>
+							<span class="details-left"><label for="l_intAmount">].$lang->txt('Amount').qq[</label>:</span>
 							<span class="details-left detail-value">] . $Data->{'l10n'}{'currency'}->format($Data->{params}{intAmount}) . qq[</span>
 						</span>
 						<span class="details-row">
@@ -529,9 +529,9 @@ sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
-	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
+	#if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
 		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getEntityID($Data->{'clientValues'});
-	}
+	#}
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
@@ -637,7 +637,7 @@ sub getTransList {
         name => 'Check', 
         name => $lang->txt('Invoice Number'), 
         field => 'strInvoiceNumber', 
-        width => 20
+        width => 20,
     },  
    
     {
@@ -647,8 +647,7 @@ sub getTransList {
     },
 	{
 		name => $Data->{'lang'}->txt('Person'),
-		field => 'strPerson'
-
+		field => 'strPerson',
 	},
 	{
 		name => $Data->{'lang'}->txt('Type'),
@@ -657,11 +656,12 @@ sub getTransList {
     {
         name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
-        width => 20
+        width => 20,
     },
     {
         name => $lang->txt('Item'), 
-        field => 'strName'
+        field => 'strName',
+        defaultShow => 1,
     },
     {
         name => $lang->txt('Quantity'), 
@@ -673,7 +673,8 @@ sub getTransList {
         name => $lang->txt('Amount'), 
         #field => 'curAmount', 
 		field => 'curAmountFormatted',
-        width => 20
+        width => 20,
+        defaultShow => 1,
     },
     {
         name => $lang->txt('Date Paid'), 
@@ -685,7 +686,7 @@ sub getTransList {
         field => 'stuff', 
         type => 'HTML', 
         hide => $displayonly, 
-        sortable => 0
+        sortable => 0,
     },
     {
         name => '', 
@@ -1148,7 +1149,6 @@ sub listTransactions {
 
       }
   } 
-	$body = qq[<div class = "col-md-12">$body</div>];
   return ($body, $header);
 }
 
@@ -1502,7 +1502,7 @@ sub resolveHoldPaymentForm  {
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
@@ -1731,7 +1731,10 @@ sub viewTransLog	{
 
     my $locale = $Data->{'lang'}->getLocale();
 	my $st_trans = qq[
-		SELECT T.intTransactionID,
+		SELECT 
+            DISTINCT
+            T.intTransactionID,
+            T.intTransLogID,
              M.strLocalSurname,
              M.strLocalFirstName,
              E.*,
@@ -1747,6 +1750,7 @@ sub viewTransLog	{
              P.curPriceTax,
              P.dblTaxRate
 		FROM tblTransactions as T
+            LEFT JOIN tblTXNLogs as TXNLog ON (TXNLog.intTXNID = T.intTransactionID)
 			LEFT JOIN tblInvoice I on I.intInvoiceID = T.intInvoiceID
 			LEFT JOIN tblPerson as M ON (M.intPersonID = T.intID and T.intTableType=$Defs::LEVEL_PERSON)
 			LEFT JOIN tblProducts as P ON (P.intProductID = T.intProductID)
@@ -1756,7 +1760,7 @@ sub viewTransLog	{
                 AND LT_P.intID = P.intProductID
                 AND LT_P.strLocale = '$locale'
             )
-		WHERE intTransLogID = $intTransLogID  
+		WHERE (T.intTransLogID = $intTransLogID or TXNLog.intTLogID = $intTransLogID)
 		AND T.intRealmID = $Data->{'Realm'}
 	];
 	
@@ -1783,7 +1787,7 @@ sub viewTransLog	{
                                 },
                                 intLogID=> {
                                         label => 'Payment Reference Number',
-                                        value => $TLref->{'intLogID'},
+                                        value => $TLref->{'strOnlinePayReference'} || $TLref->{'intLogID'},
                                         readonly => '1',
                                 },
                                 intAmount=> {
@@ -1838,7 +1842,7 @@ sub viewTransLog	{
                                 },
 				
 			},
-                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseCode strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
+                order => [qw(intLogID Name dtLog intAmount Status PaymentType dtSettlement strTXN strResponseText strBSB strBank strAccountName strAccountNum PartialPayment)],
                         options => {
                                 labelsuffix => ':',
                                 hideblank => 1,
@@ -1855,7 +1859,7 @@ sub viewTransLog	{
 	
         my ($resultHTML, undef )=handleHTMLForm($FieldDefs{'TXNLOG'}, undef, 'display', 1,$db);
 
-	return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
+	#return ($resultHTML, $lang->txt("Payment Record")) if ($Data->{'SelfRego'});
 	#my $dollarSymbol = $Data->{'LocalConfig'}{'DollarSymbol'} || "\$";
   my $previousAttemptsBody = qq[
     <h2 class="section-header">].$lang->txt('Previous Payment attempts') . qq[</h2>
@@ -1917,6 +1921,7 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 	my $count=0;
 	my $thisassoc=0;
 	$thisassoc=1 if ($TLref->{intEntityPaymentID} == $Data->{'clientValues'}{'assocID'});
+    my $otherTransLogCount = 0;
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
 		$count++;
         my $paymentFor = '';
@@ -1926,6 +1931,11 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 		$productname = qq[$dref->{strGroup}-].$productname if ($dref->{strGroup});
 		# 	Payments::TXNtoInvoiceNum($dref->{intTransactionID})	
 		my $taxRateinPercent = $dref->{'dblTaxRate'} * 100;
+        my $otherTransLog = ''; 
+        if ($dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} and $intTransLogID and $dref->{'intTransLogID'} != $intTransLogID and ! $Data->{'SelfRego'})   {
+            $otherTransLogCount++;
+            $otherTransLog = qq[*];
+        }
 		$body .= qq[
 			<tr>
 				<td>$dref->{'strInvoiceNumber'}</td>
@@ -1935,15 +1945,24 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
 				<td>$dref->{intQty}</a></td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curPriceTax'}) . qq[</td>
 				<td>].$Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}) . qq[</td>
-				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[</td>
+				<td>].$lang->txt($Defs::TransactionStatus{$dref->{intStatus}}) . qq[$otherTransLog</td>
 			</tr>
-		];
+        ];
+            
 	}
   	$qry_trans->finish;
 
 	$body .= qq[</table>];
+	if ($Data->{'SelfRego'})    {
+	    $body = $count ? $resultHTML.$body: $resultHTML;
+	    return ($body, $lang->txt("Payment Record"));
+    }
+    if ($otherTransLogCount)    {
+        $body .= qq[<p><b>* ].$lang->txt("Transaction paid via a different payment record").qq[</b></p>];
+    }
 	
-	$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
+	$body = $count ? $resultHTML.$body: $resultHTML;
+	#$body = $count ? qq[<h2 class="section-header">].$lang->txt('Payment Summary').qq[</h2>] . $resultHTML.$body: $resultHTML;
 	
 	#$body .= qq[<a href="$Data->{target}?client=$client&amp;a=WF_" class="btn-main pull-right">Go to your Dashboard</a>];
 	my $chgoptions='';

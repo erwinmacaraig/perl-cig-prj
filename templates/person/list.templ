@@ -1,17 +1,17 @@
 <div class="col-md-12 tasklist-content dashboard-tasklist ">
-    <table id="searchResult" cellpadding="5" class = "table-responsive zebra" style="width: 100%">
+    <table id="searchResult" initial-cols="1-2-3-7" cellpadding="5" class = "res-table table-responsive zebra" style="width: 100%">
         <thead>
-            <tr class="box-header">
+            <tr class="res-headers box-header">
                 <th>[% Lang.txt('MA ID') %]</th>
                 <th>[% Lang.txt('Name') %]</th>
                 <th>[% Lang.txt('Date of Birth') %]</th>
                 <th>[% Lang.txt('Role') %]</th>
-                <th>[% Lang.txt('Sub-Role') %]</th>
+                <th>[% Lang.txt('Sub Role') %]</th>
                 <th>[% Lang.txt('Level') %]</th>
                 <th>[% Lang.txt('Certificates') %]</th>
                 <th>&nbsp;</th>
             </tr>
-            <tr>
+            <tr class="res-headers">
                 <td>
                     <input style="padding: 5px" class="search-mid" type="text" placeholder="[% Lang.txt('Search MA ID') %]"/>
                 </td>

@@ -116,3 +116,27 @@ ALTER TABLE tblPayTry ADD COLUMN intSelfRego TINYINT default 0;
 
 #150507_tblNationalPeriod.sql
 ALTER TABLE tblNationalPeriod ADD COLUMN strImportPeriodCode varchar(30) default '';
+
+# FC267
+ALTER TABLE tblPersonRequest
+ADD COLUMN `intSelfTriggered` TINYINT NOT NULL DEFAULT 0 COMMENT 'Flag to identify if the request has been initiated by self user' AFTER `strRequestStatus`,
+ADD COLUMN `intRequestFromSelfUserID` INT NOT NULL DEFAULT 0 COMMENT 'Self User ID who initiated the request' AFTER `intSelfTriggered`;
+
+
+# From PlayerLoans.sql
+ALTER TABLE tblRegistrationItem
+ADD COLUMN `intItemForInternationalTransfer` TINYINT NULL DEFAULT 0 AFTER `intItemPaidProducts`,
+ADD COLUMN `intItemForInternationalLoan` TINYINT NULL DEFAULT 0 AFTER `intItemForInternationalTransfer`;
+
+ALTER TABLE `tblMatrix`
+ADD COLUMN `dtOpenFrom` DATE NULL DEFAULT NULL AFTER `dtTo`,
+ADD COLUMN `dtOpenTo` DATE NULL DEFAULT NULL AFTER `dtOpenFrom`,
+ADD COLUMN `intHonourOpenDates` TINYINT NULL DEFAULT 0 AFTER `dtOpenTo`;
+
+
+ALTER TABLE tblNationalPeriod ADD COLUMN intDontUseForLoans TINYINT DEFAULT 0;
+
+ALTER TABLE tblPersonRegistration_1 ADD COLUMN `intIsLoanedOut` TINYINT NULL DEFAULT 0 COMMENT 'Flag to identify that the person registration record is loaned out' AFTER `intOnLoan`;
+
+ALTER TABLE tblPersonRegistration_1 ADD COLUMN `strPreLoanedStatus` VARCHAR(45) NULL DEFAULT '' COMMENT 'Used as temporary column to save status from imported data' AFTER `intIsLoanedOut`;
+

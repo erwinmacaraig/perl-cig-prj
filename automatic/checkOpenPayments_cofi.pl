@@ -66,10 +66,12 @@ print STDERR "IN checkOpenPayments\n";
 	DISTINCT
             TL.intLogID,
             TL.intAmount,
+            TL.strOnlinePayReference,
             PC.strGatewayUsername,
             PC.strGatewayPassword,
             PC.strCurrency,
 			PC.intProcessPreGateway	,
+            TL.strReceiptRef,
 		PT.strPayReference
         FROM
             tblTransLog as TL
@@ -80,8 +82,9 @@ print STDERR "IN checkOpenPayments\n";
             AND PC.strGatewayCode = 'checkoutfi'
 		AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
-            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
+            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
     ];
+            #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
     my $checkURL = 'https://rpcapi.checkout.fi/poll';
     my $query = $db->prepare($st);
@@ -114,8 +117,8 @@ print STDERR "IN checkOpenPayments\n";
         my %APIResponse=();
         my $cents = $dref->{'intAmount'} * 100;
         $APIResponse{'VERSION'} = "0001";
-        $APIResponse{'STAMP'} = $Data{'SystemConfig'}{'paymentPrefix'}.$logID;
-        $APIResponse{'REFERENCE'} = $logID;
+        $APIResponse{'STAMP'} = $dref->{'strOnlinePayReference'}; #Data{'SystemConfig'}{'paymentPrefix'}.$logID;
+        $APIResponse{'REFERENCE'} = $dref->{'strReceiptRef'}; #$logID;
         $APIResponse{'MERCHANT'} = $dref->{'strGatewayUsername'};
         $APIResponse{'AMOUNT'} = $cents;
         $APIResponse{'CURRENCY'} = $dref->{'strCurrency'};
@@ -145,7 +148,7 @@ print STDERR "--- $retval\n";
         #print STDERR Dumper($dataIN);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
-print STDERR Dumper(\%APIResponse);
+#print STDERR Dumper(\%APIResponse);
 print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
         

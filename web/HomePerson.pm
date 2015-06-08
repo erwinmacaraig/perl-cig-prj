@@ -187,10 +187,16 @@ sub showPersonHome	{
                 AND tblRegistrationItem.strPersonLevel IN ('', ?)
                 AND tblRegistrationItem.intOriginLevel = ?
                 AND tblRegistrationItem.intEntityLevel = ?
+                AND (tblRegistrationItem.intItemForInternationalTransfer = 0 OR tblRegistrationItem.intItemForInternationalTransfer = ?)
+                AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             ORDER BY 
                 tblDocuments.tTimeStamp DESC, 
                 tblDocuments.intUploadFileID DESC
     ];
+
+    my $internationalTransfer = ($rego->{'intNewBaseRecord'} and $rego->{'intInternationalTransfer'}) ? 1 : 0;
+    my $internationalLoan = ($rego->{'intNewBaseRecord'} and $rego->{'intInternationalLoan'}) ? 1 : 0;
+
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID, 
@@ -201,6 +207,8 @@ sub showPersonHome	{
         $rego->{'strPersonLevel'} || '',
         $rego->{'intOriginLevel'}, 
         $rego->{'intEntityLevel'}, 
+        $internationalTransfer,
+        $internationalLoan,
     );
 
 	while(my $dref = $sth->fetchrow_hashref()){
@@ -291,10 +299,18 @@ sub showPersonHome	{
         $rego->{'renew_link'} = '';
         $rego->{'changelevel_link'} = '';
         $rego->{'cancel_loan_link'} = '';
+
+    
         #next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}) and $Data->{'authLevel'} != $Defs::LEVEL_NATIONAL);
         ## Show MA the renew link remvoed as we need them to navigate to the club level for now
-        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
+
+        #enable early deactivation of a player loan
+        if($rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
+            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}";
+        }
+
+        next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));
         #my $ageLevel = $rego->{'strAgeLevel'}; #'ADULT'; ## HERE NEEDS TO CALCULATE IF MINOR/ADULT
         my $newAgeLevel = '';
 
@@ -308,29 +324,31 @@ sub showPersonHome	{
             $renew .= "&amp;dlevel=$rego->{'strPersonLevel'}";
         }
 
-        #enable early deactivation of a player loan
-        if($rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
-            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}";
-        }
 
         if (! $rego->{'intOnLoan'} && $Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
             $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
         }
         $rego->{'changelevel_link'} = $changelevel;
         my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
-        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change $pType Level");
+        $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change [_1] Level", $pType);
 
         $rego->{'Status'} = (($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE) and $rego->{'intPaymentRequired'}) ? $Defs::personRegoStatus{$Defs::PERSONREGO_STATUS_ACTIVE_PENDING_PAYMENT} : $rego->{'Status'};
-        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID);
+        next if ($rego->{'intNationalPeriodID'} == $nationalPeriodID and $rego->{'intIsLoanedOut'} == 0);
 
 
         #FC-1105 - disable renewal from lending club if loan isn't completed yet
         #check PersonRequest::deactivatePlayerLoan
+        $rego->{'intOnLoan'} ||= 0;
+        $rego->{'existOpenLoan'} ||= 0;
         if(
             ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
             or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
             or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
             $rego->{'renew_link'} = $renew;
+        }
+        else    {
+            $rego->{'renew_link'} = '';
+            $rego->{'changelevel_link'} = '';
         }
 
     }

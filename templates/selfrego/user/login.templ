@@ -7,16 +7,14 @@
                 </div>
                 <hr>
                 <h3 class="form-signin-heading">[% Lang.txt('Sign into Self Registration') %]</h3>
-                <input type = "text" class="form-control" name = "email">
-                <input type = "password" class="form-control" name = "pw">
+                <input type = "text" class="form-control" name = "email" placeholder = "[% Lang.txt('Email') %]">
+                <input type = "password" class="form-control" name = "pw" placeholder = "[% Lang.txt('Password') %]">
                 <input type = "hidden" name = "srp" value = "[% srp %]">
                 <input class="btn btn-sm btn-primary pull-right" type = "submit" value = "[% Lang.txt('Sign in') %]">
                 <br /><br />
-                <p><a href = "?a=FORGOT&amp;srp=[% srp %]">[% Lang.txt('Forgot your password?')%]</a></p>
+                <p><a href = "user/signup.cgi?srp=[% srp %]" >[% Lang.txt('Signup') %]</a></p>
+                <p><a href = "?a=FORGOT_&amp;srp=[% srp %]">[% Lang.txt('Forgot your password?')%]</a></p>
             </form>
-            <div class="col-md-12">
-                <a href = "user/signup.cgi?srp=[% srp %]" class = "btn-main"> Signup</a>
-            </div>
         </div>
     </div>
     <br />

@@ -2,14 +2,14 @@
 
 [% count = 0 %]
 <div class="col-md-12 tasklist-content dashboard-tasklist">
-<table class="" cellpadding="5" width="100%">
+<table class="res-table" cellpadding="5" width="100%" initial-cols="0-1-2">
 	<thead>
-        <tr class="box-header">
-    		<th>[% Lang.txt('Beginning Of Registration') %]</th>
-    		<th>[% Lang.txt('End of Registration') %]</th>
+        <tr class="box-header res-headers">
+    		<th>[% Lang.txt('Start') %]</th>
+    		<th>[% Lang.txt('End') %]</th>
     		<th>[% Lang.txt('Club Name') %]</th> 
     		<th>[% Lang.txt('Level') %]</th>
-    		<th>[% Lang.txt('Registration Member Association') %]</th>
+    		<th>[% Lang.txt('Member Association') %]</th>
         </tr>
 	</thead>
 	[% FOREACH p = Passport %]

@@ -1,7 +1,7 @@
 DELETE FROM tblEntity WHERE intEntityID<>1;
-#DELETE FROM tblUser;
-#DELETE FROM tblUserAuth;
-#DELETE FROM tblUserHash;
+DELETE FROM tblUser;
+DELETE FROM tblUserAuth;
+DELETE FROM tblUserHash;
 DELETE FROM tblPerson;
 DELETE FROM tblPersonRegistration_1;
 DELETE FROM tblPersonEntity_1;
@@ -16,6 +16,7 @@ DELETE FROM tblPersonNotes;
 DELETE FROM tblPlayerPassport;
 DELETE FROM tblTransLog_Retry;
 DELETE FROM tblTransLog_Counts;
+DELETE FROM tblOldSystemAccounts;
 
 DELETE FROM tblWFTask;
 DELETE FROM tblAuditLog;

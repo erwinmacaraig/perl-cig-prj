@@ -209,7 +209,7 @@ sub validate_core_details {
         $query->execute($entityID, $facilityObj->ID());
 
         $query->finish();
-        createTempEntityStructure($self->{'Data'}); 
+        createTempEntityStructure($self->{'Data'}, 0, $facilityObj->ID()); 
     }
     else    {
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");

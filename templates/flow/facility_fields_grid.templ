@@ -1,17 +1,17 @@
 [% USE Dumper %]
 <h3 class="panel-header">[% Lang.txt('Fields') %]</h3>
 <div class="panel-body">
-    <table id="ffg_venue" class="table" cellpadding="0" style="width: 100%">
+    <table initial-cols="1-2-3" id="ffg_venue" class="table res-table" cellpadding="0" style="width: 100%">
         <thead>
-        <tr>
-            <!--<td></td>-->
-            <td>[% Lang.txt('Field Number') %]</td>
-            <td>[% Lang.txt('Field Name') %]</td>
-            <td>[% Lang.txt('Discipline') %]</td>
-            <td>[% Lang.txt('Type of Field') %]</td>
-            <td>[% Lang.txt('Length of Field') %]</td>
-            <td>[% Lang.txt('Width of Field') %]</td>
-            <td>[% Lang.txt('Capacity of Field') %]</td>
+        <tr class="res-headers">
+            <th></th>
+            <th>[% Lang.txt('Field Number') %]</td>
+            <th>[% Lang.txt('Field Name') %]</td>
+            <th>[% Lang.txt('Discipline') %]</td>
+            <th>[% Lang.txt('Type of Field') %]</td>
+            <th>[% Lang.txt('Length of Field (m)') %]</td>
+            <th>[% Lang.txt('Width of Field (m)') %]</td>
+            <th>[% Lang.txt('Capacity of Field') %]</td>
         </tr>
         </thead>
         [% COUNT = 0 %]

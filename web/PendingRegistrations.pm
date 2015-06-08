@@ -191,15 +191,20 @@ sub listPendingRegistrations    {
             name  => $Data->{'lang'}->txt('Type'),
             field => 'RegistrationNature',
             width  => 60,
+      defaultShow => 1,
+
         },
         {
             name  => $Data->{'lang'}->txt('Person'),
             field => 'LocalLatinName',
+              defaultShow => 1,
+
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
             field  => 'PersonType',
             width  => 30,
+              defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Role'),
@@ -350,7 +355,6 @@ sub listPendingRegistrations    {
             filters => $filterfields,
         ); 
         $resultHTML .=  qq[
-            <div style="clear:both">&nbsp;</div>
             <div class="clearfix">
                     $grid             
             </div>
@@ -373,7 +377,7 @@ sub listPendingRegistrations    {
         ];
     }
     if(! @rowdata and ! @fielddata){
-    	$resultHTML = 'No Pending Registrations';
+    	$resultHTML = $Data->{'lang'}->txt('No Pending Registrations');
     }
     $title = $Data->{'lang'}->txt('Pending Registrations');
            

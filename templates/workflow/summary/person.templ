@@ -15,7 +15,7 @@
             <br/>
 
             [% FOREACH request IN personRequests %]
-            <label>The [% request.requestType %] Request (ID: [% request.id %] --[% request.personType %]/[% request.sport %]--) has been sent to [% request.requestTo %].</label>
+            <label>The [_1] request (ID: [_2]) -- [_3]/[_4] has been sent to [_5].',request.requestType, request.id, request.personType, request.sport, request.requestTo) %].</label>
             <br/>
             [% END %]
             <div class="top-bottom-spacer">

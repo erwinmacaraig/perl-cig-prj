@@ -3,52 +3,21 @@
 	<div class="container">
 		<div class="row">
 			<div class="col-md-12">
+                [% IF LanguageChooser %]
+                <div class = "lang-select-wrapper">[% LanguageChooser %]</div>
+                [% END %]
       
 [% IF NavTree %]
-        <div class="access-level">
-          <p class="viewAs">[% Lang.txt('View as') %]:</p>
-            <div class="nav_session_menu_wrap">
-              <div class="nav_session_placement">
-                <a class="nav_session_current" href="">
-                  <span class="nav-bar-name">[% NavTree.last.name %]</span>
-                  <span class="level-name">[% Lang.txt(NavTree.last.levelname) %]</span>
-                </a>
-              </div>
-              <ol class="nav_session_levels">
-                [% FOR level = NavTree %]
-                  <li class="session_item"><a href = "[% level.url %]"><span class="nav-bar-name">[% level.name %]</span>&nbsp;<span class="level-name">[% Lang.txt(level.levelname) %]</span></a></li>
-                [% END %]
-              </ol>
-              <script type="text/javascript">
-                var sessno = jQuery('li.session_item').length;
-                if(sessno > 1) {
-                  jQuery('.nav_session_placement').addClass('arrow_bg');
-                  jQuery('.nav_session_current').click(function() {
-                    jQuery('.nav_session_levels').toggleClass('nav_display');
-                      return false;
-                  });
-                }
-                else {
-                  jQuery('.nav_session_current').click(function() {
-                    return false;
-                  });
-                }
-                  jQuery('html').click(function() {
-                  jQuery('.nav_session_levels').removeClass('nav_display');
-                  });
-                </script> 
-            </div>
-        </div>
+    [% INCLUDE 'user/levelNavigation.templ' %]
 [% END %]
 
   			<ul>
+                [% IF Data.UserName %]
   				<li>[% Lang.txt('Welcome') %] [% UserName || Data.UserName %]</li>
   				<!--<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>-->
   				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
   				<li><a href="https://www.fifaconnect.org/release_notes/FCRN-20150303.pdf" target="rn" title="[% Lang.txt('Release Notes') %]">[% Lang.txt('Release Notes') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
-                [% IF LanguageChooser %]
-                <li>[% LanguageChooser %]</li>
                 [% END %]
   			</ul>
 			</div>
@@ -61,8 +30,7 @@
     <div class="row">
       <div class="col-md-12">
       [% IF Data.ELevel != 3 %]
-        <!--<a href="#" title=""><img class="header-logo" src="images/FAS-logo.png" alt="" /></a>-->
-        <a href="#" title=""><img class="header-logo" src="[% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a><h1>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]</h1>
+        <a href="#" title=""><img class="header-logo" src="[% DirPrefix %][% HeaderLogo || DefaultSystemConfig.LoginError_MA_logo || DefaultSystemConfig.MA_logo  %]" alt="" /></a><h1>[% HeaderSystemName || DefaultSystemConfig.HeaderSystemName %]</h1>
       [% END %]  
         <ul>
           <li>

@@ -91,6 +91,9 @@
 
 										);
 									});
+									this.on("canceled", function(file, response){
+										jQuery(".dropzone.dz-started").removeClass('dz-started')
+									});
 								}
 
 
@@ -193,6 +196,7 @@
 										}).done(
 											
 										);
+
 									});
 								}
 							}
