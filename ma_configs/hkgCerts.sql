@@ -1,7 +1,7 @@
 UPDATE tblCertificationTypes SET intRealmID=0, strCertificationType = '.COACHOLD' WHERE strCertificationType='COACH';
-INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 12 12 'AFC Pro');
-INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 11 11 'AFC A');
-INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 10 10 'AFC B');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 12, 12, 'AFC Pro');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 11, 11, 'AFC A');
+INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 10, 10, 'AFC B');
 INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 9, 9, 'AFC C');
 INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 8, 8, 'AFC Futsal 1');
 INSERT INTO tblCertificationTypes (intRealmID, strCertificationType, intActive, intDisplayOrder, intActiveOrder, strCertificationName) VALUES (1, 'COACH', 1, 7, 7, 'AFC Futsal 2');
