@@ -1,0 +1,26 @@
+<div class="container">
+    <div class="row">
+      <div class="col-md-3 reg-complete-summary-left-bar">
+            [% PersonSummaryPanel %]
+            <!-- DO IF TEST HERE ON registration.strStatus -->
+            [% IF registration.strStatus == "PENDING" %]
+                <div class="registration-pending">[% Lang.txt(registration.personTypeText) %]: [% Lang.txt(registration.personRegoStatus) %]</div>
+            [% ELSIF registration.strStatus == "ACTIVE" %]
+                <div class="registration-approved">[% Lang.txt(registration.personTypeText) %]: [% Lang.txt(registration.personRegoStatus) %]</div>
+            [% END %]
+       </div>
+      <div class="col-md-9">
+	 <h3 class="panel-header">
+            [% player %]
+         </h3>
+	  <div class="panel-body">
+	    <div class="reg-complete-wrapper">
+		You have cancelled the player loan of [% player %].
+	     </div>
+	  </div> <!-- end panel-body -->
+	  <div class="button-row pull-right">
+            <a href="[% url %]" title="" class="btn-main">Go to your dashboard</a>
+        </div> 
+      </div><!-- end col-mid-9 -->
+  <div> <!-- end row -->
+</div> <!-- end container -->
