@@ -783,7 +783,7 @@ table tr.new-task {
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
-	height: 345px;
+	/*height: 345px;*/
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color: transparent;
