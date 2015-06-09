@@ -1110,6 +1110,23 @@ sub displayRegoFlowProducts {
             ? $maObj->name()
             : '';
 		$rego_ref->{'MA'} = $maName || '';
+
+    my $product_terms = '';
+    {
+        my $locale = $Data->{'lang'}->getLocale();
+        my $st = qq[
+            SELECT strNote
+            FROM tblLocalTranslations AS LT
+                LT.strType = 'PRODUCTTERMS'
+                AND LT.intID = 1;
+                AND LT_D.strLocale = '$locale'
+        ];
+        my $qp = $Data->{'db'}->prepare($st);
+        $qp->execute();
+        ($product_terms) = $qp->fetchrow_array();
+        $qp->finish();
+
+    }
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
@@ -1122,6 +1139,7 @@ sub displayRegoFlowProducts {
         NoFormFields =>$noFormFields,
 		AssociationName => $maName,
 		payMethod => $rego_ref->{'payMethod'},
+		productTerms => $product_terms || '',
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';

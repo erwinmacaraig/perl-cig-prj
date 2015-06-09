@@ -12,6 +12,9 @@
         </select></p>
 [% END %]
 [% product_body %]
+[% IF productTerms %]
+    [% productTerms %]
+[% END %]
 [% IF mandatoryPayment %]
 	<div id="payOptions" style="display:[% IF amountCheck %] block [% ELSE %] none [% END %];">
 	
