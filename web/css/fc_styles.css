@@ -2766,3 +2766,7 @@ header .navbar-brand {
   content: "\f059";
   font-size:20px;
 }
+.product-terms {
+    padding:5px;
+    margin:5px;
+}

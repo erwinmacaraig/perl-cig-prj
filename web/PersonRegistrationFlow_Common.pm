@@ -47,6 +47,7 @@ use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
 use Switch;
+use TermsConditions;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -1111,22 +1112,8 @@ sub displayRegoFlowProducts {
             : '';
 		$rego_ref->{'MA'} = $maName || '';
 
-    my $product_terms = '';
-    {
-        my $locale = $Data->{'lang'}->getLocale();
-        my $st = qq[
-            SELECT strNote
-            FROM tblLocalTranslations AS LT
-                LT.strType = 'PRODUCTTERMS'
-                AND LT.intID = 1;
-                AND LT_D.strLocale = '$locale'
-        ];
-        my $qp = $Data->{'db'}->prepare($st);
-        $qp->execute();
-        ($product_terms) = $qp->fetchrow_array();
-        $qp->finish();
-
-    }
+    my ($termsId, $product_terms) = getTerms($Data, 'PRODUCT');
+warn("IOII $product_terms");
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},

@@ -13,7 +13,9 @@
 [% END %]
 [% product_body %]
 [% IF productTerms %]
+    <div class = "product-terms">
     [% productTerms %]
+    </div>
 [% END %]
 [% IF mandatoryPayment %]
 	<div id="payOptions" style="display:[% IF amountCheck %] block [% ELSE %] none [% END %];">
