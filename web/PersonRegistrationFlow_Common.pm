@@ -1113,7 +1113,6 @@ sub displayRegoFlowProducts {
 		$rego_ref->{'MA'} = $maName || '';
 
     my ($termsId, $product_terms) = getTerms($Data, 'PRODUCT');
-warn("IOII $product_terms");
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
