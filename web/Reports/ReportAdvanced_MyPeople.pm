@@ -107,6 +107,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personStatus,
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -249,6 +250,7 @@ sub _getConfiguration {
                     size          => 2,
                     multiple      => 1,
                     optiongroup   => 'details',
+                    translate       => 1,
                     allowgrouping => 1,
                     allowsort     => 1
                 }
@@ -261,6 +263,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => $CommonVals->{'DefCodes'}{-8},
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -277,6 +280,7 @@ sub _getConfiguration {
                         3 => 'Already in Country',
                         4 => 'Inside EU',
                     },
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -289,6 +293,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personType,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -300,6 +305,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personLevel,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -311,6 +317,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::registrationNature,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -323,6 +330,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personRegoStatus,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -335,6 +343,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::sportType,
                     optiongroup     => 'regos',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -344,7 +353,13 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     dbfield     => 'ETR.strEntityRoleName',
-                    optiongroup => 'regos'
+                    translate       => 1,
+                    optiongroup => 'regos',
+                    dbfrom => "
+                        LEFT JOIN tblEntityTypeRoles as ETR ON (
+                            ETR.strEntityRoleKey = PR.strPersonEntityRole
+                        ) 
+                    ",
                 }
             ],
             PRdtFrom=> [
@@ -359,7 +374,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtTo=> [
-                'Date To',
+                $lang->txt('Date To'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -379,6 +394,7 @@ sub _getConfiguration {
                     dbfield       => 'PR.intPaymentRequired',
                     defaultcomp   => 'equal',
                     defaultvalue  => '0',
+                    translate       => 1,
                     active        => 1,
                     optiongroup   => 'regos'
                 }
@@ -1267,7 +1283,7 @@ sub _getConfiguration {
               strRegionName => [
                 (
                       $currentLevel > $Defs::LEVEL_REGION
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_REGION} . ' Name'
+                    ? $lang->txt('Region Name')
                     : ''
                 ),
                 {
@@ -1437,6 +1453,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::paymentTypes,
                     allowsort       => 1,
+                    translate       => 1,
                     optiongroup     => 'transactions',
                     dbfield         => 'TL.intPaymentType',
                     allowgrouping   => 1

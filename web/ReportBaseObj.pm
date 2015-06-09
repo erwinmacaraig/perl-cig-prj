@@ -244,6 +244,7 @@ sub formatOutput {
 			SummaryCount => $self->{'RunParams'}{'SummaryCount'},
 			Summarise => $self->{'RunParams'}{'Summarise'} || 0,
 			Options => $self->{'OtherOptions'},
+            LimitView => $self->{'Config'}{'Config'}{'limitView'} || 0,
     },
     "reports/$templatename.templ",
   );
@@ -403,6 +404,9 @@ sub _processrow	{
 			if($displaytype eq 'currency' and $self->{'Config'}->{'Config'}{'CurrencySymbol'})  {
 				$outvalue= $self->{'Config'}{'Config'}{'CurrencySymbol'} . $outvalue;
 			}
+			if($fieldopts->{'translate'} and $self->{'Lang'})   {
+                $outvalue = $self->{'Lang'}->txt($outvalue);
+            }
 			$dataref->{$field} = $outvalue;
 
 			#Handle grouping
