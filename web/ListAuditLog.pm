@@ -67,6 +67,58 @@ sub listPersonAuditLog    {
             AL.dtUpdated DESC
     
 	];
+    $query = qq[
+    (
+        SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            INNER JOIN tblPersonRegistration_1 as PR ON (
+                PR.intPersonRegistrationID=AL.intID
+                AND AL.strSection="Person Registration"
+            )
+        WHERE
+            PR.intPersonID=?
+            AND AL.strSection NOT IN ('Person Entity')
+            AND (
+                AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
+            )
+    )
+UNION ALL
+    (
+     SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            LEFT JOIN tblWFTask as WFT ON (
+                WFT.intWFTaskID = AL.intID
+                AND AL.strSection="WFTask"
+            )
+        WHERE
+            WFT.intPersonID=?
+            AND AL.strSection NOT IN ('Person Entity')
+            AND (AL.strSection = "WFTask" AND WFT.intPersonID=?)
+    )
+UNION ALL
+    (
+     SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            INNER JOIN tblPerson as P ON (
+                P.intPersonID= AL.intID
+                AND AL.strSection IN ("Player Passport", "PERSON", "Person")
+            )
+        WHERE
+            (
+                AL.intID=?
+                OR P.intPersonID=?
+            )
+            AND AL.strSection NOT IN ('Person Entity')
+            AND (
+                AL.strSection IN ("Player Passport", "PERSON", "Person")
+            )
+    )
+    ORDER BY
+            dtUpdated DESC
+    ];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
         $personID,
@@ -132,9 +184,38 @@ sub listEntityAuditLog {
             AL.dtUpdated DESC
     
 	];
+    $query = qq[
+(SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            INNER JOIN tblEntity as E ON (
+                E.intEntityID= AL.intID
+                AND AL.strSection IN ("Imported", "Club", "Entity", "Venue")
+            )
+        WHERE
+            AL.intID=?
+            AND AL.strSection IN ("Imported", "Club", "Entity", "Venue")
+)
+UNION ALL
+( SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+            INNER JOIN tblWFTask as WFT ON (
+                WFT.intWFTaskID = AL.intID
+                AND AL.strSection="WFTask"
+                AND WFT.intPersonID=0
+                AND WFT.strWFRuleFor = "ENTITY"
+            )
+        WHERE
+            WFT.intEntityID=?
+            AND AL.strSection = "WFTask" AND WFT.intEntityID=?
+)
+        ORDER BY
+            dtUpdated DESC
+    ];
+
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
-        $entityID,
         $entityID,
         $entityID,
         $entityID,
