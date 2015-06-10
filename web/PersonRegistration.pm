@@ -1085,7 +1085,7 @@ sub personInProgressToPending {
     return if (! $personID);
     my $st = qq[
         UPDATE tblPerson
-        SET strStatus='PENDING'
+        SET strStatus='PENDING', intSystemStatus=1
         WHERE 
             intPersonID=?
             AND intRealmID=?
