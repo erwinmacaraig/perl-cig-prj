@@ -34,7 +34,7 @@ use strict;
             AND prq.strRequestResponse = 'ACCEPTED'
             AND prq.intOpenLoan= 1
             AND (
-                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') <= ?
+                    DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') < ?
                 )
             AND DATE_FORMAT(prq.dtLoanTo, '%Y-%m-%d') != '0000-00-00'
     ];
