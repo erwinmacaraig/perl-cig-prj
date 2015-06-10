@@ -5,6 +5,7 @@ require Exporter;
 
 @EXPORT = @EXPORT_OK = qw(
     doesUserHaveAccess
+    doesSelfUserHaveAccess
     doesUserHaveEntityAccess
 );
 
@@ -83,7 +84,7 @@ sub doesUserHaveAccess  {
             #person is in the process of being initially registered - everyone has access
             return 1;
         }
-        $entities{'WRITE'}{$dref->{'intEntityID'}} = 1 if $count == 1;
+        $entities{'WRITE'}{$dref->{'intEntityID'}} = 1 if $count >= 1;
         $entities{'WRITE'}{$dref->{'intRequestFromEntityID'}} = 1 if $count >= 1;
         $entities{'READ'}{$dref->{'intEntityID'}} = 1;
         $entities{'READ'}{$dref->{'intRequestFromEntityID'}} = 1;
@@ -143,5 +144,37 @@ sub doesUserHaveEntityAccess  {
     my ($found) = $q->fetchrow_array();
     $q->finish();
     return $found || 0;
+}
+
+sub doesSelfUserHaveAccess  {
+    my (
+        $Data,
+        $personID,
+        $userID,
+    ) = @_;
+
+    return 0 if !$userID;
+    return 0 if !$personID;
+
+    my $st = qq[
+        SELECT
+            intSelfUserID
+        FROM
+            tblSelfUserAuth
+        WHERE
+            intEntityTypeID = $Defs::LEVEL_PERSON
+            AND intEntityID = ?
+            AND intSelfUserID = ?
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st);
+    $q->execute(
+        $personID,
+        $userID,
+    );
+    my ($found) = $q->fetchrow_array();
+    $q->finish();
+    return $found ? 1 : 0;
 }
 1;

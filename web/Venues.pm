@@ -197,7 +197,7 @@ sub venue_details   {
        intLocalLanguage => {
           label       => 'Language the name is written in',
           type        => 'lookup',
-          value       => $field->{intLocalLanguage},
+          value       => $field->{intLocalLanguage} || $Data->{'SystemConfig'}{'Default_NameLanguage'},
           options     => \%languageOptions,
           firstoption => [ '', 'Select Language' ],
           compulsory => 1,
@@ -537,7 +537,6 @@ sub venue_details   {
       target => $Data->{'target'},
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
       NoHTML => 1, 
       updateSQL => qq[
           UPDATE tblEntity
@@ -769,7 +768,6 @@ sub listVenues  {
         AND CN.intDataAccess>$Defs::DATA_ACCESS_NONE
       ORDER BY CN.strLocalName
     ];
-print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute($entityID, $Defs::LEVEL_VENUE);
     my $results=0;
@@ -811,6 +809,7 @@ print STDERR "VEN FOR $entityID | $Defs::LEVEL_VENUE\n";
         {
             name  => $Data->{'lang'}->txt('Venue Name'),
             field => 'strLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Status'),
@@ -875,7 +874,7 @@ sub postVenueAdd {
       $query->execute($entityID, $id);
       $query->finish();
       $Data->{'db'}=$db;
-      createTempEntityStructure($Data); 
+      createTempEntityStructure($Data, $Data->{'Realm'}, $id); 
         #my $rc = addTasks($Data,$entityID, 0,0);
       addWorkFlowTasks($Data, 'ENTITY', 'NEW', $Data->{'clientValues'}{'authLevel'}, $id,0,0, 0);
     }
@@ -994,7 +993,7 @@ sub list_venue_fields {
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
     
     my $entityFields = new EntityFields();
-    my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
+    my $title = $venueDetails->{strLocalName} . ": " . $Data->{'lang'}->txt("Edit Fields");
 
     $entityFields->setEntityID($venueID);
     $entityFields->setData($Data);
@@ -1038,7 +1037,7 @@ sub update_venue_fields {
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     my $entityFields = new EntityFields();
-    my $title = $venueDetails->{strLocalName} . ": " . "Fields";;
+    my $title = $venueDetails->{strLocalName} . ": " . $Data->{'lang'}->txt("Edit Fields");;
 
     $entityFields->setEntityID($venueID);
     $entityFields->setData($Data);
@@ -1091,9 +1090,9 @@ sub update_venue_fields {
 
     my %flashMessage;
     $flashMessage{'flash'}{'type'} = 'success';
-    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields updated.");
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt("Facility fields have been updated.");
 
-    FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
+    #FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
 
     if($back_screen){
       my %tempClientValues = getClient($Data->{'client'});
@@ -1102,6 +1101,7 @@ sub update_venue_fields {
         $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&venueID=$venueID&$back_screen";
       }
       else {
+		FlashMessage::setFlashMessage($Data, 'FAC_FM', \%flashMessage);
         $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&amp;a=FE_D&amp;venueID=$venueID";
       }
      
@@ -1119,20 +1119,20 @@ sub add_venue_fields {
 
 	my $p = new CGI;
 	my %params = $p->Vars();
-	
+
     my @err;
     if (!$params{'field_count'}) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: required");
+        push @err, $Data->{'lang'}->txt("Number of Fields") . " : " . $Data->{'lang'}->txt("required");
     }
 
     if ($params{'field_count'} !~ /^\d+$/) {
-        push @err, $Data->{'lang'}->txt("Number of Fields: invalid input");
+        push @err, $Data->{'lang'}->txt("Number of Fields"). " : " .$Data->{'lang'}->txt("invalid input");
     }
 
     return pre_add_venue_fields($action, $Data, $venueID, \@err) if scalar(@err);
 
     my $venueDetails = loadVenueDetails($Data->{'db'}, $venueID);
-    my $title = $venueDetails->{strLocalName} . ": " . "Add Fields";;
+    my $title = $venueDetails->{strLocalName} . ": " . $Data->{'lang'}->txt("Add Fields");
 
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
@@ -1140,9 +1140,10 @@ sub add_venue_fields {
     my $facilityFieldCount = $params{'field_count'};
 
     my $facilityFields = new EntityFields();
-    $facilityFields->setCount($facilityFieldCount);
     $facilityFields->setEntityID($venueID);
     $facilityFields->setData($Data);
+    my $existingFacilityFields = $facilityFields->getAll();
+    $facilityFields->setCount($facilityFieldCount + scalar(@{$facilityFields->getAll()}));
     
     my @facilityFieldsData = ();
 
@@ -1159,7 +1160,15 @@ sub add_venue_fields {
 	$FieldsGridData{'at'} = $params{'at'} if($params{'at'});
 
     if($action =~ /^VENUE_Fadd/) {
-        for my $i (1 .. $facilityFieldCount){
+        my $startNewIndex = 1;
+
+        foreach my $fieldObjData (@{$existingFacilityFields}){
+            $facilityFields->setDBData($fieldObjData);
+            push @facilityFieldsData, $facilityFields->generateSingleRowField($startNewIndex, $fieldObjData->{'intEntityFieldID'});
+            $startNewIndex++;
+        }
+
+        for my $i ($startNewIndex .. ($facilityFieldCount + $startNewIndex) - 1){
             $facilityFields->setDBData({});
             push @facilityFieldsData, $facilityFields->generateSingleRowField($i, undef);
         }
@@ -1169,6 +1178,7 @@ sub add_venue_fields {
             \%FieldsGridData,
             'entity/venue_fields.templ',
         );
+
 
         return ($facilityFieldsContent, $title);
     }
@@ -1195,7 +1205,9 @@ sub add_venue_fields {
         my $updatedFields = 0;
 
         foreach my $fieldObjData (@{$facilityFieldDataCluster}){
-            my $entityFieldObj = new EntityFieldObj(db => $Data->{'db'}, ID => 0);
+            my $existingEntityFieldID = $fieldObjData->{'intEntityFieldID'} || 0;
+            my $entityFieldObj = new EntityFieldObj(db => $Data->{'db'}, ID => $existingEntityFieldID);
+            $entityFieldObj->load();
             $entityFieldObj->setValues($fieldObjData);
             $entityFieldObj->write();
             $updatedFields++;
@@ -1240,7 +1252,7 @@ sub delete_venue_fields {
     return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid Venue/Facility ID.")) if($venueDetails->{'intEntityLevel'} != $Defs::LEVEL_VENUE);
 
     my $entityFields = new EntityFields();
-    my $title = $venueDetails->{strLocalName} . ": " . "Delete Fields";;
+    my $title = $venueDetails->{strLocalName} . ": " . $Data->{'lang'}->txt("Delete Fields");
 
     $entityFields->setEntityID($venueID);
     $entityFields->setData($Data);

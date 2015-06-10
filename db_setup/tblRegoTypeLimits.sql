@@ -3,6 +3,7 @@ CREATE TABLE tblRegoTypeLimits(
     intLimitID int NOT NULL AUTO_INCREMENT,
     intRealmID int default 0,
     intSubRealmID int default 0 ,
+    strEntityType varchar(30) default '',
     strSport varchar(20) default '',
     strPersonType varchar(30) default '',
     strPersonEntityRole varchar(30) default '',

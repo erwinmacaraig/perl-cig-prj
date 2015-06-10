@@ -213,6 +213,7 @@ sub _getConfiguration {
 					fieldtype=>'dropdown', 
 					dropdownoptions => \%Defs::TransactionStatus , 
 					allowsort=>1, 
+                    translate       => 1,
 					dbfield=>'T.intStatus'
 				}
 			],
@@ -304,7 +305,7 @@ sub SQLBuilder  {
   my $sql = '';
   { #Work out SQL
 
-    $where_list=' AND '.$where_list if $where_list and ($where_levels or $current_where);
+    $where_list=' AND '.$where_list if $where_list; # and ($where_levels or $current_where);
 
     my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
     $sql = qq[
@@ -332,26 +333,12 @@ sub SQLBuilder  {
 			FROM tblTransactions as T
                 LEFT JOIN $PRtablename as PR ON (
                     PR.intPersonRegistrationID = T.intPersonRegistrationID
-                    AND (
-                        T.intStatus=1 
-                        OR (
-                            T.intStatus=0 
-                            AND PR.strStatus NOT IN ("$Defs::PERSONREGO_STATUS_INPROGRESS", "$Defs::PERSONREGO_STATUS_REJECTED")
-                        )
-                    )
                 )
 				LEFT JOIN tblProducts as P ON (P.intProductID=T.intProductID)
 				LEFT JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID)
 				LEFT JOIN tblPerson as M ON (
                     M.intPersonID = T.intID 
                     AND T.intTableType = $Defs::LEVEL_PERSON 
-                    AND (
-                        T.intStatus=1 
-                        OR (
-                            T.intStatus=0 
-                            AND M.strStatus NOT IN ("$Defs::PERSON_STATUS_INPROGRESS", "$Defs::PERSON_STATUS_DELETED")
-                        )
-                    )
                 )
 				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
 			WHERE 
@@ -360,17 +347,15 @@ sub SQLBuilder  {
                 AND M.intPersonID IS NOT NULL
 				AND T.intStatus <> -1
                 AND (
-                        (   
-                            TL.intEntityPaymentID IN (0, $self->{'EntityID'}) 
-                            OR TL.intEntityPaymentID IS NULL
-                        ) 
-                        AND  (
-                            T.intTXNEntityID = $self->{'EntityID'} 
-                            OR PR.intEntityID=$self->{'EntityID'}
-                        )
+                    T.intTXNEntityID = $self->{'EntityID'} 
+                    OR PR.intEntityID=$self->{'EntityID'}
                 ) 
 				$where_list
     ];
+                        #(   
+                        #    TL.intEntityPaymentID IN (0, $self->{'EntityID'}) 
+                        #    OR TL.intEntityPaymentID IS NULL
+                        #) 
     return ($sql,'');
   }
 }

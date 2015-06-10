@@ -27,6 +27,7 @@ CREATE TABLE tblWFTask (
   intPersonID int(11) NOT NULL DEFAULT '0' COMMENT 'The person who is registering',
   intPersonRegistrationID int(11) NOT NULL DEFAULT '0' COMMENT 'Foreign key to the registration that triggered this task',
   intDocumentID int(11) NOT NULL DEFAULT '0' COMMENT 'The document to check - for a particular document',
+  intPaymentGatewayResponded tinyint default 0 COMMENT 'Has payment gateway responded',
 
   tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (intWFTaskID),

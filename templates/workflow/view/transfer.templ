@@ -69,17 +69,17 @@
             </div>
 <br>
             <ul class="nav nav-tabs">
-                <li id="docstab" class="active"><a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i></span></a></li>
-                <li><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Personal Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></a></li>
+                <li id="docstab" [% IF ActiveTab == 1 %]class="active"[% END %]> <a data-toggle="tab" data-visited="true" href="#memberdocs">[% Lang.txt('Documents') %]<span class="circleBg"><i class="fa fa-check documents-complete documents-incomplete"></i></span></a></li>
+                <li [% IF ActiveTab == 2 %]class="active"[% END %]><a data-toggle="tab" data-visited="false" href="#memberdetails">[% Lang.txt('Personal Information') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></a></li>
                 <li><a data-toggle="tab" data-visited="false" href="#regdetails">[% Lang.txt('Transfer Details') %]<span class="circleBg"><i class="fa fa-check memdetails-visited tab-not-visited"></i></a></li>
             </ul>
             <div class="tab-content">
                 
-                <div id="memberdocs" class="tab-pane fade in active">
+                <div id="memberdocs" class="tab-pane fade [% IF ActiveTab == 1 %]in active[% END %]">
                     [% DocumentBlock %]
                 </div>
 
-                <div id="memberdetails" class="tab-pane fade">
+                <div id="memberdetails" class="tab-pane fade [% IF ActiveTab == 2 %]in active[% END %]">
 
                     <div class="read-only">
                         <h4 style="position: relative">[% Lang.txt('Personal Information') %]</h4>
@@ -123,7 +123,7 @@
 
                         [% IF EditDetailsLink and !ReadOnlyLogin  %]
                             <span style="float: right" class="">
-                                <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2"" class="edit-link">
                                     [% Lang.txt('Edit') %]
                                 </a>
                             </span>
@@ -181,7 +181,7 @@
 
                         [% IF EditDetailsLink and !ReadOnlyLogin  %]
                             <span style="float: right" class="">
-                                <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                <a href = "[% EditDetailsLink %]&e_a=con&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
                                     [% Lang.txt('Edit') %]
                                 </a>
                             </span>
@@ -255,7 +255,7 @@
     </div>
     <div class="col-md-3">
         [% PersonSummary %]
-        <div class="registration-approved">[% Lang.txt('Transfer Status: Accepted') %]</div>
+        <div class="registration-approved">[% Lang.txt('Transfer Status') %] : [% Lang.txt('Accepted') %]</div>
     </div>
 </div>
 

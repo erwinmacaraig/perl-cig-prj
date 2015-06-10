@@ -89,7 +89,8 @@ warn("AAAAAAAAAAAAAAAAAAAA$clientTransRefID");
 
 	my $intLogID = processTransLog($db, $txn, $responsecode, $responsetext, $clientTransRefID, $paymentSettings, $chkv, $settlement_date,'', '', '', '', '');
 warn("ABOUT TO BEALL OK FOR $intLogID $paymentType");
-	if ($intLogID and ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1"))    {
+	#if ($intLogID and ($responsecode eq "00" or $responsecode eq "08" or $responsecode eq "OK" or $responsecode eq "1"))    {
+	if ($intLogID and ($responsecode eq "OK"))    {
 warn("ALL OK");
 		UpdateCart(\%Data, $paymentSettings, $client, $txn, $responsecode, $clientTransRefID);
 		#EmailPaymentConfirmation(\%Data, $paymentSettings, $clientTransRefID, $client);

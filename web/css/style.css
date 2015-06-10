@@ -258,6 +258,9 @@ body.report h1	{
     background: #d8d8d8;
     border: 1px solid #ccc;
 }
+table.table.shrink-table thead tr th {
+    padding:8px;
+}
 
 .report-numrows	{
 	font-size:8px;
@@ -288,6 +291,10 @@ body.report h1	{
 }
 .report-daterun	{
 	font-style:italic;
+}
+
+.repbutton-col {
+    width:250px;
 }
 
 TD.total {
@@ -363,6 +370,7 @@ div.row span.formw {
   float: left;
   vertical-align:middle;
   text-align: left;
+  width: 66%;
 }
 
 input, textarea {
@@ -1361,7 +1369,7 @@ ul#menu li.hover, ul#menu li:hover  {
   position: relative;
 }
 /* ----- Level 2 ----- */
-ul#menu ul  {
+/*ul#menu ul  {
   width: 16em;
   visibility: hidden;
   position: absolute;
@@ -1369,7 +1377,7 @@ ul#menu ul  {
   left: 0;
   z-index:10;
   padding: 0px;
-}
+}*/
 
 ul#menu ul li  {
   font-weight: normal;
@@ -1378,7 +1386,7 @@ ul#menu ul li  {
   float: none;
   z-index:10;
   background: #ddd;
-  width: 16em;
+  /*width: 16em;*/
 }
 
 /* IE 6 & 7 Needs Inline Block */
@@ -1401,7 +1409,10 @@ ul#menu ul ul {
 }
 
 ul#menu li:hover > ul {
-  visibility: visible;
+  /*display: none; */
+}
+ul#menu li.subnav a[aria-expanded="true"]{
+	box-shadow: 0 0 4px 0px gray;
 }
 
 .system-icon,
@@ -1518,7 +1529,7 @@ ul#menu li:hover > ul {
   padding:6px;
 }
 
-/* Passport Login */
+/*  Passport Login */
 
 body.membership-login {
   background: url(../images/bg.jpg);
@@ -1755,6 +1766,9 @@ body.membership-login #footer {
   font-size: 27px;
   margin: 10px 0 5px 0;
   line-height: 32px;
+}
+.membership-login .form-signin {
+    margin-top:30px;
 }
 
 body.membership-login .spp_loggedin {
@@ -2146,6 +2160,7 @@ body {
 
 #content {
 	font-size: 14px;
+	width: 100%;
 }
 
 .membership-wrap #globalnav-inner {
@@ -2213,7 +2228,7 @@ body {
 
 /* Regs: Navbar re-write August 2012 */
 
-.nav_session_levels {
+.nav_session_levels,  .nav_session_levelsmobile {
   display: none;
 }
 
@@ -2294,7 +2309,7 @@ body {
   font-family: 'noto_sansregular';
 }
 
-.nav_session_levels {
+.nav_session_levels, .nav_session_levelsmobile {
 	list-style-type: none;
 	margin: 30px 0 0 0;
 	position:relative;
@@ -2309,7 +2324,8 @@ body {
   z-index: 2147483647;
 }
 
-.nav_session_levels li a {
+.nav_session_levels li a,
+.nav_session_levelsmobile li a {
   display: inline-block;
   width: 100%;
   padding: 5px 10px 0;
@@ -2319,15 +2335,18 @@ body {
   border-top: 1px solid #CECECE;
 }
 
-.nav_session_levels li a:hover {
+.nav_session_levels li a:hover,
+.nav_session_levelsmobile li a:hover {
   background:#EFEFEF;
 }
 
-.nav_session_levels li:first-child a {
+.nav_session_levels li:first-child a,
+.nav_session_levelsmobile li:first-child a {
   border-top: 0px;
 }
 
-.nav_session_levels li:last-child {
+.nav_session_levels li:last-child,
+.nav_session_levelsmbile li:last-child {
   display:none;
 }
 
@@ -3061,6 +3080,8 @@ body.report h1 {
 */
 .reporttabs {
 	width: 180px;
+	position: relative;
+	text-align: center;
 }
 
 .reporttab-button {
@@ -3080,7 +3101,9 @@ body.report h1 {
 }
 
 .reporttab-data {
-	margin-left: 200px;
+	float: left;
+	width: 59%;
+  	margin-left: 1%;
 }
 
 .reporttab-datacontent {
@@ -4526,6 +4549,7 @@ div#content div.member-home-page div.task-actions {
     height:100%;
     background-color: rgba(0,0,0,0.8);
     overflow:none;
+    position: fixed;
 }
 #docViewerContent {
     padding: 30px;
@@ -4583,4 +4607,14 @@ div#content div.member-home-page div.task-actions {
 .white  {
     color:#fff;
 }
+body.membership-login .login-error-page p { 
+    color:#000;
+}
 
+.txnrow {
+    border-top:1px solid #ccc;
+    border-bottom:1px solid #ccc;
+    margin-bottom:5px;
+    padding:10px 10px 20px 10px;
+
+}

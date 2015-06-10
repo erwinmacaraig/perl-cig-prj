@@ -16,6 +16,7 @@ use FieldLabels;
 use Data::Dumper;
 use WorkFlow;
 use AuditLog;
+use FieldMessages;
 
 sub handlePersonEdit {
     my ($action, $Data) = @_;
@@ -55,12 +56,14 @@ sub handlePersonEdit {
 
     my $body = '';
     if($fieldsetType)   {
+        my $fieldMessages = getFieldMessages($Data, 'person', $Data->{'lang'}->getLocale());
         my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}, 'Person',);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
           Lang => $Data->{'lang'},
           SystemConfig => $Data->{'SystemConfig'},
           Fields => $fieldset->{$fieldsetType},
+          FieldMessages => $fieldMessages,
         );
         if($action eq 'PE_U')    {
           my $p = new CGI;
@@ -99,7 +102,8 @@ sub handlePersonEdit {
             $body = 'updated';
             if($back_screen){
                 my %tempClientValues = getClient($Data->{'client'});
-                $tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                #$tempClientValues{currentLevel} = $tempClientValues{authLevel};
+                $tempClientValues{currentLevel} = getLastEntityLevel($Data->{'clientValues'}) || $tempClientValues{authLevel};
                 my $tempClient= setClient(\%tempClientValues);
 
                 $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$tempClient&$back_screen";
@@ -169,6 +173,7 @@ sub triggerRule {
                 $personID,
                 0,
                 0,
+		$currPersonObj->getValue('intInternationalTransfer')
             );
         }
 

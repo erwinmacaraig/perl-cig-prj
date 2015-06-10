@@ -25,6 +25,7 @@ sub main	{
   my $client=param('client') || '';
   my $action = safe_param('a','action') || 'view';
   my $fileID = safe_param('f','number') || 0;
+  my $regoID = safe_param('regoID','number') || 0;
 
   my %Data=();
   my $target='viewer.cgi';
@@ -61,6 +62,7 @@ sub main	{
   my $resultHTML = '';
   if($fileID)   {
 
+    my $locale = $Data{'lang'}->getLocale();
     my $st = qq[
       SELECT 
           UF.*,
@@ -68,13 +70,19 @@ sub main	{
           tblDocuments.intDocumentTypeID,
 		  tblDocuments.strApprovalStatus,
           tblDocumentType.strLockAtLevel,
-          tblDocumentType.strDocumentName
+          COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as strDocumentName
       FROM  
           tblUploadedFiles AS UF 
           LEFT JOIN tblDocuments 
               ON UF.intFileID = tblDocuments.intUploadFileID 
           LEFT JOIN tblDocumentType 
               ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID  
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = tblDocuments.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+
       WHERE 
           UF.intFileID = ?
     ];
@@ -119,6 +127,7 @@ sub main	{
 	$TemplateData->{'showRejectButton'} = $dref->{'strApprovalStatus'} ne 'REJECTED' ? 1 : 0;
 	$TemplateData->{'showApproveButton'} = $dref->{'strApprovalStatus'} ne 'APPROVED' ? 1 : 0;
 	$TemplateData->{'client'} = $client;
+	$TemplateData->{'regoID'} = $regoID;
     $resultHTML = runTemplate(
           \%Data,
           $TemplateData,

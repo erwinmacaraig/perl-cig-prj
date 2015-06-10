@@ -1,6 +1,9 @@
 <div class="member-home-page">
     <h3 class="pageHeading">[% Name %]</h3>
-	<div class="col-md-9">
+	<div class="col-md-3 col-md-push-9">
+        [% SummaryPanel %]
+	</div>
+	<div class="col-md-9 col-md-pull-3">
 		<div class="clearfix">
 			<br />
 			<div class="read-only">
@@ -9,12 +12,12 @@
 
 					[% IF Details.LatinSurname %]
 					<div class="">
-						<span class="details-left">[% Lang.txt("Family name (Latin Characters)") %]:</span>
+						<span class="details-left">[% Lang.txt("Family Name (Latin Characters)") %]:</span>
 						<span class="detail-value">[% Details.LatinSurname %]</span>
 					</div>
 					[% ELSE %]
 					<div class="">
-						<span class="details-left">[% Lang.txt("Family name") %]:</span>
+						<span class="details-left">[% Lang.txt("Family Name") %]:</span>
 						<span class="detail-value">[% Details.strLocalSurname %]</span>
 					</div>
 					[% END %]
@@ -26,7 +29,7 @@
 					</div>
 					[% ELSE %]
 					<div class="">
-						<span class="details-left">[% Lang.txt("First name") %]:</span>
+						<span class="details-left">[% Lang.txt("First Name") %]:</span>
 						<span class="detail-value">[% Details.strLocalFirstname %]&nbsp;</span>
 					</div>
 					[% END %]
@@ -72,20 +75,24 @@
 			<br/ >
 			
 			<div class="read-only">
-				<h4>Contact details</h4>
+				<h4>[% Lang.txt('Contact Details') %]</h4>
 				<div class="read-only-text">
 					[% IF Details.Address1 %]
 					<div class="">
-					  	<span class="details-left">[% Lang.txt('Address 1:') %]</span>
-					  	<span class="detail-value">[% Details.Address1 %]</span>
-				    </div>
+					  	<span class="details-left">[% Lang.txt('Address 1') %]:</span>
+					  	<span class="detail-value">[% Details.Address1 %]
+					  	[% IF !Details.Address2 %]
+					  	&nbsp;[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]
+					  	[% END %]
+					  	</span>
+					</div>
 				    <div class="">
 				    	[% IF Details.Address2 %]
-				    	<span class="details-left">[% Lang.txt('Address 2:') %]</span>
-                        <span class="detail-value">[% Details.Address2 %]</span>
-                        <span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
-                        [% END %]
-                    </div>
+					  <span class="details-left">[% Lang.txt('Address 2') %]:</span>
+					  <span class="detail-value">[% Details.Address2 %]</span>
+					  <span class="detail-value">[% Details.Suburb %]&nbsp;[% Details.State %]&nbsp;[% Details.PostalCode %] [% Details.Country %]</span>
+				      [% END %]
+				</div>
 					[% END %]
 
 
@@ -161,7 +168,4 @@
 
 	</div>
 
-	<div class="col-md-3">
-        [% SummaryPanel %]
-	</div>
 </div>

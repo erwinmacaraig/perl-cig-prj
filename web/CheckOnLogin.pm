@@ -53,26 +53,26 @@ sub checkOnLogin	{
                          or $entityTypeID == $Defs::LEVEL_CLUB
                     )
         ){
-            addNotification(
-                $Data,
-                $entityTypeID,
-                $entityID,
-                {
-                    type => 'Payment Application',
-                    title => $Data->{'lang'}->txt('Collect your fees online-Find out more. ',0),
-                    url =>  "$Data->{'target'}?client=XXX_CLIENT_XXX&amp;a=BA_",
-                },
-            );
+            #addNotification(
+                #$Data,
+                #$entityTypeID,
+                #$entityID,
+                #{
+                    #type => 'Payment Application',
+                    #title => $Data->{'lang'}->txtA('Collect your fees online-Find out more. ',0),
+                    #url =>  "$Data->{'target'}?client=XXX_CLIENT_XXX&amp;a=BA_",
+                #},
+            #);
         }
          else  {
-            deleteNotification(
-                $Data,
-                $entityTypeID,
-                $entityID,
-                0,
-                'Payment Application',
-                0,
-            );
+            #deleteNotification(
+                #$Data,
+                #$entityTypeID,
+                #$entityID,
+                #0,
+                #'Payment Application',
+                #0,
+            #);
         }
     }
          else  {

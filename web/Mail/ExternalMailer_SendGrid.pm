@@ -43,6 +43,7 @@ sub send {
 		FromAddress
 		ReplyToAddress
 		BCCRecipients
+		CCRecipients
 		ToAddress
 		ToName
 		MessageCategory
@@ -119,9 +120,36 @@ sub send {
         $outputparams{'bcc'} = \@addresses;
     }
 
+	if(
+        $params{'CCRecipients'} 
+        and ref($params{'CCRecipients'}) eq 'ARRAY' 
+        and scalar(@{$params{'CCRecipients'}})
+    )    {
+        my @addresses = ();
+        my %address_seen = ();
+        for my $email (@{ $params{'CCRecipients'}})	{
+            next if $address_seen{$email};
+            next if $email !~/\@/;
+            next if $email !~/\./;
+            push @addresses, $email;
+            $address_seen{$email} = 1;
+        }
+        return (0, 'No Recipients') if !scalar(@addresses);
+
+        $outputparams{'cc'} = \@addresses;
+    }
+
+    my $content = '';
+    for my $k (keys %outputparams) {
+        $content .= qq[------------------------------400f182a9360\r\nContent-Disposition: form-data; name="$k"\r\nContent-Type: text/html\r\n\r\n$outputparams{$k}\r\n];
+    }
     my $url = 'https://sendgrid.com/api/mail.send.json';
     my $ua = LWP::UserAgent->new();
-    my $req = POST $url, \%outputparams;
+    #my $req = POST $url, \%outputparams;
+    my $req = POST $url;
+    $req->content_type("multipart/form-data; boundary=----------------------------400f182a9360");
+    $req->content($content);
+    $req->content_length(length($content));
     my $res= $ua->request($req);
 	my $retvalue = $res->content() || '';
 	my $retvalues = from_json($retvalue);

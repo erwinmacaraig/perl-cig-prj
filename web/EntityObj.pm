@@ -91,7 +91,7 @@ sub canDelete {
 sub _get_sql_details{
 
     my $field_details = {
-        'fields_to_ignore' => ['tTimestamp'],
+        'fields_to_ignore' => ['tTimeStamp'],
         'table_name' => 'tblEntity',
         'key_field' => 'intEntityID',
     };

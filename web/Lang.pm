@@ -11,7 +11,8 @@ sub new {
   my $class  = ref($this) || $this;
   my %params = @_;
   my $self   = {
-    'handle' => $params{'handle'}
+    'handle' => $params{'handle'},
+    'locale' => '',
   };
   ##bless selfhash to class
   bless $self, $class;
@@ -21,7 +22,7 @@ sub new {
 sub get_handle    {
     my $class = shift;
     my($locale, $SystemConfig) = @_;
-    $locale = generateLocale($SystemConfig) if !$locale;
+    $locale = $class->generateLocale($SystemConfig) if !$locale;
     my $handle = LangBase->get_handle($locale);
     if($handle) {
         $handle->bindtextdomain("messages", $Defs::fs_base."/translations");
@@ -41,7 +42,17 @@ sub AUTOLOAD {
 }
 
 
+sub getLocale  {
+    my $self = shift;
+    my (
+        $SystemConfig,
+    ) = @_;
+    return $self->{'locale'} if $self->{'locale'};
+    return $self->generateLocale($SystemConfig);
+}
+
 sub generateLocale  {
+    my $self = shift;
     my (
         $SystemConfig,
     ) = @_;
@@ -50,10 +61,9 @@ sub generateLocale  {
     my $cgi = new CGI;
     my $cookie_locale = $cgi->cookie($Defs::COOKIE_LANG) || '';
     
-    return 
-        $cookie_locale 
-        || $defaultLocale
-        || 'en_US';
+    my $locale = $cookie_locale || $defaultLocale || 'en_US';
+    $self->{'locale'} = $locale;
+    return $locale;
 }
 
 1;

@@ -178,6 +178,12 @@ sub allowedTo {
     );
     $user->load();
     my $userID = $user->id() || 0;
+
+    if ($userID != $clientValues_ref->{'userID'} and $Data->{'ptry'})   {
+        $Data->{'kickoff'} = 1;
+        $Data->{'db'} = $db;
+        return $db;
+    }
     kickThemOff() if $userID != $clientValues_ref->{'userID'};
 
     my $st = qq[
@@ -305,7 +311,7 @@ sub setClient {
 
 sub getClient {
 
-    my ($client) = @_;
+    my ($client, $origValues) = @_;
     my %clientValues = ();
 
     # DECRYPT HERE
@@ -383,9 +389,11 @@ sub getClient {
     }
 
     # HAS THIS LINK EXPIRED?
-    if ( $lastAccess and ( ( time() - $lastAccess ) > $Defs::expiryseconds ) ) {
-        $clientValues{authLevel}    = -1;
-        $clientValues{currentLevel} = -1;
+    if(!$origValues)    {
+        if ( $lastAccess and ( ( time() - $lastAccess ) > $Defs::expiryseconds ) ) {
+            $clientValues{authLevel}    = -1;
+            $clientValues{currentLevel} = -1;
+        }
     }
 
     return (%clientValues);
@@ -562,8 +570,6 @@ sub getDBConfig {
             [ 'Regions',         20,  1, 'Regions'],
             [ 'Zones',           10,  1, "Zone"],
             [ 'Zone',            10,  0, 'Zone'],
-            [ 'Association',     5,   0, 'Assoc'],
-            [ 'Associations',    5,   1, 'Assocs'],
             [ 'Clubs',           3,   1, 'Clubs'],
             [ 'Club',            3,   0, 'Club'],
             [ 'Person',          1,   0, 'Person'],

@@ -202,7 +202,7 @@ sub handlePerson {
 sub listPlayerPassport {
 	my ($Data, $personID) = @_;
 
-	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, IF(dtTo > NOW(), '', dtTo) as dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY dtFrom,dtTo DESC
+	my $query = qq[ SELECT strPersonLevel, strEntityName, strMAName, dtFrom, IF(dtTo > NOW(), '', dtTo) as dtTo FROM tblPlayerPassport WHERE intPersonID = ? ORDER BY intPlayerPassportID, dtFrom,dtTo 
 	];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute($personID);
@@ -212,7 +212,7 @@ sub listPlayerPassport {
 			From => $passportref->{'dtFrom'},
 			To => $passportref->{'dtTo'},
 			Club => $passportref->{'strEntityName'},
-			Level => $passportref->{'strPersonLevel'},
+			Level => $Defs::personLevel{$passportref->{'strPersonLevel'}} || '',
 			MAName => $passportref->{'strMAName'},
 		};
 	}
@@ -223,7 +223,7 @@ sub listPlayerPassport {
 	};
 	 my $title = '';
 	 my $resultHTML = runTemplate($Data, $PageContent, 'registration/playerpassport.templ') || '';
-	 $title = 'Player Passport';
+	 $title = $Data->{'lang'}->txt('Player Passport');
 	 return ($resultHTML, $title);
 }
 
@@ -250,15 +250,17 @@ sub personRegistrationsHistory   {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
         EntityLatinName=> $rego->{'strLatinName'} || '',
+        dtApproved=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || '',
+        dtApproved_RAW=> $rego->{'dtApproved'} || '',
+        PersonType=> $lang->txt($rego->{'PersonType'} || ''),
+        PersonLevel=> $lang->txt($rego->{'PersonLevel'} || ''),
+        AgeLevel=> $lang->txt($rego->{'AgeLevel'} || ''),
+        RegistrationNature=> $lang->txt($rego->{'RegistrationNature'} || ''),
+        Status=> $lang->txt($rego->{'Status'} || ''),
+        PersonEntityRole=> $lang->txt($rego->{'strPersonEntityRole'} || ''),
+        Sport=> $lang->txt($rego->{'Sport'} || ''),
         Date => $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtLastUpdated'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
         Date_RAW => $rego->{'dtApproved'} || $rego->{'dtLastUpdated'} || $rego->{'dtAdded'} || '',
-        PersonType=> $rego->{'PersonType'} || '',
-        PersonLevel=> $rego->{'PersonLevel'} || '',
-        AgeLevel=> $rego->{'AgeLevel'} || '',
-        RegistrationNature=> $rego->{'RegistrationNature'} || '',
-        Status=> $rego->{'Status'} || '',
-        PersonEntityRole=> $rego->{'strPersonEntityRole'} || '',
-        Sport=> $rego->{'Sport'} || '',
         SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
       };
     }
@@ -291,11 +293,13 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Registered To'),
             field => 'EntityLocalName',
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Type'),
             field  => 'PersonType',
             width  => 30,
+            defaultShow => 1,
         },
         {
             name   => $Data->{'lang'}->txt('Sport'),
@@ -318,6 +322,7 @@ sub personRegistrationsHistory   {
             name  => $Data->{'lang'}->txt('Date'),
             field => 'Date',
             sortdata => 'Date_RAW',
+            defaultShow => 1,
         },
         {
             type  => 'Selector',
@@ -385,6 +390,7 @@ my @headers = (
        		 {
            	 name => $lang->txt('Type'),
           	  field => 'strDocumentName',
+                defaultShow => 1,
        		 },
        		 {
       	      name => $lang->txt('Status'),
@@ -400,6 +406,7 @@ my @headers = (
        		     field => 'ViewDoc',
        		     type => 'HTML',
              sortable => 0,
+                defaultShow => 1,
       		  },
       		  {
        		 	name => $lang->txt('Replace'),
@@ -420,7 +427,7 @@ my @headers = (
 		$cnt++;
 		my @rowdata = ();
 		#get the documents here		
-		$grid .= qq[<br /><h2 class="section-header">$registration->{'PersonType'} - $registration->{'Sport'} - $registration->{'PersonLevel'} ] . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
+		$grid .= qq[<br /><h2 class="section-header">].$lang->txt($registration->{'PersonType'}).' - '. $lang->txt($registration->{'Sport'}) .' - ' . $lang->txt($registration->{'PersonLevel'})  . ' ' . $lang->txt('for') . qq[ $registration->{'strNationalPeriodName'} ] . $lang->txt('in') . qq[ $registration->{'strLocalName'}</h2>];
 			
 			#loop over rego documents
 			foreach my $regodoc (@{$registration->{'documents'}}){
@@ -530,10 +537,10 @@ my $addlink='';
                               <option value=""> </option>
                        ];
     while(my $dref = $sth->fetchrow_hashref()){
-        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">$dref->{'strDocumentName'}</option>];
+        $doclisttype .= qq[<option value="$dref->{'intDocumentTypeID'}">].$lang->txt($dref->{'strDocumentName'}).qq[</option>];
     }  
 	$doclisttype .= qq[ </select>
-                        <input type="submit" class="btn-inside-panels" value="Add" />
+                        <input type="submit" class="btn-inside-panels" value="].$lang->txt('Add').qq[" />
 					</form></div>];
 
 	 my $modoptions=qq[<div class="changeoptions"></div>];
@@ -823,6 +830,7 @@ sub person_details {
         subRealmID => $Data->{'RealmSubType'} || $field->{'intAssocTypeID'},
         assocID    => $Data->{'clientValues'}{'assocID'},
         hideCodes  => $Data->{'SystemConfig'}{'AssocConfig'}{'hideDefCodes'},
+        locale     => $Data->{'lang'}->getLocale(),
     );
 
     my $CustomFieldNames = CustomFields::getCustomFieldNames( $Data, $field->{'intAssocTypeID'} ) || '';
@@ -1434,7 +1442,6 @@ sub person_details {
             target               => $Data->{'target'},
             formname             => 'm_form',
             submitlabel          => $Data->{'lang'}->txt( 'Update ' . $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} ),
-            introtext            => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
             buttonloc            => $Data->{'SystemConfig'}{'HTMLFORM_ButtonLocation'} || 'both',
             OptionAfterProcessed => 'display',
             updateSQL            => qq[
@@ -1537,6 +1544,7 @@ sub person_details {
             firstoption => [ '', " " ],
             sectionname => 'other',
             readonly    => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'SystemConfig'}{"NationalOnly_$fieldname"} ? 1 : 0 ),
+            translateLookupValues => 1,
         };
     }
 
@@ -1549,7 +1557,7 @@ sub person_details {
             value => $field->{$fieldname},
             type  => 'checkbox',
             sectionname   => 'other',
-            displaylookup => { 1 => 'Yes', 0 => 'No' },
+            displaylookup => { 1 => $Data->{'lang'}->txt('Yes'), 0 => $Data->{'lang'}->txt('No') },
             readonly      => ( $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL and $Data->{'SystemConfig'}{"NationalOnly_$fieldname"} ? 1 : 0 ),
         };
     }
@@ -1742,13 +1750,13 @@ sub postPersonUpdate {
 
     my $genAgeGroup ||= new GenAgeGroup( $Data->{'db'}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $Data->{'clientValues'}{'assocID'} );
     my $st = qq[
-		SELECT DATE_FORMAT(dtDOB, "%Y%m%d"), intGender
+		SELECT DATE_FORMAT(dtDOB, "%Y%m%d"), intGender, intInternationalTransfer
 		FROM tblPerson
 		WHERE intPersonID = ?
 	];
     my $qry = $db->prepare($st);
     $qry->execute($id);
-    my ( $DOBAgeGroup, $Gender ) = $qry->fetchrow_array();
+    my ( $DOBAgeGroup, $Gender, $itc ) = $qry->fetchrow_array();
     $DOBAgeGroup ||= '';
     $Gender      ||= 0;
     my $ageGroupID = $genAgeGroup->getAgeGroup( $Gender, $DOBAgeGroup ) || 0;
@@ -1787,7 +1795,7 @@ sub postPersonUpdate {
                 $id,
                 0,
                 0,
-                0
+		$itc
             );
 
             my $body = qq[
@@ -1877,6 +1885,7 @@ sub postPersonUpdate {
                         $id,
                         0,
                         0,
+			$itc
                     );
                 }
 

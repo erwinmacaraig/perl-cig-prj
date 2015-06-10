@@ -32,13 +32,16 @@
 	
 	"mapping" : {
 		"PersonCode" : "strImportPersonCode",
+		"PalloID" : "strNationalNum",
 		"Status" : "strStatus",
 		"LocalFirstName" : "strLocalFirstname",
 		"LocalLastName" : "strLocalSurname",
+		"LocalPreviousLastName" : "strLocalMiddlename",
 		"LocalLanguageCode" : "intLocalLanguage",
 		"PreferredName" : "strPreferredName",
 		"LatinFirstName" : "strLatinFirstname",
 		"LatinLastName" : "strLatinSurname",
+		"LatinPreviousLastName" : "strLatinMiddlename",
 		"DateOfBirth" : "dtDOB",
 		"Gender" : "intGender",
 		"Nationality" : "strISONationality",
@@ -50,10 +53,9 @@
 		"Address1" : "strAddress1",
 		"Address2" : "strAddress2",
 		"PostalCode" : "strPostalCode",
-		"Suburb" : "strSuburb",
-		"State" : "strState",
+		"Town" : "strSuburb",
+		"Suburb" : "strState",
 		"Email" : "strEmail",
-		"DemographicField2" : "intEthnicityID",
-		"DemographicField3" : "intNatCustomLU1"
+		"Identifier" : "strOtherPersonIdentifier"
 	}
 }

@@ -64,6 +64,7 @@ sub readCSVFile{
 	$csv_config->{'encoding_in'} = "iso-8859-1";
 	$csv_config->{'encoding_out'} = "cp1252";
 	$csv_config->{binary} = 1;
+	$csv_config->{'allow_loose_quotes'} = 1;
 	
     my @tag = split(/\.([^.]+)$/,$table,2);
     my $object =  $tag[0];
@@ -71,6 +72,13 @@ sub readCSVFile{
     my $csv = Text::CSV::Encoded->new($csv_config) or die "Text::CSV error: " . Text::CSV->error_diag;
 	
     my $tblPRFlag = 0;
+    my $tblPersonFlag = 0;
+    my $tblOrgFlag = 0;
+
+    $tblPersonFlag = 1 if ($object eq "tblPerson");
+    $tblOrgFlag = 1 if ($object eq "tblEntity.organisation");
+    print STDERR Dumper $tblOrgFlag;
+
 	if( $object =~ /(\w+)_(\d+)/ && $1 eq "tblPersonRegistration") {
         $tblPRFlag = 1;
         copyDbTable($db, $1."_1", $object);
@@ -108,16 +116,28 @@ sub readCSVFile{
     }
 
     say 'Total Input Records: #'.$ctr;
-    my $records = ApplyPreRules($config->{"rules"},\@records);
-    my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
+    #print STDERR Dumper @records;
 
-    #print STDERR Dumper $inserts;
-    insertBatch($db,$tbl,$inserts,$importId, $realmID);
-    my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
-	say Dumper($links);
-	say Dumper($entstruct);
-    insertBatch($db,"tblEntityLinks",$links,$importId);
-	insertBatch($db,"tblTempEntityStructure",$entstruct,0,0);
+    if($tblPersonFlag) {
+        insertBatch($db,$tbl,\@records,$importId, $realmID);
+    }
+
+    if($tblOrgFlag) {
+        my $records = ApplyPreRules($config->{"rules"},\@records);
+        my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
+
+        #print STDERR Dumper $inserts;
+        insertBatch($db,$tbl,$inserts,$importId, $realmID);
+        #insertBatch($db,$tbl,\@records,$importId, $realmID);
+        my ($links, $entstruct) = ApplyPostRules($tbl,$config->{"rules"},\@records);
+        #say Dumper($links);
+        #say Dumper($entstruct);
+        insertBatch($db,"tblEntityLinks",$links,$importId);
+
+        #removing call to insertBatch for tblTempEntityStructure; automatic/tempEntityStructure.pl shall handle this
+        #insertBatch($db,"tblTempEntityStructure",$entstruct,0,0);
+    }
+
     close $fh;
 }
 
@@ -185,6 +205,8 @@ sub ApplyPostRules{
            ($links, $entstruct) = insertLink($links,$records,$rule);
         } elsif($rule->{"rule"} eq "entityLink") {
 			($links, $entstruct) = entityLink($links,$records,$rule);
+        } elsif($rule->{"rule"} eq "entityLink2") {
+			($links, $entstruct) = entityLink2($links,$records,$rule);
 		}
     }
     return $links, $entstruct;

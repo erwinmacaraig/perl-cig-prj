@@ -2,6 +2,7 @@ package LangBase;
 
 @EXPORT= (qw/txt lexicon/);
 use Locale::Maketext::Gettext;
+use Encode;
 use base ('Locale::Maketext::Gettext');
 
 sub txt (@) { 
@@ -11,10 +12,14 @@ sub txt (@) {
   my @temp = @_;
   $temp[0] =~ s/^\n+//m;
   $temp[0] =~ s/\n+$//m;
+  return $temp[0] if($temp[0] =~ /[^\0-\x7f]/); #return key if key is non-ascii
+  for my $b (@temp) {
+    $b = Encode::decode('UTF-8',$b);
+  }
 
   my $s = $self->maketext(@temp); 
   return $s;
-  #return qq[<span style="color:red !important;">$s</span>];
+  #return qq[<span style='color:red !important;'>$s</span>];
 } 
 
 # I decree that this project's first language is English.
@@ -69,9 +74,23 @@ package LangBase::en_us;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
+package LangBase::en_bsw;
+use base qw(Locale::Maketext::Gettext);
+return 1;
+
+package LangBase::fi_fi;
+use base qw(Locale::Maketext::Gettext);
+return 1;
+
 package LangBase::fr_fr;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
+package LangBase::sv_se;
+use base qw(Locale::Maketext::Gettext);
+return 1;
 
+package LangBase::zh_cn;
+use base qw(Locale::Maketext::Gettext);
+return 1;
 

@@ -15,6 +15,7 @@ use EntityFieldsSetup;
 use FieldLabels;
 use Data::Dumper;
 use AuditLog;
+use FieldMessages;
 
 sub handleEntityEdit {
     my ($action, $Data) = @_;
@@ -40,8 +41,10 @@ sub handleEntityEdit {
         }
     }
 
+    my $permissionType = 'Entity';
     my $fieldset = undef;
     if($currentLevel == $Defs::LEVEL_CLUB)  {
+        $permissionType = 'Club';
         @sections = ('core', 'contactdetails','roledetails');
         if($action eq 'EE_D')   {
             $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=EE_E&e_a=core">].$Data->{'lang'}->txt('edit').qq[</a></div>];
@@ -66,12 +69,15 @@ sub handleEntityEdit {
     my $body = '';
 
     if($action eq 'EE_U')    {
-          my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, 'Entity',);
+          my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, $permissionType,);
+          my $fieldMessages = getFieldMessages($Data, lc($permissionType), $Data->{'lang'}->getLocale());
+
           my $obj = new Flow_DisplayFields(
               Data => $Data,
               Lang => $Data->{'lang'},
               SystemConfig => $Data->{'SystemConfig'},
               Fields => $fieldset->{$e_action},
+              FieldMessages => $fieldMessages,
           );
           my $p = new CGI;
           my %params = $p->Vars();
@@ -124,7 +130,7 @@ sub handleEntityEdit {
           }
     }
     if($action eq 'EE_E')    {
-        my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, 'Entity',);
+        my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$e_action}, $permissionType,);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
           Lang => $Data->{'lang'},
@@ -148,7 +154,7 @@ sub handleEntityEdit {
     }
     if($action eq 'EE_D')    {
         for my $section (@sections) {
-            my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$section}, 'Entity',);
+            my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$section}, $permissionType,);
             my $obj = new Flow_DisplayFields(
               Data => $Data,
               Lang => $Data->{'lang'},
@@ -236,11 +242,12 @@ sub getFieldNames {
         strLegalID
         strImportEntityCode
         intImportID
-        strAcceptSelfRego
         strShortNotes
         intNotifications
         strOrganisationLevel
         intFacilityTypeID
+        strBankAccountNumber
+        intAcceptSelfRego
     ));
     return \@fields;
 }

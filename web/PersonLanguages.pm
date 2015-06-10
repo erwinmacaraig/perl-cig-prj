@@ -44,7 +44,7 @@ sub getPersonLanguages {
         while (my $dref = $query->fetchrow_hashref) {
             next if($dref->{'intSubRealmID'} and $dref->{'intSubRealmID'} != $subtypeID);
             if($withLocale) {
-                next if $dref->{'strLocale'};
+                next if !$dref->{'strLocale'};
             }
             $dref->{'language'} = $dref->{$orderfield};
             push @languages, $dref;

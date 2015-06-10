@@ -122,7 +122,6 @@ function checkIfDocsAllApproved() {
         //}
         //localStorage.removeItem("workflowtabs");
         //this means you are viewing a new work task
-        console.log("new task:" + taskID);
     }
     
  }
@@ -133,13 +132,54 @@ function calculateProducts(){
     });
     $('.totalValue').html('$'+totalProduct.toFixed(2));
 }
+function updateRegoProductsTotal(chkb,id_cost,id_total,client,formatter){	
+	var total = parseFloat($("#"+id_total).val());
+   
+	//if( $('form#flowFormID td.col-1 input[type="checkbox"]:checked').prop("checked") == true){
+	if( $('#'+chkb).prop("checked") == true){
+		total = total + parseFloat($("#"+id_cost).val());	
+	}	
+	else {
+		total = total - parseFloat($("#"+id_cost).val());
+	}
+	
+	if(total > 0){
+		$("#payOptions").css("display","block");
+	}
+	else {
+		$("#payOptions").css("display","none");
+		total = 0;
+	}
+	//$("#totalAmountUnpaidInFlow").val(total);
+	$('#TotalAmountUnformatted').val(total);
+	$.ajax(
+		{
+			method: "POST",
+			url:formatter + "/formatcurrencyamount.cgi",
+			data:"amount=" + total + "&client="+ client 			
+		}).done(
+			function(formattedamount){
+				$("#totalAmountUnpaidInFlow").html(formattedamount);
+				
+			}
+	);
+
+
+
+
+	//$("#"+id_total).html(total);
+	//total = parseFloat(total);
+	//console.log(total);
+	//alert(total);
+}
+
 
 $(document).ready(function(){
-    
     calculateProducts();
-
-    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){
-        calculateProducts();
+    $('[data-toggle="popover"]').popover()
+	
+    $('form#flowFormID td.col-1 input[type="checkbox"]').click(function(){        
+		
     });
 
     $("#menu li.subnav a.menutop").mouseover(function(){
@@ -197,14 +237,48 @@ $(document).ready(function(){
     $(".document-upload").insertAfter($("fieldset").first());
 
      $(document).on("change", "input.paytxn_chk", function(){
-        if(this.checked){
-          $('#payment_manual').show();
-          $('#payment_cc').show();
-        } else {
-          $('#payment_manual').hide();
-          $('#payment_cc').hide();
-        }
-     })
+		var totalamount = 0;
+		$("#l_intAmount").val('');
+		$("#block-manualpay").css('display','none');
+		var client = $('#clientstr').val();
+		//if(this.checked){
+          //$('#payment_manual').show();
+		 // } else {
+          //$('#payment_manual').hide();
+          //$('#payment_cc').hide();
+        //}
+          
+		  //check if manual pay is enabled
+			if($('#manualpayment').length || $('#payment_cc').length){
+				$('input[type="checkbox"]:checked').each(function (){
+					totalamount += parseFloat(this.value);
+					$("#block-manualpay").css('display','block');
+				});
+				$("#l_intAmount").val(totalamount.toFixed(2));
+				//
+				$.ajax(
+				{
+					method: "POST",
+					url:"formatcurrencyamount.cgi",
+					data:"amount=" + totalamount + "&client="+ client 			
+				}).done(
+					function(formattedamount){
+					$("#manualsum").html(formattedamount);				
+					}
+				);
+				//
+				if(totalamount > 0){
+					$('#payment_manual').css('display','block');
+					$('#payment_cc').show();
+				}
+				else {
+					$('#payment_manual').css('display','none');
+					$('#payment_cc').hide();
+				}
+				
+			}
+      
+     });
 
      $("#btn-manualpay").click(function() {
             if($('#paymentType').val() == '') {
@@ -257,6 +331,7 @@ $(document).ready(function(){
     jQuery("input.search").on("keypress", function(){
 		jQuery("input.search").quicksearch();
 	});
+	
 
     jQuery("input[type=checkbox]#selectall").on("click", function(){
         var targetprefix = jQuery(this).data("targetprefix");
@@ -268,9 +343,74 @@ $(document).ready(function(){
         }
     });
 
-});
-jQuery(document).ready(function(){
+        if ($(window).width() <= 480) {  
+            jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
+            jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
+            jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
+            
+            jQuery(".defaultnav").attr("style", "display:none;");
+            jQuery(".smartphonenav").attr("style", "display:block;");
+        }else{
+            jQuery(".defaultnav").attr("style", "display:block;");
+            jQuery(".smartphonenav").attr("style", "display:none;");
+        }
+        
+    $(window).resize(function() {
+        if ($(window).width() <= 480) {  
+            jQuery("#menu .subnav").addClass("dropdown").removeClass("subnav");
+            jQuery("#menu .dropdown a.menutop").addClass("dropdown-toggle").removeClass("menutop").attr("aria-expanded", true).attr("role", "button").attr("data-toggle", "dropdown");
+            jQuery("#menu .dropdown ul").addClass("dropdown-menu").attr("role", "menu");
+        
+            jQuery(".defaultnav").attr("style", "display:none;");
+            jQuery(".smartphonenav").attr("style", "display:block;");
+        }else{
+            jQuery(".defaultnav").attr("style", "display:block;");
+            jQuery(".smartphonenav").attr("style", "display:none;");
+        }
+    });   
 
+});
+/*
+$(window).scroll(function() {
+
+    if ($(this).scrollTop()>0)
+     {
+        if ($(window).width() <= 480) {  
+            $('.pageHeading').fadeOut();
+        }
+     }else{
+        if ($(window).width() <= 480) { 
+            $('.pageHeading').fadeIn();
+        }
+     }
+});
+*/
+var columnCounter = 0;
+jQuery(document).ready(function(){
+    $(window).resize(function(){
+        $("body,nav").removeAttr("style")
+        // no padding for view in dashboards 
+        if($(window).width()< 612){
+        }
+    }) 
+    // fixingnav of nav in mobile sizez
+    $(".navbar-toggle").click(function(){
+        if($(window).width()>=275 && $(window).width()<313){
+            $(".navbar-fixed-top").animate({
+                'margin-left':'0'
+            })
+            $(".header").animate({
+                "margin-left": "72%"
+            })
+            $(".navmenu-fixed-left").addClass("opend")
+            $(".offcanvas:not(.opend)").css('display','block');
+            $(".offcanvas:not(.navmenu-fixed-left)").animate({
+              "margin-left": "-34%"
+            })
+        }
+    })
+
+    var headers = "";
     jQuery('a.btn-proceed').each(function() {
         var t = jQuery(this).html();
         jQuery(this).html(jQuery(this).html() + ' <span class ="fa fa-angle-right fa-2x proceed-chevron"></span>');
@@ -279,7 +419,7 @@ jQuery(document).ready(function(){
         var text = jQuery(this).val();
         var id = 'replaced' + jQuery(this).attr('id');
         var classes = jQuery(this).attr('class');
-        jQuery(this).after('<a href = "#" class = "' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
+        jQuery(this).after('<a href = "#" class = "btn ' + classes + '" id = "' + id + '">' + text + '<span class ="fa fa-angle-right fa-2x proceed-chevron"></span></a>');
         if(!jQuery(this).is(':visible')) {
             jQuery('#' + id).hide(); 
         }
@@ -296,5 +436,108 @@ jQuery(document).ready(function(){
         });
 
     });
+    $(".res-table tr td").click(function(){
+        var index = $(this).index()
+        $(".res-table tbody tr").each(function() {
+        $(this).children(':eq('+index+')').addClass('ellipsis');
+       
+        })
+    });
 
+    function checkWidth(){
+        return $(window).width() < 800
+    }
+    jQuery('.res-table').each(function() {
+        var table = this;
+        if( checkWidth() == true  || $(table).find("thead tr th").length > 20){
+
+        var dropdownGenerator = function(){
+            var headers = '';
+            $(table).find(".res-headers th").each(function() {
+                 // create li elements for our custom dropdown
+                 if ($(this).html() != "") {
+                    // check if a header is empty
+                    var headerChecker = function(val){if(val == " "){return "Actions";}else{return val;}}
+                     headers += '<li>\
+                                  <a selcol="false" ellipsis="false" class="small responsiveTableColumnOptions" tabindex="-1" >  \
+                                    &nbsp;'+headerChecker($(this).html())+'\
+                                  </a>\
+                                </li>';
+                    columnCounter += 1;
+                };
+            });
+            // wrap up made li's with a custom ul
+            return '<div class="button-group responsiveTablesDropDown">\
+                      <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown">' + $('#label_columns').val() + ' <i class = "fa fa-caret-down"></i></button>\
+                          <ul style="top:inherit" class="dropdown-menu res-items-group">\
+                          '+ headers +'\
+                          </ul>\
+                    </div>';
+        }
+        // check if dropdown is empty
+        if($(table).find(".res-items-group").length<=0){
+            $(table).wrap('<div class="res-wrapper"></div>'); 
+            $(table).before(dropdownGenerator())
+            var toInitialize = $(table).attr("initial-cols").split("-").map(Number);   
+            var toInitializeLength = toInitialize.length;
+            for (var v = 0; v < toInitializeLength; v++) {
+                $(table).parent().parent().find(".res-items-group li:eq("+toInitialize[v]+") a").attr('selcol','true');
+            };
+            // wrap entire table with a div for width purposes
+            // fit the width of visible columns based on percentage
+            $(table).find('thead tr th:not(.res-invisible)').each(function () {
+                $(this).css('width',90/columnCounter+"%")    
+            });   
+        }
+        responsiveTableDraw(table);
+    }
+    });
 });
+
+jQuery('.container').on( 'draw.dt','.res-wrapper .res-table', function () {
+    responsiveTableDraw(this);
+});
+
+jQuery('.container').on('click','a.responsiveTableColumnOptions',function(e) {
+    var st= jQuery(this).attr('selcol');
+    var newstatus = jQuery(this).attr('selcol') == 'true' ? 'false' : 'true';
+    jQuery(this).attr('selcol',newstatus);
+    var t = jQuery(this).closest('.res-wrapper').find('table.res-table');
+    responsiveTableDraw(t);
+    $(this).closest(".dropdown-menu").prev().dropdown("toggle");
+    e.preventDefault();
+    return false;
+});
+
+function responsiveTableDraw(table) {
+    var activeColumns = [];
+    $(table).parent().parent().find('.responsiveTablesDropDown li a').each(function(index) {
+        if(jQuery(this).attr('selcol') == 'true') {
+            activeColumns.push(index);
+        }
+    });
+
+    $.each(['tbody td', 'thead th', 'thead td'], function(index, ele) {
+        $(table).find(ele).each(function(){
+            var columnIndex = $(this).index();
+            if($.inArray(columnIndex, activeColumns) != -1){
+               $(this).removeClass('res-invisible');
+            }
+            else    {
+               $(this).addClass('res-invisible');
+            }
+        });
+    });
+    return true;
+}
+
+function spinnerGenerator(command){
+    if(command == "kill"){
+        $(".spinner").remove()
+    }else if(command == "generate"){
+        $("body").append('<div class="spinner"></div>')
+    }else{
+        alert("nothing to do")
+    }
+}
+

@@ -56,7 +56,6 @@ use Logo;
 use FieldConfig;
 use EntitySettings;
 
-use RegoFormReplication;
 use AddToPage;
 use AuthMaintenance;
 use Dashboard;
@@ -68,6 +67,7 @@ use EntityRegistrationAllowedEdit;
 use PersonRegistrationFlow_Backend;
 use PersonRegistrationFlow_Bulk;
 use PendingRegistrations;
+use IncompleteRegistrations;
 
 use PersonRequest;
 
@@ -75,6 +75,7 @@ use Log;
 use Data::Dumper;
 use ListAuditLog;
 
+use PaymentDisplay_LoggedOff;
 main();
 
 sub main {
@@ -95,6 +96,21 @@ sub main {
     $Data{'clientValues'} = \%clientValues;
 
     # AUTHENTICATE
+    my $paytry = param('ptry') || '';
+    my $EncPayTry = param('eptry') || '';
+    $Data{'ptry'} = $paytry;
+    if ($paytry)    {
+        my $m;
+        $m = new MD5;
+        $m->reset();
+        $m->add($paytry);
+        my $encLogID= uc($m->hexdigest());
+        if ($encLogID ne $EncPayTry)    {
+            $Data{'ptry'} = 0;
+            $Data{'eptry'} = 0;
+            $paytry = 0;
+        }
+    }
     my $db = allowedTo( \%Data );
 
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
@@ -104,7 +120,13 @@ sub main {
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
     initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
 
+    if ($Data{'kickoff'} and $db and $paytry)  {
+    ## Display Payment Summary if logged off
+        paymentDisplay_LoggedOff(\%Data, $paytry);
+        return;
+    }
     logPageData( \%Data, $action, $client);
 
     $clientValues{'currentLevel'} = safe_param( 'cl', 'number' )
@@ -166,7 +188,7 @@ sub main {
         }
     }
     elsif ( $action =~ /^P_/ ) {
-        my $personID= getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
+        my $personID= param('personID') || getID($Data{'clientValues'},$Defs::LEVEL_PERSON);
         ( $resultHTML, $pageHeading ) = handlePerson( $action, \%Data, $personID);  
     }
     elsif ( $action =~ /^DOC_/ ) {  
@@ -297,12 +319,20 @@ use PersonFlow;
 use TransferFlow;
         ( $resultHTML, $pageHeading ) = handleTransferFlow($action, \%Data);
     }
+    elsif ( $action =~ /^PLF_/ ) {
+use LoanFlow;
+        ( $resultHTML, $pageHeading ) = handleLoanFlow($action, \%Data);
+    }
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
        # $pageHeading = $pageHeading . "entityID = " . $entityID;    
-}
+    }
+    elsif ( $action =~ /^INCOMPLPR_/ ) {
+        my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
+        ( $resultHTML, $pageHeading ) = handleIncompleteRegistrations($action, \%Data, $entityID);
+    }
     elsif ( $action =~ /^PRA_/) {
         ($resultHTML, $pageHeading) = handlePersonRequest($action, \%Data);
     }
@@ -314,6 +344,11 @@ use TransferFlow;
 		use PayInvoice;
 		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
 		($resultHTML, $pageHeading) = PayInvoice::handlePayInvoice($action, \%Data, $clubID);				
+	}
+	elsif($action =~ /^TXN_FIND/){
+		use FindPayment;
+		my $clubID = getID($Data{'clientValues'},$Defs::LEVEL_CLUB); 
+		($resultHTML, $pageHeading) = FindPayment::handleFindPayment($action, \%Data, $clubID);				
 	}
 
 	elsif($action eq 'itcf'){
@@ -328,7 +363,7 @@ use TransferFlow;
 
    
     # BUILD PAGE
-    if ( !$report ) {
+    #if ( !$report ) {
         $client = setClient( \%clientValues );
         $clientValues{INTERNAL_db} = $db;
         my $navbar = navBar( \%Data, $DataAccess_ref, $Data{'SystemConfig'} );
@@ -343,8 +378,8 @@ use TransferFlow;
 		] if $pageHeading;
         pageMain( $Defs::page_title, $navbar, $resultHTML, \%clientValues,
             $client, \%Data );
-    }
-    else { printReport( $resultHTML, $lang ); }
+    #}
+    #else { printReport( $resultHTML, $lang ); }
     disconnectDB($db);
 }
 

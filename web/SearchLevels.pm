@@ -40,8 +40,16 @@ sub getLevelQueryStuff	{
             INNER JOIN tblEntity as E ON (
                 E.intEntityID = PR.intEntityID
             ) 
-            LEFT JOIN tblEntityTypeRoles as ETR ON (
-                ETR.strEntityRoleKey = PR.strPersonEntityRole
+            LEFT JOIN tblEntity as tblClub ON (
+                PR.intEntityID = tblClub.intEntityID
+                AND tblClub.intEntityLevel = $Defs::LEVEL_CLUB
+            ) 
+            LEFT JOIN tblTempEntityStructure as RL ON (
+                E.intEntityID = RL.intChildID
+                AND RL.intParentLevel = $Defs::LEVEL_REGION
+            )
+            LEFT JOIN tblEntity as tblRegion ON (
+                RL.intParentID = tblRegion.intEntityID
             ) 
         ] ;
         $where_levels.=qq[ 

@@ -24,6 +24,8 @@ use CGI qw(param unescape escape);
 use PayPal;
 use Gateway_Common;
 use GatewayProcess;
+use PayTry;
+use MCache;
 
 main();
 
@@ -68,6 +70,7 @@ sub main	{
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
   my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
   $Data{'lang'}=$lang;
+    $Data{'cache'}  = new MCache();
 
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
     my $payTry = payTryRead(\%Data, $clientTransRefID, 0);
@@ -170,17 +173,17 @@ sub main	{
 	}
 	elsif ($action eq 'C')	{
         print STDERR "PAYPAL CANCELLLED!!!!!!\n";
-#    payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
+#    payTryRedirectBack(\%Data, $payTry, $client, $clientTransRefID, 1);
 #		my $msg = qq[<div align="center" class="warningmsg" style="font-size:14px;">You cancelled the Transaction</div>];
 #		my $body = displayPaymentResult(\%Data, $clientTransRefID, 1, $msg);
 #		$body .= qq[<br><p><a href="$Defs::base_url/main.cgi?client=$client&a=P_TXNLog_list&mode=p">Return to Membership System</a></p>] if ! $external;
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
-        payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
+        payTryRedirectBack(\%Data, $payTry, $client, $clientTransRefID, 1);
 	}
 	elsif ($action eq 'S')	{
 		my $body = payPalUpdate(\%Data, $paymentSettings, $client, $clientTransRefID, $INtoken, $Order, $external, $encryptedID);
 		#pageForm( 'Sportzware Membership', $body, $Data{'clientValues'}, q{}, \%Data);
-        payTryRedirectBack($payTry, $client, $clientTransRefID, 1);
+        payTryRedirectBack(\%Data, $payTry, $client, $clientTransRefID, 1);
 	}
 	disconnectDB($db);
 

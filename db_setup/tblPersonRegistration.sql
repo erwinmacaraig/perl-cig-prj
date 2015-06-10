@@ -38,6 +38,12 @@ CREATE TABLE tblPersonRegistration_XX (
     intPersonRequestID INT DEFAULT 0,
     intNewBaseRecord TINYINT DEFAULT 0,
     `intImportId` INT NULL,
+    intWasActivatedByPayment tinyint default 0 COMMENT 'Debug flag for if record was auto activated by Payment',
+    `strOldStatus` varchar(30) DEFAULT '',
+    `intPersonRequestID` INT NOT NULL DEFAULT 0 COMMENT 'For tracking purposes if entry came from Person Request (TRANSFER or ACCESS)',
+    `intNewBaseRecord` TINYINT NOT NULL DEFAULT 0,
+    intPersonLevelChanged TINYINT DEFAULT 0,
+    strPreviousPersonLevel varchar(30) DEFAULT '',
 
   PRIMARY KEY  (intPersonRegistrationID),
   KEY index_intPersonID (intPersonID),

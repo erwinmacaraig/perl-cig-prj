@@ -285,7 +285,6 @@ strAddress2 => {
       target => $Data->{'target'},
       formname => 'n_form',
       submitlabel => $Data->{'lang'}->txt('Update'),
-      introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
       NoHTML => 1, 
       updateSQL => qq[
                 UPDATE tblEntity
@@ -515,7 +514,7 @@ sub listEntities {
   ];
 
   my $title=$Data->{'SystemConfig'}{"PageTitle_List_$newentityLevel"} 
-    || "$Data->{'LevelNames'}{$newentityLevel.'_P'} in $currentname"; ###needs translation ->  WHAT in WHAT? 
+    || $Data->{'lang'}->txt("Regions in [_1]",$currentname); ###needs translation ->  WHAT in WHAT? 
     $title = $Data->{'lang'}->txt($title);
   return ($resultHTML,$title);
 }

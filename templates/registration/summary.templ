@@ -41,14 +41,13 @@
 				    </div>
 				</div>
 			</div>
-	<div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 				<div class="read-only registration-details">
 					 <h4>[% Lang.txt('Registration Details') %]</h4>
 				     <div class="read-only-text clearfix">
 					    <ul>
 					    	<li><span class="details-left">[% Lang.txt("Register to") %]:</span> <span class="detail-value">[% registration.strLocalName %]</span></li>
-					    	<li><span class="details-left">[% Lang.txt("Register as") %]:</span> <span class="detail-value">[% registration.PersonType %][% IF registration.roleName %] - [% Lang.txt(registration.roleName ) %][% END %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Register as") %]:</span> <span class="detail-value">[% Lang.txt(registration.PersonType) %][% IF registration.roleName %] - [% Lang.txt(registration.roleName ) %][% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Sport") %]:</span> <span class="detail-value">[% IF registration.Sport %] [% registration.Sport %] [% ELSE %] - [% END %]</span></li>
 					    	[% IF registration.PersonLevel %]
 					    		<li><span class="details-left">[% Lang.txt("Level") %]:</span> <span class="detail-value">[% registration.PersonLevel %]</span></li>							
@@ -61,8 +60,26 @@
 				     </div>
 				</div>
 			</div>
-	[% IF registration.documents.size %]
-	<div class="col-md-6">
+    [% IF DisplayPayment %]
+		[% IF payment.totalPaymentDue %]
+			<div class="col-md-6">
+				<div class="read-only license-details">
+					 <h4>[% Lang.txt('Payment Options') %]</h4>
+				     <div class="read-only-text clearfix">
+					    <ul>
+					    	<li><span class="details-left">[% Lang.txt("Total") %]:</span> <span class="detail-value">[% CurrencyFormat.format(payment.totalPaymentDue) %]</span></li>
+					    	<li><span class="details-left">[% Lang.txt("Payment Method") %]:</span> <span class="detail-value">[% Lang.txt(payment.paymentMethodText) %]</span></li>
+					    </ul>
+					    <a href="[% editlink %]&amp;rfp=p" class="pull-right">[% Lang.txt('Edit') %]</a>
+				     </div>
+				</div>
+			</div>
+		[% END %]
+    	[% END %]
+
+		[% IF registration.documents.size %]
+			<div class="clearfix" style="clear:both;">&nbsp;</div>
+			<div class="col-md-6">
 		<div class="read-only">
 			 <h4>[% Lang.txt('Documents') %]</h4>
 			 <div class="read-only-text documents-list clearfix">
@@ -76,15 +93,15 @@
                 <a href="[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt('Edit') %]</a>
 		     </div>
 		</div>
-	</div>
-	[% END %]
+			</div>
+		[% END %]
 
 	<!--<form action="[% target %]" method="POST">
 	    <input type="hidden" name="a" value="c">
 	[% FOREACH h IN  hidden_ref %]
 	<input type="hidden" name="[% h.key %]" value="[% h.value %]">
 	[% END %]
-	<input type="submit" name="submitb" value="[% Lang.txt('Submit to Member Association') %]" class = "button proceed-button"><br><br>
+	<input type="submit" name="submitb" value="[% Lang.txt('Submit for approval') %]" class = "button proceed-button"><br><br>
 	            </form>
 	-->
 	</div>

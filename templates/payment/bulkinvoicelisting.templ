@@ -1,11 +1,14 @@
-<p>Please select the people you wish to register from the list below and click on the update button to commit your change.</p>
+<!-- <p>[% Lang.txt('Please select the people you wish to register from the list below and click on the update button to commit your change') %].</p> -->
+
 	<script type="text/javascript">
 		var clicked;
-		function submitForm(){
+		function AsubmitForm(){
 			document.payform.action = clicked;
+			//check if there is a transaction
 			return true;  
+		}
 	</script>
-    <form name="payform" method="POST" onsubmit="submitForm(); return true;"> 
+    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action="main.cgi"> 
 	[% grid %]   
     <input type="hidden" name="a" value="[% nextAction %]">
     <input type="hidden" name="client" value="[% client %]">
@@ -13,7 +16,9 @@
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">
 [% END %]
-
+[% IF transactions %]
+[% transactions %]
+[% END %]
 <br />
 [% gateway_body %]
             </form>

@@ -13,6 +13,9 @@ use PageMain;
 use Lang;
 use Login;
 use TTTemplate;
+use SystemConfig;
+use Localisation;
+use LanguageChooser;
 
 main();
 
@@ -26,6 +29,9 @@ sub main {
     my $target = 'authlist.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
+
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $email = param('email') || '';
     my $password = param('pw') || '';
 
@@ -91,19 +97,56 @@ sub main {
     else    {
       $body = runTemplate(
         \%Data,
-        {'errors' => $errors},
+        {'returnURL'=>"../index.cgi",'errors' => $errors},
+        #{'returnURL'=>"$Data{'SystemConfig'}{'loginError_returnURL'}" ,'errors' => $errors},
         'user/loginerror.templ',
       );
     }
 
     my $title = 'Login';
 
-    pageForm(
-              $title,
-              $body,
-              {},
-              '',
-              \%Data,
+
+    my $title=$lang->txt('APPNAME') || 'FIFA Connect';
+    initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
+    my %TemplateData = (
+        Lang => $lang,
+        SystemConfig => $Data{'SystemConfig'},
+        DirPrefix => '../',
     );
+
+    my $nav = runTemplate(\%Data, \%TemplateData, 'user/globalnav.templ',);
+
+    %TemplateData = (
+        Lang => $lang,
+        title => $title,
+        globalnav=> $nav,
+        pagebody=> $body,
+        SystemConfig => $Data{'SystemConfig'},
+        LanguageChooser => genLanguageChooser(\%Data),
+        DirPrefix => '../',
+    );
+
+
+    if($Data{'RedirectTo'}) {
+        pageForm(
+                  $title,
+                  $body,
+                  {},
+                  '',
+                  \%Data,
+                  'user/index.templ',
+        );
+
+    }
+    else    {
+        print "Content-type: text/html\n\n";
+        print runTemplate(
+            \%Data,
+            \%TemplateData,
+            'user/index.templ',
+        );
+    }
+
 }
 

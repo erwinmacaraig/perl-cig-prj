@@ -36,16 +36,15 @@ sub handleTransactions	{
 
   	my $resultHTML='';
 	my $heading='';
+	my $lang = $Data->{'lang'};
 
-  if ($action =~ /_TXN_LIST/) {
-        $entityID = getLastEntityID($Data->{'clientValues'});
-		($resultHTML,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
-  }
-  elsif ($action =~ /_TXN_EDIT/) {
+  if ($action =~ /_TXN_EDIT/) {
 		($resultHTML,$heading) = displayTransaction($Data, $intTableID, $ID, 1);
+		$action =~ s/_EDIT/_LIST/ if (defined param("HF_subbutact"));
   }
   elsif ($action =~ /_TXN_ADD/) {
 		($resultHTML,$heading) = displayTransaction($Data, $intTableID, 0, 1);
+		$action =~ s/_ADD/_LIST/ if (defined param("HF_subbutact"));
   }
   elsif ($action =~ /_TXN_DEL/) {
 		($resultHTML,$heading) = deleteTransaction($Data, $intTableID, $ID);
@@ -55,8 +54,6 @@ sub handleTransactions	{
 		($resultHTML,$heading) = queryBlkTXN($action, $Data, $intTableID); 
 		#queryBlkTXNviaInvoice($action, $Data, $intTableID) if  ($action =~ /_step2/ && param('d_strInvoiceNumber')); 
 		
-
-
 		 if($action =~ /_step2/){
 			$heading = 'This is just a test run';	
 			my $value = param('d_strInvoiceNumber') ;
@@ -74,15 +71,47 @@ sub handleTransactions	{
 		
   }
 
+  if ($action =~ /_TXN_LIST/) {
+        $entityID = getLastEntityID($Data->{'clientValues'});		
+		my $cl = setClient($Data->{'clientValues'});
+        my %cv = getClient($cl);
+		if ($Data->{'clientValues'}{'clubID'} > 0)   {
+            $cv{'clubID'} = $entityID;
+            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
+       }
+       elsif ($Data->{'clientValues'}{'regionID'} > 0)    {
+            $cv{'regionID'} = $entityID;
+            $cv{'currentLevel'} = $Defs::LEVEL_REGION;
+       }
+       else {
+            $cv{'entityID'} = $entityID; ## As its getLastEntityID
+            $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+        }
+ 		my $clm = setClient(\%cv);
+		my $resultHTML_ = '';
+		($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
+    		$heading = $Data->{'lang'}->txt('List Transactions');
+		$resultHTML_ .= qq[<br />
+			<div>
+				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> ] . $lang->txt('Go to your dashboard') . qq[ </a>
+				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">]. $lang->txt('Return to Invoices') . qq[ </a>
+				
+			</div>
+		];
+			
+		$resultHTML .= $resultHTML_;
+
+  }
   if ($action =~ /_TXN_FAILURE/) {
 	my $intLogID=param("ci") || '';
 		Payments::processTransLogFailure($Data->{'db'}, $intLogID);
-		($resultHTML,$heading) = ("There was an error processing the payment.  Please try again.", "Error with Payment");
+		($resultHTML,$heading) = ($lang->txt("There was an error processing the payment.  Please try again."), $lang->txt("Error with Payment"));
   }
 
 	if (! $heading)	{
-		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  'Transactions';
+		$heading = ($Data->{'SystemConfig'}{'txns_link_name'}) ? $Data->{'SystemConfig'}{'txns_link_name'} :  $lang->txt('Transactions');
 	}
+    $heading = $Data->{'lang'}->txt($heading);
 	#$heading ||= $Data->{'SystemConfig'}{'txns_link_name'} || 'Transactions';
 
 	#$heading ||= 'Transactions';
@@ -117,7 +146,7 @@ sub checkExistingProduct    {
             $prWhere
             AND t.intRealmID = ?
             AND t.intTableType = ?
-            AND t.intStatus=1
+            AND t.intStatus IN ($Defs::TXN_PAID, $Defs::TXN_HOLD)
             AND t.intProductID=?
     ];
     my @values=(
@@ -134,7 +163,6 @@ sub checkExistingProduct    {
 
     my $q= $Data->{'db'}->prepare($st);
     $q->execute(@values) or query_error($st);
-print STDERR $st;
     my ($count) = $q->fetchrow_array();
     return $count || 0;
 }
@@ -150,8 +178,9 @@ sub deleteTransaction	{
 	];
 	my $query = $db->prepare($st);
 	$query->execute;
+	my $lang = $Data->{'lang'};
   auditLog($id, $Data, 'Delete', 'Transaction');
-  return ("Transaction has been deleted", "Transaction deleted");	
+  return ($lang->txt("Transaction has been deleted"), $lang->txt("Transaction deleted"));	
 }
 
 sub displayTransaction	{
@@ -161,13 +190,14 @@ sub displayTransaction	{
     my $lang = $Data->{'lang'};
 	my $db=$Data->{'db'} || undef;
     my $client=setClient($Data->{'clientValues'}) || '';
+	
 	my $target=$Data->{'target'} || '';
 	my $option=$edit ? ($id ? 'edit' : 'add')  :'display' ;
 	my $type2=param("ty2") || '';
 #($Data->{'Realm'},$Data->{'RealmSubType'})=getRealm($Data);
 
 	my $action = 'P_TXN_EDIT';
-	$action = 'C_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
+	#$action = 'C_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     my $resultHTML = '';
 	my $toplist='';
 
@@ -178,6 +208,7 @@ sub displayTransaction	{
 		SELECT 
       P.strName, 
       T.* , 
+	IF(T.intSentToGateway=1 and T.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       DATE_FORMAT(T.dtTransaction ,"%d/%m/%Y") AS dtTransaction, 
       DATE_FORMAT(T.dtStart ,"%d/%m/%Y") AS dtStart, 
       DATE_FORMAT(T.dtEnd ,"%d/%m/%Y") AS dtEnd, 
@@ -189,17 +220,19 @@ sub displayTransaction	{
 		LEFT JOIN tblTransactions as tParent ON (tParent.intTransactionID= T.intParentTXNID)
 		LEFT JOIN tblProducts as PParent ON (PParent.intProductID = tParent.intProductID)
 		LEFT JOIN tblTransactions as tChildren ON (tChildren.intParentTXNID = T.intTransactionID and tChildren.intStatus=1 and tChildren.intProductID=T.intProductID)
-		WHERE T.intID =$TableID
-			AND T.intTableType=$Data->{'clientValues'}{'currentLevel'}
-			AND T.intTransactionID = $id
+		WHERE T.intID = $TableID
+			
+		AND T.intTransactionID = $id
 		GROUP BY T.intTransactionID
 	];
-
+	#AND T.intTableType=$Data->{'clientValues'}{'currentLevel'} 
+	
 	my $query = $db->prepare($statement);
 	my $RecordData={};
 	$query->execute;
 	my $dref=$query->fetchrow_hashref();
 	$dref->{'NumChildren'} ||= 0;
+	my $gatewayLocked = $dref->{'GatewayLocked'} || 0;
 	my $txnupdate=qq[
 		UPDATE tblTransactions
 			SET --VAL--
@@ -223,10 +256,11 @@ sub displayTransaction	{
                 ];
         }
 
-  my $prodSellLevel = qq[ AND (intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} or intMinSellLevel=0)];
-  $prodSellLevel .= qq[ AND (intSellLevel =0 or intSellLevel = $Data->{'clientValues'}{'currentLevel'})];
+  #my $prodSellLevel = qq[ AND (intMinSellLevel <= $Data->{'clientValues'}{'authLevel'} or intMinSellLevel=0)];
+  #$prodSellLevel .= qq[ AND (intSellLevel =0 or intSellLevel = $Data->{'clientValues'}{'currentLevel'})];
+ my $prodSellLevel = qq[ AND (intMinAddSingleTXNLevel <> 0 and $Data->{'clientValues'}{'authLevel'}>= intMinAddSingleTXNLevel) ];
 
-  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and  intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) $prodSellLevel];
+  my $st_prods=qq[ SELECT intProductID, strName FROM tblProducts WHERE intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) AND intRealmID = $Data->{'Realm'} and  intInactive = 0 $WHEREClub AND intProductSubRealmID IN (0, $Data->{'RealmSubType'}) $prodSellLevel ];
 
   my $st_paymenttypes=qq[ SELECT intPaymentTypeID, strPaymentType FROM tblPaymentTypes WHERE intRealmID = $Data->{'Realm'}];
   my ($prods_vals,$prods_order)=getDBdrop_down_Ref($Data->{'db'},$st_prods,'');
@@ -254,15 +288,15 @@ sub displayTransaction	{
         );
         if ($pr_count) {
             foreach my $reg (@{$regs})   {
-                my $sport = $Defs::sportType{$reg->{'strSport'}} || '';
-                my $personType= $Defs::personType{$reg->{'strPersonType'}} || '';
+                my $sport = $lang->txt($Defs::sportType{$reg->{'strSport'}}) || '';
+                my $personType= $lang->txt($Defs::personType{$reg->{'strPersonType'}}) || '';
                 my $entityRole= $reg->{'strEntityRoleName'};
-                my $personLevel= $Defs::personLevel{$reg->{'strPersonLevel'}} || '';
-                my $ageLevel= $Defs::ageLevel{$reg->{'strAgeLevel'}} || '';
+                my $personLevel= $lang->txt($Defs::personLevel{$reg->{'strPersonLevel'}}) || '';
+                my $ageLevel= $lang->txt($Defs::ageLevel{$reg->{'strAgeLevel'}}) || '';
                 my $entityLocalName= $reg->{'strLocalName'};
                 my $nationalPeriodName= $reg->{'strNationalPeriodName'};
                 my $entityLatinName= $reg->{'strLatinName'};
-                my $status= $Defs::personRegoStatus{$reg->{'strStatus'}} || '';
+                my $status= $lang->txt($Defs::personRegoStatus{$reg->{'strStatus'}}) || '';
                 my $text = $entityLocalName;
                 $text .=  " ($entityLatinName)" if ($entityLatinName);
                 $text .= " -$personType" if ($personType);
@@ -279,7 +313,7 @@ sub displayTransaction	{
 
     my $showPR = $pr_count ? 1 : 0;
 
-	my $readonly = ($dref->{intStatus} == $Defs::TXN_UNPAID) ? 1 : 0;
+	my $readonly = ($Data->{'SystemConfig'}{'TXNStatusChange_MinLevel'} > $Data->{'clientValues'}{'authLevel'} or $dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD) ? 1 : 0;
 	#my $amount_readonly = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? 0: 1;
 	my $amount_readonly = ! $dref->{intStatus} ? 0: 1;
 	$amount_readonly = 1 if ! $id;
@@ -288,14 +322,14 @@ sub displayTransaction	{
 		TXN => {
 			fields => {
 				intStatus=> {
-			        	label => $lang->txt("Paid ?"),
+			        	label => $id ? $lang->txt("Paid ?") : '',
 		                	value => $dref->{'intStatus'},
                 			type  => 'lookup',
-                			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}},
+                			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}, $Defs::TXN_HOLD => $Defs::TransactionStatus{$Defs::TXN_HOLD}},
 					readonly=>$readonly,
             			},
 				intDelivered=> {
-			        	label => $lang->txt("Delivered ?"),
+			        	label => $lang->txt("Delivered"),
 		                	value => $dref->{'intDelivered'},
                 			type  => 'checkbox',
                 			displaylookup => {0=>'Undelivered', 1=>'Delivered'},
@@ -319,13 +353,15 @@ sub displayTransaction	{
 					type => 'text',
 					size => 8,
 					value => $dref->{'intQty'} || 1,
+					readonly=>$prod_readonly,
 				},
 				curAmount=> {
-					label => $lang->txt('Amount Due'),
+					label => $id ? $lang->txt('Amount Due') : '',
 					type => 'text',
 					size => 8,
-					value => $dref->{'curAmount'},
-					readonly=>$amount_readonly,
+					value => $Data->{'l10n'}{'currency'}->format($dref->{'curAmount'}),
+					readonly => 1,
+					#readonly=>($amount_readonly or $gatewayLocked),
 				},
 				AmountAlreadyPaid=> {
 					label => $dref->{'AmountAlreadyPaid'} ? $lang->txt('Amount Already Paid via Part Payments') : '',
@@ -381,8 +417,7 @@ sub displayTransaction	{
 				hideblank => 1,
 				target => $Data->{'target'},
 				formname => 'txn_form',
-				submitlabel => 'Update Transaction',
-				introtext => 'auto',
+				submitlabel => $lang->txt('Update Transaction'),
 				buttonloc => 'bottom',
 				updateSQL => $txnupdate,
 				addSQL => $txnadd,
@@ -408,12 +443,12 @@ sub displayTransaction	{
 
 				stopAfterAction => 1,
 				updateOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=M_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
-				],
+					<div class="OKmsg">] . $lang->txt('Record updated successfully') . qq[</div> <br>
+					<!--<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>-->
+				], # M_TXN_LIST
 				addOKtext => qq[
-					<div class="OKmsg">Record updated successfully</div> <br>
-					<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>
+					<div class="OKmsg">]. $lang->txt('Record added successfully') . qq[</div> <br>
+					<!--<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">].$lang->txt('Return to Transaction').qq[</a>-->
 				],
 			},
 			sections => [ ['main',$lang->txt('Details')], ],
@@ -428,6 +463,9 @@ sub displayTransaction	{
 	my $url = getPartPayURL($Data, $id) if ($dref->{'NumChildren'});
 	if ($url)	{
 		$resultHTML.= qq[<a href=$url target="invoice_pay">].$lang->txt('Click to View Part Payment form').qq[</a><br><br>];
+	}
+	if ($gatewayLocked)	{
+		$resultHTML = qq[<p class="warningmsg">]. $lang->txt("Record locked until Payment Gateway responds") . qq[</p>] . $resultHTML;
 	}
 	$resultHTML .= showTransactionChildren($Data, $id) if ($dref->{'NumChildren'});
 
@@ -445,8 +483,8 @@ sub displayTransaction	{
 					$resultHTML
 				</div>
 		];
-		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || $lang->txt('Transactions');
-		return ($resultHTML,$heading);
+		my $heading = $Data->{'SystemConfig'}{'txns_link_name'}  || 'Transactions';
+		return ($resultHTML,$Data->{'lang'}->txt($heading));
 }
 
 sub showTransactionChildren	{
@@ -616,7 +654,6 @@ sub queryBlkTXN {
       		target => $Data->{'target'},
       		formname => 'n_form',
       		submitlabel => $Data->{'lang'}->txt('Continue'),
-      		introtext => $Data->{'lang'}->txt('HTMLFORM_INTROTEXT'),
 			 NoHTML => 1,
 		}, #end of options
 		carryfields =>  {

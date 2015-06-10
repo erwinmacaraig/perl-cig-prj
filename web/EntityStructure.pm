@@ -13,27 +13,11 @@ use Utils;
 
 sub createTempEntityStructure  {
 
-  my ($Data, $realmID_IN) = @_;
+  my ($Data, $realmID_IN, $eid) = @_;
+  my $realmID=1;
+  ## if $eid passed then only work on that 1 ID
+  $eid ||= 0;
   my $db = $Data->{'db'};
-
-  $realmID_IN ||= 0;
-  my @realms = ();
-  if($realmID_IN) {
-    push @realms, $realmID_IN;
-  }
-  else  {
-    my $st = qq[
-      SELECT 
-        intRealmID
-      FROM 
-        tblRealms
-    ];
-    my $qry = $db->prepare($st);
-    $qry->execute();
-    while (my($intRealmID) = $qry->fetchrow_array) {
-        push @realms, $intRealmID;
-    }
-  }
 
   my $ins_st = qq[
     INSERT IGNORE INTO tblTempEntityStructure (
@@ -65,6 +49,11 @@ sub createTempEntityStructure  {
     WHERE 
       intRealmID = ?
   ];
+    if ($eid)    {
+        $del_st .= qq[
+            AND (intParentID = $eid or intChildID = $eid)
+        ];
+    }
 
   my $del_qry= $db->prepare($del_st);
 
@@ -82,7 +71,7 @@ sub createTempEntityStructure  {
   my $q_e = $db->prepare($st_e);
 
 
-  foreach my $realmID (@realms) {
+  #foreach my $realmID (@realms) {
     $del_qry->execute($realmID);
     $del_qry->finish();
 
@@ -123,6 +112,12 @@ sub createTempEntityStructure  {
               $entityLinksCtoP{$child} = $parent;
           }
           #Insert the direct relationships
+            if ($eid)    {
+                next if (
+                    $parent != $eid 
+                    and $child != $eid
+                );
+            }
           $ins_qry->execute(
               $realmID,
               $parent,
@@ -140,6 +135,7 @@ sub createTempEntityStructure  {
     #Now to generate and insert the indirect relationships
     foreach my $entityID (keys %entities)    {
       insertRelationships(
+            $eid,
           $entityID,
           \%entities,
           \%entityLinks,
@@ -148,12 +144,13 @@ sub createTempEntityStructure  {
       );
     }
 
-    createTreeStructure($db, $realmID, \%entities, \%entityLinks, \%entityLinksCtoP);
-  }
+    createTreeStructure($db, $realmID, $eid, \%entities, \%entityLinks, \%entityLinksCtoP);
+  #}
 }
 
 sub insertRelationships {
     my  (
+            $eid,
         $entityID,
         $entities,
         $entityLinks,
@@ -170,6 +167,7 @@ sub insertRelationships {
             dataaccess => $entities->{$childID}{'dataaccess'},
           };
           my $ret = insertRelationships(
+            $eid,
             $childID,
             $entities,
             $entityLinks,
@@ -179,6 +177,12 @@ sub insertRelationships {
           push @children, @{$ret} if $ret;
       }
       foreach my $child (@children) {
+             if ($eid)   {
+                next if (
+                    $entityID != $eid
+                    and $child->{'id'} != $eid
+                );
+            }
           $qry->execute(
               $realmID,
               $entityID,
@@ -202,6 +206,7 @@ sub createTreeStructure {
     my (
         $db, 
         $realmID, 
+        $eid,
         $entities, 
         $entityLinks,
         $entityLinksCtoP,
@@ -233,6 +238,7 @@ sub createTreeStructure {
     }
     my $ins_st = qq[
         INSERT INTO tblTempTreeStructure (
+            tTimeStamp,
             intRealmID, 
             int100_ID,
             int30_ID,
@@ -241,6 +247,7 @@ sub createTreeStructure {
             int3_ID
         )
         VALUES (
+            NOW(),
             ?,
             ?,
             ?,
@@ -257,6 +264,11 @@ sub createTreeStructure {
       WHERE 
         intRealmID = ?
     ];
+    if ($eid)    {
+        $del_st .= qq[
+            AND (int3_ID = $eid or int10_ID = $eid or int20_ID = $eid or int30_ID = $eid or int100_ID = $eid)
+        ];
+    }
 
     my $del_qry= $db->prepare($del_st);
     $del_qry->execute($realmID);
@@ -264,6 +276,21 @@ sub createTreeStructure {
         my %row = ();
         for my $r (@{$pathToNational{$eId}})    {
             $row{'t'.$r->[1]} = $r->[0];
+        }
+        $row{'t100'} ||= 0;
+        $row{'t30'} ||= 0;
+        $row{'t20'} ||= 0;
+        $row{'t10'} ||= 0;
+        $row{'t3'} ||= 0;
+
+        if ($eid)    {
+            next if (
+                $row{'t100'} != $eid
+                and $row{'t30'} != $eid
+                and $row{'t20'} != $eid
+                and $row{'t10'} != $eid
+                and $row{'t3'} != $eid
+            );
         }
         
         $ins_qry->execute(
