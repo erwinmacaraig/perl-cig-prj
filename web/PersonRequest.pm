@@ -1251,8 +1251,8 @@ sub viewRequest {
         \%TemplateData,
         $templateFile
     );
-
-    return ($body, $title);
+    
+    return ($body, "request" . $TemplateData{'requestTo'});#return ($body, $title);
 }
 
 sub setRequestResponse {
