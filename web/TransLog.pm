@@ -530,7 +530,7 @@ sub getTransList {
 	#
 	my $TXNEntityID = '';
 	#if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
-		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getEntityID($Data->{'clientValues'});
+		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
 	#}
 	#	
 	$displayonly ||= 0;
