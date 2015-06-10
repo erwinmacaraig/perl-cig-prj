@@ -783,7 +783,7 @@ table tr.new-task {
 .read-only-text, .fieldSectionGroupWrapper-DisplayOnly .panel-body {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
-	height: 345px;
+	/*height: 345px;*/
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color: transparent;
@@ -2335,6 +2335,7 @@ header .navbar-brand {
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 30px; margin-top: 0px; }
   #worktasks_length { display: none; }
+  .dataTables_length { display: none; }
   #worktasks_filter { text-align: right; }
   /*.summaryPanel { display: none; }*/
   div.dataTables_filter label { color: #000; }
@@ -2772,4 +2773,8 @@ header .navbar-brand {
   font-family: FontAwesome;
   content: "\f059";
   font-size:20px;
+}
+.product-terms {
+    padding:5px;
+    margin:5px;
 }

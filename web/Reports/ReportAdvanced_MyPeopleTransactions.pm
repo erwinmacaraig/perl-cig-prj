@@ -213,6 +213,7 @@ sub _getConfiguration {
 					fieldtype=>'dropdown', 
 					dropdownoptions => \%Defs::TransactionStatus , 
 					allowsort=>1, 
+                    translate       => 1,
 					dbfield=>'T.intStatus'
 				}
 			],

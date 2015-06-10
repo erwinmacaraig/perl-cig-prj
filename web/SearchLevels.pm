@@ -40,9 +40,6 @@ sub getLevelQueryStuff	{
             INNER JOIN tblEntity as E ON (
                 E.intEntityID = PR.intEntityID
             ) 
-            LEFT JOIN tblEntityTypeRoles as ETR ON (
-                ETR.strEntityRoleKey = PR.strPersonEntityRole
-            ) 
             LEFT JOIN tblEntity as tblClub ON (
                 PR.intEntityID = tblClub.intEntityID
                 AND tblClub.intEntityLevel = $Defs::LEVEL_CLUB

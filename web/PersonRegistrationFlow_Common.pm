@@ -47,6 +47,7 @@ use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
 use Switch;
+use TermsConditions;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -1110,6 +1111,8 @@ sub displayRegoFlowProducts {
             ? $maObj->name()
             : '';
 		$rego_ref->{'MA'} = $maName || '';
+
+    my ($termsId, $product_terms) = getTerms($Data, 'PRODUCT');
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
@@ -1122,6 +1125,7 @@ sub displayRegoFlowProducts {
         NoFormFields =>$noFormFields,
 		AssociationName => $maName,
 		payMethod => $rego_ref->{'payMethod'},
+		productTerms => $product_terms || '',
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';

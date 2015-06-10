@@ -28,7 +28,7 @@ use strict;
         INNER JOIN
             tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
-            pr.strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+            pr.strStatus IN ('PENDING')
             AND prq.strRequestType = 'LOAN'
             AND prq.strRequestStatus IN ('COMPLETED')
             AND prq.strRequestResponse = 'ACCEPTED'

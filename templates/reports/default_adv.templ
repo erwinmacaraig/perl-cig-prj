@@ -1,5 +1,15 @@
 [% INCLUDE 'reports/reportoptions_header.templ' %]
 <div class = "report-wrapper table-responsive" id = "report-data-wrapper">
+[% IF RecordCount > LimitView %]
+<h2>[% Lang.txt('Too many records') %]</h2>
+<p>[% Lang.txt('Your report has returned [_1] records. This is too many to display on the screen.',RecordCount) %].</p>
+<p> [% Lang.txt('You can download the report or have it sent to you via email.') %]</p>
+
+<p class = "text-center">
+<a href = "[% Data.target %]?client=[% Data.client %]&amp;a=REP_REPORT&amp;RO_download=1&amp;repID=[% SavedReportID %]&amp;rID=[% ReportID %]" class = "btn-inside-panels">[% Lang.txt('Download CSV') %]</a>
+</p>
+
+[% ELSE %]
 <table class="sreport-table table tableboxheader table-striped table-bordered table-condensed [% IF Labels.size > 7 %]shrink-table[% END %]">
 <caption>
 	<div class="report-numrows">[% Lang.txt('Records returned:') %] [% RecordCount %] </div>
@@ -7,7 +17,7 @@
 	<thead>
 		<tr>
 [% FOREACH i = Labels %]
-		<th>[% i.1 %]</th>
+		<th>[% Lang.txt(i.1) %]</th>
 [% END %]
 [% IF Summarise %]
 		<th>[% Lang.txt('Count') %]</th>
@@ -74,5 +84,6 @@
 	</tbody>
 	</tfoot>
 </table>
+[% END %]
 </div>
 <span class="report-daterun">[% Lang.txt('Report Run') %] [% DateFormat.TZformat(DateRun,'MEDIUM','SHORT') %]</span>
