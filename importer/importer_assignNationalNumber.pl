@@ -44,22 +44,22 @@ sub main	{
 
     $qryPR->execute();
 
-    #while (my $dref= $qryPR->fetchrow_hashref())    {
-    #    $tempClientValues{'personID'} = $dref->{'intPersonID'};
-    #    $tempClientValues{'currentLevel'} = $Defs::LEVEL_PERSON;
-#
-#        my $tempClient = setClient( \%tempClientValues );
-#        my %clientValues = getClient($tempClient);
-#
-#        $Data{'clientValues'} = \%clientValues;
-#
-#        assignNationalNumber(
-#            \%Data,
-#            'PERSON',
-#            $dref->{'intPersonID'},
-#            $dref->{'intPersonRegistrationID'},
-#        );
-#    }
+    while (my $dref= $qryPR->fetchrow_hashref())    {
+        $tempClientValues{'personID'} = $dref->{'intPersonID'};
+        $tempClientValues{'currentLevel'} = $Defs::LEVEL_PERSON;
+
+       my $tempClient = setClient( \%tempClientValues );
+       my %clientValues = getClient($tempClient);
+
+       $Data{'clientValues'} = \%clientValues;
+
+       assignNationalNumber(
+           \%Data,
+           'PERSON',
+           $dref->{'intPersonID'},
+           $dref->{'intPersonRegistrationID'},
+       );
+   }
 
     my $stE = qq[
         SELECT
