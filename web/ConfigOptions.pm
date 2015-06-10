@@ -63,7 +63,6 @@ sub GetPermissions {
             WHERE
                 T.intRealmID = ? 
                 AND intChildID = ?
-            LIMIT 1
         ];
         
         
