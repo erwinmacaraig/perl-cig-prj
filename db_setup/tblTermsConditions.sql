@@ -10,4 +10,4 @@ CREATE TABLE tblTermsConditions (
     PRIMARY KEY (intTermsID),
     KEY index_type (strType, strLocale, intCurrent)
 
-);
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
