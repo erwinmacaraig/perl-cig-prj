@@ -1252,7 +1252,7 @@ sub viewRequest {
         $templateFile
     );
     
-    return ($body, "request" . $TemplateData{'requestTo'});#return ($body, $title);
+    return ($body, $title);
 }
 
 sub setRequestResponse {
