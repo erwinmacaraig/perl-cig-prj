@@ -72,6 +72,7 @@ print STDERR "IN checkOpenPayments\n";
             PC.strCurrency,
 			PC.intProcessPreGateway	,
             TL.strReceiptRef,
+            TL.strTXN,
 		PT.strPayReference
         FROM
             tblTransLog as TL
@@ -184,8 +185,8 @@ print STDERR "API STATUS IS " . $APIResponse{'STATUS'};
 
             my $chkAction = 'SUCCESS'; ## Otherwise it wpuldn't have gotten this far
 
-            $returnVals{'GATEWAY_TXN_ID'}= $APIResponse{'PAYMENT'} || '';
-            $returnVals{'GATEWAY_AUTH_ID'}= $APIResponse{'REFERENCE'} || '';
+            $returnVals{'GATEWAY_TXN_ID'}= $APIResponse{'PAYMENT'} || $dref->{'strTXN'} || '';
+            $returnVals{'GATEWAY_AUTH_ID'}= $APIResponse{'REFERENCE'} || '';#$dref->{'strAuthID'} || '';
             my $co_status = $APIResponse{'STATUS'} || '';
             $returnVals{'GATEWAY_RESPONSE_CODE'}= "99";
             $returnVals{'GATEWAY_RESPONSE_CODE'}= "OK" if (
