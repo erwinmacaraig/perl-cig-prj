@@ -2402,9 +2402,9 @@ sub activatePlayerLoan {
 
 
     for my $personID (@{$personIDs}) {
-        #savePlayerPassport($Data, $personID);
-        #my $personObject = getInstanceOf($Data, 'person',$personID);
-        #updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+        savePlayerPassport($Data, $personID);
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
     }
 }
 
@@ -2455,9 +2455,9 @@ sub deactivatePlayerLoan {
     #$query->execute() or query_error($lst);
 
     for my $personID (@{$personIDs}) {
-        #savePlayerPassport($Data, $personID);
-        #my $personObject = getInstanceOf($Data, 'person',$personID);
-        #updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
+        savePlayerPassport($Data, $personID);
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
     }
 }
 
