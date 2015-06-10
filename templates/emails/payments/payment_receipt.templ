@@ -56,7 +56,7 @@
                                     [% IF ReceiptHeader %]
                                         <p>[% ReceiptHeader %]</p>
                                     [% END %]
-                                    <p>[% Lang.txt('You have successfully made a payment of') %] <b>[% DollarSymbol %][% TotalAmount %]</b>[% IF AssocPaymentExtraDetails %]&nbsp;[% AssocPaymentExtraDetails %].[% END %]</p>
+                                    <p>[% Lang.txt('You have successfully made a payment of') %] <b>[% CurrencyFormat.format(TotalAmount) %]</b>[% IF AssocPaymentExtraDetails %]&nbsp;[% AssocPaymentExtraDetails %].[% END %]</p>
                                     <br />
                                     <table cellspacing="5" cellpadding="0" border="0" width="610">
                                         <tbody>
@@ -78,7 +78,7 @@
                                     [% END %]
                                     [% FOREACH t = Transactions %]
                                         <hr style="border-top:0px;border-left:0px;border-right:0px;color:#999999;">
-                                        <p>[% Lang.txt('A payment of') %] <b>[% DollarSymbol %][% t.curAmount %]</b> [% IF t.strGSTText %]GST&nbsp;[% t.strGSTText %][% END %] [% Lang.txt('for') %] <strong>[% t.Name %]</strong> [%Lang.txt('at') %] [% t.strName %] [% PaymentAssocType %]</p>
+                                        <p>[% Lang.txt('A payment of') %] <b>[% CurrencyFormat.format(t.curAmount) %]</b> [% IF t.strGSTText %]GST&nbsp;[% t.strGSTText %][% END %] [% Lang.txt('for') %] <strong>[% t.Name %]</strong> [%Lang.txt('at') %] [% t.strName %] [% PaymentAssocType %]</p>
                                         <br />
                                         <table cellspacing="5" cellpadding="0" border="0" width="460">
                                             <tbody>
@@ -114,7 +114,7 @@
                                                 [% END %]
                                                 <tr>
                                                     <td valign="top" align="left"><b>[% Lang.txt('Amount') %]:</b></td>
-                                                    <td valign="top" align="left">[% DollarSymbol %][% t.curAmount %][% IF t.strGSTText %]&nbsp;GST&nbsp;[% t.strGSTText %][% END %]</td>
+                                                    <td valign="top" align="left">[% CurrencyFormat.format(t.curAmount) %][% IF t.strGSTText %]&nbsp;GST&nbsp;[% t.strGSTText %][% END %]</td>
                                                 </tr>
                                                 <tr>
                                                     <td colspan="2" align="center"><span style="font-weight:normal;font-size:10px;">&nbsp;<br/></span></td>
@@ -132,7 +132,7 @@
                                             </tr>
                                             <tr>
                                                 <td width="160" align="left"><b>[% Lang.txt('Total Amount') %]:</b></td>
-                                                <td align="left">[% DollarSymbol %][% TotalAmount %]</td>
+                                                <td align="left">[% CurrencyFormat.format(TotalAmount) %]</td>
                                             </tr>
                                             <tr>
                                                 <td colspan="2" align="center"><span style="font-weight:normal;font-size:10px;">&nbsp;<br/></span></td>
