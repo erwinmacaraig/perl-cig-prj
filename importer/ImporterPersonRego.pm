@@ -21,6 +21,7 @@ use SystemConfig;
 use CGI qw(cookie unescape);
 use ImporterTXNs;
 use ImporterCommon;
+use NationalReportingPeriod;
 
 use Log;
 use Data::Dumper;
@@ -336,6 +337,7 @@ my $stDEL = "DELETE FROM tmpPersonRego WHERE strFileType = ?";
 my $qDEL= $db->prepare($stDEL) or query_error($stDEL);
 $qDEL->execute($type);
 
+my %existingNationalPeriod = ();
 while (<INFILE>)	{
 	my %parts = ();
 	$count ++;
@@ -349,6 +351,78 @@ while (<INFILE>)	{
 
     #:PersonCode;OrganisationCode;Status;RegistrationNature;PersonType;Role;Level;Sport;AgeLevel;DateFrom;DateTo;Transferred;IsLoan;NationalSeason;ProductCode;Amount;IsPaid;PaymentReference
     if ($maCode eq 'HKG')   {
+        $fields[0] = "MAOFFICIAL" if $fields[0] eq 'MA Official';
+        $fields[0] = "TEAMOFFICIAL" if $fields[0] eq 'Team Official';
+        $fields[0] = "CLUBOFFICIAL" if $fields[0] eq 'Club Official';
+        $fields[0] = "PLAYER" if $fields[0] eq 'Player';
+        $fields[0] = "COACH" if $fields[0] eq 'Coach';
+        $fields[0] = "REFEREE" if $fields[0] eq 'Referee';
+
+        $fields[5] = "ACTIVE" if $fields[5] eq 'Active';
+        $fields[5] = "PASSIVE" if $fields[5] eq 'Passive';
+
+        $fields[7] = "NEW" if $fields[7] eq 'New';
+        $fields[7] = "RENEWAL" if $fields[7] eq 'Renewal';
+        $fields[7] = "TRANSFER" if $fields[7] eq 'Transfer';
+
+        $fields[8] = "AMATEUR" if $fields[8] eq 'Amateur';
+        $fields[8] = "PROFESSIONAL" if $fields[8] eq 'Professional';
+
+        $fields[9] = "FOOTBALL" if $fields[9] eq 'Football';
+        $fields[9] = "FUTSAL" if $fields[9] eq 'Futsal';
+        $fields[9] = "WOMENSFOOTBALL" if $fields[9] eq 'Women\'s Football';
+
+        $fields[10] = "ADULT" if $fields[10] eq 'senior';
+        $fields[10] = "MINOR" if $fields[10] eq 'minor';
+
+        if($fields[11] and $fields[12]) {
+            my @dtFrom = split("\/", $fields[11]);
+            my @dtTo = split("\/", $fields[12]);
+
+            $fields[11] = (scalar(@dtFrom)) ? $dtFrom[2] . '-' . $dtFrom[0] . '-' . $dtFrom[1] : $fields[11];
+            $fields[12] = (scalar(@dtTo)) ? $dtTo[2] . '-' . $dtTo[0] . '-' . $dtTo[1] : $fields[12];
+        }
+
+        #print STDERR Dumper @fields;
+        my $natPeriod = '';
+        my $sportFill = (!$fields[9] || $fields[0] eq 'MAOFFICIAL' || $fields[0] eq 'CLUBOFFICIAL') ? '_SPORT_' : $fields[9];
+        my $sport = ($sportFill eq '_SPORT_') ? '' : $fields[9];
+
+        if($fields[13]) {
+            my @nationalPeriod = split('-', $fields[13]);
+
+            if(! $existingNationalPeriod{$nationalPeriod[0]}{$sportFill}) {
+                my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($db, 1, 0, $sport, $fields[0], $fields[7]);
+                $existingNationalPeriod{$nationalPeriod[0]}{$sportFill} = $nationalPeriodID;
+                $natPeriod = $nationalPeriodID;
+            } else {
+                $natPeriod = $existingNationalPeriod{$nationalPeriod[0]}{$sportFill};
+            }
+        }
+
+        #Person;Role;Code;Organization ID;Level;Status;Current;RegistrationNature;Level;Sport;AgeLevel;DateFrom;DateTo;National Season
+        $parts{'PERSONCODE'} = $fields[2];
+	    $parts{'ENTITYCODE'} = $fields[3];
+        $parts{'STATUS'} = $fields[5];
+        $parts{'REGNATURE'} = $fields[7];
+        $parts{'PERSONTYPE'} = $fields[0];
+        $parts{'PERSONROLE'} = $fields[1];
+        $parts{'PERSONLEVEL'} = $fields[8];
+        $parts{'SPORT'} = $fields[9];
+        $parts{'AGELEVEL'} = $fields[10];
+        $parts{'DATEFROM'} = $fields[11];
+        $parts{'DATETO'} = $fields[12];
+        $parts{'DATETRANSFERRED'} = '';
+        $parts{'ISLOAN'} = '';
+        $parts{'NATIONALPERIOD'} = $fields[13] || '';
+        $parts{'NATIONALPERIODID'} = $natPeriod;
+        $parts{'PRODUCTCODE'} = '';
+        $parts{'PRODUCTAMOUNT'} = '';
+        $parts{'ISPAID'} = '';
+        $parts{'TRANSACTIONNO'} = '';
+        $parts{'DATEPAID'} = '';
+        $parts{'CERTIFICATIONS'} = $fields[4] || '';
+
         ## Update field mapping for HKG 
     }
     else    {
@@ -367,6 +441,7 @@ while (<INFILE>)	{
 	    $parts{'DATETRANSFERRED'} = $fields[11] || '0000-00-00';
 	    $parts{'ISLOAN'} = $fields[12] || '';
 	    $parts{'NATIONALPERIOD'} = $fields[13] || '';
+	    $parts{'NATIONALPERIODID'} = 0;
 	    $parts{'PRODUCTCODE'} = $fields[14] || '';
 	    $parts{'PRODUCTAMOUNT'} = $fields[15] || 0;
 	    $parts{'ISPAID'} = $fields[16] || '';
@@ -384,6 +459,8 @@ while (<INFILE>)	{
             $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
             $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
         }
+
+        $parts{'CERTIFICATIONS'} = '';
         
     }
 	if ($countOnly)	{
@@ -393,8 +470,8 @@ while (<INFILE>)	{
 
 	my $st = qq[
 		INSERT INTO tmpPersonRego
-		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, intNationalPeriodID, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid, strCertifications)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
@@ -413,15 +490,19 @@ while (<INFILE>)	{
         $parts{'DATETRANSFERRED'},
         $parts{'ISLOAN'},
         $parts{'NATIONALPERIOD'},
+        $parts{'NATIONALPERIODID'},
         $parts{'PRODUCTCODE'},
         $parts{'PRODUCTAMOUNT'},
         $parts{'ISPAID'},
         $parts{'TRANSACTIONNO'},
-        $parts{'DATEPAID'}
+        $parts{'DATEPAID'},
+        $parts{'CERTIFICATIONS'}
     ) or print "ERROR";
 }
+
+print STDERR Dumper %existingNationalPeriod;
 $count --;
-print STDERR "COUNT CHECK ONLY !!!\n" if $countOnly;
+print STDERR "COUNT CHECK ONLY !!!\n" . $count if $countOnly;
 
 close INFILE;
 
