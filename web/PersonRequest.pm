@@ -1251,7 +1251,7 @@ sub viewRequest {
         \%TemplateData,
         $templateFile
     );
-
+    
     return ($body, $title);
 }
 
