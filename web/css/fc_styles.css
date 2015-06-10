@@ -2778,3 +2778,10 @@ header .navbar-brand {
     padding:5px;
     margin:5px;
 }
+.selfregterms {
+    padding:5px;
+    margin:15px;
+    max-height:100px;
+    overflow:auto;
+    border:1px solid #ddd;
+}

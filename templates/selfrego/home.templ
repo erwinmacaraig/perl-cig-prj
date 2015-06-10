@@ -33,13 +33,13 @@
         <p>[% Lang.txt('You can link an account from your old system into your new self registration account.') %]</p>
          <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
             <div class = "form-group">
-                <label class="col-md-2" for="link-un">[% Lang.txt(OldSystemUsername) %]</label>
+                <label class="col-md-5" for="link-un">[% Lang.txt(OldSystemUsername) %]</label>
                 <div class="col-md-6 control-fields">
                     <input type = "text" name = "un" value = "" id = "link-un"  class="form-control fields required" title="[% Lang.txt(OldSystemUsername) %]">
                 </div>
             </div>
             <div class = "form-group">
-                <label class="col-md-2" for="link-pw">[% Lang.txt(OldSystemPassword) %]</label>
+                <label class="col-md-5" for="link-pw">[% Lang.txt(OldSystemPassword) %]</label>
                 <div class="col-md-6 control-fields">
                     <input type = "text" name = "pw" value = "" size = "50" id = "link-pw"  class="form-control fields required" title="[% Lang.txt(OldSystemPassword) %]">
                 </div>
