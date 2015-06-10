@@ -61,7 +61,8 @@ sub readCSVFile{
     elsif($format eq 'csv'){
     	$csv_config->{sep_char} = qq|,|;
     }
-	$csv_config->{'encoding_in'} = "iso-8859-1";
+    #$csv_config->{'encoding_in'} = "iso-8859-1";
+    $csv_config->{'encoding_in'} = "utf-8";
 	$csv_config->{'encoding_out'} = "cp1252";
 	$csv_config->{binary} = 1;
 	$csv_config->{'allow_loose_quotes'} = 1;
