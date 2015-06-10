@@ -20,9 +20,23 @@ main();
 sub main	{
     my $db=connectDB();
 
-    linkPRPeople($db);
-    linkPRClubs($db);
-    linkPRNationalPeriods($db);
-    linkPRProducts($db);
-
+    my $maCode = getImportMACode($db) || '';
+    switch($maCode) {
+        case 'FAF' {
+            linkPRPeople($db);
+            linkPRClubs($db);
+            linkPRNationalPeriods($db);
+            linkPRProducts($db);
+        }
+        case 'HKG' {
+            linkPRPeople($db);
+            linkPRClubs($db);
+        }
+        else {
+            linkPRPeople($db);
+            linkPRClubs($db);
+            linkPRNationalPeriods($db);
+            linkPRProducts($db);
+        }
+    }
 }
