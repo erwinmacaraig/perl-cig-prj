@@ -4464,8 +4464,8 @@ form#signup-form {
 }
 
 #register-form label {
-    text-align: left;
-    width: 160px;
+/*    text-align: left;
+    width: 160px;*/
 }
 form#signup-form .button {
     float: left;
