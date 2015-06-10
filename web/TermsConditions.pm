@@ -41,7 +41,6 @@ sub getTerms {
 sub logTermsAcceptance {
     my ($Data, $type, $userID, $personID, $termsID) = @_;
 
-    warn("OOO my ($Data, $type, $userID, $personID, $termsID) ="); 
     return 0 if !$type;
     return 0 if (!$userID and !$personID);
 
