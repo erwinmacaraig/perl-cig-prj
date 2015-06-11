@@ -1,6 +1,8 @@
+
 <div class="document-upload">
 	<!-- display document upload information --> 
 
+[% IF documents.size %]
 <h3 class="panel-header">[% Lang.txt('Required Documents') %]</h3> 
 
 <div class="panel-body">
@@ -103,8 +105,19 @@
 				</tr>
 			[% END %]
 		</table>
+		
 	</div>
+	
+
 </div>
+[% ELSE %]
+	<div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>[% Lang.txt('No documents required for this registration, click') %] <strong>[% Lang.txt('Continue') %]</strong> [% Lang.txt('to proceed') %].</p>
+            </div>
+</div>
+[% END %]
 <div class="clearfix">&nbsp;</div>
 [% IF optionaldocs.size %]
 <h3 class="panel-header">[% Lang.txt('Optional Documents') %]</h3> 
