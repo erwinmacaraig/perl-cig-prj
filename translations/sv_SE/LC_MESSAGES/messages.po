@@ -1,7 +1,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
-"POT-Creation-Date: 2015-06-11 08:38+1000\n"
+"POT-Creation-Date: 2015-06-12 09:27+1000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Warren Rodie <w.rodie@sportingpulseinternational.com>\n"
 "Language-Team: \n"
@@ -166,7 +166,7 @@ msgid "Birth Country"
 msgstr "Födelseland"
 
 #: Defs::ProdTransactionStatus Defs::TransactionStatus Defs::TransLogStatus
-#: Defs::personRequestResponse web/PersonRequest.pm Line:1298
+#: Defs::personRequestResponse web/PersonRequest.pm Line:1305
 #: templates/personrequest/transfer/request_cancelled.templ Line:5
 msgid "Cancelled"
 msgstr "Annulerad"
@@ -231,7 +231,7 @@ msgstr "Föreningsfunktionär"
 
 #: Defs::personType Defs::memberTypeName
 #: templates/dashboards/personstatus.templ Line:104 Line:123 Line:154 Line:173
-#: templates/selfrego/home.templ Line:61
+#: templates/selfrego/home.templ Line:33
 msgid "Coach"
 msgstr "Tränare"
 
@@ -338,7 +338,7 @@ msgstr "Födelseland (mor)"
 msgid "Date Suspended Until"
 msgstr "Avstängd till"
 
-#: Person FieldLabels web/BulkPersons.pm Line:182
+#: Person FieldLabels web/BulkPersons.pm Line:205
 #: templates/dashboards/person.templ Line:46
 #: templates/search/grid/personregistration.templ Line:9
 #: templates/search/grid/people.templ Line:8
@@ -387,7 +387,7 @@ msgstr "Nekat"
 
 #: Club Field Labels web/EntityIdentifier.pm Line:359
 #: templates/registration/certificate_flow_backend.templ Line:59
-#: templates/registration/document_flow_backend.templ Line:126
+#: templates/registration/document_flow_backend.templ Line:139
 #: templates/emails/payments/payment_receipt.templ Line:108
 #: templates/entity/required_docs.templ Line:14 Line:102
 #: templates/txn_receipt/fnswreceipt.templ Line:64
@@ -485,7 +485,7 @@ msgid "Failed"
 msgstr "Misslyckades"
 
 #: Person FieldLabels web/registrationUser/signup.cgi Line:63
-#: web/user/signup.cgi web/BulkPersons.pm Line:174
+#: web/user/signup.cgi web/BulkPersons.pm Line:197
 #: templates/dashboards/person.templ Line:20
 #: templates/selfrego/user/profile.templ Line:25
 #: templates/selfrego/user/signup.templ Line:32
@@ -530,7 +530,7 @@ msgid "Female"
 msgstr "Kvinna"
 
 #: Person FieldLabels web/registrationUser/signup.cgi Line:62
-#: web/user/signup.cgi web/BulkPersons.pm Line:178
+#: web/user/signup.cgi web/BulkPersons.pm Line:201
 #: templates/dashboards/person.templ Line:32
 #: templates/selfrego/user/profile.templ Line:31
 #: templates/selfrego/user/signup.templ Line:39
@@ -839,7 +839,7 @@ msgid "New Registration"
 msgstr "Ny registrering"
 
 #: Defs::tfInfo web/Person.pm Line:1560 web/EntityFieldsSetup.pm Line:601
-#: web/PersonRequest.pm Line:654
+#: web/PersonRequest.pm Line:655
 #: templates/personrequest/transfer/search_form.templ Line:48
 #: templates/personrequest/generic/search_form.templ Line:42
 #: templates/personrequest/loan/search_form.templ Line:38
@@ -872,8 +872,8 @@ msgid "Normal"
 msgstr "Normal"
 
 #: Person FieldLabels web/Transactions.pm Line:389 web/ListTransactions.pm
-#: Line:133 web/Reports/ReportAdvanced_MyPeople.pm Line:1226
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1253
+#: Line:133 web/Reports/ReportAdvanced_MyPeople.pm Line:1237
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1263
 #: templates/txn_receipt/fnswreceipt.templ Line:77
 #: templates/workflow/generic/notes.templ Line:9
 msgid "Notes"
@@ -937,20 +937,20 @@ msgid "Other / Barter"
 msgstr "Annan / Barter"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:620
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:647
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:631
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:657
 msgid "Other Identifier"
 msgstr "Annan identification"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:629
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:656
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:640
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:666
 msgid "Other Identifier Description"
 msgstr "Beskrivning av annan identification"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:638
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:665
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:649
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:675
 msgid "Other Identifier Issuance Country"
 msgstr "Utfärdande land av annan identification"
 
@@ -960,14 +960,14 @@ msgid "Other Identifier Type"
 msgstr "Typ av annan identification"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:651
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:678
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:662
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:688
 msgid "Other Identifier Validity Date From"
 msgstr "Annan identification giltig från"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:663
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:690
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:674
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:700
 msgid "Other Identifier Validity Date To"
 msgstr "Annan identification giltig till"
 
@@ -1127,7 +1127,7 @@ msgstr "Telefon (arbete)"
 
 #: Defs::personType Defs::memberTypeName
 #: templates/dashboards/personstatus.templ Line:103 Line:122 Line:153 Line:172
-#: Line:200 templates/selfrego/home.templ Line:60
+#: Line:200 templates/selfrego/home.templ Line:32
 msgid "Player"
 msgstr "Spelare"
 
@@ -1174,8 +1174,8 @@ msgid "Postcode"
 msgstr "Postnummer"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:554
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:581
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:565
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:591
 msgid "Preferred Language"
 msgstr "Föredraget namn"
 
@@ -1200,7 +1200,7 @@ msgid "RA Official"
 msgstr "Distriktsfunktionär"
 
 # :Person FieldLabels
-#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:261
+#: Person FieldLabels web/Reports/ReportAdvanced_MyPeople.pm Line:272
 msgid "Race"
 msgstr "Ras"
 
@@ -1212,7 +1212,7 @@ msgstr "Skrivskyddad åtkomst"
 msgid "Ready to Approve"
 msgstr "Färdig för godkännande"
 
-#: Defs::personType templates/selfrego/home.templ Line:62
+#: Defs::personType templates/selfrego/home.templ Line:34
 msgid "Referee"
 msgstr "Domare"
 
@@ -1267,7 +1267,7 @@ msgstr "Avslå"
 #: web/WorkFlow.pm Line:4177 Line:4181 Line:4185 Line:4189 Line:4193 Line:4197
 #: Line:4201 Line:4205 Line:4210 Line:4214 Line:4224 Line:4228 Line:4232
 #: Line:4238 Line:4241 Line:4244 Line:4247 Line:4250 Line:4253
-#: web/PersonRequest.pm Line:1282
+#: web/PersonRequest.pm Line:1289
 #: templates/dashboards/personregistration.templ Line:62
 #: templates/workflow/generic/document.templ Line:58
 #: templates/personrequest/transfer/request_denied.templ Line:5
@@ -1438,7 +1438,7 @@ msgstr "Lagfunktionär"
 
 #: Person FieldLabels web/ListNotifications.pm Line:92 web/EntityDocuments.pm
 #: Line:218 web/Documents.pm Line:197
-#: templates/registration/document_flow_backend.templ Line:120
+#: templates/registration/document_flow_backend.templ Line:133
 #: templates/entity/required_docs.templ Line:10 Line:96
 #: templates/club/required_docs.templ Line:104
 msgid "Title"
@@ -1456,7 +1456,7 @@ msgstr "Stad"
 #: Line:3791 web/Navbar.pm Line:155 web/Flow_TransferBackend.pm Line:49
 #: Line:55 Line:69 Line:80 Line:90 Line:100 Line:117
 #: templates/dashboards/worktasks.templ Line:287
-#: templates/selfrego/accordion.templ Line:51
+#: templates/selfrego/accordion.templ Line:53
 #: templates/personrequest/transfer/request_cancelled.templ Line:5
 #: templates/personrequest/transfer/request_denied.templ
 msgid "Transfer"
@@ -1520,7 +1520,7 @@ msgstr "Giltig från"
 
 #: Person FieldLabels Club Field Labels web/PersonCertifications.pm Line:130
 #: web/EntityIdentifier.pm Line:355 templates/selfrego/transfer_init.templ
-#: Line:68 templates/selfrego/selfregohistorybody.templ Line:77
+#: Line:68 templates/selfrego/selfregohistorybody.templ Line:82
 #: templates/registration/certifications.templ Line:10
 msgid "Valid Until"
 msgstr "Giltig till"
@@ -1557,7 +1557,7 @@ msgid "World Federation"
 msgstr "Världorganisation"
 
 #: Defs::tfInfo web/Person.pm Line:1560 web/EntityFieldsSetup.pm Line:602
-#: web/PersonRequest.pm Line:655 templates/registration/products.templ Line:45
+#: web/PersonRequest.pm Line:656 templates/registration/products.templ Line:45
 #: Line:46 templates/personrequest/transfer/search_form.templ Line:49
 #: templates/personrequest/generic/search_form.templ Line:43
 #: templates/personrequest/loan/search_form.templ Line:39
@@ -1613,7 +1613,8 @@ msgstr "Organisationer"
 #: templates/workflow/summary/venue.templ Line:28
 #: templates/workflow/summary/club.templ
 #: templates/user/forgot_password_form.templ Line:8
-#: templates/user/globalnav.templ Line:71 templates/user/index.templ Line:48
+#: templates/user/globalnav.templ Line:61 Line:74 templates/user/index.templ
+#: Line:48
 msgid "Email"
 msgstr "E-post"
 
@@ -1698,7 +1699,7 @@ msgstr "Lägg till"
 msgid "Age Level"
 msgstr "Åldersgrupp"
 
-#: web/WorkFlow.pm Line:324 web/PersonRequest.pm Line:929
+#: web/WorkFlow.pm Line:324 web/PersonRequest.pm Line:930
 msgid "An error has been encountered."
 msgstr "Ett fel har inträffat."
 
@@ -1718,7 +1719,7 @@ msgstr "Godkännande av förbundet"
 msgid "Approval by Regional Association"
 msgstr "Godkännande av distriktet"
 
-#: web/WorkFlow.pm Line:3791 web/PersonRequest.pm Line:1290
+#: web/WorkFlow.pm Line:3791 web/PersonRequest.pm Line:1297
 #: templates/dashboards/personregistration.templ Line:65
 #: templates/workflow/generic/document.templ Line:63
 msgid "Approved"
@@ -1742,7 +1743,7 @@ msgstr "Registrering av förening"
 #: web/Flow_PersonBackend.pm Line:68 web/Flow_ClubBackend.pm Line:61
 #: web/Flow_TransferBackend.pm web/Flow_FacilityBackend.pm Line:57
 #: web/PersonFieldsSetup.pm Line:800 web/Reports/ReportAdvanced_MyPeople.pm
-#: Line:1753 web/Reports/ReportAdvanced_BelowPeople.pm Line:1780
+#: Line:1765 web/Reports/ReportAdvanced_BelowPeople.pm Line:1791
 #: templates/dashboards/person.templ Line:78
 #: templates/registration/summary.templ Line:28
 #: templates/workflow/view/venue.templ Line:114
@@ -1777,8 +1778,8 @@ msgid "Date/Time"
 msgstr "Datum/tid"
 
 #: web/WorkFlow.pm Line:1257 Line:2660 Line:4618 Line:4752 Line:4804
-#: web/ListPersons.pm Line:50 web/PersonRequest.pm Line:438 Line:445 Line:514
-#: Line:929 Line:1071 Line:1366 Line:2162 Line:2214 web/Venues.pm Line:993
+#: web/ListPersons.pm Line:50 web/PersonRequest.pm Line:439 Line:446 Line:515
+#: Line:930 Line:1078 Line:1373 Line:2171 Line:2223 web/Venues.pm Line:993
 #: Line:1004 Line:1037 Line:1048 Line:1137 Line:1252 Line:1263 Line:1295
 #: Line:1352 web/registration/SelfUserWorkFlow.pm Line:52 Line:61
 #: web/registration/SelfUserTransfer.pm Line:60 Line:66 Line:128
@@ -1849,7 +1850,7 @@ msgstr "Inte tillgänglig"
 #: web/ListNotifications.pm Line:36 web/PersonRegistrationDetail.pm Line:300
 #: web/Club.pm Line:821 Line:878 Line:928 web/Entity.pm Line:425 Line:481
 #: web/PendingRegistrations.pm Line:320 web/Products.pm Line:328
-#: web/ListTransactions.pm Line:41 web/PersonRequest.pm Line:1000
+#: web/ListTransactions.pm Line:41 web/PersonRequest.pm Line:1007
 #: web/Payments.pm Line:315 web/Venues.pm Line:801 web/EntityIdentifier.pm
 #: Line:331 web/IncompleteRegistrations.pm Line:286 web/TransLog.pm Line:2214
 #: web/PaymentSplit/PaymentSplitList.pm Line:62
@@ -1950,8 +1951,8 @@ msgid "Resolved"
 msgstr "Behandlad"
 
 #: web/FacilityFieldsSetup.pm Line:152 Line:273 web/EntityFieldsSetup.pm
-#: Line:225 Line:342 Line:690 Line:820 web/PersonRequest.pm Line:1935
-#: Line:1951 web/PersonFieldsSetup.pm Line:290 Line:301 Line:357 Line:406
+#: Line:225 Line:342 Line:690 Line:820 web/PersonRequest.pm Line:1944
+#: Line:1960 web/PersonFieldsSetup.pm Line:290 Line:301 Line:357 Line:406
 #: Line:415 Line:445 Line:772
 msgid "Select Country"
 msgstr "Välj land"
@@ -1973,7 +1974,7 @@ msgstr "Arbetsuppgiften tilldelad till"
 msgid "Task Status"
 msgstr "Arbetsuppgiftens status"
 
-#: web/PersonRegistrationDetail.pm Line:332 web/PersonRequest.pm Line:1024
+#: web/PersonRegistrationDetail.pm Line:332 web/PersonRequest.pm Line:1031
 msgid "Task Type"
 msgstr "Typ av arbetsuppgift"
 
@@ -2408,7 +2409,7 @@ msgstr "Ändra status på [_1]"
 msgid "Close Person Entity"
 msgstr "Stäng personen"
 
-#: web/Person.pm Line:322 web/PersonRequest.pm Line:1020 web/TransLog.pm
+#: web/Person.pm Line:322 web/PersonRequest.pm Line:1027 web/TransLog.pm
 #: Line:2119 Line:2230 templates/personrequest/access/view.templ Line:28
 #: Line:168
 msgid "Date"
@@ -2487,22 +2488,22 @@ msgstr "Ersätt fil"
 msgid "Save Options"
 msgstr "Spara inställningar"
 
-#: web/PersonRegisterWhat.pm Line:511 Line:522 Line:634 Line:662 Line:849
+#: web/PersonRegisterWhat.pm Line:512 Line:523 Line:635 Line:663 Line:850
 msgid "Selection Not Required"
 msgstr "Val krävs ej"
 
-#: web/PersonRegisterWhat.pm Line:386 templates/registration/what.templ
+#: web/PersonRegisterWhat.pm Line:387 templates/registration/what.templ
 #: Line:24 templates/flow/default.templ Line:43
 msgid "This type of registration is not available"
 msgstr "Denna typ av registrering är inte möjlig"
 
-#: web/PersonRegisterWhat.pm Line:390
+#: web/PersonRegisterWhat.pm Line:391
 msgid "This type of registration is not within the window."
 msgstr "Denna typ av registrering är inte möjlig just nu."
 
 #: web/Person.pm Line:299 Line:391 web/EntityDocuments.pm Line:112
 #: web/PendingRegistrations.pm Line:191 Line:204 web/PersonRequest.pm
-#: Line:1012 web/EntityIdentifier.pm Line:343 web/IncompleteRegistrations.pm
+#: Line:1019 web/EntityIdentifier.pm Line:343 web/IncompleteRegistrations.pm
 #: Line:162 Line:168 Line:291 web/TransLog.pm Line:653
 #: templates/dashboards/personregistration.templ Line:132
 #: templates/selfrego/transfer_init.templ Line:50
@@ -2526,14 +2527,13 @@ msgstr "i"
 
 #: web/Flow_DisplayFields.pm Line:957 templates/translation/outstanding.templ
 #: Line:5
-#, fuzzy
 msgid "Apr"
-msgstr "Godkänn"
+msgstr "April"
 
 #: web/Flow_DisplayFields.pm Line:961 templates/translation/outstanding.templ
 #: Line:9
 msgid "Aug"
-msgstr ""
+msgstr "Aug"
 
 #: web/Club.pm Line:946
 msgid "Clubs in [_1]"
@@ -2552,7 +2552,7 @@ msgstr "Dag"
 #: web/Flow_DisplayFields.pm Line:965 templates/translation/outstanding.templ
 #: Line:13
 msgid "Dec"
-msgstr ""
+msgstr "Dec"
 
 #: web/Entity.pm Line:337 web/Transactions.pm Line:454
 #: templates/dashboards/entity.templ Line:9 templates/dashboards/club.templ
@@ -2560,7 +2560,7 @@ msgstr ""
 msgid "Details"
 msgstr "Detaljer"
 
-#: web/Entity.pm Line:322 web/ReportManager.pm Line:244 web/TransLog.pm
+#: web/Entity.pm Line:322 web/ReportManager.pm Line:245 web/TransLog.pm
 #: Line:695 templates/dashboards/entity.templ Line:9
 #: templates/dashboards/club.templ Line:4 Line:29
 #: templates/dashboards/person.templ Line:68 Line:123
@@ -2582,7 +2582,7 @@ msgstr "Ändra"
 #: web/Flow_DisplayFields.pm Line:955 templates/translation/outstanding.templ
 #: Line:3
 msgid "Feb"
-msgstr ""
+msgstr "Feb"
 
 #: web/Flow_DisplayFields.pm Line:1151 Line:1156 web/EntityFields.pm Line:297
 msgid "Field required"
@@ -2591,29 +2591,27 @@ msgstr "Obligatorisk fält"
 #: web/Flow_DisplayFields.pm Line:954 templates/translation/outstanding.templ
 #: Line:2
 msgid "Jan"
-msgstr ""
+msgstr "Jan"
 
 #: web/Flow_DisplayFields.pm Line:960 templates/translation/outstanding.templ
 #: Line:8
 msgid "Jul"
-msgstr ""
+msgstr "Juli"
 
 #: web/Flow_DisplayFields.pm Line:959 templates/translation/outstanding.templ
 #: Line:7
-#, fuzzy
 msgid "Jun"
-msgstr "Kör"
+msgstr "Juni"
 
 #: web/Flow_DisplayFields.pm Line:956 templates/translation/outstanding.templ
 #: Line:4
 msgid "Mar"
-msgstr ""
+msgstr "Mars"
 
 #: web/Flow_DisplayFields.pm Line:958 templates/translation/outstanding.templ
 #: Line:6
-#, fuzzy
 msgid "May"
-msgstr "Dag"
+msgstr "Maj"
 
 #: web/Flow_DisplayFields.pm Line:953 templates/translation/outstanding.templ
 #: Line:15
@@ -2622,9 +2620,8 @@ msgstr "Månad"
 
 #: web/Flow_DisplayFields.pm Line:964 templates/translation/outstanding.templ
 #: Line:12
-#, fuzzy
 msgid "Nov"
-msgstr "Nej"
+msgstr "Nov"
 
 #: web/Flow_DisplayFields.pm Line:1217
 msgid "Number is invalid"
@@ -2633,7 +2630,7 @@ msgstr "Nummret är ogiltigt"
 #: web/Flow_DisplayFields.pm Line:963 templates/translation/outstanding.templ
 #: Line:11
 msgid "Oct"
-msgstr ""
+msgstr "Okt"
 
 #: web/Club.pm Line:822 Line:887 web/Entity.pm Line:426 Line:489
 #: templates/dashboards/entity.templ Line:20 templates/dashboards/club.templ
@@ -2642,7 +2639,7 @@ msgstr ""
 #: templates/emails/notification/hk-notification-template.templ
 #: templates/emails/notification/FI-notification-template.templ Line:101
 #: Line:108 templates/workflow/result/venue.templ Line:65
-#: templates/user/globalnav.templ Line:38 Line:57 Line:64
+#: templates/user/globalnav.templ Line:41 Line:60 Line:67
 #: templates/user/index.templ Line:42 Line:47
 #: templates/personrequest/access/current_club_view.templ Line:148
 #: templates/personrequest/access/requesting_club_view.templ Line:51 Line:180
@@ -2712,7 +2709,7 @@ msgstr "Välj några alternativ"
 #: web/Flow_DisplayFields.pm Line:962 templates/translation/outstanding.templ
 #: Line:10
 msgid "Sep"
-msgstr ""
+msgstr "Sep"
 
 #: web/Flow_DisplayFields.pm Line:1169
 msgid "This must be [_1] characters long"
@@ -2722,10 +2719,6 @@ msgstr "Detta måste vara [_1] tecken långt"
 #: Line:16
 msgid "Year"
 msgstr "År"
-
-#: web/PersonSummaryPanel.pm Line:52
-msgid "valid to"
-msgstr "giltig till"
 
 #: web/PersonCertifications.pm Line:299 Line:312
 msgid "Add Another Certificate"
@@ -2776,7 +2769,7 @@ msgstr "Typ av klassificering"
 
 #: web/PersonCertifications.pm Line:162 web/Flow_PersonBackend.pm Line:92
 #: templates/dashboards/personregistration.templ Line:190
-#: templates/selfrego/selfregohistorybody.templ Line:84
+#: templates/selfrego/selfregohistorybody.templ Line:94
 #: templates/registration/summary.templ Line:56
 #: templates/workflow/view/person.templ Line:269
 #: templates/workflow/view/personregistration.templ Line:293
@@ -2784,7 +2777,7 @@ msgid "Certifications"
 msgstr "Klassificeringar"
 
 #: web/EntityDocuments.pm Line:305 web/Documents.pm Line:324
-#: templates/registration/document_flow_backend.templ Line:72 Line:181
+#: templates/registration/document_flow_backend.templ Line:74 Line:194
 #: templates/entity/required_docs.templ Line:57 Line:144
 #: templates/club/required_docs.templ Line:61 Line:156
 #: templates/workflow/view/document_upload.templ Line:42
@@ -2797,10 +2790,10 @@ msgid "Comments"
 msgstr "Komentarer"
 
 #: web/EntityDocuments.pm Line:327 Line:378 web/Transactions.pm Line:656
-#: web/Documents.pm Line:137 Line:144 Line:351 web/PersonRequest.pm Line:2130
+#: web/Documents.pm Line:137 Line:144 Line:351 web/PersonRequest.pm Line:2139
 #: templates/registration/product_flow_backend.templ Line:48
 #: templates/registration/certificate_flow_backend.templ Line:72
-#: templates/registration/document_flow_backend.templ Line:220
+#: templates/registration/document_flow_backend.templ Line:117 Line:233
 #: templates/entity/venue_fields.templ Line:111
 #: templates/entity/add_fields_count.templ Line:36
 #: templates/payment/invoicenum_frm.templ Line:12
@@ -2817,7 +2810,7 @@ msgstr "Betaldatum"
 
 #: web/EntityDocuments.pm Line:247 web/Documents.pm Line:227
 #: web/UploadFiles.pm Line:102 Line:108 Line:113 Line:116 Line:119 Line:128
-#: web/ReportManager.pm Line:246 web/IncompleteRegistrations.pm Line:241
+#: web/ReportManager.pm web/IncompleteRegistrations.pm Line:241
 msgid "Delete"
 msgstr "Radera"
 
@@ -2905,8 +2898,8 @@ msgstr "Betala fakturorna nu"
 
 #: web/PayInvoice.pm Line:417 Line:714 web/FindPayment.pm Line:156
 #: web/TransLog.pm Line:414 Line:1100 Line:1582 Line:1868 Line:2122 Line:2210
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1450
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1478
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1461
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1488
 #: templates/txn_receipt/fnswreceipt.templ Line:51
 #: templates/txn_receipt/receiptbody.templ Line:23
 #: templates/workflow/generic/payment.templ Line:15
@@ -2925,8 +2918,8 @@ msgstr "Skriv ut kvitto"
 
 #: web/PayInvoice.pm Line:312 Line:604 web/Transactions.pm Line:352
 #: web/ListTransactions.pm Line:113 web/TransLog.pm Line:667 Line:1628
-#: Line:1914 Line:2077 web/Reports/ReportAdvanced_MyPeople.pm Line:1429
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1457
+#: Line:1914 Line:2077 web/Reports/ReportAdvanced_MyPeople.pm Line:1440
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1467
 #: templates/payment/invoicetemplate.templ Line:56
 msgid "Quantity"
 msgstr "Antal"
@@ -2957,8 +2950,8 @@ msgstr "För att visa klassificeringsdetaljer"
 
 #: web/PersonRegistrationFlow_Common.pm Line:207 Line:443
 #: web/PersonRegistrationFlow_Backend.pm Line:109 web/Flow_PersonBackend.pm
-#: Line:873 web/Flow_LoanBackend.pm Line:789 web/Flow_TransferBackend.pm
-#: Line:792 web/registration/Flow_PersonSelfReg.pm Line:654
+#: Line:873 web/Flow_LoanBackend.pm Line:790 web/Flow_TransferBackend.pm
+#: Line:793 web/registration/Flow_PersonSelfReg.pm Line:654
 msgid "You cannot register this combination, limit exceeded"
 msgstr ""
 "Du kan inte göra en sådan registrering, kolla de existerande registreringarna"
@@ -2968,9 +2961,13 @@ msgid "including"
 msgstr "inkluderar"
 
 #: web/PersonCertifications.pm Line:298 Line:311 templates/selfrego/home.templ
-#: Line:31 templates/reports/reportoptions_header.templ Line:21
+#: Line:41 templates/reports/reportoptions_header.templ Line:21
 msgid "or"
 msgstr "eller"
+
+#: web/PersonSummaryPanel.pm Line:52
+msgid "valid to"
+msgstr "giltig till"
 
 #: web/Transactions.pm Line:367
 msgid "Amount Already Paid via Part Payments"
@@ -2998,8 +2995,8 @@ msgid "Edit Logo"
 msgstr "Byt logo"
 
 #: web/Transactions.pm Line:382 web/ListTransactions.pm Line:129
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1540
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1568
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1551
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1578
 msgid "End Date"
 msgstr "Slutdatum"
 
@@ -3060,7 +3057,7 @@ msgid "Part Payment for"
 msgstr "Delbetalning för"
 
 #: web/Transactions.pm Line:405 web/Reports/ReportAdvanced_MyPeople.pm
-#: Line:1394 web/Reports/ReportAdvanced_BelowPeople.pm Line:1422
+#: Line:1405 web/Reports/ReportAdvanced_BelowPeople.pm Line:1432
 #: templates/emails/payments/payment_receipt.templ Line:100
 #: templates/workflow/generic/payment.templ Line:11
 msgid "Product"
@@ -3101,8 +3098,8 @@ msgid "Select Registration"
 msgstr "Välj registrering"
 
 #: web/Transactions.pm Line:376 web/ListTransactions.pm Line:125
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1529
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1557
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1540
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1567
 msgid "Start Date"
 msgstr "Startdatum"
 
@@ -3119,7 +3116,7 @@ msgid "Transaction has been deleted"
 msgstr "Betalningen har blivit raderad"
 
 #: web/Transactions.pm Line:112 web/Navbar.pm Line:729 Line:1158 Line:1209
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1787
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1798
 #: templates/selfrego/accordion.templ Line:12
 msgid "Transactions"
 msgstr "Betalningar"
@@ -3273,7 +3270,7 @@ msgstr "Föreningens betalningar"
 msgid "Club Work Tasks"
 msgstr "Föreningens arbetsuppgifter"
 
-#: web/Navbar.pm Line:472 web/PageMain.pm Line:284
+#: web/Navbar.pm Line:472 web/PageMain.pm Line:286
 #: web/IncompleteRegistrations.pm Line:345
 #: templates/translation/outstanding.templ Line:28
 msgid "Clubs"
@@ -3383,7 +3380,7 @@ msgstr "Registreringsformulär"
 msgid "Registrations Allowed"
 msgstr "Tillåtna registreringar"
 
-#: web/Navbar.pm Line:175 Line:526 Line:575 Line:947 web/PageMain.pm Line:359
+#: web/Navbar.pm Line:175 Line:526 Line:575 Line:947 web/PageMain.pm Line:361
 #: templates/dashboards/worktasks.templ Line:238 Line:250
 msgid "Reports"
 msgstr "Rapporter"
@@ -3635,8 +3632,8 @@ msgid "Width of Field"
 msgstr "Fältets bredd"
 
 #: web/PersonRegistrationFlow_Backend.pm Line:106 web/Flow_PersonBackend.pm
-#: Line:870 web/Flow_LoanBackend.pm Line:786 web/Flow_TransferBackend.pm
-#: Line:789 web/registration/Flow_PersonSelfReg.pm Line:651
+#: Line:870 web/Flow_LoanBackend.pm Line:787 web/Flow_TransferBackend.pm
+#: Line:790 web/registration/Flow_PersonSelfReg.pm Line:651
 msgid "You cannot register at this time, Person is currently SUSPENDED"
 msgstr "Denna person kan inte registreras just nu. Personen är AVSTÄNGD."
 
@@ -3648,15 +3645,15 @@ msgstr "Ny betalning"
 msgid "Amount Paid"
 msgstr "Betalad summa"
 
-#: web/ReportManager.pm Line:246
+#: web/ReportManager.pm Line:247
 msgid "Are you sure you want to delete this saved report?"
 msgstr "Är du säker att du vill radera denna sparade rapport?"
 
-#: web/ReportManager.pm Line:238
+#: web/ReportManager.pm Line:239
 msgid "Build"
 msgstr "Skapa"
 
-#: web/ReportManager.pm Line:215
+#: web/ReportManager.pm Line:216
 msgid "Build a Report"
 msgstr "Skapa en rapport"
 
@@ -3687,10 +3684,6 @@ msgstr "Rapportens inställningar"
 msgid "Confirm License"
 msgstr "Bekräfta spelpass"
 
-#: web/ListPersons.pm Line:193
-msgid "DUPLICATE"
-msgstr "DUPLIKAT"
-
 #: web/Flow_PersonBackend.pm Line:94
 msgid "Enter Certifications"
 msgstr "Ange klassificering"
@@ -3710,10 +3703,6 @@ msgstr "Ange ogranisationens uppgifter"
 #: web/Flow_PersonBackend.pm Line:56
 msgid "Enter Personal Information"
 msgstr "Ange personuppgifter"
-
-#: web/ListPersons.pm Line:48
-msgid "Entity Not Allowed To View List"
-msgstr "Ingen rätt att visa listan"
 
 #: web/Flow_PersonBackend.pm Line:233
 msgid "Has this person already been registered?"
@@ -3743,8 +3732,8 @@ msgid "Invalid Club ID"
 msgstr "Felaktigt förenings ID"
 
 #: web/Flow_PersonBackend.pm Line:1079 Line:1428 Line:1532
-#: web/Flow_ClubBackend.pm Line:566 web/Flow_LoanBackend.pm Line:869 Line:1252
-#: Line:1356 web/Flow_TransferBackend.pm Line:873 Line:1257 Line:1368
+#: web/Flow_ClubBackend.pm Line:566 web/Flow_LoanBackend.pm Line:870 Line:1253
+#: Line:1357 web/Flow_TransferBackend.pm Line:874 Line:1258 Line:1369
 #: web/Flow_FacilityBackend.pm Line:215 Line:638
 #: web/registration/Flow_PersonSelfReg.pm Line:859 Line:1219 Line:1352
 msgid "Invalid Registration ID"
@@ -3754,10 +3743,6 @@ msgstr "Felaktigt registrerings ID"
 #: Line:509
 msgid "Invalid Renewal Details"
 msgstr "Felaktiga detaljer för förnyande"
-
-#: web/ListPersons.pm Line:58
-msgid "Invalid page requested"
-msgstr "Felaktig sida begärd"
 
 #: web/ListTransactions.pm Line:109
 msgid "Item Name"
@@ -3771,27 +3756,11 @@ msgstr "Spelpass"
 msgid "List of Transactions"
 msgstr "Lista på betalningar"
 
-#: web/ListPersons.pm Line:289
-msgid "List of people registered directly with the Member Association"
-msgstr "Lista på personer som är registrerade direkt till förbundet"
-
-#: web/ListPersons.pm Line:292
-msgid "List of people registered directly with the Region"
-msgstr "Lista på personer som är registrerade direkt till distriktet"
-
-#: web/ListPersons.pm Line:295
-msgid "List of people registered with the Club"
-msgstr "Lista på personer som är registrerade till föreningen"
-
-#: web/ListPersons.pm Line:335
-msgid "N"
-msgstr "N"
-
 #: web/ListTransactions.pm Line:42
 msgid "No Transactions can be found in the database."
 msgstr "Inga betalningar hittade"
 
-#: web/Flow_PersonBackend.pm Line:164 web/PersonRequest.pm Line:514
+#: web/Flow_PersonBackend.pm Line:164 web/PersonRequest.pm Line:515
 #: web/registration/Flow_PersonSelfReg.pm Line:510
 #: templates/dashboards/personregistration.templ Line:244
 msgid "No record found."
@@ -3803,14 +3772,10 @@ msgstr "Är du osäker?"
 
 #: web/Flow_PersonBackend.pm Line:55 web/Flow_TransferBackend.pm Line:54
 #: web/PersonFieldsSetup.pm Line:723 web/Reports/ReportAdvanced_MyPeople.pm
-#: Line:1751 web/Reports/ReportAdvanced_BelowPeople.pm Line:1778
+#: Line:1763 web/Reports/ReportAdvanced_BelowPeople.pm Line:1789
 #: templates/selfrego/user/signup.templ Line:3
 msgid "Personal Details"
 msgstr "Personuppgifter"
-
-#: web/ListPersons.pm Line:287
-msgid "Persons in [_1]"
-msgstr "Personer i [_1]"
 
 #: web/Flow_PersonBackend.pm Line:227 web/registration/Flow_PersonSelfReg.pm
 #: Line:185
@@ -3818,12 +3783,12 @@ msgid ""
 "Please check that this player has not been registered with another club?"
 msgstr "Har spelaren tidigare registrerats i en annan förening?"
 
-#: web/Flow_ClubBackend.pm Line:742 web/Flow_LoanBackend.pm Line:1270
+#: web/Flow_ClubBackend.pm Line:742 web/Flow_LoanBackend.pm Line:1271
 #: web/Flow_BulkRenewalsBackend.pm Line:407
 msgid "Proceed to Payment and Submit to Member Association"
 msgstr "Fortsätt till betalning och skicka för godkännande"
 
-#: web/Flow_PersonBackend.pm Line:1457 web/Flow_TransferBackend.pm Line:1282
+#: web/Flow_PersonBackend.pm Line:1457 web/Flow_TransferBackend.pm Line:1283
 #: web/registration/Flow_PersonSelfReg.pm Line:1245
 msgid "Proceed to Payment and Submit to [_1]"
 msgstr "Fortsätt till betalning och skicka till [_1]"
@@ -3843,30 +3808,26 @@ msgid "Reports Manager"
 msgstr "Rapporthanteraren"
 
 #: web/Flow_PersonBackend.pm Line:1344 web/Flow_ClubBackend.pm Line:630
-#: web/Flow_LoanBackend.pm Line:1136 web/Flow_TransferBackend.pm Line:1141
+#: web/Flow_LoanBackend.pm Line:1137 web/Flow_TransferBackend.pm Line:1142
 #: web/Flow_FacilityBackend.pm Line:698 web/registration/Flow_PersonSelfReg.pm
 #: Line:1133
 msgid "Required Document Missing"
 msgstr "Obligatoriskt dokument fattas"
 
-#: web/ReportManager.pm Line:229 Line:249
+#: web/ReportManager.pm Line:230 Line:250
 msgid "Run"
 msgstr "Kör"
 
-#: web/ReportManager.pm Line:216
+#: web/ReportManager.pm Line:217
 msgid "Run a Report"
 msgstr "Kör rapport"
 
-#: web/ListPersons.pm Line:145
-msgid "SUSPENDED"
-msgstr "AVSTÄNGD"
-
-#: web/Flow_PersonBackend.pm Line:1450 web/Flow_TransferBackend.pm Line:1275
+#: web/Flow_PersonBackend.pm Line:1450 web/Flow_TransferBackend.pm Line:1276
 #: web/registration/Flow_PersonSelfReg.pm Line:1272
 msgid "Submit to "
 msgstr "Skicka till"
 
-#: web/Flow_ClubBackend.pm Line:734 web/Flow_LoanBackend.pm Line:1263
+#: web/Flow_ClubBackend.pm Line:734 web/Flow_LoanBackend.pm Line:1264
 #: web/Flow_FacilityBackend.pm Line:828 web/Flow_BulkRenewalsBackend.pm
 #: Line:400
 msgid "Submit to Member Association"
@@ -3904,25 +3865,21 @@ msgstr "Denna person är möjligen ett duplikat"
 msgid "Upload Documents"
 msgstr "Skicka dokument"
 
-#: web/ListPersons.pm Line:335
-msgid "Y"
-msgstr "J"
-
-#: web/EditMemberClubs.pm Line:457
-msgid "Clubs Updated"
-msgstr "Föreningar uppdaterade"
-
-#: web/PersonRequest.pm Line:667
+#: web/PersonRequest.pm Line:668
 msgid "Confirm Request"
 msgstr "Godkänn begäran"
 
-#: web/PersonRequest.pm Line:652
+#: web/ListPersons.pm Line:193
+msgid "DUPLICATE"
+msgstr "DUPLIKAT"
+
+#: web/PersonRequest.pm Line:653
 msgid "Do you have the player's International Transfer Certificate?"
 msgstr "Har du internationellt speltillstånd (ITC)?"
 
-#: web/EditMemberClubs.pm Line:231
-msgid "Edit "
-msgstr "Ändra"
+#: web/ListPersons.pm Line:48
+msgid "Entity Not Allowed To View List"
+msgstr "Ingen rätt att visa listan"
 
 #: web/GridDisplay.pm Line:435 templates/dashboards/worktasks.templ Line:392
 #: templates/personrequest/transfer/search_result.templ Line:67
@@ -3931,9 +3888,13 @@ msgstr "Ändra"
 msgid "First"
 msgstr "Första"
 
-#: web/PersonRequest.pm Line:2128
+#: web/PersonRequest.pm Line:2137
 msgid "International Transfer Certificate request has been sent"
 msgstr "Begäran på internationellt speltillstånd (ITC) har sckickats"
+
+#: web/ListPersons.pm Line:58
+msgid "Invalid page requested"
+msgstr "Felaktig sida begärd"
 
 #: web/GridDisplay.pm Line:436 templates/dashboards/worktasks.templ Line:392
 #: templates/personrequest/transfer/search_result.templ Line:67
@@ -3942,28 +3903,44 @@ msgstr "Begäran på internationellt speltillstånd (ITC) har sckickats"
 msgid "Last"
 msgstr "Sista"
 
-#: web/PersonRequest.pm Line:2251 templates/workflow/view/loan.templ Line:229
+#: web/ListPersons.pm Line:289
+msgid "List of people registered directly with the Member Association"
+msgstr "Lista på personer som är registrerade direkt till förbundet"
+
+#: web/ListPersons.pm Line:292
+msgid "List of people registered directly with the Region"
+msgstr "Lista på personer som är registrerade direkt till distriktet"
+
+#: web/ListPersons.pm Line:295
+msgid "List of people registered with the Club"
+msgstr "Lista på personer som är registrerade till föreningen"
+
+#: web/PersonRequest.pm Line:2260 templates/workflow/view/loan.templ Line:229
 #: templates/workflow/view/personregistration.templ Line:320
 #: templates/workflow/summary/loan.templ Line:31
 msgid "Loan End Date"
 msgstr "Slutdatum för tidsbunden spelarövergång"
 
-#: web/PersonRequest.pm Line:2241 templates/workflow/view/loan.templ Line:224
+#: web/PersonRequest.pm Line:2250 templates/workflow/view/loan.templ Line:224
 #: templates/workflow/view/personregistration.templ Line:316
 #: templates/workflow/summary/loan.templ Line:27
 msgid "Loan Start Date"
 msgstr "Startdatum för tidsbunden spelarövergång"
 
-#: web/PersonRequest.pm Line:996
+#: web/PersonRequest.pm Line:1003
 #: templates/search/grid/personregistration.templ Line:6
 #: templates/registration/summarybulk.templ Line:7 templates/person/list.templ
 #: Line:5
 msgid "MA ID"
 msgstr "PalloID"
 
-#: web/PersonRequest.pm Line:438
+#: web/PersonRequest.pm Line:439
 msgid "Member is currently registered."
 msgstr "Personen är registrerad."
+
+#: web/ListPersons.pm Line:335
+msgid "N"
+msgstr "N"
 
 #: web/GridDisplay.pm Line:437 templates/dashboards/worktasks.templ Line:392
 #: templates/personrequest/transfer/search_result.templ Line:67
@@ -3979,28 +3956,37 @@ msgstr "Nästa"
 msgid "No matching records found"
 msgstr "Inget resultat "
 
-#: web/PersonRequest.pm Line:445
+#: web/PersonRequest.pm Line:997
+#, fuzzy
+msgid "No transfer history found"
+msgstr "Tidigare spelarövergångar"
+
+#: web/PersonRequest.pm Line:446
 msgid "Pending request has been found."
 msgstr "En väntande begäran har hittats."
 
-#: web/PersonRequest.pm Line:2207
+#: web/PersonRequest.pm Line:2216
 msgid "Person Request History"
 msgstr "Tidigare begäran av person"
 
-#: web/PersonRequest.pm Line:1071 Line:2162
+#: web/PersonRequest.pm Line:1078 Line:2171
 msgid "Person Request not found."
 msgstr "Begäran av person hittades inte"
 
-#: web/PersonRequest.pm Line:879
+#: web/ListPersons.pm Line:287
+msgid "Persons in [_1]"
+msgstr "Personer i [_1]"
+
+#: web/PersonRequest.pm Line:880
 msgid "Player Loan - Submitted to Current Club"
 msgstr "Tidsbunden spelarövergång - Skickad till gamla föreningen"
 
-#: web/Flow_LoanBackend.pm Line:1371
+#: web/Flow_LoanBackend.pm Line:1372
 msgid "Player Loan Submitted to MA"
 msgstr "Tidsbunden spelarövergång - Skickad till förbundet"
 
-#: web/Flow_LoanBackend.pm Line:791 Line:840 Line:1034 Line:1117 Line:1198
-#: Line:1239
+#: web/Flow_LoanBackend.pm Line:792 Line:841 Line:1035 Line:1118 Line:1199
+#: Line:1240
 msgid "Player loan failed, cannot find registration."
 msgstr "Tidsbunden spelarövergång misslyckad, registrering hittas inte."
 
@@ -4011,15 +3997,15 @@ msgstr "Tidsbunden spelarövergång misslyckad, registrering hittas inte."
 msgid "Previous"
 msgstr "Föregående"
 
-#: web/PersonRequest.pm Line:992
+#: web/PersonRequest.pm Line:999
 msgid "Records found"
 msgstr "Poster hittade"
 
-#: web/PersonRequest.pm Line:878
+#: web/PersonRequest.pm Line:879
 msgid "Request Access (Add Role) - Submitted to Current Club"
 msgstr "Begär åtkomst (lägg till roll) - Skickad till nuvarande föreningen"
 
-#: web/PersonRequest.pm Line:522
+#: web/PersonRequest.pm Line:523
 msgid "Request Access cannot continue until re-approved by MA."
 msgstr ""
 "Begäran på åtkomst kan inte fortsätta utan nytt godkännande av förbundet."
@@ -4028,21 +4014,21 @@ msgstr ""
 msgid "Request Access to Person Details"
 msgstr "Begär åtkomst till personuppgifter"
 
-#: web/PersonRequest.pm Line:1004 templates/personrequest/access/view.templ
+#: web/PersonRequest.pm Line:1011 templates/personrequest/access/view.templ
 #: Line:20 Line:160
 msgid "Request From"
 msgstr "Ny förening"
 
-#: web/PersonRequest.pm Line:1008 templates/personrequest/access/view.templ
+#: web/PersonRequest.pm Line:1015 templates/personrequest/access/view.templ
 #: Line:24 Line:164
 msgid "Request To"
 msgstr "Gammal förening"
 
-#: web/PersonRequest.pm Line:871 Line:877
+#: web/PersonRequest.pm Line:872 Line:878
 msgid "Request a Transfer - Submitted to Current Club"
 msgstr "Begär spelarövergång - Skickad till gammal förening"
 
-#: web/PersonRequest.pm Line:2009 Line:2043 Line:2069
+#: web/PersonRequest.pm Line:2018 Line:2052 Line:2078
 msgid "Request for an International Transfer Certificate"
 msgstr "Begär internationellt speltillstånd (ITC)"
 
@@ -4054,22 +4040,22 @@ msgstr "Starta tidsbunden spelarövergång"
 msgid "Request/Initiate a Transfer"
 msgstr "Starta spelarövergång"
 
-#: web/PersonRequest.pm Line:918 Line:985 Line:2194
+#: web/PersonRequest.pm Line:919 Line:986 Line:2203
 #: templates/personrequest/transfer/current_club_view.templ Line:196
 #: templates/personrequest/generic/completed.templ Line:5
 #: templates/personrequest/loan/current_club_view.templ Line:210
 msgid "Requested"
 msgstr "Begärd"
 
-#: web/PersonRequest.pm Line:956
+#: web/PersonRequest.pm Line:957
 msgid "Requests"
 msgstr "Begäran"
 
-#: web/PersonRequest.pm Line:1016
+#: web/PersonRequest.pm Line:1023
 msgid "Response Status"
 msgstr "Svar"
 
-#: web/PersonRequest.pm Line:1366
+#: web/PersonRequest.pm Line:1373
 msgid "Response has been submitted already."
 msgstr "Svaret har redan skickats"
 
@@ -4077,12 +4063,12 @@ msgstr "Svaret har redan skickats"
 msgid "Result"
 msgstr "Resultat"
 
-#: web/EditMemberClubs.pm Line:51 Line:223
-msgid "Save "
-msgstr "Spara"
+#: web/ListPersons.pm Line:145
+msgid "SUSPENDED"
+msgstr "AVSTÄNGD"
 
-#: web/Flow_LoanBackend.pm Line:250 Line:345 Line:915 Line:1072
-#: web/Flow_TransferBackend.pm Line:251 Line:346 Line:919 Line:1077
+#: web/Flow_LoanBackend.pm Line:250 Line:345 Line:916 Line:1073
+#: web/Flow_TransferBackend.pm Line:251 Line:346 Line:920 Line:1078
 msgid "Save & Continue"
 msgstr "Spara och fortsätt"
 
@@ -4108,11 +4094,11 @@ msgstr "Visar _START_ till _END_ av totalt _TOTAL_ "
 msgid "Sorry there is no data to return"
 msgstr "Inget att visa"
 
-#: web/PersonRequest.pm Line:2232
+#: web/PersonRequest.pm Line:2241
 msgid "Source Club"
 msgstr "Spelarens egna förening"
 
-#: web/PersonRequest.pm Line:2004 templates/selfrego/transfer_init.templ
+#: web/PersonRequest.pm Line:2013 templates/selfrego/transfer_init.templ
 #: Line:106 templates/entity/venue_fields.templ Line:150
 #: templates/workflow/generic/actions.templ Line:75
 #: templates/personrequest/access/current_club_view.templ Line:244
@@ -4129,46 +4115,42 @@ msgstr "Spelarens egna förening"
 msgid "Submit"
 msgstr "Skicka"
 
-#: web/PersonRequest.pm Line:2261 templates/workflow/summary/loan.templ
+#: web/PersonRequest.pm Line:2270 templates/workflow/summary/loan.templ
 #: Line:36 templates/personrequest/loan/current_club_view.templ Line:134
 #: templates/personrequest/loan/new_club_view.templ Line:168
 msgid "TMS Reference"
 msgstr "TMS-referens"
 
-#: web/Flow_LoanBackend.pm Line:1206 web/Flow_TransferBackend.pm Line:1211
+#: web/Flow_LoanBackend.pm Line:1207 web/Flow_TransferBackend.pm Line:1212
 msgid "Transfer failed, you must step through Payments screen."
 msgstr "Spelarövergången misslyckades, du måste gå via betalningssidan."
 
-#: web/Flow_LoanBackend.pm Line:1655 web/Flow_TransferBackend.pm Line:1667
+#: web/Flow_LoanBackend.pm Line:1656 web/Flow_TransferBackend.pm Line:1668
 msgid "Use the Continue button to go to the next page"
 msgstr "Använd Fortsätt -knappen för att gå till nästa sida"
 
-#: web/PersonRequest.pm Line:448
+#: web/PersonRequest.pm Line:449
 msgid "View pending"
 msgstr "Visa vändande"
 
-#: web/PersonRequest.pm Line:1375
-msgid "You have [_1] the [_2] of [_3] [_4]."
-msgstr "Du har  [_1] [_2] av [_3] [_4]."
+#: web/ListPersons.pm Line:335
+msgid "Y"
+msgstr "J"
 
-#: web/PersonRequest.pm Line:1381
+#: web/PersonRequest.pm Line:1382
+msgid "You have [_1] the [_2] of [_3] [_4]."
+msgstr "Du har [_1] [_2] av [_3] [_4]."
+
+#: web/PersonRequest.pm Line:1388
 msgid "You will be notified once the transfer is effective and approved by "
 msgstr ""
 "Du kommer att bil informerad när spelarövergången är i kraft och godkänd av "
 
-#: web/BulkPersons.pm Line:205
+#: web/BulkPersons.pm Line:167
 msgid "Bulk Registration"
 msgstr "Gruppregistrering"
 
-#: web/PageMain.pm Line:596 templates/selfrego/wrapper.templ Line:76
-#: templates/page_wrapper/main_wrapper.templ Line:149
-#: templates/user/index.templ Line:75
-msgid "COPYRIGHT"
-msgstr ""
-"&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2015.&nbsp; "
-"All rights reserved."
-
-#: web/BulkPersons.pm Line:161
+#: web/BulkPersons.pm Line:184
 msgid "Check"
 msgstr "Kontrollera"
 
@@ -4184,6 +4166,10 @@ msgstr "Kontrollera/uppdatera dokument"
 msgid "Check/Update Personal Details"
 msgstr "Kontrollera/uppdatera personuppgifter"
 
+#: web/EditMemberClubs.pm Line:457
+msgid "Clubs Updated"
+msgstr "Föreningar uppdaterade"
+
 #: web/Flow_TransferBackend.pm Line:100
 msgid "Confirm Transfer Fee"
 msgstr "Godkänn priset på övergången"
@@ -4196,11 +4182,11 @@ msgstr "Godkänn spelarövergången"
 msgid "Congratulations your payment has been successful"
 msgstr "Tack, betalningen lyckades"
 
-#: web/PageMain.pm Line:126
-msgid "NO_BODY"
-msgstr "NO_BODY"
+#: web/EditMemberClubs.pm Line:231
+msgid "Edit "
+msgstr "Ändra"
 
-#: web/BulkPersons.pm Line:170
+#: web/BulkPersons.pm Line:193
 msgid "National Num."
 msgstr "Nationellt nummer"
 
@@ -4219,10 +4205,6 @@ msgstr "Information on gammal förening"
 msgid "Payment Summary"
 msgstr "Översikt av betalningen"
 
-#: web/PageMain.pm Line:283 web/IncompleteRegistrations.pm Line:328
-msgid "Persons"
-msgstr "Personer"
-
 #: web/Payments.pm Line:348
 msgid ""
 "Please confirm the details above, then click the <b>Pay Now</b> button to "
@@ -4231,9 +4213,17 @@ msgstr ""
 "Godkänn uppgifterna ovan, klicka sedan på <b>Betala nu</b> knappen för att "
 "betala"
 
+#: web/EditMemberClubs.pm Line:51 Line:223
+msgid "Save "
+msgstr "Spara"
+
 #: web/Flow_TransferBackend.pm Line:110
 msgid "Summary and Submission"
 msgstr "Översikt och skickande"
+
+#: web/BulkPersons.pm Line:169
+msgid "Too many records returned - You must enter a Family Name filter"
+msgstr ""
 
 #: web/Payments.pm Line:322 templates/registration/products.templ Line:109
 #: templates/registration/summary.templ Line:70
@@ -4251,12 +4241,12 @@ msgstr "Totalt"
 msgid "Transaction Number"
 msgstr "Betalningens nummer"
 
-#: web/Flow_TransferBackend.pm Line:1383
+#: web/Flow_TransferBackend.pm Line:1384
 msgid "Transfer Submitted to MA"
 msgstr "Spelarövergången skickad till förbundet"
 
-#: web/Flow_TransferBackend.pm Line:794 Line:844 Line:1039 Line:1122 Line:1203
-#: Line:1244
+#: web/Flow_TransferBackend.pm Line:795 Line:845 Line:1040 Line:1123 Line:1204
+#: Line:1245
 msgid "Transfer failed, cannot find registration."
 msgstr "Spelarövergången misslyckades, hittade inte registrering."
 
@@ -4277,10 +4267,6 @@ msgstr "Din betalning väntar / är returnerad"
 msgid "Add Fields"
 msgstr "Lägg till fält"
 
-#: web/PersonFieldsSetup.pm Line:1012
-msgid "Add New Certification"
-msgstr "Lägg till klassificering"
-
 #: web/EntityRegistrationAllowedEdit.pm Line:227
 msgid "Add New Registration Type"
 msgstr "Lägg till ny registreringstyp"
@@ -4293,10 +4279,6 @@ msgstr "Lägg till en registreringstyp till"
 msgid "Add new Rule"
 msgstr "Lägg till regel"
 
-#: web/PersonFieldsSetup.pm Line:725
-msgid "Additional Information"
-msgstr "Tilläggsuppgifter"
-
 #: web/IncompleteRegistrations.pm Line:108 Line:241
 msgid "Are you sure you want to delete this registration?"
 msgstr "Är du säker att du vill radera denna registrering?"
@@ -4304,6 +4286,14 @@ msgstr "Är du säker att du vill radera denna registrering?"
 #: web/FindPayment.pm Line:143
 msgid "Bank Reference"
 msgstr "Referensnummer"
+
+#: web/PageMain.pm Line:598 templates/selfrego/wrapper.templ Line:76
+#: templates/page_wrapper/main_wrapper.templ Line:149
+#: templates/user/index.templ Line:75
+msgid "COPYRIGHT"
+msgstr ""
+"&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2015.&nbsp; "
+"All rights reserved."
 
 #: web/EntityRegistrationAllowedEdit.pm Line:229
 msgid "Click here"
@@ -4364,32 +4354,6 @@ msgstr "Fält för anläggningar uppdaterade."
 msgid "Fields"
 msgstr "Fält"
 
-#: web/PersonFieldsSetup.pm Line:656 templates/selfrego/user/signup.templ
-#: Line:75
-msgid "I agree to the terms and conditions as specified above"
-msgstr ""
-
-#: web/PersonFieldsSetup.pm Line:529
-msgid ""
-"If the player has been registered in another country before, you will need "
-"an ITC to continue with the registration."
-msgstr ""
-"Om spelaren tidigare har registrerats i ett annat land, behöver du ett "
-"internationellt speltillstånd (ITC) för att fortsätta."
-
-#: web/PersonFieldsSetup.pm Line:529
-msgid ""
-"If you don't have an ITC you can request it here prior to the registration."
-msgstr ""
-"Om du inte har ett internationellt speltillstånd (ITC) kan du begära ett här "
-"före registreringen."
-
-#: web/PersonFieldsSetup.pm Line:529
-msgid "If you have the ITC then please start the transfer process here."
-msgstr ""
-"Om du har ett internationellt spelstillstånd (ITC) kan starta "
-"registreringsprocessen här."
-
 #: web/IncompleteRegistrations.pm Line:413
 msgid "Incomplete registration has been delete"
 msgstr "Den ofullständiga registreringen har raderats"
@@ -4406,13 +4370,9 @@ msgstr "Felaktigt arena/anläggnings ID."
 msgid "Invalid number of fields to be deleted."
 msgstr "Felaktigt antal fält att radera."
 
-#: web/PersonFieldsSetup.pm Line:646
-msgid "Legal Guardian"
-msgstr "Förmyndare"
-
-#: web/PersonFieldsSetup.pm Line:727
-msgid "Loan Information"
-msgstr "Information om tidsbunden spelarövergång"
+#: web/PageMain.pm Line:127
+msgid "NO_BODY"
+msgstr "NO_BODY"
 
 #: web/IncompleteRegistrations.pm Line:353
 msgid "No Incomplete Registrations"
@@ -4422,16 +4382,8 @@ msgstr "Inga ofullständiga registreringar"
 msgid "Number of Fields"
 msgstr "Antal fält"
 
-#: web/PersonFieldsSetup.pm Line:646
-msgid "Parent"
-msgstr "Förälder"
-
-#: web/PersonFieldsSetup.pm Line:722
-msgid "Parent/Guardian Details"
-msgstr "Information om förälder/förmyndare"
-
 #: web/FindPayment.pm Line:147 web/Reports/ReportAdvanced_MyPeople.pm
-#: Line:1505 web/Reports/ReportAdvanced_BelowPeople.pm Line:1533
+#: Line:1516 web/Reports/ReportAdvanced_BelowPeople.pm Line:1543
 #: templates/txn_receipt/fnswreceipt.templ Line:47
 #: templates/txn_receipt/receiptbody.templ Line:19
 msgid "Payment Date"
@@ -4458,6 +4410,10 @@ msgstr "Personens nivå"
 msgid "Person Type"
 msgstr "Personens typ"
 
+#: web/PageMain.pm Line:285 web/IncompleteRegistrations.pm Line:328
+msgid "Persons"
+msgstr "Personer"
+
 #: web/EntityRegistrationAllowedEdit.pm Line:204
 msgid "Registration Rule Deleted"
 msgstr "Registreringsregel raderad"
@@ -4478,17 +4434,9 @@ msgstr "Registreringstyp tillsatt"
 msgid "Registrations accepted by my organisation"
 msgstr "Registreringar godkända av min organisation"
 
-#: web/PersonFieldsSetup.pm Line:726
-msgid "Terms and Conditions"
-msgstr ""
-
 #: web/RegistrationAllowed.pm Line:59
 msgid "The system does not allow this combination"
 msgstr "Systemet tillåter inte denna kombination"
-
-#: web/PersonFieldsSetup.pm Line:728
-msgid "Transfer Information"
-msgstr "Information om spelarövergången"
 
 #: web/Venues.pm Line:810 templates/workflow/view/venue.templ Line:64
 #: templates/workflow/summary/venue.templ Line:21
@@ -4499,14 +4447,6 @@ msgstr "Arenans namn"
 #: web/IncompleteRegistrations.pm Line:126 Line:259
 msgid "View & Resume"
 msgstr "Visa och fortsätt"
-
-#: web/PersonFieldsSetup.pm Line:619
-msgid "What is your relationship to the minor you are registering?"
-msgstr "Vilken är din relation till den minderåring du registrerar?"
-
-#: web/PersonFieldsSetup.pm Line:507
-msgid "You must choose one of the following options"
-msgstr "Du måste välja ett av följände allternativ"
 
 #: web/Venues.pm Line:1129
 msgid "invalid input"
@@ -4520,17 +4460,21 @@ msgstr "obligatorisk"
 msgid "to return to list of current registration types accepted"
 msgstr "för att gå tillbaka till listan på godkända registreringstyper"
 
-#: web/registration/AccountActivation.pm Line:25
-msgid "Account Activation"
-msgstr "Aktivering av användarnamn"
-
 #: web/registration/OldSystemAccounts.pm Line:80
 msgid "Account linked successfully"
 msgstr "Användarnamnet länkat till personen"
 
+#: web/PersonFieldsSetup.pm Line:1012
+msgid "Add New Certification"
+msgstr "Lägg till klassificering"
+
 #: web/TransLog.pm Line:912
 msgid "Add Transaction"
 msgstr "Ny betalning"
+
+#: web/PersonFieldsSetup.pm Line:725
+msgid "Additional Information"
+msgstr "Tilläggsuppgifter"
 
 #: web/registration/SelfUserWorkFlow.pm Line:61
 msgid "An invalid Action Code has been passed to me."
@@ -4564,6 +4508,32 @@ msgstr "Kvitterad"
 msgid "Hold on this Transaction has been resolved"
 msgstr "Denna betalning har blivit kvitterad"
 
+#: web/PersonFieldsSetup.pm Line:656 templates/selfrego/user/signup.templ
+#: Line:75
+msgid "I agree to the terms and conditions as specified above"
+msgstr "Jag godkänner villkoren ovan"
+
+#: web/PersonFieldsSetup.pm Line:529
+msgid ""
+"If the player has been registered in another country before, you will need "
+"an ITC to continue with the registration."
+msgstr ""
+"Om spelaren tidigare har registrerats i ett annat land, behöver du ett "
+"internationellt speltillstånd (ITC) för att fortsätta."
+
+#: web/PersonFieldsSetup.pm Line:529
+msgid ""
+"If you don't have an ITC you can request it here prior to the registration."
+msgstr ""
+"Om du inte har ett internationellt speltillstånd (ITC) kan du begära ett här "
+"före registreringen."
+
+#: web/PersonFieldsSetup.pm Line:529
+msgid "If you have the ITC then please start the transfer process here."
+msgstr ""
+"Om du har ett internationellt spelstillstånd (ITC) kan starta "
+"registreringsprocessen här."
+
 #: web/TransLog.pm Line:468
 msgid "Invalid Transaction"
 msgstr "Felaktig betalning"
@@ -4588,6 +4558,10 @@ msgstr "Betalningen består av följande produkter"
 msgid "Items making up this order"
 msgstr "Ordern består av följande produkter"
 
+#: web/PersonFieldsSetup.pm Line:646
+msgid "Legal Guardian"
+msgstr "Förmyndare"
+
 #: web/TransLog.pm Line:799
 msgid "List All Payment Records"
 msgstr "Visa alla betalningar"
@@ -4596,6 +4570,10 @@ msgstr "Visa alla betalningar"
 msgid "List of Payment Records"
 msgstr "Lista på alla betalningar"
 
+#: web/PersonFieldsSetup.pm Line:727
+msgid "Loan Information"
+msgstr "Information om tidsbunden spelarövergång"
+
 #: web/TransLog.pm Line:2121
 msgid "No Payment Records can be found in the database."
 msgstr "Inga betalningar kan hittas i databasen."
@@ -4603,6 +4581,14 @@ msgstr "Inga betalningar kan hittas i databasen."
 #: web/TransLog.pm Line:803
 msgid "No records were found with this filter"
 msgstr "Inget hittades med detta filter"
+
+#: web/PersonFieldsSetup.pm Line:646
+msgid "Parent"
+msgstr "Förälder"
+
+#: web/PersonFieldsSetup.pm Line:722
+msgid "Parent/Guardian Details"
+msgstr "Information om förälder/förmyndare"
 
 #: web/TransLog.pm Line:986 templates/registration/product_flow_backend.templ
 #: Line:29
@@ -4691,6 +4677,10 @@ msgstr "Välj de personer som du vill förnya"
 msgid "Tax Price"
 msgstr "Skatt"
 
+#: web/PersonFieldsSetup.pm Line:726
+msgid "Terms and Conditions"
+msgstr "Vilkor"
+
 #: web/registration/OldSystemAccounts.pm Line:59
 msgid ""
 "The person you are trying to link is an adult and there is already an adult "
@@ -4746,6 +4736,10 @@ msgstr "Slutsumma"
 msgid "Transaction paid via a different payment record"
 msgstr "Transaktionen betald via en annan betalning"
 
+#: web/PersonFieldsSetup.pm Line:728
+msgid "Transfer Information"
+msgstr "Information om spelarövergången"
+
 #: web/TransLog.pm Line:725
 msgid "View Payments"
 msgstr "Visa betalningar"
@@ -4758,19 +4752,23 @@ msgstr "Visa kvitto"
 msgid "We can't seem to find your old account"
 msgstr "Vi kan inte hitta personuppgifterna"
 
+#: web/PersonFieldsSetup.pm Line:619
+msgid "What is your relationship to the minor you are registering?"
+msgstr "Vilken är din relation till den minderåring du registrerar?"
+
 #: web/CheckOnLogin.pm Line:123
 msgid "You have [_1] duplicate to resolve."
 msgstr "Du har [_1] duplikat som väntar på att behandlas"
+
+#: web/PersonFieldsSetup.pm Line:507
+msgid "You must choose one of the following options"
+msgstr "Du måste välja ett av följände allternativ"
 
 #: web/registration/OldSystemAccounts.pm Line:29
 msgid "You must supply both credentials to link to your old system account"
 msgstr ""
 "Du måste fylla i båda fälten för att länka personuppgifterna till ditt "
 "användarnamn"
-
-#: web/registration/AccountActivation.pm Line:53
-msgid "Your account has already been confirmed"
-msgstr "Ditt användarnamn har redan bekräftats"
 
 #: web/TransLog.pm Line:519
 msgid "Your payment has been Confirmed"
@@ -4788,6 +4786,10 @@ msgstr "är en felaktig summa"
 msgid "is not valid for Date Paid"
 msgstr "är ett felaktigt betalningsdatum"
 
+#: web/registration/AccountActivation.pm Line:25
+msgid "Account Activation"
+msgstr "Aktivering av användarnamn"
+
 #: web/registration/AccountProfile.pm Line:96
 msgid "All fields must be entered"
 msgstr "Alla fält måste fyllas i"
@@ -4802,7 +4804,7 @@ msgstr "Båda fälten måste vara identiska"
 msgid "Change your password"
 msgstr "Byt lösenord"
 
-#: web/registration/user/ConfirmationEmail.pm Line:62
+#: web/registration/user/ConfirmationEmail.pm Line:60
 msgid "Confirm your email with "
 msgstr "Bekräfta din e-postadress med"
 
@@ -4890,6 +4892,10 @@ msgstr "Du måste ange ett lösenord"
 msgid "You must enter an email address"
 msgstr "Du måste ange en e-postadress"
 
+#: web/registration/AccountActivation.pm Line:53
+msgid "Your account has already been confirmed"
+msgstr "Ditt användarnamn har redan bekräftats"
+
 #: web/registration/AccountProfile.pm Line:107
 msgid "Your profile has been updated"
 msgstr "Din användarprofil har uppdaterats"
@@ -4921,8 +4927,8 @@ msgstr "Ditt användarnamn är inte ännu bekräftat"
 msgid "Request for Person Details Search"
 msgstr "Sök begäran på personuppgifter"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1757
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1784
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1769
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1795
 msgid "Affiliations"
 msgstr "Anknytningar"
 
@@ -4934,34 +4940,34 @@ msgstr "Alla"
 msgid "Ascending"
 msgstr "Stigande"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1463
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1491
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1474
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1501
 #: templates/emails/payments/payment_receipt.templ Line:71
 msgid "Bank Reference Number"
 msgstr "Referensnummer"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:582
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:609
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:593
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:619
 msgid "Birth Certificate Country"
 msgstr "Födelsebevisets land"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:573
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:600
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:584
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:610
 msgid "Birth Certificate Notes"
 msgstr "Födelsebevisets anmärkningar"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:564
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:591
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:575
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:601
 msgid "Birth Certificate Number"
 msgstr "Födelsebevisets nummer"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:595
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:622
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:606
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:632
 msgid "Birth Certificate Valid From"
 msgstr "Födelsebeviset giltigt från"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:607
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:634
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:618
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:644
 msgid "Birth Certificate Valid To"
 msgstr "Födelsebeviset giltigt till"
 
@@ -4969,16 +4975,10 @@ msgstr "Födelsebeviset giltigt till"
 msgid "Choose how you want to receive the data from this report."
 msgstr "Välj hur du vill att rapporten levereras."
 
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:373
-#, fuzzy
-msgid "Date From"
-msgstr "Giltig från"
-
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:377
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:384
-#, fuzzy
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:388
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:394
 msgid "Date To"
-msgstr "Datum"
+msgstr "Till"
 
 #: web/Reports/ReportAdvanced.pm Line:367
 msgid "Descending"
@@ -5014,8 +5014,8 @@ msgid ""
 msgstr ""
 "Skicka rapporten per e-post i ett format som man kan läsa in andra produkter."
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:405
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:414
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:416
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:424
 msgid "Entity Name"
 msgstr "Enhetens namn"
 
@@ -5023,8 +5023,8 @@ msgstr "Enhetens namn"
 msgid "Filter Only"
 msgstr "Endast filtrering"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1755
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1782
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1767
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1793
 msgid "Financial"
 msgstr "Finansiell"
 
@@ -5032,23 +5032,28 @@ msgstr "Finansiell"
 msgid "Group By"
 msgstr "Gruppera"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1754
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1781
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1766
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1792
 msgid "Identifications"
 msgstr "Identifikationer"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1419
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1447
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:104
+#: web/Reports/ReportAdvanced_BelowPeople.pm
+msgid "Imported Person Code"
+msgstr ""
+
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1430
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1457
 msgid "Line Item Total"
 msgstr "Raderna totalt"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1440
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1468
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1451
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1478
 msgid "Manual Receipt Reference"
 msgstr "Förklaring/referens"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1758
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1785
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1770
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1796
 msgid "Member Records"
 msgstr "Medlemsuppgifter"
 
@@ -5064,13 +5069,13 @@ msgstr "Öppna rapporten på skärmen"
 msgid "Options"
 msgstr "Inställningar"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1481
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1509
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1492
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1519
 msgid "Order Total"
 msgstr "Sammanlagt"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1756
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1783
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1768
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1794
 msgid "Other Fields"
 msgstr "Andra fält"
 
@@ -5078,44 +5083,43 @@ msgstr "Andra fält"
 msgid "Output"
 msgstr "Resultat"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1472
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1500
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1483
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1510
 msgid "Payment Log ID"
 msgstr "Betalningens nummer"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1571
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1599
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1582
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1609
 msgid "Payment Record Notes"
 msgstr "Betalningens tilläggsinformation"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:388
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:395
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:399
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:405
 msgid "Payment Required ?"
 msgstr "Betalning obligatorisk?"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1239
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1266
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1250
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1276
 msgid "Photo Present?"
 msgstr "Foto finns?"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1409
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1437
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1420
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1447
 msgid "Product Group"
 msgstr "Produktgrupp"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1379
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1406
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1390
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1416
 msgid "Product Reporting"
 msgstr "Produktrapportering"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1286
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1313
-#, fuzzy
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1297
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1323
 msgid "Region Name"
-msgstr "Filändelse"
+msgstr "Distriktets namn"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1752
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1779
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1764
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1790
 #: templates/dashboards/personregistration.templ Line:1
 #: templates/workflow/view/person.templ Line:42
 msgid "Registrations"
@@ -5133,8 +5137,8 @@ msgstr "Sortera efter (sekundärt)"
 msgid "Selected Fields"
 msgstr "Valda fält"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1516
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1544
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1527
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1554
 msgid "Settlement Date"
 msgstr "Betalningsdatum"
 
@@ -5150,23 +5154,23 @@ msgstr "Sortera efter"
 msgid "Summary Data"
 msgstr "Översikt"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1492
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1520
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1503
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1530
 msgid "Transaction Date"
 msgstr "Transaktionsdatum"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1370
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1397
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1381
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1407
 msgid "Transaction ID"
 msgstr "Transaktions ID"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1562
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1590
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1573
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1600
 msgid "Transaction Notes"
 msgstr "Transaktionens anmärkningar"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:1551
-#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1579
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:1562
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:1589
 msgid "Transaction Status"
 msgstr "Transaktionens status"
 
@@ -5174,10 +5178,14 @@ msgstr "Transaktionens status"
 msgid "Unique Records Only"
 msgstr "Endast unika rader"
 
-#: web/Reports/ReportAdvanced_MyPeople.pm Line:208
-#: web/Reports/ReportAdvanced_BelowPeople.pm
+#: web/Reports/ReportAdvanced_MyPeople.pm Line:219
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:218
 msgid "Year of Birth"
 msgstr "Födelseår"
+
+#: web/Reports/ReportAdvanced_BelowPeople.pm Line:383
+msgid "Date From"
+msgstr "Från"
 
 #: web/registrationUser/RegoLogin.pm Line:124
 msgid "Invalid Email/Password"
@@ -5239,32 +5247,9 @@ msgstr "Avbryt tidsbunden spelarövergång"
 msgid "Cleared Out"
 msgstr "Tömd"
 
-#: templates/selfrego/wrapper.templ Line:93
-#: templates/page_wrapper/main_wrapper.templ Line:172
-msgid "Columns"
-msgstr "Kolumner"
-
 #: templates/dashboards/club.templ Line:29
 msgid "Contacts"
 msgstr "Kontakter"
-
-#: templates/selfrego/transfer_init.templ Line:74
-#: templates/emails/notification/personrequest/html/requestloan_denied.templ
-#: Line:24
-#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestloan_sent.templ
-#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-#: templates/personrequest/access/personregistration_summary.templ Line:26
-#: templates/personrequest/generic/search_form.templ Line:207
-#: templates/personrequest/generic/reg_summary.templ Line:5
-msgid "Current Club"
-msgstr "Nuvarande förening"
 
 #: templates/search/grid/people.templ Line:7
 msgid "Date Added"
@@ -5465,17 +5450,6 @@ msgstr "Personens uppgifter"
 msgid "Personal Information"
 msgstr "Personuppgifter"
 
-#: templates/selfrego/transfer_init.templ Line:129
-#: templates/personrequest/access/current_club_view.templ Line:270
-#: templates/personrequest/transfer/current_club_view.templ Line:276
-#: templates/personrequest/transfer/search_form.templ Line:310
-#: templates/personrequest/transfer/new_club_view.templ Line:305
-#: templates/personrequest/transfer/view.templ Line:258
-#: templates/personrequest/generic/search_form.templ Line:309
-#: templates/personrequest/loan/search_form.templ Line:308
-msgid "Please add notes"
-msgstr "Lägg till anmärkningar"
-
 #: templates/dashboards/worktasks.templ Line:233 Line:243
 msgid "Quick Links"
 msgstr "Snabblänkar"
@@ -5550,10 +5524,6 @@ msgstr "Begär åtkomst för godkännande"
 msgid "Request Access sent to Club"
 msgstr "Begär åtkomst, skickat till föreningen"
 
-#: templates/selfrego/transfer_init.templ Line:91
-msgid "Request notes"
-msgstr "Begärans anmärkningar"
-
 #: templates/dashboards/worktasks.templ Line:236 Line:247
 msgid "Request or Start a Transfer"
 msgstr "Begär eller starta en spelarövergång"
@@ -5589,10 +5559,6 @@ msgstr "Sök organisation"
 #: templates/search/form.templ Line:30
 msgid "Search keyword is required."
 msgstr "Ange ett sökord"
-
-#: templates/selfrego/transfer_init.templ Line:82
-msgid "Select Club"
-msgstr "Välj förening"
 
 #: templates/dashboards/worktasks.templ Line:53
 #: templates/search/grid/personregistration.templ Line:25
@@ -5656,20 +5622,6 @@ msgstr "Väntande arbetsuppgifter"
 msgid "Total Task Rejected"
 msgstr "Avslagna arbetsuppgifter"
 
-#: templates/selfrego/transfer_init.templ Line:13
-#: templates/workflow/view/transfer.templ Line:39 Line:74
-#: templates/workflow/summary/transfer.templ Line:16
-#: templates/personrequest/transfer/current_club_view.templ Line:105
-#: templates/personrequest/transfer/search_form.templ Line:19
-#: templates/personrequest/transfer/new_club_view.templ Line:139
-#: templates/personrequest/generic/search_form.templ
-msgid "Transfer Details"
-msgstr "Spelarövergångens detaljer"
-
-#: templates/selfrego/transfer_init.templ Line:80
-msgid "Transfer To"
-msgstr "Övergå till"
-
 #: templates/dashboards/personregistration.templ Line:175
 #: templates/workflow/view/person.templ Line:265
 msgid "Valid To"
@@ -5730,37 +5682,21 @@ msgstr "har begärt åtkomst för"
 msgid "A minor in my care"
 msgstr "En minderårig i mitt förmyndarskap"
 
-#: templates/selfrego/accordion.templ Line:63
+#: templates/selfrego/accordion.templ Line:65
 msgid "Add Coach Role"
 msgstr "Lägg till tränarroll"
 
-#: templates/selfrego/accordion.templ Line:60 Line:62
+#: templates/selfrego/accordion.templ Line:62 Line:64
 msgid "Add Player Role"
 msgstr "Lägg till spelarroll"
 
-#: templates/selfrego/accordion.templ Line:64
+#: templates/selfrego/accordion.templ Line:66
 msgid "Add Referee Role"
 msgstr "Lägg till domarroll"
 
 #: templates/selfrego/home.templ Line:8
 msgid "Add an additional person?"
 msgstr "Lägg till person?"
-
-#: templates/registration/product_flow_backend.templ Line:30
-msgid ""
-"After you submit the registration to the [_1], the system will connect you "
-"to the payment portal"
-msgstr ""
-"Efter att du har skickat registreringen till [_1], flyttas du till "
-"betalningstjänsten"
-
-#: templates/registration/product_flow_backend.templ Line:37
-msgid ""
-"After you submit the registration to the [_1], the system will create an "
-"invoice for you to pay later"
-msgstr ""
-"Efter att du har skickat registreringen till [_1], skapar systemet en "
-"faktura som du kan betala senare"
 
 #: templates/registration/sr_account_activation_result.templ Line:3
 msgid ""
@@ -5793,6 +5729,11 @@ msgstr "Skapa ett lösenord"
 msgid "Click here to try again"
 msgstr "Klicka här för att försöka igen"
 
+#: templates/selfrego/wrapper.templ Line:93
+#: templates/page_wrapper/main_wrapper.templ Line:172
+msgid "Columns"
+msgstr "Kolumner"
+
 #: templates/selfrego/user/profile.templ Line:55
 #: templates/selfrego/user/signup.templ
 msgid "Contain at least one lower-case character"
@@ -5817,6 +5758,24 @@ msgstr "Innehålla åtminstone en stor bokstav"
 #: templates/payment/invoicetemplate.templ Line:57
 msgid "Cost"
 msgstr "Pris"
+
+#: templates/selfrego/transfer_init.templ Line:74
+#: templates/emails/notification/personrequest/html/requestloan_denied.templ
+#: Line:24
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_accepted.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+#: templates/personrequest/access/personregistration_summary.templ Line:26
+#: templates/personrequest/generic/search_form.templ Line:207
+#: templates/personrequest/generic/reg_summary.templ Line:5
+msgid "Current Club"
+msgstr "Nuvarande förening"
 
 #: templates/selfrego/accordion.templ Line:22
 msgid "DOB"
@@ -5851,7 +5810,7 @@ msgstr "Glömt lösenord?"
 msgid "Items"
 msgstr "Produkter"
 
-#: templates/selfrego/home.templ Line:47
+#: templates/selfrego/home.templ Line:57
 msgid "Link Account"
 msgstr "Länka dina personuppgifter"
 
@@ -5894,20 +5853,20 @@ msgstr "Lösenorden stämmer inte"
 msgid "Passwords must follow these rules"
 msgstr "Lösenordet måste uppfylla följande krav"
 
-#: templates/registration/product_flow_backend.templ Line:36
-msgid "Pay Later"
-msgstr "Betala senare"
-
-#: templates/registration/product_flow_backend.templ Line:24
-#: templates/registration/summary.templ Line:67
-#: templates/registration/summarybulk.templ Line:50
-#: templates/flow/club_summary.templ Line:77
-msgid "Payment Options"
-msgstr "Betalnings inställningar"
-
 #: templates/selfrego/accordion.templ Line:33
 msgid "Period"
 msgstr "Säsong"
+
+#: templates/selfrego/transfer_init.templ Line:129
+#: templates/personrequest/access/current_club_view.templ Line:270
+#: templates/personrequest/transfer/current_club_view.templ Line:276
+#: templates/personrequest/transfer/search_form.templ Line:310
+#: templates/personrequest/transfer/new_club_view.templ Line:305
+#: templates/personrequest/transfer/view.templ Line:258
+#: templates/personrequest/generic/search_form.templ Line:309
+#: templates/personrequest/loan/search_form.templ Line:308
+msgid "Please add notes"
+msgstr "Lägg till anmärkningar"
 
 #: templates/selfrego/user/profile.templ Line:95
 #: templates/selfrego/user/signup.templ Line:120 templates/user/signup.templ
@@ -5941,9 +5900,13 @@ msgstr "Nya lösenordet igen"
 msgid "Remind Me"
 msgstr "Skicka"
 
-#: templates/selfrego/accordion.templ Line:46
+#: templates/selfrego/accordion.templ Line:48
 msgid "Renew"
 msgstr "Förnya"
+
+#: templates/selfrego/transfer_init.templ Line:91
+msgid "Request notes"
+msgstr "Begärans anmärkningar"
 
 #: templates/selfrego/user/profile.templ Line:126
 msgid "Return to dashboard"
@@ -5961,10 +5924,9 @@ msgstr "Tillbaka till inloggningssidan"
 msgid "Return to signup page"
 msgstr "Tillbaka till registrering av användarnamn"
 
-#: templates/registration/product_flow_backend.templ Line:8
-#: templates/registration/person_flow_manual_pay.templ Line:6
-msgid "Select Payment Type"
-msgstr "Välj betalsätt"
+#: templates/selfrego/transfer_init.templ Line:82
+msgid "Select Club"
+msgstr "Välj förening"
 
 #: templates/selfrego/home.templ Line:1
 msgid "Self Registration Dashboard"
@@ -5983,6 +5945,20 @@ msgstr "Logga in på medlemsregistret"
 #: templates/user/signupfinish.templ
 msgid "Thanks for signing up"
 msgstr "Tack för registreringen av ett nytt användarnamn"
+
+#: templates/selfrego/transfer_init.templ Line:13
+#: templates/workflow/view/transfer.templ Line:39 Line:74
+#: templates/workflow/summary/transfer.templ Line:16
+#: templates/personrequest/transfer/current_club_view.templ Line:105
+#: templates/personrequest/transfer/search_form.templ Line:19
+#: templates/personrequest/transfer/new_club_view.templ Line:139
+#: templates/personrequest/generic/search_form.templ
+msgid "Transfer Details"
+msgstr "Spelarövergångens detaljer"
+
+#: templates/selfrego/transfer_init.templ Line:80
+msgid "Transfer To"
+msgstr "Övergå till"
 
 #: templates/selfrego/accordion.templ Line:31
 msgid "Type/Level"
@@ -6023,7 +5999,7 @@ msgstr "Välkommen"
 msgid "Welcome..."
 msgstr "Välkommen"
 
-#: templates/selfrego/home.templ Line:58
+#: templates/selfrego/home.templ Line:30
 msgid "What type of registration do you want?"
 msgstr "Vilken typ av registrering vill du göra?"
 
@@ -6031,7 +6007,7 @@ msgstr "Vilken typ av registrering vill du göra?"
 msgid "Who are you registering for?"
 msgstr "Vart vill du registrera till?"
 
-#: templates/selfrego/home.templ Line:33
+#: templates/selfrego/home.templ Line:43
 msgid ""
 "You can link an account from your old system into your new self registration "
 "account."
@@ -6040,9 +6016,8 @@ msgstr ""
 "användarnamn, genom att ange informationen nedan."
 
 #: templates/selfrego/user/signup.templ Line:121
-#, fuzzy
 msgid "You must agree to the terms and conditions"
-msgstr "Du måste välja ett av följände allternativ"
+msgstr "Du måste godkänna villkoren"
 
 #: templates/registration/sr_account_activation_result.templ Line:11
 msgid "Your account has been activated successfully."
@@ -6069,7 +6044,7 @@ msgstr "lösenord"
 msgid "re-enter password"
 msgstr "lösenord igen"
 
-#: templates/selfrego/accordion.templ Line:42
+#: templates/selfrego/accordion.templ Line:44
 msgid "valid until"
 msgstr "giltig till"
 
@@ -6078,6 +6053,22 @@ msgstr "giltig till"
 #: templates/personrequest/transfer/complete.templ Line:19
 msgid " Please note that any Level/Status change is subject to"
 msgstr "Observera att ändrande av spelarstatus orsakar"
+
+#: templates/registration/product_flow_backend.templ Line:30
+msgid ""
+"After you submit the registration to the [_1], the system will connect you "
+"to the payment portal"
+msgstr ""
+"Efter att du har skickat registreringen till [_1], flyttas du till "
+"betalningstjänsten"
+
+#: templates/registration/product_flow_backend.templ Line:37
+msgid ""
+"After you submit the registration to the [_1], the system will create an "
+"invoice for you to pay later"
+msgstr ""
+"Efter att du har skickat registreringen till [_1], skapar systemet en "
+"faktura som du kan betala senare"
 
 #: templates/registration/what.templ Line:73
 #: templates/registration/whatbulk.templ Line:38
@@ -6094,11 +6085,6 @@ msgstr ""
 "En faktura har skapats angående denna registrering. Du kan hitta alla dina "
 "fakturor via betalningsmenyn."
 
-#: templates/registration/document_flow_backend.templ Line:75
-#: templates/club/required_docs.templ Line:64 Line:159
-msgid "Are you sure you want to cancel this upload?"
-msgstr "Är du säker att du villa avbryta denna uppladdning?"
-
 #: templates/registration/completebulk.templ Line:4
 msgid "Bulk Registration is complete"
 msgstr "Gruppregistreringen är färdig"
@@ -6107,11 +6093,6 @@ msgstr "Gruppregistreringen är färdig"
 msgid "Bulk Renewal Registration"
 msgstr "Gruppköp"
 
-#: templates/registration/document_flow_backend.templ Line:74
-#: templates/club/required_docs.templ Line:63 Line:158
-msgid "Cancel Upload"
-msgstr "Avbryt uppladdning"
-
 #: templates/registration/certificate_flow_backend.templ Line:10
 msgid "Certifcation Type"
 msgstr "Typ av klassificering"
@@ -6119,12 +6100,6 @@ msgstr "Typ av klassificering"
 #: templates/registration/error.templ Line:2
 msgid "Click here to select new combination"
 msgstr "Klicka här för att välja ny kombination"
-
-#: templates/registration/document_flow_backend.templ Line:45 Line:70 Line:153
-#: Line:179 templates/entity/required_docs.templ Line:36 Line:123
-#: templates/club/required_docs.templ Line:59 Line:132 Line:154
-msgid "Click here to update this file"
-msgstr "Klicka här för att uppdatera denna fil"
 
 #: templates/registration/playerpassport.templ Line:10
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:20
@@ -6149,6 +6124,11 @@ msgstr "Giltig till"
 msgid "End"
 msgstr "Slut"
 
+#: templates/registration/whatbulk.templ Line:47
+#, fuzzy
+msgid "Family Name starting with"
+msgstr "Efternamn och initialer"
+
 #: templates/registration/summary.templ Line:15
 #: templates/workflow/view/loan.templ Line:101
 #: templates/workflow/view/transfer.templ Line:99
@@ -6163,7 +6143,7 @@ msgstr "Flicknamn"
 #: templates/emails/notification/myfas-notification-template.templ Line:32
 #: templates/emails/notification/hk-notification-template.templ
 #: templates/emails/notification/FI-notification-template.templ Line:100
-#: templates/user/globalnav.templ Line:37 templates/user/index.templ Line:41
+#: templates/user/globalnav.templ Line:40 templates/user/index.templ Line:41
 msgid "Member Association"
 msgstr "Medlemsförbund"
 
@@ -6196,17 +6176,22 @@ msgstr "Inget hittades"
 msgid "Once processing has taken place, the outcome will be emailed to the "
 msgstr "E-post skickas efter att ärendet är behandlat"
 
-#: templates/registration/document_flow_backend.templ Line:110
-#: templates/entity/required_docs.templ Line:86
-#: templates/club/required_docs.templ Line:94
-msgid "Optional Documents"
-msgstr "Valfria dokument"
+#: templates/registration/product_flow_backend.templ Line:36
+msgid "Pay Later"
+msgstr "Betala senare"
 
 #: templates/registration/summary.templ Line:71
 #: templates/registration/summarybulk.templ Line:54
 #: templates/flow/club_summary.templ Line:81
 msgid "Payment Method"
 msgstr "Betalsätt"
+
+#: templates/registration/product_flow_backend.templ Line:24
+#: templates/registration/summary.templ Line:67
+#: templates/registration/summarybulk.templ Line:50
+#: templates/flow/club_summary.templ Line:77
+msgid "Payment Options"
+msgstr "Betalnings inställningar"
 
 #: templates/registration/summary.templ Line:37
 #: templates/workflow/view/loan.templ Line:174
@@ -6254,14 +6239,6 @@ msgstr "Postnummer"
 msgid "Previous Level/Status"
 msgstr "Tidigare nivå/spelarstatus"
 
-#: templates/registration/complete.templ Line:66
-msgid "Register another Person"
-msgstr "Registrera en annan person"
-
-#: templates/registration/complete.templ Line:64
-msgid "Register another [_1]"
-msgstr "Registrera en annan [_1]"
-
 #: templates/registration/summary.templ Line:50
 #: templates/registration/summarybulk.templ Line:36
 #: templates/workflow/result/personregistration.templ Line:37
@@ -6303,28 +6280,9 @@ msgstr "Registrera till"
 msgid "Registration Details"
 msgstr "Registreringsdetaljer"
 
-#: templates/registration/complete.templ Line:18
-msgid "Registration has been submitted for approval"
-msgstr "Registreringen har skickat vidare för att godkännas"
-
-#: templates/registration/complete.templ Line:41
-#: templates/entity/complete.templ Line:10 templates/club/complete.templ
-#: Line:16 Line:34 templates/personrequest/transfer/complete.templ Line:44
-msgid "Registration has been submitted to"
-msgstr "Registreringen har skickats till"
-
 #: templates/registration/completebulk.templ Line:24
 msgid "Registrations have been submitted to"
 msgstr "Registreringarna har skickats till"
-
-#: templates/registration/document_flow_backend.templ Line:76
-#: templates/club/required_docs.templ Line:65 Line:160
-msgid "Remove file"
-msgstr "Radera fil"
-
-#: templates/registration/document_flow_backend.templ Line:4
-msgid "Required Documents"
-msgstr "Obligatoriska dokument"
 
 #: templates/registration/what.templ Line:40
 #: templates/registration/whatbulk.templ Line:18
@@ -6338,6 +6296,11 @@ msgstr "Tillbaka till gruppköp"
 #: templates/registration/entityselect.templ Line:7
 msgid "SEARCH/FIND A CLUB"
 msgstr "SÖK FÖRENING"
+
+#: templates/registration/product_flow_backend.templ Line:8
+#: templates/registration/person_flow_manual_pay.templ Line:6
+msgid "Select Payment Type"
+msgstr "Välj betalsätt"
 
 #: templates/registration/playerpassport.templ Line:8
 msgid "Start"
@@ -6367,24 +6330,6 @@ msgstr "Skicka för godkännande"
 #: templates/personrequest/generic/itc_confirmation.templ
 msgid "Thank you"
 msgstr "Tack"
-
-#: templates/registration/document_flow_backend.templ Line:48 Line:53 Line:156
-#: Line:161 templates/entity/required_docs.templ Line:39 Line:44 Line:126
-#: Line:131 templates/club/required_docs.templ Line:135 Line:140
-msgid "Upload"
-msgstr "Ladda upp"
-
-#: templates/registration/document_flow_backend.templ Line:45 Line:70 Line:153
-#: Line:179 templates/entity/required_docs.templ Line:36 Line:123
-#: templates/club/required_docs.templ Line:59 Line:132 Line:154
-msgid "Uploaded"
-msgstr "Uppladdad"
-
-#: templates/registration/complete.templ Line:62
-#: templates/entity/complete.templ Line:17 templates/club/complete.templ
-#: Line:42 templates/personrequest/transfer/complete.templ Line:51
-msgid "View all currently submitted registrations"
-msgstr "Visa alla skickade registreringar"
 
 #: templates/registration/complete_sr.templ Line:25
 #: templates/registration/complete.templ Line:27 templates/club/complete.templ
@@ -6426,15 +6371,6 @@ msgstr ""
 "Dina registreringsdetaljer är redan valda. Välj \"Återställ registrering\" "
 "för att ändra på detaljerna."
 
-#: templates/registration/complete.templ Line:41 templates/club/complete.templ
-#: Line:34 templates/personrequest/transfer/complete.templ Line:44
-msgid ""
-"and an invoice has been created for this registration.  You can pay anytime "
-"by going to the Payments Menu and choose the corresponding invoice"
-msgstr ""
-"och en faktura har skapats för denna registrering. Du kan betala när som "
-"helst genom att gå till betalningsmenyn och välja fakturan"
-
 #: templates/registration/completebulk.templ Line:24
 msgid ""
 "and an invoice has been created.  You can pay anytime by going to the "
@@ -6448,6 +6384,22 @@ msgstr ""
 #: templates/personrequest/transfer/complete.templ Line:19
 msgid "approval"
 msgstr "godkännande"
+
+#: templates/registration/document_flow_backend.templ Line:77
+#: templates/club/required_docs.templ Line:64 Line:159
+msgid "Are you sure you want to cancel this upload?"
+msgstr "Är du säker att du villa avbryta denna uppladdning?"
+
+#: templates/registration/document_flow_backend.templ Line:76
+#: templates/club/required_docs.templ Line:63 Line:158
+msgid "Cancel Upload"
+msgstr "Avbryt uppladdning"
+
+#: templates/registration/document_flow_backend.templ Line:47 Line:72 Line:166
+#: Line:192 templates/entity/required_docs.templ Line:36 Line:123
+#: templates/club/required_docs.templ Line:59 Line:132 Line:154
+msgid "Click here to update this file"
+msgstr "Klicka här för att uppdatera denna fil"
 
 #: templates/emails/notification/myfas-notification-template.templ Line:49
 #: templates/emails/notification/hk-notification-template.templ
@@ -6493,17 +6445,23 @@ msgstr "Bästa"
 msgid "Facility/Venue Name"
 msgstr "Namn på anläggningen/arenan"
 
-#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:3
-#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
-msgid "Greetings"
-msgstr "Hälsningar"
-
 #: templates/emails/notification/myfas-notification-template.templ Line:39
 #: templates/emails/notification/hk-notification-template.templ
 #: templates/emails/notification/FI-notification-template.templ Line:107
-#: templates/user/globalnav.templ Line:63 templates/user/index.templ Line:46
+#: templates/user/globalnav.templ Line:66 templates/user/index.templ Line:46
 msgid "Help Desk"
 msgstr "Help Desk"
+
+#: templates/registration/document_flow_backend.templ Line:117
+#, fuzzy
+msgid "No documents required for this registration, click"
+msgstr "Lägg till ett nytt dokument till denna registrering"
+
+#: templates/registration/document_flow_backend.templ Line:123
+#: templates/entity/required_docs.templ Line:86
+#: templates/club/required_docs.templ Line:94
+msgid "Optional Documents"
+msgstr "Valfria dokument"
 
 #: templates/emails/notification/workflow/html/wftask_added.templ Line:35
 #: templates/emails/notification/workflow/html/wftask_rejected.templ
@@ -6523,28 +6481,6 @@ msgstr "Originator"
 #: templates/emails/registration/activate.templ Line:9
 msgid "Please click"
 msgstr "Klicka här"
-
-#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:40
-#: templates/emails/notification/workflow/html/wftask_held.templ
-#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:64
-#: templates/emails/notification/personrequest/html/requestloan_denied.templ
-#: Line:55
-#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
-#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
-#: Line:50
-#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
-#: templates/emails/notification/personrequest/html/requestloan_sent.templ
-#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
-#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
-#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
-#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
-#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
-msgid "Reason"
-msgstr "Orsak"
 
 #: templates/emails/registration/activate.templ Line:13
 #: templates/emails/registration/passwordreset.templ Line:16
@@ -6582,6 +6518,33 @@ msgstr "Orsak"
 msgid "Regards"
 msgstr "Hälsningar"
 
+#: templates/registration/complete.templ Line:66
+msgid "Register another Person"
+msgstr "Registrera en annan person"
+
+#: templates/registration/complete.templ Line:64
+msgid "Register another [_1]"
+msgstr "Registrera en annan [_1]"
+
+#: templates/registration/complete.templ Line:18
+msgid "Registration has been submitted for approval"
+msgstr "Registreringen har skickat vidare för att godkännas"
+
+#: templates/registration/complete.templ Line:41
+#: templates/entity/complete.templ Line:10 templates/club/complete.templ
+#: Line:16 Line:34 templates/personrequest/transfer/complete.templ Line:44
+msgid "Registration has been submitted to"
+msgstr "Registreringen har skickats till"
+
+#: templates/registration/document_flow_backend.templ Line:78
+#: templates/club/required_docs.templ Line:65 Line:160
+msgid "Remove file"
+msgstr "Radera fil"
+
+#: templates/registration/document_flow_backend.templ Line:6
+msgid "Required Documents"
+msgstr "Obligatoriska dokument"
+
 #: templates/emails/registration/activate.templ Line:9
 msgid "Thank you for registering with"
 msgstr "Tack för registreringen till"
@@ -6590,26 +6553,33 @@ msgstr "Tack för registreringen till"
 msgid "The following task has been ASSIGNED to you for action"
 msgstr "Följande arbetsuppgift har TILLDELATS dig för att åtgärdas"
 
-#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:9
-msgid ""
-"The following task has been REJECTED. The reason for the rejection is "
-"detailed below. Please note that when a task is rejected it cannot be "
-"resumed. You would need start over and resubmit a new task through"
-msgstr ""
-"Följande arbetsuppgift har AVSLAGITS. Orsaken ser du nedan. Observera att "
-"man inte kan fortsätta på en avslagen arbetsuppgift, utan man måste starta "
-"en ny"
-
 #: templates/emails/registration/passwordreset.templ Line:9
-#, fuzzy
 msgid "To change your password please click on the link below."
 msgstr "Klicka på länken nedan för att byta ditt lösenord."
+
+#: templates/registration/document_flow_backend.templ Line:50 Line:55 Line:169
+#: Line:174 templates/entity/required_docs.templ Line:39 Line:44 Line:126
+#: Line:131 templates/club/required_docs.templ Line:135 Line:140
+msgid "Upload"
+msgstr "Ladda upp"
+
+#: templates/registration/document_flow_backend.templ Line:47 Line:72 Line:166
+#: Line:192 templates/entity/required_docs.templ Line:36 Line:123
+#: templates/club/required_docs.templ Line:59 Line:132 Line:154
+msgid "Uploaded"
+msgstr "Uppladdad"
+
+#: templates/registration/complete.templ Line:62
+#: templates/entity/complete.templ Line:17 templates/club/complete.templ
+#: Line:42 templates/personrequest/transfer/complete.templ Line:51
+msgid "View all currently submitted registrations"
+msgstr "Visa alla skickade registreringar"
 
 #: templates/emails/notification/myfas-notification-template.templ Line:34
 #: templates/emails/notification/hk-notification-template.templ
 #: templates/emails/notification/FI-notification-template.templ Line:102
 #: templates/workflow/summary/venue.templ Line:35
-#: templates/user/globalnav.templ Line:46 Line:59 templates/user/index.templ
+#: templates/user/globalnav.templ Line:49 Line:62 templates/user/index.templ
 #: Line:43
 msgid "Website"
 msgstr "Webbplats"
@@ -6642,9 +6612,14 @@ msgstr "Webbplats"
 msgid "Work Task"
 msgstr "Arbetsuppgift"
 
-#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:5
-msgid "Work task has been resumed."
-msgstr "Arbetsuppgiften har återupptagits"
+#: templates/registration/complete.templ Line:41 templates/club/complete.templ
+#: Line:34 templates/personrequest/transfer/complete.templ Line:44
+msgid ""
+"and an invoice has been created for this registration.  You can pay anytime "
+"by going to the Payments Menu and choose the corresponding invoice"
+msgstr ""
+"och en faktura har skapats för denna registrering. Du kan betala när som "
+"helst genom att gå till betalningsmenyn och välja fakturan"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "here"
@@ -6653,6 +6628,10 @@ msgstr "här"
 #: templates/emails/registration/activate.templ Line:9
 msgid "to confirm your account."
 msgstr "för att bekräfta ditt användarnamn."
+
+#: templates/registration/document_flow_backend.templ Line:117
+msgid "to proceed"
+msgstr ""
 
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #: Line:29
@@ -6667,6 +6646,11 @@ msgstr "Förening under den tidsbundna övergången"
 msgid "For further information please contact"
 msgstr "För tilläggsinformation, kontakta"
 
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:3
+#: templates/emails/notification/personrequest/html/requestaccess_overridden.templ
+msgid "Greetings"
+msgstr "Hälsningar"
+
 #: templates/emails/notification/personrequest/html/requesttransfer_completed.templ
 #: Line:29
 #: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
@@ -6680,6 +6664,28 @@ msgstr "Ny förening"
 #: Line:78
 msgid "Previous Club"
 msgstr "Tidigare förening"
+
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:40
+#: templates/emails/notification/workflow/html/wftask_held.templ
+#: templates/emails/notification/workflow/html/wftask_resolved.templ Line:64
+#: templates/emails/notification/personrequest/html/requestloan_denied.templ
+#: Line:55
+#: templates/emails/notification/personrequest/html/requestloan_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_completed.templ
+#: Line:50
+#: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_denied.templ
+#: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
+#: templates/emails/notification/personrequest/html/requestaccess_sent.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_rejected.templ
+#: templates/emails/notification/personrequest/html/requestaccess_rejected.templ
+#: templates/emails/notification/personrequest/html/requesttransfer_denied.templ
+msgid "Reason"
+msgstr "Orsak"
 
 #: templates/emails/notification/personrequest/html/requestaccess_completed.templ
 #: Line:9
@@ -6713,6 +6719,16 @@ msgid ""
 "no further action is required."
 msgstr "Följande arbetsuppgift har GODKÄNTS, inga ytterligare åtgärder krävs."
 
+#: templates/emails/notification/workflow/html/wftask_rejected.templ Line:9
+msgid ""
+"The following task has been REJECTED. The reason for the rejection is "
+"detailed below. Please note that when a task is rejected it cannot be "
+"resumed. You would need start over and resubmit a new task through"
+msgstr ""
+"Följande arbetsuppgift har AVSLAGITS. Orsaken ser du nedan. Observera att "
+"man inte kan fortsätta på en avslagen arbetsuppgift, utan man måste starta "
+"en ny"
+
 #: templates/emails/notification/workflow/html/wftask_held.templ Line:9
 msgid ""
 "The following task has been placed ON HOLD. The reason and further action "
@@ -6731,6 +6747,10 @@ msgid ""
 msgstr ""
 "Följande spelarövergång är nu GODKÄND av alla parter. Spelaren är nu "
 "registrerad i den nya föreningen."
+
+#: templates/emails/notification/workflow/html/wftask_resumed.templ Line:5
+msgid "Work task has been resumed."
+msgstr "Arbetsuppgiften har återupptagits"
 
 #: templates/emails/notification/personrequest/html/requestloan_accepted.templ
 #: Line:9
@@ -6771,22 +6791,6 @@ msgstr ""
 "har AVSLAGIT följande tidsbundna spelarövergång. Orsaken ser du nedan. "
 "Arbetsuppgiften är nu slutförd. Observera att man inte kan fortsätta på en "
 "avslagen arbetsuppgift, utan man måste starta en ny"
-
-#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
-#: Line:9
-msgid ""
-"has REQUESTED for a transfer. You are required to take action on this "
-"request within 7 days."
-msgstr "har BEGÄRT en spelarövergång. Du är skyldig att svara inom 7 dagar."
-
-#: templates/emails/notification/personrequest/html/requestloan_sent.templ
-#: Line:9
-msgid ""
-"has REQUESTED the loan of the following player. You are required to take "
-"action on this request within 7 days."
-msgstr ""
-"har BEGÄRT en tidsbunden spelarövergång. Du är skyldig att svara inom 7 "
-"dagar."
 
 #: templates/emails/notification/personrequest/html/requesttransfer_sent.templ
 #: Line:9
@@ -6905,6 +6909,22 @@ msgid ""
 msgstr ""
 "har BEGÄRT åtkomst till personen nedan, för att registrera en annan roll till"
 
+#: templates/emails/notification/personrequest/html/requestselftransfer_sent.templ
+#: Line:9
+msgid ""
+"has REQUESTED for a transfer. You are required to take action on this "
+"request within 7 days."
+msgstr "har BEGÄRT en spelarövergång. Du är skyldig att svara inom 7 dagar."
+
+#: templates/emails/notification/personrequest/html/requestloan_sent.templ
+#: Line:9
+msgid ""
+"has REQUESTED the loan of the following player. You are required to take "
+"action on this request within 7 days."
+msgstr ""
+"har BEGÄRT en tidsbunden spelarövergång. Du är skyldig att svara inom 7 "
+"dagar."
+
 #: templates/emails/notification/personrequest/html/requestloan_cancelled.templ
 #: Line:9
 msgid ""
@@ -6938,10 +6958,6 @@ msgstr "Betalning"
 msgid "Click here to download the file"
 msgstr "Klicka här för att ladda ned filen"
 
-#: templates/auth/authlist.templ Line:14
-msgid "Create a new user"
-msgstr "Skapa en ny användare"
-
 #: templates/emails/payments/payment_receipt.templ Line:64
 msgid "Date Purchased"
 msgstr "Betalningsdatum"
@@ -6958,10 +6974,6 @@ msgstr "ID"
 msgid "It appears you don't have a PDF plugin for this browser."
 msgstr "Det verkar som om du inte har en PDF-plugin för denna webbläsare."
 
-#: templates/entity/summarypanel.templ Line:3
-msgid "MA venue ID"
-msgstr "Förbundets arena ID"
-
 #: templates/emails/payments/payment_receipt.templ Line:18
 msgid "Payment Confirmation"
 msgstr "Betalningsbekräftelse"
@@ -6971,14 +6983,6 @@ msgstr "Betalningsbekräftelse"
 #: templates/txn_receipt/receiptbody.templ Line:27
 msgid "Receipt No"
 msgstr "Kvittonummer"
-
-#: templates/auth/authlist.templ Line:20
-msgid "Restricted Access"
-msgstr "Begränsad åtkomst"
-
-#: templates/auth/authlist.templ Line:2
-msgid "The following users are authorised to login"
-msgstr "Följande användare är auktoriserade att logga in"
 
 #: templates/viewer/viewer.templ Line:45
 msgid "There is no viewer for this type of file."
@@ -7026,6 +7030,10 @@ msgstr "Fältets kapacitet"
 msgid "Close"
 msgstr "Stäng"
 
+#: templates/auth/authlist.templ Line:14
+msgid "Create a new user"
+msgstr "Skapa en ny användare"
+
 #: templates/entity/auditlog.templ Line:8 templates/person/auditlog.templ
 msgid "Date Last Updated"
 msgstr "Uppdaterat"
@@ -7042,6 +7050,10 @@ msgstr "Sport"
 #: templates/entity/add_fields_count.templ Line:31
 msgid "Enter the number of additional fields"
 msgstr "Ange antal av tilläggsfält"
+
+#: templates/entity/summarypanel.templ Line:3
+msgid "MA venue ID"
+msgstr "Förbundets arena ID"
 
 #: templates/txn_receipt/fnswreceipt.templ Line:83
 #: templates/txn_receipt/receiptbody.templ Line:53
@@ -7061,6 +7073,10 @@ msgstr "St"
 msgid "Required Venue Documents"
 msgstr "Obligatoriska dokument för arena"
 
+#: templates/auth/authlist.templ Line:20
+msgid "Restricted Access"
+msgstr "Begränsad åtkomst"
+
 #: templates/entity/venue_fields.templ Line:30
 msgid "Successfully updated."
 msgstr "Uppdaterad."
@@ -7070,6 +7086,10 @@ msgstr "Uppdaterad."
 msgid "Thank You"
 msgstr "Tack"
 
+#: templates/auth/authlist.templ Line:2
+msgid "The following users are authorised to login"
+msgstr "Följande användare är auktoriserade att logga in"
+
 #: templates/entity/venue_fields.templ Line:145
 msgid "To delete click 'Submit', to cancel, click 'Close'"
 msgstr "Klicka 'Skicka' för att radera eller 'Stäng' för att avbryta"
@@ -7078,38 +7098,9 @@ msgstr "Klicka 'Skicka' för att radera eller 'Stäng' för att avbryta"
 msgid "Position"
 msgstr "Position"
 
-#: templates/reports/default.templ Line:22 templates/reports/default_adv.templ
-#: Line:89 templates/reports/ladder.templ Line:6
-msgid "Report Run"
-msgstr "Rapporten körd"
-
 #: templates/team/team_staff.templ Line:28
 msgid "Staff Member"
 msgstr "Personal"
-
-#: templates/reports/email_confirmation.templ Line:5
-msgid ""
-"The attached file is a comma seperated text file that can be opened in most "
-"spreadsheet applications (including Microsoft Excel)"
-msgstr ""
-"Filen som bilaga är i CSV-format, och kan öppnas i de flesta "
-"kalkylprogrammen (t.ex. Microsoft Excel)."
-
-#: templates/reports/email_confirmation.templ Line:7
-msgid "The data contains"
-msgstr "Datat innehåller"
-
-#: templates/reports/email_confirmation.templ Line:2
-msgid "Your Data has been sent"
-msgstr "Ditt data har skickats"
-
-#: templates/reports/email_confirmation.templ Line:3
-msgid "Your data export has been processed and emailed to"
-msgstr "Din export på data har behandlats och skickats till "
-
-#: templates/reports/email_confirmation.templ Line:7
-msgid "rows"
-msgstr "rader"
 
 #: templates/payment/invoicetemplate.templ Line:68
 msgid "Amount To Pay"
@@ -7193,6 +7184,11 @@ msgstr "Rader hittade:"
 msgid "Replace Existing Report"
 msgstr "Ersätt en befintlig rapport"
 
+#: templates/reports/default.templ Line:22 templates/reports/default_adv.templ
+#: Line:89 templates/reports/ladder.templ Line:6
+msgid "Report Run"
+msgstr "Rapporten körd"
+
 #: templates/reports/reportoptions_header.templ Line:6
 msgid "Save Report"
 msgstr "Spara rapport"
@@ -7207,25 +7203,50 @@ msgid ""
 "again"
 msgstr "Kolla detaljerna nedan. Stäng detta fönster och försök betala på nytt."
 
+#: templates/reports/email_confirmation.templ Line:5
+msgid ""
+"The attached file is a comma seperated text file that can be opened in most "
+"spreadsheet applications (including Microsoft Excel)"
+msgstr ""
+"Filen som bilaga är i CSV-format, och kan öppnas i de flesta "
+"kalkylprogrammen (t.ex. Microsoft Excel)."
+
+#: templates/reports/email_confirmation.templ Line:7
+msgid "The data contains"
+msgstr "Datat innehåller"
+
 #: templates/payment/payment_error.templ Line:11
 #: templates/payment/payment_failure.templ Line:2
 msgid "There was an Error with your Payment."
 msgstr "Ett fel uppstod vid betalningen."
 
 #: templates/reports/default_adv.templ Line:4
-#, fuzzy
 msgid "Too many records"
-msgstr "Inget resultat "
+msgstr "För många rader"
 
 #: templates/reports/default_adv.templ Line:6
 msgid "You can download the report or have it sent to you via email."
-msgstr ""
+msgstr "Du kan ladda ned rapporten eller ha den skickad per e-post."
+
+#: templates/reports/email_confirmation.templ Line:2
+msgid "Your Data has been sent"
+msgstr "Ditt data har skickats"
+
+#: templates/reports/email_confirmation.templ Line:3
+msgid "Your data export has been processed and emailed to"
+msgstr "Din export på data har behandlats och skickats till "
 
 #: templates/reports/default_adv.templ Line:5
 msgid ""
 "Your report has returned [_1] records. This is too many to display on the "
 "screen."
 msgstr ""
+"Din rapport returnerade [_1] rader. Detta är för mycket för att visa på "
+"skärmen."
+
+#: templates/reports/email_confirmation.templ Line:7
+msgid "rows"
+msgstr "rader"
 
 #: templates/translation/outstanding.templ Line:32
 msgid "Advanced Club"
@@ -7252,12 +7273,12 @@ msgid "Finance"
 msgstr "Betalningsrapportering"
 
 #: templates/page_wrapper/main_wrapper.templ Line:94
-#: templates/user/globalnav.templ Line:18
+#: templates/user/globalnav.templ Line:19
 msgid "Help"
 msgstr "Hjälp"
 
 #: templates/page_wrapper/main_wrapper.templ Line:96
-#: templates/user/globalnav.templ Line:20
+#: templates/user/globalnav.templ Line:23
 msgid "Logout"
 msgstr "Logga ut"
 
@@ -7438,17 +7459,6 @@ msgstr "ARBETSUPPGIFT ÅTERUPPTAGEN:"
 msgid "More Information"
 msgstr "Mera information"
 
-#: templates/workflow/view/loan.templ Line:235
-#: templates/workflow/view/transfer.templ Line:222
-#: templates/personrequest/access/current_club_view.templ Line:117
-#: templates/personrequest/access/requesting_club_view.templ Line:147
-#: templates/personrequest/transfer/current_club_view.templ Line:125
-#: templates/personrequest/transfer/new_club_view.templ Line:159
-#: templates/personrequest/loan/current_club_view.templ Line:139
-#: templates/personrequest/loan/new_club_view.templ Line:173
-msgid "Additional Comments"
-msgstr "Tilläggsinformation"
-
 #: templates/workflow/view/venue.templ Line:155
 msgid "Fax Number"
 msgstr "Fax nummer"
@@ -7463,10 +7473,6 @@ msgstr "Grundat"
 #: templates/workflow/view/personregistration.templ Line:209
 msgid "Last Update"
 msgstr "Uppdaterat"
-
-#: templates/workflow/view/loan.templ Line:204
-msgid "Lending To"
-msgstr "Tidsbunden övergång till"
 
 #: templates/workflow/result/person.templ Line:78
 #: templates/workflow/view/venue.templ Line:199
@@ -7489,44 +7495,13 @@ msgstr "Lokalt namn"
 msgid "Member Details"
 msgstr "Medelmsdetaljer"
 
-#: templates/workflow/view/loan.templ Line:43
-#: templates/workflow/view/transfer.templ
-#: templates/workflow/summary/loan.templ Line:19
-#: templates/workflow/summary/transfer.templ
-#: templates/workflow/summary/personregistration.templ Line:38
-#: templates/personrequest/transfer/search_form.templ Line:184
-#: templates/personrequest/transfer/search_result.templ Line:6
-#: templates/personrequest/generic/search_form.templ Line:183
-#: templates/personrequest/loan/search_form.templ Line:177
-#: templates/personrequest/loan/search_result.templ
-#: templates/person/summarypanel.templ Line:3
-msgid "Member ID"
-msgstr "PalloID"
-
 #: templates/workflow/result/person.templ Line:9
 msgid "Name (Latin Characters)"
 msgstr "Namn (latinska bokstäver)"
 
-#: templates/workflow/view/loan.templ Line:39 Line:76
-#: templates/workflow/summary/loan.templ Line:16
-#: templates/personrequest/loan/current_club_view.templ Line:105
-#: templates/personrequest/loan/search_form.templ Line:9
-#: templates/personrequest/loan/new_club_view.templ Line:139
-msgid "Player Loan Details"
-msgstr "Information om tidsbunden spelarövergång"
-
-#: templates/workflow/view/loan.templ Line:271
-msgid "Player Loan Status: Accepted"
-msgstr "Tidsbunden spelarövergång: Godkänd"
-
 #: templates/workflow/history.templ Line:10
 msgid "Problem Resolution Entity"
 msgstr "Behandlas av"
-
-#: templates/workflow/view/transfer.templ Line:202
-#: templates/workflow/view/personregistration.templ Line:235
-msgid "Register To"
-msgstr "Registrara till"
 
 #: templates/mapfinder/searchresults_afl9s.templ Line:168
 msgid "Register Your Team Now"
@@ -7536,24 +7511,6 @@ msgstr "Registrera ditt lag nu"
 msgid "Register another Club"
 msgstr "Registrera en annan förening"
 
-#: templates/workflow/view/loan.templ Line:54
-#: templates/workflow/view/transfer.templ Line:53
-msgid "Registration Date from"
-msgstr "Registrerad från"
-
-#: templates/workflow/view/loan.templ Line:59
-#: templates/workflow/view/transfer.templ Line:58
-#: templates/workflow/summary/transfer.templ Line:31
-msgid "Registration Date to"
-msgstr "Registrerad till"
-
-#: templates/workflow/view/loan.templ Line:48
-#: templates/workflow/view/transfer.templ
-#: templates/workflow/summary/loan.templ Line:23
-#: templates/workflow/summary/transfer.templ
-msgid "Registration Status"
-msgstr "Registreringens status"
-
 #: templates/club/required_docs.templ Line:1
 msgid "Required Club Documents"
 msgstr "Obligatoriska dokument för föreningen"
@@ -7561,11 +7518,6 @@ msgstr "Obligatoriska dokument för föreningen"
 #: templates/workflow/result/venue.templ Line:16
 msgid "Short Name"
 msgstr "Förkortning"
-
-#: templates/workflow/view/transfer.templ Line:63
-#: templates/workflow/summary/transfer.templ Line:39
-msgid "Summary Clubs transfer"
-msgstr "Översikt på föreningens övergång"
 
 #: templates/workflow/result/person.templ Line:51
 #: templates/workflow/view/person.templ Line:189
@@ -7594,15 +7546,6 @@ msgstr ""
 #: templates/workflow/summary/personregistration.templ Line:29
 msgid "The following registration has been approved."
 msgstr "Följande registrering har godkänts."
-
-#: templates/workflow/view/transfer.templ Line:258
-#: templates/workflow/generic/hold_reject_taskscreen.templ Line:11
-#: templates/flow/transfer.templ Line:85
-#: templates/personrequest/transfer/current_club_view.templ Line:196
-#: templates/personrequest/transfer/request_accepted.templ Line:5
-#: templates/personrequest/transfer/new_club_view.templ Line:248
-msgid "Transfer Status"
-msgstr "Spelarövergångens status"
 
 #: templates/workflow/result/page.templ Line:29
 #: templates/personrequest/transfer/complete.templ Line:52
@@ -7672,17 +7615,20 @@ msgstr "har notifierats."
 msgid "Accept"
 msgstr "Godkänn"
 
-#: templates/workflow/generic/hold_reject_taskscreen.templ Line:13
-msgid "Approval Status"
-msgstr "Godkännandets status"
+#: templates/workflow/view/loan.templ Line:235
+#: templates/workflow/view/transfer.templ Line:222
+#: templates/personrequest/access/current_club_view.templ Line:117
+#: templates/personrequest/access/requesting_club_view.templ Line:147
+#: templates/personrequest/transfer/current_club_view.templ Line:125
+#: templates/personrequest/transfer/new_club_view.templ Line:159
+#: templates/personrequest/loan/current_club_view.templ Line:139
+#: templates/personrequest/loan/new_club_view.templ Line:173
+msgid "Additional Comments"
+msgstr "Tilläggsinformation"
 
 #: templates/workflow/view/club.templ Line:39
 msgid "Club Information"
 msgstr "Föreningsinformation"
-
-#: templates/workflow/generic/notes.templ Line:12
-msgid "Date/Time Resolved"
-msgstr "Godkänd datum/tid"
 
 #: templates/workflow/view/document_upload.templ Line:8
 msgid "Document description"
@@ -7701,6 +7647,10 @@ msgstr "Information om internationell spelarövergång"
 msgid "Legal entity identification number"
 msgstr "FO-nummer"
 
+#: templates/workflow/view/loan.templ Line:204
+msgid "Lending To"
+msgstr "Tidsbunden övergång till"
+
 #: templates/workflow/view/personregistration.templ Line:308
 msgid "Loan Source Club"
 msgstr "Gammal förening"
@@ -7709,6 +7659,20 @@ msgstr "Gammal förening"
 #: templates/workflow/view/personregistration.templ Line:40
 msgid "Member Detail Summary"
 msgstr "Medlemsuppgifter"
+
+#: templates/workflow/view/loan.templ Line:43
+#: templates/workflow/view/transfer.templ
+#: templates/workflow/summary/loan.templ Line:19
+#: templates/workflow/summary/transfer.templ
+#: templates/workflow/summary/personregistration.templ Line:38
+#: templates/personrequest/transfer/search_form.templ Line:184
+#: templates/personrequest/transfer/search_result.templ Line:6
+#: templates/personrequest/generic/search_form.templ Line:183
+#: templates/personrequest/loan/search_form.templ Line:177
+#: templates/personrequest/loan/search_result.templ
+#: templates/person/summarypanel.templ Line:3
+msgid "Member ID"
+msgstr "PalloID"
 
 #: templates/workflow/view/person.templ Line:182
 #: templates/workflow/view/personregistration.templ Line:195
@@ -7733,6 +7697,18 @@ msgstr "Personens dokument"
 msgid "Person Role"
 msgstr "Personens roll"
 
+#: templates/workflow/view/loan.templ Line:39 Line:76
+#: templates/workflow/summary/loan.templ Line:16
+#: templates/personrequest/loan/current_club_view.templ Line:105
+#: templates/personrequest/loan/search_form.templ Line:9
+#: templates/personrequest/loan/new_club_view.templ Line:139
+msgid "Player Loan Details"
+msgstr "Information om tidsbunden spelarövergång"
+
+#: templates/workflow/view/loan.templ Line:271
+msgid "Player Loan Status: Accepted"
+msgstr "Tidsbunden spelarövergång: Godkänd"
+
 #: templates/workflow/summary/personregistration.templ Line:61
 msgid "Player TMS Reference"
 msgstr "Spelarens TMS-referens"
@@ -7749,13 +7725,37 @@ msgstr "Produkttyp"
 msgid "Put on-hold"
 msgstr "Returnera"
 
+#: templates/workflow/view/transfer.templ Line:202
+#: templates/workflow/view/personregistration.templ Line:235
+msgid "Register To"
+msgstr "Registrara till"
+
 #: templates/workflow/summary/transfer.templ Line:27
 msgid "Registration Date From"
 msgstr "Registrering från"
 
-#: templates/workflow/generic/notes.templ Line:11
-msgid "Resolution Notes"
-msgstr "Behandlingsanteckningar"
+#: templates/workflow/view/loan.templ Line:54
+#: templates/workflow/view/transfer.templ Line:53
+msgid "Registration Date from"
+msgstr "Registrerad från"
+
+#: templates/workflow/view/loan.templ Line:59
+#: templates/workflow/view/transfer.templ Line:58
+#: templates/workflow/summary/transfer.templ Line:31
+msgid "Registration Date to"
+msgstr "Registrerad till"
+
+#: templates/workflow/view/loan.templ Line:48
+#: templates/workflow/view/transfer.templ
+#: templates/workflow/summary/loan.templ Line:23
+#: templates/workflow/summary/transfer.templ
+msgid "Registration Status"
+msgstr "Registreringens status"
+
+#: templates/workflow/view/transfer.templ Line:63
+#: templates/workflow/summary/transfer.templ Line:39
+msgid "Summary Clubs transfer"
+msgstr "Översikt på föreningens övergång"
 
 #: templates/workflow/view/personregistration.templ Line:312 Line:333
 msgid "TMS Reference Number"
@@ -7777,6 +7777,15 @@ msgstr "Denna begäran har godkänts."
 msgid "Total Cost"
 msgstr "Slutsumma"
 
+#: templates/workflow/view/transfer.templ Line:258
+#: templates/workflow/generic/hold_reject_taskscreen.templ Line:11
+#: templates/flow/transfer.templ Line:85
+#: templates/personrequest/transfer/current_club_view.templ Line:196
+#: templates/personrequest/transfer/request_accepted.templ Line:5
+#: templates/personrequest/transfer/new_club_view.templ Line:248
+msgid "Transfer Status"
+msgstr "Spelarövergångens status"
+
 #: templates/workflow/summary/transfer.templ Line:35
 msgid "Transfer fee"
 msgstr "Pris på övergång"
@@ -7796,9 +7805,17 @@ msgstr "[_1] och [_2] har informerats."
 msgid "approved"
 msgstr "godkänd"
 
-#: templates/user/globalnav.templ Line:56
+#: templates/workflow/generic/hold_reject_taskscreen.templ Line:13
+msgid "Approval Status"
+msgstr "Godkännandets status"
+
+#: templates/user/globalnav.templ Line:59
 msgid "Club Contact"
 msgstr "Kontaktperson"
+
+#: templates/workflow/generic/notes.templ Line:12
+msgid "Date/Time Resolved"
+msgstr "Godkänd datum/tid"
 
 #: templates/user/loginform.templ Line:20
 msgid "Forgot your password? Please contact Help Desk to reset your password"
@@ -7818,13 +7835,13 @@ msgid ""
 msgstr ""
 "Klicka på länken nedan för att skapa ett nytt lösenord för ditt användarnamn."
 
-#: templates/user/globalnav.templ Line:19
-msgid "Release Notes"
-msgstr "Release Notes"
-
 #: templates/user/loginform.templ Line:13
 msgid "Remember me on this computer"
 msgstr "Kom ihåg mig på denna dator"
+
+#: templates/workflow/generic/notes.templ Line:11
+msgid "Resolution Notes"
+msgstr "Behandlingsanteckningar"
 
 #: templates/user/modify_user_password.templ Line:15
 msgid "Retype Password"
@@ -7889,14 +7906,6 @@ msgid ""
 "By approving you are giving access to all of the details of [_1] [_2] to [_3]"
 msgstr "Genom att godkänna ger du [_3] full åtkomst till [_1] [_2]"
 
-#: templates/personrequest/access/requesting_club_view.templ Line:202
-msgid "Cancel Access"
-msgstr "Avbryt åtkomst"
-
-#: templates/personrequest/access/requesting_club_view.templ Line:24 Line:31
-msgid "Current Club Details"
-msgstr "Nuvarande föreningens detaljer"
-
 #: templates/flow/facility_summary.templ Line:55
 msgid "Field Discipline"
 msgstr "Fältets sport"
@@ -7935,13 +7944,6 @@ msgstr "Organisationens namn"
 msgid "Player Loan Status: Released"
 msgstr "Tidsbunden spelarövergång: Släppt"
 
-#: templates/personrequest/access/requesting_club_view.templ Line:303
-#: templates/personrequest/access/personregistration_summary.templ Line:110
-#: templates/personrequest/loan/current_club_view.templ Line:290
-#: templates/personrequest/loan/new_club_view.templ Line:319
-msgid "Please add notes."
-msgstr "Anmärkningar."
-
 #: templates/personrequest/access/current_club_view.templ Line:8
 #: templates/personrequest/transfer/current_club_view.templ
 #: templates/personrequest/loan/current_club_view.templ
@@ -7955,18 +7957,6 @@ msgid ""
 msgstr ""
 "Kontrollera och uppdatera all information före skickande för slutligt "
 "godkännande."
-
-#: templates/personrequest/access/requesting_club_view.templ Line:16
-msgid ""
-"Please continue with the Add Role process and submit to the Member "
-"Association for final approval."
-msgstr ""
-"Fortsätt med processen på att lägga till en ny roll, och skicka för slutligt "
-"godkännande."
-
-#: templates/personrequest/access/requesting_club_view.templ Line:263
-msgid "Please specify why request access was cancelled."
-msgstr "Ange orsaken till att begäran på åtkomst avbröts."
 
 #: templates/personrequest/access/current_club_view.templ Line:230
 msgid "Please specify why request access was rejected."
@@ -7996,11 +7986,6 @@ msgstr "Avslå seplarövergång"
 msgid "Released"
 msgstr "Släppt"
 
-#: templates/personrequest/access/request_accepted.templ Line:5
-#: templates/personrequest/access/requesting_club_view.templ Line:247
-msgid "Request Access: Approved"
-msgstr "Begär åtkomst: Godkänd"
-
 #: templates/personrequest/access/request_cancelled.templ Line:5
 msgid "Request Access: Cancelled"
 msgstr "Begär åtkomst: Avbruten"
@@ -8022,10 +8007,6 @@ msgstr "Begärans anmärkningar"
 #: templates/personrequest/access/current_club_view.templ Line:190
 msgid "Request Status: Pending"
 msgstr "Registreringens status: Väntar"
-
-#: templates/personrequest/access/requesting_club_view.templ Line:258
-msgid "Request access cancelled"
-msgstr "Begär åtkomst avbruten"
 
 #: templates/personrequest/history.templ Line:18
 msgid "Request approval status"
@@ -8081,23 +8062,18 @@ msgstr "Uppdaterad"
 msgid "Width of Field (m)"
 msgstr "Fältets bredd (m)"
 
-#: templates/personrequest/access/requesting_club_view.templ Line:8
-msgid "[_1] has approved access to the details of [_2] [_3]"
-msgstr "[_1] har godkänt åtkomst till [_2] [_3]"
-
 #: templates/personrequest/access/current_club_view.templ Line:8
-#, fuzzy
 msgid "[_1] has requested data access for [_2] [_3]"
-msgstr "[_1] har begärt en spelarövergång för [_2] [_3]."
-
-#: templates/personrequest/transfer/view.templ Line:13
-msgid "By approving you are giving access to all of"
-msgstr "Genom att godkänna ger du åtkomst till alla"
+msgstr "[_1] har begärt åtkomst för [_2] [_3]."
 
 #: templates/personrequest/transfer/current_club_view.templ Line:13
 msgid ""
 "By approving, you are giving access to all the details of [_1] [_2] to [_3]"
 msgstr "Genom att godkänna ger du åtkomst till  [_1] [_2] för [_3]"
+
+#: templates/personrequest/access/requesting_club_view.templ Line:202
+msgid "Cancel Access"
+msgstr "Avbryt åtkomst"
 
 #: templates/personrequest/transfer/new_club_view.templ Line:215
 msgid "Cancel Transfer"
@@ -8106,6 +8082,10 @@ msgstr "Avbryt spelarövergång"
 #: templates/personrequest/transfer/new_club_view.templ Line:236
 msgid "Continue Transfer"
 msgstr "Fortsätt spelarövergång"
+
+#: templates/personrequest/access/requesting_club_view.templ Line:24 Line:31
+msgid "Current Club Details"
+msgstr "Nuvarande föreningens detaljer"
 
 #: templates/personrequest/access/personregistration_summary.templ Line:31
 msgid "Current Registrations"
@@ -8130,10 +8110,6 @@ msgstr "Nuvarande registreringar"
 #: templates/personrequest/loan/search_form.templ Line:213
 msgid "Current sport(s)"
 msgstr "Nuvarande sport"
-
-#: templates/personrequest/transfer/view.templ Line:162
-msgid "Deny"
-msgstr "Neka"
 
 #: templates/personrequest/transfer/search_form.templ Line:45
 #: templates/personrequest/generic/search_form.templ Line:39
@@ -8186,9 +8162,12 @@ msgstr "Personens status"
 msgid "Player Details"
 msgstr "Spelarens detaljer"
 
-#: templates/personrequest/transfer/view.templ Line:8
-msgid "Please approve or reject the request"
-msgstr "Var god och godkänn eller avslå begäran"
+#: templates/personrequest/access/requesting_club_view.templ Line:303
+#: templates/personrequest/access/personregistration_summary.templ Line:110
+#: templates/personrequest/loan/current_club_view.templ Line:290
+#: templates/personrequest/loan/new_club_view.templ Line:319
+msgid "Please add notes."
+msgstr "Anmärkningar."
 
 #: templates/personrequest/transfer/new_club_view.templ Line:12
 #: templates/personrequest/loan/new_club_view.templ
@@ -8199,12 +8178,24 @@ msgstr "Kontrollera och uppdatera alla detaljer före skickande till"
 msgid "Please continue the transfer process."
 msgstr "Fortsätt övergångsprocessen"
 
+#: templates/personrequest/access/requesting_club_view.templ Line:16
+msgid ""
+"Please continue with the Add Role process and submit to the Member "
+"Association for final approval."
+msgstr ""
+"Fortsätt med processen på att lägga till en ny roll, och skicka för slutligt "
+"godkännande."
+
 #: templates/personrequest/access/personregistration_summary.templ Line:69
 #: templates/personrequest/transfer/search_form.templ Line:240
 #: templates/personrequest/generic/search_form.templ Line:239
 #: templates/personrequest/loan/search_form.templ Line:233
 msgid "Please enter request notes"
 msgstr "Ange anmärkningar för begäran"
+
+#: templates/personrequest/access/requesting_club_view.templ Line:263
+msgid "Please specify why request access was cancelled."
+msgstr "Ange orsaken till att begäran på åtkomst avbröts."
 
 #: templates/personrequest/transfer/new_club_view.templ Line:265
 msgid "Please specify why transfer was cancelled."
@@ -8214,14 +8205,6 @@ msgstr "Ange varför spelarövergången avbröts."
 msgid "Please specify why transfer was rejected."
 msgstr "Ange varför spelarövergången avslogs."
 
-#: templates/personrequest/transfer/view.templ Line:218
-msgid ""
-"Please specify why transfer was rejected. All documents will be available "
-"for all parties involved."
-msgstr ""
-"Ange varför spelarövergången avslogs. Alla dokument kommer att vara "
-"tillgängliga för alla inblandade parter."
-
 #: templates/personrequest/access/personregistration_summary.templ Line:23
 msgid "Registration Summary"
 msgstr "Registreringsöversikt"
@@ -8229,6 +8212,11 @@ msgstr "Registreringsöversikt"
 #: templates/personrequest/access/personregistration_summary.templ Line:64
 msgid "Request Access (Add Role) notes"
 msgstr "Begär åtkomst (lägg till roll) anmärkningar"
+
+#: templates/personrequest/access/request_accepted.templ Line:5
+#: templates/personrequest/access/requesting_club_view.templ Line:247
+msgid "Request Access: Approved"
+msgstr "Begär åtkomst: Godkänd"
 
 #: templates/personrequest/access/request_denied.templ Line:5
 msgid "Request Access: Rejected"
@@ -8243,19 +8231,13 @@ msgstr "Svar på begäran"
 msgid "Request Transfer Notes"
 msgstr "Övergångsbegärans anmärkningar"
 
-#: templates/personrequest/transfer/search_result.templ Line:50
-#: templates/personrequest/loan/search_result.templ
-msgid "Request Transfer for approval"
-msgstr "Övergångsbegäran för godkännande"
-
-#: templates/personrequest/transfer/search_result.templ Line:48
-#: templates/personrequest/loan/search_result.templ
-msgid "Request Transfer sent to Club"
-msgstr "Begäran på spelarövergång skickad till föreningen"
-
 #: templates/personrequest/access/view.templ Line:16 Line:155
 msgid "Request Type"
 msgstr "Typ av begäran"
+
+#: templates/personrequest/access/requesting_club_view.templ Line:258
+msgid "Request access cancelled"
+msgstr "Begär åtkomst avbruten"
 
 #: templates/personrequest/access/view.templ Line:36 Line:177
 msgid "Response By"
@@ -8315,13 +8297,13 @@ msgstr "Du blir informerad när detta är i kraft."
 msgid "Your transfer request has been submitted for final approval."
 msgstr "Din begäran har skickats för slutligt godkännande."
 
+#: templates/personrequest/access/requesting_club_view.templ Line:8
+msgid "[_1] has approved access to the details of [_2] [_3]"
+msgstr "[_1] har godkänt åtkomst till [_2] [_3]"
+
 #: templates/personrequest/transfer/current_club_view.templ Line:8
 msgid "[_1] has requested a transfer for [_2] [_3]."
 msgstr "[_1] har begärt en spelarövergång för [_2] [_3]."
-
-#: templates/personrequest/transfer/view.templ Line:8
-msgid "[_1] have requested a transfer for [_2]"
-msgstr "[_1] har begärt en spelarövergång för [_2]"
 
 #: templates/personrequest/transfer/new_club_view.templ Line:7
 #: templates/personrequest/loan/new_club_view.templ
@@ -8336,6 +8318,10 @@ msgstr "Godkänn tidsbunden spelarövergång"
 msgid "Borrowing Club Details"
 msgstr "Tidsbundna föreningens detaljer"
 
+#: templates/personrequest/transfer/view.templ Line:13
+msgid "By approving you are giving access to all of"
+msgstr "Genom att godkänna ger du åtkomst till alla"
+
 #: templates/personrequest/loan/current_club_view.templ Line:13
 msgid ""
 "By approving, you are giving access to all details of [_1] [_2] to [_3]."
@@ -8344,6 +8330,10 @@ msgstr "Genom att godkänna ger du [_3] full åtkomst till [_1] [_2]"
 #: templates/personrequest/generic/search_form.templ Line:213
 msgid "Current Registration"
 msgstr "Nuvarande registrering"
+
+#: templates/personrequest/transfer/view.templ Line:162
+msgid "Deny"
+msgstr "Neka"
 
 #: templates/personrequest/generic/itc_confirmation.templ Line:2
 msgid "ITC Request submitted to MA"
@@ -8397,6 +8387,10 @@ msgstr "Tidsbunden övergång: avbruten"
 msgid "Player Loan: Rejected"
 msgstr "Tidsbunden övergång: Avslagen"
 
+#: templates/personrequest/transfer/view.templ Line:8
+msgid "Please approve or reject the request"
+msgstr "Var god och godkänn eller avslå begäran"
+
 #: templates/personrequest/loan/new_club_view.templ Line:7
 msgid "Please continue the player loan process."
 msgstr "Fortsätt processen för tidsbunden övergång"
@@ -8409,6 +8403,14 @@ msgstr "Ange varför den tidsbundna övergången avbröts."
 msgid "Please specify why player loan was rejected."
 msgstr "Ange varför den tidsbundna övergången avslogs."
 
+#: templates/personrequest/transfer/view.templ Line:218
+msgid ""
+"Please specify why transfer was rejected. All documents will be available "
+"for all parties involved."
+msgstr ""
+"Ange varför spelarövergången avslogs. Alla dokument kommer att vara "
+"tillgängliga för alla inblandade parter."
+
 #: templates/personrequest/loan/current_club_view.templ Line:198 Line:229
 msgid "Reject player loan"
 msgstr "Avslå tidsbunden övergång"
@@ -8416,6 +8418,16 @@ msgstr "Avslå tidsbunden övergång"
 #: templates/personrequest/loan/search_form.templ Line:228
 msgid "Request Player Loan Notes"
 msgstr "Anmärkningar för begäran på tidsbunden övergång"
+
+#: templates/personrequest/transfer/search_result.templ Line:50
+#: templates/personrequest/loan/search_result.templ
+msgid "Request Transfer for approval"
+msgstr "Övergångsbegäran för godkännande"
+
+#: templates/personrequest/transfer/search_result.templ Line:48
+#: templates/personrequest/loan/search_result.templ
+msgid "Request Transfer sent to Club"
+msgstr "Begäran på spelarövergång skickad till föreningen"
 
 #: templates/personrequest/generic/reg_summary.templ Line:2
 msgid "Review Role Details"
@@ -8434,13 +8446,19 @@ msgid "Your ITC Request has been submitted"
 msgstr "Din begäran på internationellt speltillstånd (ITC) har skickats"
 
 #: templates/personrequest/loan/current_club_view.templ Line:8
-#, fuzzy
 msgid "[_1] has requested a player loan for [_2] [_3]."
-msgstr "[_1] har begärt en spelarövergång för [_2] [_3]."
+msgstr "[_1] har begärt en tidsbunden spelarövergång för [_2] [_3]."
+
+#: templates/personrequest/transfer/view.templ Line:8
+msgid "[_1] have requested a transfer for [_2]"
+msgstr "[_1] har begärt en spelarövergång för [_2]"
 
 #: templates/person/renewal_roledetails.templ Line:2
 msgid "Review Role Renewal Details"
 msgstr "Kontrollera rollens detaljer för förnyande"
+
+#~ msgid "Release Notes"
+#~ msgstr "Release Notes"
 
 #~ msgid ""
 #~ "[_1] has requested data access for [_2] [_3], requestFrom, "
