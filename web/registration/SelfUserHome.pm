@@ -69,7 +69,7 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,	
-			Accordion => $accordion,
+	    Accordion => $accordion,
             OldSystemLinkage => $Data->{'SystemConfig'}{'OldSystemLinkage'} || 0,
             OldSystemUsername => $Data->{'SystemConfig'}{'OldSystemUsername'} || '',
             OldSystemPassword => $Data->{'SystemConfig'}{'OldSystemPassword'} || '',
@@ -264,7 +264,7 @@ sub getPreviousRegos {
         $found{$type} = 1;
         $dref->{'strPersonTypeName'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
-        
+        $dref->{'strSportType'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'renewlink'} = '';
 		$dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;

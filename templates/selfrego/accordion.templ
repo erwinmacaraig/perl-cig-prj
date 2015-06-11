@@ -37,7 +37,9 @@
                                     </thead>
                                 [% FOREACH rego IN  PreviousRegistrations %]
                                     <tr>
-                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]</td>
+                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]
+                                        [% IF rego.strSportType %] <br /> [% rego.strSportType %] [% END %]
+                                        </td>
                                         <td>[% rego.EntityName %]</td>
                                         <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
                                         <td>[% rego.PRStatus %]</td>
