@@ -18,6 +18,7 @@ use TTTemplate;
 use Log;
 use Data::Dumper;
 use LanguageChooser;
+use HelpLink;;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -261,6 +262,7 @@ sub pageMain {
         LanguageChooser => genLanguageChooser($Data),
         HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        HelpLink => retrieveHelpLink($Data),
     );
 
   my $globalnav = runTemplate(
