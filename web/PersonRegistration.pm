@@ -711,10 +711,12 @@ sub getRegistrationData	{
             )	
             LEFT JOIN tblPersonRequest prq ON (
                 prq.intPersonRequestID = pr.intPersonRequestID
+                AND prq.intPersonID = pr.intPersonID
                 AND prq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblPersonRequest existprq ON (
                 existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
+                AND existprq.intPersonID= pr.intPersonID
                 AND existprq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblEntity eprq ON (

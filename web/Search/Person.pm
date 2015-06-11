@@ -151,6 +151,7 @@ sub getUnique {
 }
 
 sub getTransfer {
+
     my ($self) = shift;
     my ($raw) = @_;
 
@@ -176,6 +177,50 @@ sub getTransfer {
     my @memarray = ();
     if(@persons)  {
         my $person_list = join(',',@persons);
+        my %personRegMapping = ();
+
+        my $pst = qq [
+            SELECT
+                intPersonID,
+                intEntityID,
+                intPersonRegistrationID,
+                strStatus,
+                strSport
+            FROM
+                tblPersonRegistration_1
+            WHERE
+                intPersonID IN ($person_list)
+                AND intEntityID = $filters->{'club'}
+            ORDER BY
+                intPersonID, dtFrom DESC, dtTo DESC
+        ];
+
+        my $precheck = $self->getData->{'db'}->prepare($pst);
+        $precheck->execute();
+        while(my $pdref = $precheck->fetchrow_hashref()) {
+            next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
+
+            #we're only interested in the status of the registration per person per sport
+            #if there's no TRANSFERRED on each of the sports, then we remove the person in the list
+            #that means that person is registered under the requestor (logged in club)
+            $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = $pdref->{'strStatus'};
+        }
+
+        my $flag = 0;
+        my @includePersonList = ();
+
+        foreach my $pID (keys %personRegMapping) {
+            foreach my $sport (keys %Defs::sportType) {
+                next if !$personRegMapping{$pID}{$sport};
+
+                $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+            }
+
+            push @includePersonList, $pID if $flag > 0;
+            $flag = 0;
+        }
+
+        my $valid_person_list = join(',', @includePersonList);
 
         my $entity_list = '';
         $entity_list = join(',', @{$subNodes});
@@ -208,13 +253,6 @@ sub getTransfer {
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
             )
-            LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
-                tblPerson.intPersonID = PRAlready.intPersonID
-                AND PRAlready.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
-                AND PRAlready.intEntityID = $filters->{'club'}
-                AND PRAlready.strSport =  PR.strSport
-                AND PRAlready.strPersonType = 'PLAYER'
-            )
             INNER JOIN tblEntity AS E ON (
                 PR.intEntityID = E.intEntityID
             )
@@ -246,10 +284,9 @@ sub getTransfer {
             ON  (
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
-            WHERE tblPerson.intPersonID IN ($person_list)
+            WHERE tblPerson.intPersonID IN ($valid_person_list)
                 AND tblPerson.strStatus IN ('REGISTERED')
                 AND PRQinprogress.intPersonRequestID IS NULL
-                AND PRAlready.intPersonRegistrationID IS NULL
             ORDER BY 
                 strLocalSurname, 
                 strLocalFirstname

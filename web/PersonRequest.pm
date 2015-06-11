@@ -371,6 +371,7 @@ sub listPersonRecord {
         LEFT JOIN tblPersonRequest as eRQ
             ON  (
                 eRQ.intPersonRequestID = PR.intPersonRequestID
+                AND eRQ.intPersonID= PR.intPersonID
                 )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} ePR
             ON (
@@ -989,7 +990,13 @@ sub listRequests {
         }
     }
 
-    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
+           
+    return( qq[<div class="alert alert-warning" role="alert">
+		  <div>
+		    <span class="fa fa-info"></span>
+		    <p>] . $Data->{'lang'}->txt("No transfer history found") . 
+	    qq[.</p> </div> </div>] , $title) if !$found;
+    #return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -2355,7 +2362,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
@@ -2387,7 +2394,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
@@ -2474,7 +2481,7 @@ sub setPlayerLoanValidDate {
             UPDATE
                 tblPersonRegistration_$Data->{'Realm'} PR
             INNER JOIN
-                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
             INNER JOIN
                 tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
             SET
