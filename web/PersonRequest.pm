@@ -2388,7 +2388,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonID and PRQ.intExistingPersonRegistrationID = PR.intPersonID)
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
