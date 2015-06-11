@@ -165,7 +165,14 @@ sub bulkPersonRollover {
     my $title = $Data->{'lang'}->txt('Bulk Registration');
     if ($count > $maxCount) {
         my $errMsg = $Data->{'lang'}->txt("Too many records returned - You must enter a Family Name filter");
-        $body = qq[<div class="warningmsg">$errMsg</div>];
+        $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
         return ($body, $title);
     }
 
