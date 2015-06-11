@@ -101,7 +101,7 @@ sub _getConfiguration {
                 }
             ],
             PstrImportCode=> [
-                'Imported Person Code',
+                $lang->txt('Imported Person Code'),
                 {
                     dbfield         => 'tblPerson.strImportPersonCode',
                     displaytype   => 'text',
