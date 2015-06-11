@@ -64,6 +64,7 @@ sub displayPersonRegisterWhat   {
         dnat=>$defaultNature,
         dentityrole=> $defaultEntityRole,
         existingReg => $regoID || 0,
+        SystemConfig => $systemConfig,
         EntitySelection => $entitySelection || 0,
         DefaultEntity => getLastEntityID($Data->{'clientValues'}) || 0,
         ClientID => getLastEntityID($Data->{'clientValues'}) || 0,
