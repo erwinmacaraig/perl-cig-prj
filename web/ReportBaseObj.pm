@@ -33,6 +33,7 @@ sub new {
 	$self->{'RunParams'}= ();
 	$self->{'CarryFields'}= ();
 	$self->{'ClientValues'} = $params{'ClientValues'};
+	$self->{'AuthID'}=$params{'AuthID'} || 0;
 	$self->{'Permissions'}=$params{'Permissions'};
 	$self->{'Lang'}=$params{'Lang'};
 	$self->{'ReturnURL'}=$params{'ReturnURL'};
