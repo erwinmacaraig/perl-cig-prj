@@ -100,6 +100,16 @@ sub _getConfiguration {
                     allowgrouping => 1
                 }
             ],
+            PstrImportCode=> [
+                $lang->txt('Imported Person Code'),
+                {
+                    dbfield         => 'tblPerson.strImportPersonCode',
+                    displaytype   => 'text',
+                    fieldtype     => 'text',
+                    allowsort     => 1,
+                    optiongroup   => 'details',
+                }
+            ],
             PstrStatus=> [
                 'Person Status',
                 {
@@ -108,6 +118,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personStatus,
                     optiongroup     => 'details',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -179,7 +190,7 @@ sub _getConfiguration {
                 }
             ],
             strISOCountryOfBirth => [
-                'Country Of Birth',
+                'Country of Birth',
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
@@ -250,6 +261,7 @@ sub _getConfiguration {
                     multiple      => 1,
                     optiongroup   => 'details',
                     allowgrouping => 1,
+                    translate       => 1,
                     allowsort     => 1
                 }
             ],
@@ -262,6 +274,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => $CommonVals->{'DefCodes'}{-8},
                     optiongroup     => 'details',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -278,6 +291,7 @@ sub _getConfiguration {
                         4 => 'Inside EU',
                     },
                     optiongroup     => 'details',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -290,6 +304,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personType,
                     optiongroup     => 'regos',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -302,6 +317,7 @@ sub _getConfiguration {
                     dropdownoptions => \%Defs::personLevel,
                     optiongroup     => 'regos',
                     allowsort   => 1,
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -314,6 +330,7 @@ sub _getConfiguration {
                     dropdownoptions => \%Defs::registrationNature,
                     optiongroup     => 'regos',
                     allowsort   => 1,
+                    translate       => 1,
                     allowgrouping   => 1,
                 }
             ],
@@ -327,6 +344,7 @@ sub _getConfiguration {
                     dropdownoptions => \%Defs::personRegoStatus,
                     optiongroup     => 'regos',
                     allowgrouping   => 1,
+                    translate       => 1,
                     allowsort   => 1,
                 }
             ],
@@ -339,6 +357,7 @@ sub _getConfiguration {
                     dropdownoptions => \%Defs::sportType,
                     optiongroup     => 'regos',
                     allowgrouping   => 1,
+                    translate       => 1,
                     allowsort   => 1,
                 }
             ],
@@ -349,12 +368,19 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     dbfield     => 'ETR.strEntityRoleName',
                     optiongroup => 'regos',
+                    translate       => 1,
                     allowsort   => 1,
                     allowgrouping => 1,
+                    dbfrom => "
+                        LEFT JOIN tblEntityTypeRoles as ETR ON (
+                            ETR.strEntityRoleKey = PR.strPersonEntityRole
+                        ) 
+                    ",
+
                 }
             ],
             PRdtFrom=> [
-                'Date From',
+                $lang->txt('Date From'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -365,7 +391,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtTo=> [
-                'Date To',
+                $lang->txt('Date To'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -387,6 +413,7 @@ sub _getConfiguration {
                     defaultvalue  => '0',
                     active        => 1,
                     optiongroup   => 'regos',
+                    translate       => 1,
                     allowsort   => 1,
                     allowgrouping => 1,
                 }
@@ -1293,7 +1320,7 @@ sub _getConfiguration {
               strRegionName => [
                 (
                       $currentLevel > $Defs::LEVEL_REGION
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_REGION} . ' Name'
+                    ? $lang->txt('Region Name')
                     : ''
                 ),
                 {
@@ -1465,6 +1492,7 @@ sub _getConfiguration {
                     dropdownoptions => \%Defs::paymentTypes,
                     allowsort       => 1,
                     optiongroup     => 'transactions',
+                    translate       => 1,
                     dbfield         => 'TL.intPaymentType',
                     allowgrouping   => 1
                 }
@@ -1614,6 +1642,7 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
+                PstrImportCode
               PstrStatus
               strLocalFirstname
               strLocalSurname

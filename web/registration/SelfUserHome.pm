@@ -112,6 +112,7 @@ my ($Data, $previousRegos) = @_;
 			push @{$history{'regohist'}}, {
 				NationalPeriodName => $regoDetail->{'strNationalPeriodName'},
 				RegistrationType => $Defs::registrationNature{$regoDetail->{'strRegistrationNature'}},
+				RegistrationNature => $regoDetail->{'strRegistrationNature'},
 				Status => $Defs::entityStatus{$regoDetail->{'strStatus'}},
 				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
 				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
@@ -121,6 +122,8 @@ my ($Data, $previousRegos) = @_;
 				NPdtFrom => $regoDetail->{'NPdtFrom'},
 				NPdtTo => $regoDetail->{'NPdtTo'},
 				Certifications => $regoDetail->{'regCertifications'},
+				dtFrom => $regoDetail->{'dtFrom'},
+				dtTo => $regoDetail->{'dtTo'},
 			};
 		}
 		
@@ -205,6 +208,7 @@ sub getPreviousRegos {
             P.strStatus as PersonStatus,
             NP.strNationalPeriodName,
             NP.dtTo as NPdtTo,
+            NP.dtFrom as NPdtFrom,
             prq.intOpenLoan,
             existprq.intOpenLoan as existOpenLoan
         FROM

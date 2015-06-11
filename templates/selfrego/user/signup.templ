@@ -64,7 +64,20 @@
 	  		<input type = "password" name = "password2" value = "" size = "50"  id = "signup-password2" class="fields required" title="[% Lang.txt('re-enter password') %]">
 	  	</div>
 	</div>
-
+    [% IF terms %]
+     <div class = "selfregterms">
+         [% terms %]
+     </div>
+     <div class="formfield form-group">
+        <div class="col-md-offset-4 col-md-6">
+          <div class="checkbox">
+            <label>
+              <input type="checkbox" value = "1" name = "terms"> [% Lang.txt('I agree to the terms and conditions as specified above') %]
+            </label>
+          </div>
+        </div>
+     </div>
+ [% END %]
     <input type = "submit" class = "btn-main" value =" [% Lang.txt('Signup') %] ">
     <input type = "hidden" name = "a" value = "SIGNUP">
     <input type = "hidden" name = "srp" value = "[% srp %]">
@@ -80,6 +93,9 @@
 				email : {
 					required: true,
 					email: true
+				},
+				terms : {
+					required: true,
 				},
 				firstname : {
 					required: true,
@@ -102,6 +118,7 @@
 			messages: {
 				firstname: "[% Lang.txt('Please enter your First Name') %]",
 				familyname: "[% Lang.txt('Please enter your Family Name') %]",
+				terms : "[% Lang.txt('You must agree to the terms and conditions') %]",
 				password: {
 					required: "[% Lang.txt('Please provide a password') %]",
 					minlength: "[% Lang.txt('must be at least 8 characters long') %]"

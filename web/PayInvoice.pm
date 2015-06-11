@@ -290,11 +290,6 @@ sub queryInvoiceByNumber {
 	#my $body = displayResults($Data,\@rowdata,$client);
 my @headers = (
 	{
-		name => '', 
-		field => 'SelectLink', 
-	    type => 'Selector', 
-	},
-	{
       name => $Data->{'lang'}->txt('Invoice Number'),
       field => 'invoiceNum',
     },
@@ -302,6 +297,7 @@ my @headers = (
       name => $Data->{'lang'}->txt('Invoice Date'),
       field => 'invoiceDate',
 	  sortdata => 'invoiceDateSortColumn',
+      defaultShow => 1,
     },
     {
       name =>   $Data->{'lang'}->txt('Item'),
@@ -310,6 +306,7 @@ my @headers = (
     {
       name =>   $Data->{'lang'}->txt('Person'),
       field =>  'person',
+      defaultShow => 1,
     },
 	{
 		name => $Data->{'lang'}->txt('Quantity'),
@@ -318,11 +315,17 @@ my @headers = (
 	{
 		name => $Data->{'lang'}->txt('Amount'),
 		field => 'amount',
+      defaultShow => 1,
 	},
 	{
 		name => $Data->{'lang'}->txt('Status'),
 		field => 'status', 
-	}
+	},
+	{
+		name => '', 
+		field => 'SelectLink', 
+	    type => 'Selector', 
+	},
 	);
 	 my $grid  = showGrid(
    		 Data => $Data,
@@ -573,15 +576,11 @@ sub displayResults {
 
 	my @headers = (
 	{
-		name => '', 
-		field => 'SelectLink', 
-	    type => 'Selector', 
-	},
-	{
 	  name => 'Pay',
 	  field => 'selectpay',
 	  width => 20,
       type => 'HTML',
+      defaultShow => 1,
     },
 	{
       name => $Data->{'lang'}->txt('Invoice Number'),
@@ -599,6 +598,7 @@ sub displayResults {
     {
       name =>   $Data->{'lang'}->txt('Person'),
       field =>  'person',
+      defaultShow => 1,
     },
 	{
 		name => $Data->{'lang'}->txt('Quantity'),
@@ -607,11 +607,17 @@ sub displayResults {
 	{
 		name => $Data->{'lang'}->txt('Amount'),
 		field => 'amount',
+      defaultShow => 1,
 	},
 	{
 		name => $Data->{'lang'}->txt('Status'),
 		field => 'status', 
-	}
+	},
+	{
+		name => '', 
+		field => 'SelectLink', 
+	    type => 'Selector', 
+	},
 	);
 	 my $grid  = showGrid(
    		 Data => $Data,

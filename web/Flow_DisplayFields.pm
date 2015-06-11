@@ -148,6 +148,7 @@ sub build {
             }
             if ( $type eq 'htmlrow' ) {
                 $sections{$sname} .= $val || '';
+                $clientside_validation{$fieldname}{'compulsory'} = 1 if $f->{'compulsory'};
                 next FIELD;
             }
             if ( $type eq 'htmlblock' ) {

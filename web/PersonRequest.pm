@@ -171,9 +171,9 @@ sub handlePersonRequest {
             ($body, $title) = displayCompletedRequest($Data);
         }
         case 'PRA_CL' {
-            cancelPlayerLoan($Data);
-            my $query = new CGI;
-            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+            ($body, $title) = cancelPlayerLoan($Data);
+            #my $query = new CGI;
+            #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
         }
         else {
         }
@@ -1251,7 +1251,7 @@ sub viewRequest {
         \%TemplateData,
         $templateFile
     );
-
+    
     return ($body, $title);
 }
 
@@ -2546,8 +2546,24 @@ sub cancelPlayerLoan {
 
     push @requestIDs, $preqid;
     push @personIDs, $personRequest->{'intPersonID'};
-
     deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
+    my ($body, $title) = displayCancelPlayerLoanConfirmationMessage($Data, \@personIDs);
+    return ($body,$title);
+    
+    
 }
+sub displayCancelPlayerLoanConfirmationMessage {
 
+  my ($Data, $personIDs) = @_;
+  my $personObj = getInstanceOf($Data, 'person', $personIDs->[0]);
+  my $body = runTemplate($Data, {
+      'url' => "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME",
+      'PersonSummaryPanel' => personSummaryPanel($Data, $personIDs->[0]),
+      'player' => $personObj->getValue('strLocalFirstname') . " " . $personObj->getValue('strLocalSurname'), 
+    }, 
+    'dashboards/cancelplayerloanmsg.templ'    
+    );
+    my $title = 'Cancel Player Loan';
+    return ($body, $title);
+}
 1;

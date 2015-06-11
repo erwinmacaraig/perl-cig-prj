@@ -1062,7 +1062,7 @@ sub loadSavedReportData	{
 	$q->execute(
 		$reportID,
 		$self->{'EntityTypeID'},
-		$self->{'EntityID'},
+		$self->{'AuthID'},
 	);
 	my ($name, $data) = $q->fetchrow_array();
 	$q->finish();
@@ -1167,7 +1167,7 @@ sub saveReportData	{
 	$q->execute(
 		$self->{'ID'},
 		$self->{'EntityTypeID'},
-		$self->{'EntityID'},
+		$self->{'AuthID'},
 		$json,
 	);
 	my $newID = $q->{mysql_insertid} || 0;
@@ -1239,7 +1239,7 @@ sub saveReportName {
 		my $q=$self->{'db'}->prepare($st);
 		$q->execute(
 			$self->{'EntityTypeID'},
-			$self->{'EntityID'},
+			$self->{'AuthID'},
 			$self->{'ID'},
 		);
 		my $existing_count = 0;
@@ -1277,7 +1277,7 @@ sub saveReportName {
 		$self->{'ID'},
 		$name,
 		$self->{'EntityTypeID'},
-		$self->{'EntityID'},
+		$self->{'AuthID'},
 		$json,
 	);
 	my $newID = $q->{mysql_insertid} || 0;
