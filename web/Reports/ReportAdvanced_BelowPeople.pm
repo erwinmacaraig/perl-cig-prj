@@ -100,6 +100,16 @@ sub _getConfiguration {
                     allowgrouping => 1
                 }
             ],
+            PstrImportCode=> [
+                'Imported Person Code',
+                {
+                    dbfield         => 'tblPerson.strImportPersonCode',
+                    displaytype   => 'text',
+                    fieldtype     => 'text',
+                    allowsort     => 1,
+                    optiongroup   => 'details',
+                }
+            ],
             PstrStatus=> [
                 'Person Status',
                 {
@@ -1632,6 +1642,7 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
+                PstrImportCode
               PstrStatus
               strLocalFirstname
               strLocalSurname
