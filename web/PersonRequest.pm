@@ -993,7 +993,7 @@ sub listRequests {
     return( qq[<div class="alert alert-warning" role="alert">
 		  <div>
 		    <span class="fa fa-info"></span>
-		    <p>] . $Data->{'lang'}->txt("No result found") . 
+		    <p>] . $Data->{'lang'}->txt("No transfer history found") . 
 	    qq[.</p> </div> </div>] , $title) if !$found;
     #return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
