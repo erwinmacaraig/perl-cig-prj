@@ -127,14 +127,14 @@ sub resolveHoldPayment  {
     if ($resolveStatus == $Defs::TXNLOG_SUCCESS)   {
         my $st = qq[
             UPDATE tblTransactions
-            SET intStatus = 1
+            SET intStatus = 1,  intPaymentGatewayResponded=1
             WHERE intTransLogID = ?
         ];
         my $query = $Data->{'db'}->prepare($st);
         $query->execute($logID);
         $st = qq[
             UPDATE tblTransLog
-            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED', strText = 'Resolved'
+            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED', strText = 'Resolved',  intPaymentGatewayResponded=1
             WHERE intLogID = ?
         ];
         $query = $Data->{'db'}->prepare($st);
