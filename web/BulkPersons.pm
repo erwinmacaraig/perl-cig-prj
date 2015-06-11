@@ -105,11 +105,13 @@ sub bulkPersonRollover {
                 AND PRto.intNationalPeriodID = ?
             )
             LEFT JOIN tblPersonRequest prq ON (
-                prq.intPersonRequestID = PR.intPersonRequestID
+                prq.intPersonID= PR.intPersonID
+                AND prq.intPersonRequestID = PR.intPersonRequestID
                 AND prq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblPersonRequest existprq ON (
-                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+                existprq.intPersonID= PR.intPersonID
+                AND existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
                 AND existprq.strRequestType = 'LOAN'
             )
         WHERE 

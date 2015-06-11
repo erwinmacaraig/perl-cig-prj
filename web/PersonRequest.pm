@@ -371,6 +371,7 @@ sub listPersonRecord {
         LEFT JOIN tblPersonRequest as eRQ
             ON  (
                 eRQ.intPersonRequestID = PR.intPersonRequestID
+                AND eRQ.intPersonID= PR.intPersonID
                 )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} ePR
             ON (
@@ -2355,7 +2356,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
@@ -2387,7 +2388,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonID and PRQ.intExistingPersonRegistrationID = PR.intPersonID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
@@ -2474,7 +2475,7 @@ sub setPlayerLoanValidDate {
             UPDATE
                 tblPersonRegistration_$Data->{'Realm'} PR
             INNER JOIN
-                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
             INNER JOIN
                 tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
             SET
