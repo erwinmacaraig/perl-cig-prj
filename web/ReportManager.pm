@@ -163,6 +163,7 @@ sub getReportObj {
 			ID => $reportID,
 			EntityTypeID => $currentLevel,
 			EntityID => $entityID,
+			AuthID => getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'}),
 			FormParams => \%Params,
 			Permissions => $fieldPermissions_ref,
 			Lang => $Data->{'lang'},
