@@ -15,7 +15,11 @@
                 [% IF Data.UserName %]
   				<li>[% Lang.txt('Welcome') %] [% UserName || Data.UserName %]</li>
   				<!--<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>-->
-  				<li><a target="_blank" href ="[% HelpLink %]">[% Lang.txt('Help') %]</a></li>
+                [% IF HelpLink %]
+                    <li><a target="_blank" href ="[% HelpLink %]">[% Lang.txt('Help') %]</a></li>
+                [% ELSE %]
+                    <li>&nbsp;</li>
+                [% END %]
   				<li><a href="https://www.fifaconnect.org/release_notes/FCRN-20150303.pdf" target="rn" title="[% Lang.txt('Release Notes') %]">[% Lang.txt('Release Notes') %]</a></li>
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
                 [% END %]
