@@ -1442,7 +1442,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
+    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonID=pq.intPersonID and pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
     my @values = (
         $Data->{'Realm'}
     );
@@ -1608,13 +1608,15 @@ sub getRequests {
             $where
     ];
 
+    my @personRequests = ();
+    return (\@personRequests) if (! $where);
+
 
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st);
     $q->execute(@values) or query_error($st);
 
-    my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
         $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
