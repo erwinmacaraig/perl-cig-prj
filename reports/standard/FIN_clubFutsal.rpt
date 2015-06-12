@@ -27,7 +27,7 @@
             END as PersonLevel,
             tblPerson.strEmail AS strEmail, 
             strLocalFirstname,  
-            DATE_FORMAT(tblPerson.dtDOB, "%d/%m/%Y") AS dtDOB, 
+            tblPerson.dtDOB,
             strNationalNum
         FROM
             tblPerson
@@ -61,12 +61,12 @@
 	Template => 'default',
 	DistinctValues => 1,
 	Labels => [
-		['strNationalNum','Registration Number'],
+		['strNationalNum','PalloID'],
 		['strLocalFirstname', 'First Name'],
 		['strLocalSurname', 'Family Name'],
-		['dtDOB','DOB'],
-		['Gender','Gender'],
-		['PersonLevel','Level'],
+		['dtDOB','DOB','date'],
+		['Gender','Gender','string','translate'],
+		['PersonLevel','Level','string','translate'],
 		['strAddress1','Address 1'],
 		['strSuburb','City'],
 		['strPostalCode','Postal Code'],
