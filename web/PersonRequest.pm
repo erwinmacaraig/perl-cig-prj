@@ -2423,7 +2423,7 @@ sub deactivatePlayerLoan {
     my $db = $Data->{'db'};
     my $idset = join(', ', @{$requestIDs});
     my $peopleIds= join(', ', @{$personIDs});
-    return if ! $idset or ! $peopleIds;
+    return if (! $idset or ! $peopleIds);
     my $bst = qq [
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
