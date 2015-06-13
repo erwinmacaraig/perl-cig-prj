@@ -764,7 +764,7 @@ sub getTransList {
                 #$row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
             }     
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
-            $row_data->{'strOnlinePayReference'} = $row->{'strOnlinePayReference'};
+            $row_data->{'strOnlinePayReference'} = $row->{'strOnlinePayReference'} || $row->{'intTransLogID'} || '';
             $row_data->{'curAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($row->{'curAmount'});
             push @rowdata, $row_data if $row_data;
             $i++;
