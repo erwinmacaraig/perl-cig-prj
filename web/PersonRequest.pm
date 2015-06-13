@@ -1630,6 +1630,7 @@ sub getRequests {
 
 sub finaliseTransfer {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -1637,6 +1638,7 @@ sub finaliseTransfer {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
     my $db = $Data->{'db'};
 
 #    my $st = qq[
@@ -2285,6 +2287,7 @@ sub loanRequiredFields {
 
 sub finalisePlayerLoan {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -2297,6 +2300,7 @@ sub finalisePlayerLoan {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
 
     my($year_req,$month_req,$day_req) = $personRequest->{'dtLoanFromFormatted'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     my($year_today,$month_today,$day_today) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
@@ -2322,6 +2326,8 @@ sub finalisePlayerLoan {
                 WHERE
                     intPersonRequestID = ?
                     AND strStatus IN ('ACTIVE', 'PENDING')
+                    AND intPersonID = ?
+                    AND intPersonRequestID > 0
             ];
             #called when dtLoanFrom/dtLoanTo is in the future
             setPlayerLoanValidDate($Data, $requestID, $personRequest->{'intPersonID'}, undef);
@@ -2329,7 +2335,8 @@ sub finalisePlayerLoan {
             my $db = $Data->{'db'};
             my $query = $db->prepare($st) or query_error($st);
             $query->execute(
-                $personRequest->{'intPersonRequestID'}
+                $personRequest->{'intPersonRequestID'},
+                $personRequest->{'intPersonID'}
             ) or query_error($st);
 
             if ($personRequest->{'intPersonID'})    {
