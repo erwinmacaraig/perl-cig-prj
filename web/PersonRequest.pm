@@ -2422,6 +2422,8 @@ sub deactivatePlayerLoan {
 
     my $db = $Data->{'db'};
     my $idset = join(', ', @{$requestIDs});
+    my $peopleIds= join(', ', @{$personIDs});
+    return if ! $idset or ! $peopleIds;
     my $bst = qq [
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -2430,7 +2432,10 @@ sub deactivatePlayerLoan {
             dtTo = IF(NOW() < dtTo, NOW(), dtTo)
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonRequestID > 0
+            AND intPersonID IN ($peopleIds)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+            AND intOnLoan=1
     ];
     my $query = $db->prepare($bst) or query_error($bst);
     $query->execute() or query_error($bst);
@@ -2442,6 +2447,7 @@ sub deactivatePlayerLoan {
             intOpenLoan=0
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonID IN ($peopleIds)
             AND intOpenLoan=1
     ];
     $query = $db->prepare($st) or query_error($st);
