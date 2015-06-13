@@ -2555,10 +2555,25 @@ sub cancelPlayerLoan {
 
     my $query = new CGI;
     my $preqid = safe_param('prqid', 'number') || '';
+    my $personid= safe_param('pid', 'number') || 0;
 
     my %reqFilters = (
-        'requestID' => $preqid
+        'requestID' => $preqid,
+        'personID' => $personid,
     );
+    if (! $personid or ! $preqid)   {
+        my $title = $Data->{'lang'}->txt('Cancel Player Loan');
+        my $errMsg= $Data->{'lang'}->txt("Error Cancelling Loan");
+        my $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
+        return ($body,$title);
+    }
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
