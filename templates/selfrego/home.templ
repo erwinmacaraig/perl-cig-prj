@@ -15,10 +15,12 @@
         [% IF !Found.adult %]
             <a href = "#" id = "btn-myself" class = "btn-main">[% Lang.txt('Myself') %]</a>
         [% END %]
-        [% IF !Found.minor %]
-        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
-        [% ELSE %]
-        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+        [% IF selfRegoMatrixOptions.PLAYER %]
+            [% IF !Found.minor %]
+            <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
+            [% ELSE %]
+            <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+            [% END %]
         [% END %]
     </div>
     <div class = "col-md-5">&nbsp;</div>
@@ -29,9 +31,15 @@
     <div id = "selfreg-myselfoptions">
         <h3>[% Lang.txt('What type of registration do you want?') %]</h3>
         <div class = "col-md-5">
+        [% IF selfRegoMatrixOptions.PLAYER %]
             <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=PLAYER" class = "btn-main">[% Lang.txt('Player') %]</a><br>
+        [% END %]
+        [% IF selfRegoMatrixOptions.COACH %]
             <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=COACH" class = "btn-main">[% Lang.txt('Coach') %]</a><br>
+        [% END %]
+        [% IF selfRegoMatrixOptions.REFEREE %]
             <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
+        [% END %]
          </div>
     </div>
 [% END %]
