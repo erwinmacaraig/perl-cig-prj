@@ -571,6 +571,7 @@ sub getTransList {
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
+      tl.strOnlinePayReference,
 	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
@@ -656,6 +657,11 @@ sub getTransList {
     {
         name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
+        width => 20,
+    },
+    {
+        name => $lang->txt('Payment Reference Number'), 
+        field => 'strOnlinePayReference', 
         width => 20,
     },
     {
@@ -758,6 +764,7 @@ sub getTransList {
                 #$row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
             }     
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
+            $row_data->{'strOnlinePayReference'} = $row->{'strOnlinePayReference'} || $row->{'intTransLogID'} || '';
             $row_data->{'curAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($row->{'curAmount'});
             push @rowdata, $row_data if $row_data;
             $i++;
