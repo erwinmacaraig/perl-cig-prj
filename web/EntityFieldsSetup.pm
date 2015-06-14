@@ -365,6 +365,15 @@ sub clubFieldsSetup {
                     maxsize     => '100',
                     validate    => 'EMAIL',
                 },
+                strWebURL => {
+                  label       => $FieldLabels->{'strWebURL'},
+                  value => $values->{strWebURL},
+                  type  => 'text',
+                  size  => '35',
+                  maxsize => '250',
+                  validate    => 'URL',
+                },
+
                 intNotifications => {
                     label       => $FieldLabels->{'intNotifications'},
                     value       => $values->{'intNotifications'},
@@ -387,6 +396,7 @@ sub clubFieldsSetup {
                 strContact
                 strPhone
                 strEmail
+                strWebURL
                 intNotifications
             )],
             sections => [
@@ -844,6 +854,14 @@ sub entityFieldsSetup {
                     validate    => 'EMAIL',
                     compulsory  => 1,
                 },
+                strWebURL => {
+                  label       => $FieldLabels->{'strWebURL'},
+                  value => $values->{strWebURL},
+                  type  => 'text',
+                  size  => '35',
+                  maxsize => '250',
+                  validate    => 'URL',
+                },
                 intNotifications => {
                     label       => $FieldLabels->{'intNotifications'},
                     value       => $values->{'intNotifications'},
@@ -865,6 +883,7 @@ sub entityFieldsSetup {
                 strContactISOCountry
                 strPhone
                 strEmail
+                strWebURL
                 intNotifications
             )],
             sections => [
