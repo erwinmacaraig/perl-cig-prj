@@ -68,6 +68,10 @@ UPDATE tblPersonRegistration_1 SET strPersonLevel='' WHERE strPersonType='MAOFFI
 
 UPDATE tblPersonRegistration_1 SET strSport='FOOTBALL' WHERE strSport ='NULL'; # Bruce, do we need this?
 
+UPDATE tblPerson as PR
+ inner join (select intPersonID, strRegistrationNature, dtFrom, dtTo, GROUP_CONCAT(intEntityID ORDER by dtFrom, dtTo) as grouped_entity
+ from tblPersonRegistration_1 where strPersonType = 'PLAYER' group by intPersonID HAVING FIND_IN_SET('1659', grouped_entity) = 1)
+ group_international on PR.intPersonID = group_international.intPersonID set PR.intInternationalTransfer = 1;
 
 
 ./importer_AuditLog.pl

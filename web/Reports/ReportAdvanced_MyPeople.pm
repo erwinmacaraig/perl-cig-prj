@@ -100,6 +100,17 @@ sub _getConfiguration {
                     allowgrouping => 1
                 }
             ],
+            PstrImportCode=> [
+                $lang->txt('Imported Person Code'),
+                {
+                    dbfield         => 'tblPerson.strImportPersonCode',
+                    displaytype   => 'text',
+                    fieldtype     => 'text',
+                    allowsort     => 1,
+                    optiongroup   => 'details',
+                }
+            ],
+ 
             PstrStatus=> [
                 'Person Status',
                 {
@@ -107,6 +118,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personStatus,
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -198,7 +210,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'tblPerson.dtDOB',
-                    dbformat    => ' DATE_FORMAT(tblPerson.dtDOB, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'details'
                 }
             ],
@@ -249,6 +261,7 @@ sub _getConfiguration {
                     size          => 2,
                     multiple      => 1,
                     optiongroup   => 'details',
+                    translate       => 1,
                     allowgrouping => 1,
                     allowsort     => 1
                 }
@@ -261,6 +274,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => $CommonVals->{'DefCodes'}{-8},
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -277,6 +291,7 @@ sub _getConfiguration {
                         3 => 'Already in Country',
                         4 => 'Inside EU',
                     },
+                    translate       => 1,
                     optiongroup     => 'details',
                     allowgrouping   => 1
                 }
@@ -289,6 +304,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personType,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -300,6 +316,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personLevel,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -311,6 +328,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::registrationNature,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -323,6 +341,7 @@ sub _getConfiguration {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personRegoStatus,
+                    translate       => 1,
                     optiongroup     => 'regos',
                     allowgrouping   => 1
                 }
@@ -335,6 +354,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::sportType,
                     optiongroup     => 'regos',
+                    translate       => 1,
                     allowgrouping   => 1
                 }
             ],
@@ -344,7 +364,13 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     dbfield     => 'ETR.strEntityRoleName',
-                    optiongroup => 'regos'
+                    translate       => 1,
+                    optiongroup => 'regos',
+                    dbfrom => "
+                        LEFT JOIN tblEntityTypeRoles as ETR ON (
+                            ETR.strEntityRoleKey = PR.strPersonEntityRole
+                        ) 
+                    ",
                 }
             ],
             PRdtFrom=> [
@@ -354,18 +380,18 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'PR.dtFrom',
-                    dbformat    => ' DATE_FORMAT(PR.dtFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'regos'
                 }
             ],
             PRdtTo=> [
-                'Date To',
+                $lang->txt('Date To'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'PR.dtTo',
-                    dbformat    => ' DATE_FORMAT(PR.dtTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'regos'
                 }
             ],
@@ -379,6 +405,7 @@ sub _getConfiguration {
                     dbfield       => 'PR.intPaymentRequired',
                     defaultcomp   => 'equal',
                     defaultvalue  => '0',
+                    translate       => 1,
                     active        => 1,
                     optiongroup   => 'regos'
                 }
@@ -581,8 +608,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtBirthCertValidityDateFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtBirthCertValidityDateFrom'
                 }
@@ -593,8 +619,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtBirthCertValidityDateTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtBirthCertValidityDateTo'
                 }
@@ -637,8 +662,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtOtherPersonIdentifierValidDateFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateFrom'
                 }
@@ -649,8 +673,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtOtherPersonIdentifierValidDateTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateTo'
                 }
@@ -973,8 +996,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt1, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt1'
                 }
             ],
@@ -986,8 +1008,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt2, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt2'
                 }
             ],
@@ -999,8 +1020,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt3, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt3'
                 }
             ],
@@ -1012,8 +1032,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt4, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt4'
                 }
             ],
@@ -1025,8 +1044,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt5, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt5'
                 }
             ],
@@ -1238,8 +1256,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtSuspendedUntil, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'otherfields',
                     dbfield     => 'tblPerson.dtSuspendedUntil'
                 }
@@ -1267,7 +1284,7 @@ sub _getConfiguration {
               strRegionName => [
                 (
                       $currentLevel > $Defs::LEVEL_REGION
-                    ? $Data->{'LevelNames'}{$Defs::LEVEL_REGION} . ' Name'
+                    ? $lang->txt('Region Name')
                     : ''
                 ),
                 {
@@ -1437,6 +1454,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::paymentTypes,
                     allowsort       => 1,
+                    translate       => 1,
                     optiongroup     => 'transactions',
                     dbfield         => 'TL.intPaymentType',
                     allowgrouping   => 1
@@ -1477,8 +1495,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat =>
-                      ' DATE_FORMAT(TX.dtTransaction,"%d/%m/%Y %H:%i")',
+                    datetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtTransaction',
                     sortfield   => 'TX.dtTransaction'
@@ -1490,7 +1507,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtPaid,"%d/%m/%Y %H:%i")',
+                    datetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtPaid'
                 }
@@ -1501,7 +1518,7 @@ sub _getConfiguration {
                     displaytype   => 'date',
                     fieldtype     => 'date',
                     allowsort     => 1,
-                    dbformat      => ' DATE_FORMAT(TL.dtSettlement,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup   => 'transactions',
                     dbfield       => 'TL.dtSettlement',
                     allowgrouping => 1,
@@ -1514,7 +1531,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtStart,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtStart'
                 }
@@ -1525,7 +1542,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtEnd,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtEnd'
                 }
@@ -1587,6 +1604,7 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
+                PstrImportCode
               PstrStatus
               strLocalFirstname
               strLocalSurname
@@ -1727,6 +1745,7 @@ sub _getConfiguration {
             ReturnProcessData  => [
                 qw(tblPerson.strEmail tblPerson.strPhoneMobile tblPerson.strSurname tblPerson.strFirstname tblPerson.intPersonID)
             ],
+            DateTimeFormatObject => $Data->{'l10n'}{'date'},
           },
           ExportFormats => {
           },

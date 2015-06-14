@@ -18,6 +18,7 @@ use SystemConfig;
 use TemplateEmail;
 use ConfirmationEmail;
 use PasswordFormat;
+use TermsConditions;
 
 main();
 
@@ -41,6 +42,8 @@ sub main {
     my $body = '';
     my $template = 'selfrego/user/signup.templ';
     my $errors = [];
+
+    my($termsID, $terms)  = getTerms(\%Data, 'SELFREGACCOUNT');
     if($action eq 'SIGNUP') {
         $errors = signup(\%Data);
         if(!scalar(@{$errors}))    {
@@ -52,6 +55,7 @@ sub main {
         {
             'Errors' => $errors,
             'srp' => $srp || '',
+            'terms' => $terms || '',
         },
         $template,
     );
@@ -117,6 +121,7 @@ sub signup  {
     if($user->ID()) {
         $user->setPassword($inputs{'password'});
         sendConfirmationEmail($Data, $user);
+        logTermsAcceptance($Data, 'SELFREGACCOUNT',$user->ID());
     }
     else    {
         push @errors, $Data->{'lang'}->txt('Error creating user account');

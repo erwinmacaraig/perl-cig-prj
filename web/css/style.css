@@ -258,6 +258,9 @@ body.report h1	{
     background: #d8d8d8;
     border: 1px solid #ccc;
 }
+table.table.shrink-table thead tr th {
+    padding:8px;
+}
 
 .report-numrows	{
 	font-size:8px;
@@ -4464,8 +4467,8 @@ form#signup-form {
 }
 
 #register-form label {
-    text-align: left;
-    width: 160px;
+/*    text-align: left;
+    width: 160px;*/
 }
 form#signup-form .button {
     float: left;

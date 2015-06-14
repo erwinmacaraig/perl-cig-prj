@@ -1,0 +1,80 @@
+{
+	SQL => qq[
+
+        SELECT 
+            tblPerson.strStatus AS PstrStatus, 
+            tblPerson.strPostalCode AS strPostalCode, 
+            strPhoneHome, 
+            tblPerson.dtDOB AS dtDOB_RAW, 
+            PR.strStatus AS PRstrStatus, 
+            strLocalSurname, 
+            CASE intGender
+                WHEN '1' THEN 'Male'
+                WHEN '2' THEN 'Female'
+                ELSE ''
+            END as Gender,
+            PR.strPersonType AS PRstrPersonType, 
+            PR.strSport AS PRstrSport, 
+            tblPerson.strSuburb AS strSuburb, 
+            tblPerson.strAddress1 AS strAddress1, 
+            PR.strPersonLevel AS PRstrPersonLevel, 
+            CASE PR.strPersonLevel
+                WHEN 'PROFESSIONAL' THEN 'Professional'
+                WHEN 'AMATEUR' THEN 'Amateur'
+                WHEN 'HOBBY' THEN 'Hobby'
+                WHEN 'AMATEUR_U_C' THEN 'Amateur (Under Contract)'
+                ELSE ''
+            END as PersonLevel,
+            tblPerson.strEmail AS strEmail, 
+            strLocalFirstname,  
+            tblPerson.dtDOB,
+            strNationalNum
+        FROM
+            tblPerson
+            INNER JOIN tblPersonRegistration_1 as PR ON (
+                tblPerson.intPersonID=PR.intPersonID
+            )
+            INNER JOIN tblEntity as E ON (
+                E.intEntityID = PR.intEntityID
+            )
+            LEFT JOIN tblEntity as tblClub ON (
+                PR.intEntityID = tblClub.intEntityID
+                AND tblClub.intEntityLevel = 3
+            )
+            LEFT JOIN tblTempEntityStructure as RL ON (
+                E.intEntityID = RL.intChildID
+                AND RL.intParentLevel = 20
+            )
+            LEFT JOIN tblEntity as tblRegion ON (
+                RL.intParentID = tblRegion.intEntityID
+            )
+        WHERE
+            tblPerson.strStatus = 'REGISTERED'  
+            AND  PR.strPersonType = 'PLAYER'  
+            AND  PR.strStatus = 'ACTIVE'  
+            AND  PR.strSport = 'FOOTBALL'
+            AND  PR.intEntityID = ###CLUBID###
+	],
+	StatsReport => 0,
+	ReportEntity => 3,
+	ReportLevel => 3,
+	Template => 'default',
+	DistinctValues => 1,
+	Labels => [
+		['strNationalNum','PalloID'],
+		['strLocalFirstname', 'First Name'],
+		['strLocalSurname', 'Family Name'],
+		['dtDOB','DOB','date'],
+		['Gender','Gender','string','translate'],
+		['PersonLevel','Level','string','translate'],
+		['strAddress1','Address 1'],
+		['strSuburb','City'],
+		['strPostalCode','Postal Code'],
+		['strPhoneHome','Home Phone'],
+		['strEmail','Email'],
+	],
+	Sort => [
+		['strLocalSurname','ASC','string'],
+		['dtDOB','DESC','date'],
+	],
+}

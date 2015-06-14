@@ -108,7 +108,6 @@ sub GetPermissions {
     ];
     my $q = $db->prepare($st);
    
-    
     $q->execute(@vals);
     my %PermissionsRaw = ();
     my %fields_by_type = ();
