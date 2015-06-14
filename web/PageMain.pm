@@ -534,6 +534,11 @@ sub regoPageForm {
         'inline',
         'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
     );
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        'jQuery(".chzn-select").chosen({ disable_search_threshold: 32 });',
+    );
 
     $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/jscookie.js");
     $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/bootstrap-tabcollapse/bootstrap-tabcollapse.js");
