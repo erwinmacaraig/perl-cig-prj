@@ -177,7 +177,7 @@ sub _getConfiguration {
 					displaytype=>'date', 
 					fieldtype=>'datetime', 
 					allowsort=>1, 
-					dbformat=>' DATE_FORMAT(T.dtTransaction,"%d/%m/%Y %H:%i")', 
+                    datetimeformat => ['MEDIUM','MEDIUM'],
 					dbfield=>'T.dtTransaction', 
 					sortfield=>'T.dtTransaction'
 				}
@@ -189,7 +189,7 @@ sub _getConfiguration {
 					displaytype=>'date', 
 					fieldtype=>'datetime', 
 					allowsort=>1, 
-					dbformat=>' DATE_FORMAT(T.dtPaid,"%d/%m/%Y %H:%i")', 
+                    datetimeformat => ['MEDIUM','MEDIUM'],
 					dbfield=>'T.dtPaid'
 				}
 			],
@@ -199,7 +199,7 @@ sub _getConfiguration {
 					displaytype=>'date', 
 					fieldtype=>'date', 
 					allowsort=>1, 
-					dbformat=>' DATE_FORMAT(TL.dtSettlement,"%d/%m/%Y")',  
+                    datetimeformat => ['MEDIUM',''],
 					dbfield=>'TL.dtSettlement', 
 					allowgrouping=>1, 
 					sortfield=>'TL.dtSettlement'
@@ -282,6 +282,7 @@ sub _getConfiguration {
 			EmailSenderAddress => $Defs::admin_email,
 			SecondarySort => 1,
 			RunButtonLabel => 'Run Report',
+            DateTimeFormatObject => $Data->{'l10n'}{'date'},
 		},
 	);
 	$self->{'Config'} = \%config;
