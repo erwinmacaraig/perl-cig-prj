@@ -210,7 +210,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'tblPerson.dtDOB',
-                    dbformat    => ' DATE_FORMAT(tblPerson.dtDOB, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'details'
                 }
             ],
@@ -380,7 +380,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'PR.dtFrom',
-                    dbformat    => ' DATE_FORMAT(PR.dtFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'regos'
                 }
             ],
@@ -391,7 +391,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'PR.dtTo',
-                    dbformat    => ' DATE_FORMAT(PR.dtTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'regos'
                 }
             ],
@@ -608,8 +608,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtBirthCertValidityDateFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtBirthCertValidityDateFrom'
                 }
@@ -620,8 +619,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtBirthCertValidityDateTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtBirthCertValidityDateTo'
                 }
@@ -664,8 +662,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtOtherPersonIdentifierValidDateFrom, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateFrom'
                 }
@@ -676,8 +673,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      'DATE_FORMAT(tblPerson.dtOtherPersonIdentifierValidDateTo, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
                     dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateTo'
                 }
@@ -1000,8 +996,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt1, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt1'
                 }
             ],
@@ -1013,8 +1008,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt2, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt2'
                 }
             ],
@@ -1026,8 +1020,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt3, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt3'
                 }
             ],
@@ -1039,8 +1032,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt4, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt4'
                 }
             ],
@@ -1052,8 +1044,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 0,
                     optiongroup => 'otherfields',
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtNatCustomDt5, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     dbfield => 'tblPerson.dtNatCustomDt5'
                 }
             ],
@@ -1265,8 +1256,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbformat =>
-                      ' DATE_FORMAT(tblPerson.dtSuspendedUntil, "%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'otherfields',
                     dbfield     => 'tblPerson.dtSuspendedUntil'
                 }
@@ -1505,8 +1495,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat =>
-                      ' DATE_FORMAT(TX.dtTransaction,"%d/%m/%Y %H:%i")',
+                    datetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtTransaction',
                     sortfield   => 'TX.dtTransaction'
@@ -1518,7 +1507,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtPaid,"%d/%m/%Y %H:%i")',
+                    datetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtPaid'
                 }
@@ -1529,7 +1518,7 @@ sub _getConfiguration {
                     displaytype   => 'date',
                     fieldtype     => 'date',
                     allowsort     => 1,
-                    dbformat      => ' DATE_FORMAT(TL.dtSettlement,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup   => 'transactions',
                     dbfield       => 'TL.dtSettlement',
                     allowgrouping => 1,
@@ -1542,7 +1531,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtStart,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtStart'
                 }
@@ -1553,7 +1542,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    dbformat    => ' DATE_FORMAT(TX.dtEnd,"%d/%m/%Y")',
+                    datetimeformat => ['MEDIUM',''],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtEnd'
                 }
@@ -1756,6 +1745,7 @@ sub _getConfiguration {
             ReturnProcessData  => [
                 qw(tblPerson.strEmail tblPerson.strPhoneMobile tblPerson.strSurname tblPerson.strFirstname tblPerson.intPersonID)
             ],
+            DateTimeFormatObject => $Data->{'l10n'}{'date'},
           },
           ExportFormats => {
           },
