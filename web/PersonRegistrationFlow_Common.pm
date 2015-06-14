@@ -47,6 +47,7 @@ use EntityTypeRoles;
 use PersonSummaryPanel;
 use PersonCertifications;
 use Switch;
+use TermsConditions;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -845,7 +846,7 @@ sub displayRegoFlowDocuments{
 	$hidden_ref->{'pID'} = $personID;
 
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID"; 
-	 my $documents = getRegistrationItems(
+     my $documents = getRegistrationItems(
         $Data,
         'REGO',
         'DOCUMENT',
@@ -856,7 +857,7 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-		
+
 	
 	my @docos = (); 
 
@@ -1042,15 +1043,15 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
         nextaction => "PREGF_DU",
         target => $Data->{'target'},
         documents => \@required_docs_listing,
-		optionaldocs => \@optional_docs_listing,
+	optionaldocs => \@optional_docs_listing,
         hidden_ref => $hidden_ref,
         Lang => $Data->{'lang'},
         client => $client,
         regoID => $regoID,
         NoFormFields =>$noFormFields,
-		url => $Defs::base_url,
-		currentURL => $currentURL,
-		nature => $rego_ref->{'strRegistrationNature'},
+	url => $Defs::base_url,
+	currentURL => $currentURL,
+	nature => $rego_ref->{'strRegistrationNature'},
   );
 	my $pagedata = runTemplate($Data, \%PageData, 'registration/document_flow_backend.templ') || '';
 
@@ -1110,6 +1111,8 @@ sub displayRegoFlowProducts {
             ? $maObj->name()
             : '';
 		$rego_ref->{'MA'} = $maName || '';
+
+    my ($termsId, $product_terms) = getTerms($Data, 'PRODUCT');
      my %PageData = (
         nextaction=>"PREGF_PU",
         target => $Data->{'target'},
@@ -1122,6 +1125,7 @@ sub displayRegoFlowProducts {
         NoFormFields =>$noFormFields,
 		AssociationName => $maName,
 		payMethod => $rego_ref->{'payMethod'},
+		productTerms => $product_terms || '',
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';

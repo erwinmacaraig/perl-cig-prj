@@ -67,16 +67,26 @@
 
                             [% IF rego.NPdtFrom and rego.NPdtFrom != '0000-00-00' %]
                                 <tr>
-									<td class="">[% Lang.txt('Valid From') %]:</td>
-									<td>[% DateFormat.format(rego.NPdtFrom,'MEDIUM') %]</td>
-								</tr>
-
+					<td class="">[% Lang.txt('Valid From') %]:</td>
+					<td>
+					  [% IF rego.RegistrationNature == 'DOMESTIC_LOAN' %]
+					    [% DateFormat.format(rego.dtFrom,'MEDIUM') %]
+					  [% ELSE %]
+					    [% DateFormat.format(rego.NPdtFrom,'MEDIUM') %]
+					  [% END %]					  
+					</td>
+				</tr>
                             [% END %]
-								[% IF rego.NPdtTo and rego.NPdtTo != '0000-00-00' %]
+				[% IF rego.NPdtTo and rego.NPdtTo != '0000-00-00' %]
                                 <tr>
-									<td class="">[% Lang.txt('Valid Until') %]:</td>
-									<td>[% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
-								</tr>
+					<td class="">[% Lang.txt('Valid Until') %]:</td>
+					<td>[% IF rego.RegistrationNature == 'DOMESTIC_LOAN' %]
+					      [% DateFormat.format(rego.dtTo,'MEDIUM') %]
+					    [% ELSE %]
+					      [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]
+					    [% END %]
+					</td>
+				</tr>
 
                             [% END %]
                             [% IF rego.PersonType == 'REFEREE' or rego.PersonType == 'COACH' %]

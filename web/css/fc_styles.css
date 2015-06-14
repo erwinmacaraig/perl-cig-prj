@@ -2335,6 +2335,7 @@ header .navbar-brand {
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 30px; margin-top: 0px; }
   #worktasks_length { display: none; }
+  .dataTables_length { display: none; }
   #worktasks_filter { text-align: right; }
   /*.summaryPanel { display: none; }*/
   div.dataTables_filter label { color: #000; }
@@ -2772,4 +2773,15 @@ header .navbar-brand {
   font-family: FontAwesome;
   content: "\f059";
   font-size:20px;
+}
+.product-terms {
+    padding:5px;
+    margin:5px;
+}
+.selfregterms {
+    padding:5px;
+    margin:15px;
+    max-height:100px;
+    overflow:auto;
+    border:1px solid #ddd;
 }

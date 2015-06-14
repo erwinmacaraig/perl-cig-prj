@@ -35,6 +35,7 @@ use PersonSummaryPanel;
 use RenewalDetails;
 use RegoProducts;
 use FieldMessages;
+use TermsConditions;
 
 
 sub setProcessOrder {
@@ -137,6 +138,7 @@ sub setupValues    {
     $values ||= {};
     $values->{'defaultType'} = $self->{'RunParams'}{'dtype'} || '';
     $values->{'itc'} = $self->{'RunParams'}{'itc'} || 0;
+    $values->{'selfRego'} = 1;
     $values->{'minorRego'} = $self->{'RunParams'}{'minorRego'} || 0;
     if($self->{'Data'}{'User'}) {
         $values->{'strP1FName'} = $self->{'Data'}{'User'}->name();
@@ -301,6 +303,9 @@ sub validate_core_details    {
                 $personObj->ID(),
                 $self->{'RunParams'}{'minorRego'} || 0,
             );
+        }
+        if($self->{'RunParams'}{'d_strTerms'})  {
+            logTermsAcceptance($self->{'Data'}, 'SELFREG', $self->{'UserID'}, $personObj->ID());
         }
         $self->{'ClientValues'}{'personID'} = $personObj->ID();
         $self->{'ClientValues'}{'currentLevel'} = $Defs::LEVEL_PERSON;

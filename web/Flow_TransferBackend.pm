@@ -757,6 +757,7 @@ sub process_registration {
                         tblPersonRegistration_$self->{'Data'}->{'Realm'} as PR
                         INNER JOIN tblPersonRequest as Req ON (
                             PR.intPersonRequestID = Req.intPersonRequestID
+                            AND PR.intPersonID = Req.intPersonID
                         )
                     SET
                         strPreviousPersonLevel = Req.strPersonLevel,

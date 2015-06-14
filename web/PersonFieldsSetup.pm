@@ -20,6 +20,7 @@ use PersonUtils;
 use AssocTime;
 use MinorProtection;
 use Flow_DisplayFields;
+use TermsConditions;
 use Data::Dumper;
 
 sub personFieldsSetup {
@@ -159,10 +160,15 @@ sub personFieldsSetup {
         $showITCReminder = 1;
     }
     $showITCReminder = 0 if $values->{'itc'};
+    my $selfRego = $values->{'selfRego'} || 0;
     my $minorRego = $values->{'minorRego'} || 0;
     my $minorProtectionOptions = getMinorProtectionOptions($Data,$values->{'itc'} || 0);
     my $minorProtectionExplanation= getMinorProtectionExplanation($Data,$values->{'itc'} || 0);
 
+    my $terms = '';
+    if($selfRego)   {
+        (undef, $terms) = getTerms($Data, 'SELFREG');
+    }
     my ($DefCodes, $DefCodesOrder) = getDefCodes(
         dbh        => $Data->{'db'},
         realmID    => $Data->{'Realm'},
@@ -643,6 +649,17 @@ sub personFieldsSetup {
                     sectionname => 'parent',
                     active => $minorRego,
                 },
+                strTerms => {
+                    label       => 'You must agree to terms',
+                    value       => qq[
+<div class = "selfregterms">$terms</div>
+<input type = "checkbox" value = "1" name = "d_strTerms" id = "l_strTerms"><label for = "l_strTerms">&nbsp;].$Data->{'lang'}->txt("I agree to the terms and conditions as specified above").qq[</label>],
+                    type        => 'htmlrow',
+                    compulsory => 1,
+                    sectionname => 'terms',
+                    SkipProcessing => 1,
+                    active => $terms,
+                },
             },
             'order' => [qw(
                 parentBlock
@@ -699,12 +716,14 @@ sub personFieldsSetup {
                 dtInternationalLoanFromDate
                 dtInternationalLoanToDate
                 strInternationalLoanTMSRef
+strTerms
             )],
             sections => [
                 [ 'parent',      $Data->{'lang'}->txt('Parent/Guardian Details') ],
                 [ 'core',        $Data->{'lang'}->txt('Personal Details') ],
                 [ 'minor',       $Data->{'lang'}->txt('FIFA Minor Protection'),'','dynamic-panel' ],
                 [ 'other',       $Data->{'lang'}->txt('Additional Information') ],
+                [ 'terms',       $Data->{'lang'}->txt('Terms and Conditions') ],
                 [ 'loan',       $Data->{'lang'}->txt('Loan Information') ],
                 [ 'transfer',       $Data->{'lang'}->txt('Transfer Information') ],
             ],

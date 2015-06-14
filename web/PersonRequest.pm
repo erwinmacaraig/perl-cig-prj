@@ -171,9 +171,9 @@ sub handlePersonRequest {
             ($body, $title) = displayCompletedRequest($Data);
         }
         case 'PRA_CL' {
-            cancelPlayerLoan($Data);
-            my $query = new CGI;
-            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+            ($body, $title) = cancelPlayerLoan($Data);
+            #my $query = new CGI;
+            #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
         }
         else {
         }
@@ -371,6 +371,7 @@ sub listPersonRecord {
         LEFT JOIN tblPersonRequest as eRQ
             ON  (
                 eRQ.intPersonRequestID = PR.intPersonRequestID
+                AND eRQ.intPersonID= PR.intPersonID
                 )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} ePR
             ON (
@@ -989,7 +990,13 @@ sub listRequests {
         }
     }
 
-    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
+           
+    return( qq[<div class="alert alert-warning" role="alert">
+		  <div>
+		    <span class="fa fa-info"></span>
+		    <p>] . $Data->{'lang'}->txt("No transfer history found") . 
+	    qq[.</p> </div> </div>] , $title) if !$found;
+    #return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -1251,7 +1258,7 @@ sub viewRequest {
         \%TemplateData,
         $templateFile
     );
-
+    
     return ($body, $title);
 }
 
@@ -2362,7 +2369,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
@@ -2394,7 +2401,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
@@ -2487,7 +2494,7 @@ sub setPlayerLoanValidDate {
             UPDATE
                 tblPersonRegistration_$Data->{'Realm'} PR
             INNER JOIN
-                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
             INNER JOIN
                 tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
             SET
@@ -2548,10 +2555,25 @@ sub cancelPlayerLoan {
 
     my $query = new CGI;
     my $preqid = safe_param('prqid', 'number') || '';
+    my $personid= safe_param('pid', 'number') || 0;
 
     my %reqFilters = (
-        'requestID' => $preqid
+        'requestID' => $preqid,
+        'personID' => $personid,
     );
+    if (! $personid or ! $preqid)   {
+        my $title = $Data->{'lang'}->txt('Cancel Player Loan');
+        my $errMsg= $Data->{'lang'}->txt("Error Cancelling Loan");
+        my $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
+        return ($body,$title);
+    }
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
@@ -2561,8 +2583,24 @@ sub cancelPlayerLoan {
 
     push @requestIDs, $preqid;
     push @personIDs, $personRequest->{'intPersonID'};
-
     deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
+    my ($body, $title) = displayCancelPlayerLoanConfirmationMessage($Data, \@personIDs);
+    return ($body,$title);
+    
+    
 }
+sub displayCancelPlayerLoanConfirmationMessage {
 
+  my ($Data, $personIDs) = @_;
+  my $personObj = getInstanceOf($Data, 'person', $personIDs->[0]);
+  my $body = runTemplate($Data, {
+      'url' => "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME",
+      'PersonSummaryPanel' => personSummaryPanel($Data, $personIDs->[0]),
+      'player' => $personObj->getValue('strLocalFirstname') . " " . $personObj->getValue('strLocalSurname'), 
+    }, 
+    'dashboards/cancelplayerloanmsg.templ'    
+    );
+    my $title = 'Cancel Player Loan';
+    return ($body, $title);
+}
 1;

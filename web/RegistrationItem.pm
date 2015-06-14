@@ -151,7 +151,7 @@ strItemType
                 OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
             )
       ]; 
-
+   
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
 	        $Rego_ref->{'intPersonRegistrationID'} || '',

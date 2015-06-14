@@ -33,6 +33,7 @@ sub new {
 	$self->{'RunParams'}= ();
 	$self->{'CarryFields'}= ();
 	$self->{'ClientValues'} = $params{'ClientValues'};
+	$self->{'AuthID'}=$params{'AuthID'} || 0;
 	$self->{'Permissions'}=$params{'Permissions'};
 	$self->{'Lang'}=$params{'Lang'};
 	$self->{'ReturnURL'}=$params{'ReturnURL'};
@@ -244,6 +245,7 @@ sub formatOutput {
 			SummaryCount => $self->{'RunParams'}{'SummaryCount'},
 			Summarise => $self->{'RunParams'}{'Summarise'} || 0,
 			Options => $self->{'OtherOptions'},
+            LimitView => $self->{'Config'}{'Config'}{'limitView'} || 0,
     },
     "reports/$templatename.templ",
   );
@@ -403,6 +405,15 @@ sub _processrow	{
 			if($displaytype eq 'currency' and $self->{'Config'}->{'Config'}{'CurrencySymbol'})  {
 				$outvalue= $self->{'Config'}{'Config'}{'CurrencySymbol'} . $outvalue;
 			}
+			if($fieldopts->{'datetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
+                my @p = @{$fieldopts->{'datetimeformat'}};
+                my $obj = $self->{'Config'}->{'Config'}{'DateTimeFormatObject'};
+                unshift @p, $outvalue;
+                $outvalue = $obj->format(@p);
+            }
+			if($fieldopts->{'translate'} and $self->{'Lang'})   {
+                $outvalue = $self->{'Lang'}->txt($outvalue);
+            }
 			$dataref->{$field} = $outvalue;
 
 			#Handle grouping
