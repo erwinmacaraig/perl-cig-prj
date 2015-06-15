@@ -15,7 +15,11 @@
                 [% IF Data.UserName %]
   				<li>[% Lang.txt('Welcome') %] [% UserName || Data.UserName %]</li>
   				<!--<li>[% Lang.txt('Welcome') %] <a href="#" title="">[% Data.UserName %]<span class="fa fa-caret-down"></span></a></li>-->
-  				<li><a href ="#">[% Lang.txt('Help') %]</a></li>
+                [% IF HelpLink %]
+                    <li><a target="_blank" href ="[% HelpLink %]">[% Lang.txt('Help') %]</a></li>
+                [% ELSE %]
+                    <li>&nbsp;</li>
+                [% END %]
   				<li><a href="user/logout.cgi" title="[% Lang.txt('Logout') %]">[% Lang.txt('Logout') %]</a></li>
                 [% END %]
   			</ul>

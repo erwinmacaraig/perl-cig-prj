@@ -992,7 +992,13 @@ sub listRequests {
         }
     }
 
-    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
+           
+    return( qq[<div class="alert alert-warning" role="alert">
+		  <div>
+		    <span class="fa fa-info"></span>
+		    <p>] . $Data->{'lang'}->txt("No transfer history found") . 
+	    qq[.</p> </div> </div>] , $title) if !$found;
+    #return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -1633,6 +1639,7 @@ sub getRequests {
 
 sub finaliseTransfer {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -1640,6 +1647,7 @@ sub finaliseTransfer {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
     my $db = $Data->{'db'};
 
 #    my $st = qq[
@@ -2288,6 +2296,7 @@ sub loanRequiredFields {
 
 sub finalisePlayerLoan {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -2300,6 +2309,7 @@ sub finalisePlayerLoan {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
 
     my($year_req,$month_req,$day_req) = $personRequest->{'dtLoanFromFormatted'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     my($year_today,$month_today,$day_today) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
@@ -2325,6 +2335,8 @@ sub finalisePlayerLoan {
                 WHERE
                     intPersonRequestID = ?
                     AND strStatus IN ('ACTIVE', 'PENDING')
+                    AND intPersonID = ?
+                    AND intPersonRequestID > 0
             ];
             #called when dtLoanFrom/dtLoanTo is in the future
             setPlayerLoanValidDate($Data, $requestID, $personRequest->{'intPersonID'}, undef);
@@ -2332,7 +2344,8 @@ sub finalisePlayerLoan {
             my $db = $Data->{'db'};
             my $query = $db->prepare($st) or query_error($st);
             $query->execute(
-                $personRequest->{'intPersonRequestID'}
+                $personRequest->{'intPersonRequestID'},
+                $personRequest->{'intPersonID'}
             ) or query_error($st);
 
             if ($personRequest->{'intPersonID'})    {
@@ -2418,6 +2431,8 @@ sub deactivatePlayerLoan {
 
     my $db = $Data->{'db'};
     my $idset = join(', ', @{$requestIDs});
+    my $peopleIds= join(', ', @{$personIDs});
+    return if (! $idset or ! $peopleIds);
     my $bst = qq [
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -2426,7 +2441,10 @@ sub deactivatePlayerLoan {
             dtTo = IF(NOW() < dtTo, NOW(), dtTo)
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonRequestID > 0
+            AND intPersonID IN ($peopleIds)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+            AND intOnLoan=1
     ];
     my $query = $db->prepare($bst) or query_error($bst);
     $query->execute() or query_error($bst);
@@ -2438,6 +2456,7 @@ sub deactivatePlayerLoan {
             intOpenLoan=0
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonID IN ($peopleIds)
             AND intOpenLoan=1
     ];
     $query = $db->prepare($st) or query_error($st);
@@ -2538,10 +2557,25 @@ sub cancelPlayerLoan {
 
     my $query = new CGI;
     my $preqid = safe_param('prqid', 'number') || '';
+    my $personid= safe_param('pid', 'number') || 0;
 
     my %reqFilters = (
-        'requestID' => $preqid
+        'requestID' => $preqid,
+        'personID' => $personid,
     );
+    if (! $personid or ! $preqid)   {
+        my $title = $Data->{'lang'}->txt('Cancel Player Loan');
+        my $errMsg= $Data->{'lang'}->txt("Error Cancelling Loan");
+        my $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
+        return ($body,$title);
+    }
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];

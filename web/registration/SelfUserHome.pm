@@ -20,6 +20,33 @@ use Reg_common;
 use Utils;
 use L10n::DateFormat;
 use L10n::CurrencyFormat;
+
+sub getSelfRegoMatrixOptions    {
+
+    my ($Data) = @_;
+
+    my $st = qq[
+        SELECT DISTINCT strPersonType
+        FROM tblMatrix
+        WHERE
+            intRealmID=?
+            AND intOriginLevel=1
+            AND strWFRuleFor='REGO'
+            AND strRegistrationNature='NEW'
+            AND intLocked=0
+    ];
+    
+	my $q = $Data->{'db'}->prepare($st);
+	$q->execute($Data->{'Realm'});
+    my %OptionsOn=();
+	while(my $dref = $q->fetchrow_hashref()){
+        $OptionsOn{$dref->{'strPersonType'}} = 1;
+    }
+
+    return \%OptionsOn;
+}
+
+    
 sub showHome {
 	my (
 		$Data,
@@ -60,6 +87,7 @@ sub showHome {
 		'selfrego/accordion.templ',		
 		 );
 	}
+    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	
     my $resultHTML = runTemplate(
         $Data,
@@ -69,6 +97,7 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,	
+            selfRegoMatrixOptions => $selfRegoMatrixOptions,
 	    Accordion => $accordion,
             OldSystemLinkage => $Data->{'SystemConfig'}{'OldSystemLinkage'} || 0,
             OldSystemUsername => $Data->{'SystemConfig'}{'OldSystemUsername'} || '',

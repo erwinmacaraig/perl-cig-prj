@@ -18,6 +18,7 @@ use TTTemplate;
 use Log;
 use Data::Dumper;
 use LanguageChooser;
+use HelpLink;;
 
 sub ccPageForm  {
     my($title, $body, $clientValues_ref,$client, $Data) = @_;
@@ -261,6 +262,7 @@ sub pageMain {
         LanguageChooser => genLanguageChooser($Data),
         HeaderLogo => $Data->{'SystemConfig'}{'MA_logo'},
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
+        HelpLink => retrieveHelpLink($Data),
     );
 
   my $globalnav = runTemplate(
@@ -531,6 +533,11 @@ sub regoPageForm {
         'js_bottom',
         'inline',
         'jQuery(".fcToggleGroup").fcToggle({ test:1 });',
+    );
+    $Data->{'AddToPage'}->add(
+        'js_bottom',
+        'inline',
+        'jQuery(".chzn-select").chosen({ disable_search_threshold: 32 });',
     );
 
     $Data->{'AddToPage'}->add('js_bottom','file',"$Defs::base_url/js/jscookie.js");
