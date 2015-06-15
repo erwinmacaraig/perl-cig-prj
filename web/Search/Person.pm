@@ -195,8 +195,10 @@ sub getTransfer {
                 intPersonID, dtFrom DESC, dtTo DESC
         ];
 
+
         my $precheck = $self->getData->{'db'}->prepare($pst);
         $precheck->execute();
+
         while(my $pdref = $precheck->fetchrow_hashref()) {
             next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
 
@@ -208,20 +210,26 @@ sub getTransfer {
 
         my $flag = 0;
         my @includePersonList = ();
+        my $valid_person_list;
 
-        foreach my $pID (keys %personRegMapping) {
-            foreach my $sport (keys %Defs::sportType) {
-                #no records exist for $sport (e.g. BEACHSOCCER)
-                next if !$personRegMapping{$pID}{$sport};
+        if(scalar(%personRegMapping)) {
+            foreach my $pID (keys %personRegMapping) {
+                foreach my $sport (keys %Defs::sportType) {
+                    #no records exist for $sport (e.g. BEACHSOCCER)
+                    next if !$personRegMapping{$pID}{$sport};
 
-                $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+                    $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+                }
+
+                push @includePersonList, $pID if $flag > 0;
+                $flag = 0;
             }
 
-            push @includePersonList, $pID if $flag > 0;
-            $flag = 0;
+            $valid_person_list = join(',', @includePersonList);
         }
-
-        my $valid_person_list = join(',', @includePersonList);
+        else {
+            $valid_person_list = join(',', @persons);
+        }
 
         my $entity_list = '';
         $entity_list = join(',', @{$subNodes});
