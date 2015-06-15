@@ -53,3 +53,5 @@ UPDATE tblProducts SET intRealmID=-99 WHERE strProductType ='insurance' and intR
 UPDATE tblRegistrationItem SET intRealmID=-99 WHERE strItemType ='PRODUCT' AND intID IN (100,99,98,97,96,95,94, 93,92,91,90,89,88,87,86,84);
 
 
+UPDATE tblProducts SET intRealmID=1 WHERE strProductType ='insurance' and intRealmID=-99;
+UPDATE tblRegistrationItem SET intRealmID=1 WHERE strItemType ='PRODUCT' AND intID IN (100,99,98,97,96,95,94, 93,92,91,90,89,88,87,86,84) and intRealmID=-99;

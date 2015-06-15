@@ -273,6 +273,7 @@ sub listPersonRecord {
     my $dob = $params{'dob'} || '';
     my $request_type = $params{'request_type'} || '';
     my $transferType = safe_param('transfer_type', 'word') || '';
+    my $targetPRID = safe_param('tprID', 'number') || '';
 
     my $title = $Data->{'lang'}->txt('Search Result');
     my %result;
@@ -310,6 +311,7 @@ sub listPersonRecord {
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
+        $joinCondition .= qq [ AND PR.intPersonRegistrationID = $targetPRID ] if $targetPRID;
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
         $orderBy = qq[
             ORDER BY
