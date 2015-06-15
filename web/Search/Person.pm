@@ -211,6 +211,7 @@ sub getTransfer {
 
         foreach my $pID (keys %personRegMapping) {
             foreach my $sport (keys %Defs::sportType) {
+                #no records exist for $sport (e.g. BEACHSOCCER)
                 next if !$personRegMapping{$pID}{$sport};
 
                 $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
@@ -240,6 +241,11 @@ sub getTransfer {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                PR.intPersonRegistrationID,
+                PR.dtFrom,
+                PR.dtTo,
+                PR.strSport,
+                PR.strStatus,
                 PRQinprogress.intPersonRequestID as existingInProgressRequestID,
                 PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
                 PRQactive.intPersonRequestID as existingPersonRegistrationID,
@@ -286,14 +292,14 @@ sub getTransfer {
                 )
             WHERE tblPerson.intPersonID IN ($valid_person_list)
                 AND tblPerson.strStatus IN ('REGISTERED')
-                AND PRQinprogress.intPersonRequestID IS NULL
             ORDER BY 
-                strLocalSurname, 
-                strLocalFirstname
+                PR.intPersonID,
+                PR.dtFrom DESC
             LIMIT 100
         ];
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
+
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -301,31 +307,74 @@ sub getTransfer {
         my $count = 0;
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
+
+        my %validRecords = ();
+        my @sportsFilter;
+
         while(my $dref = $q->fetchrow_hashref()) {
-            $count++;
-            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
-            my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
-            push @memarray, {
-                id => $dref->{'intPersonID'} || next,
-                name => $name,
-                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$dref->{'strNationalNum'}&amp;transfer_type=",
-                otherdetails => {
-                    dob => $dref->{'dtDOB'},
-                    dtadded => $dref->{'dtadded'},
-                    ma_id => $dref->{'strNationalNum'} || '',
-                    org => $dref->{'EntityName'} || '',
-                },
-                inProgressRequestExists => $dref->{'existingInProgressRequestID'},
-                acceptedRequestLink => $acceptedRequestLink,
-                submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
-            };
+            next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
+
+            $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
         }
+
+
+        foreach my $resPersonID (keys %validRecords) {
+            foreach my $personSport (keys %{$validRecords{$resPersonID}}) {
+                push @sportsFilter, $Defs::sportType{$personSport} if !(grep /$Defs::sportType{$personSport}/, @sportsFilter);
+
+                my $result = $validRecords{$resPersonID}{$personSport};
+
+                $count++;
+                my $name = "$result->{'strLocalFirstname'} $result->{'strLocalSurname'}" || '';
+                my $acceptedRequestLink = ($result->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$result->{'existingAcceptedRequestID'}" : '';
+                push @memarray, {
+                    id => $result->{'intPersonID'} || next,
+                    name => $name,
+                    sport => $Defs::sportType{$personSport},
+                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
+                    otherdetails => {
+                        dob => $result->{'dtDOB'},
+                        dtadded => $result->{'dtadded'},
+                        ma_id => $result->{'strNationalNum'} || '',
+                        org => $result->{'EntityName'} || '',
+                    },
+                    inProgressRequestExists => $result->{'existingInProgressRequestID'},
+                    acceptedRequestLink => $acceptedRequestLink,
+                    submittedPersonRegistrationExists => $result->{'existingPendingRegistrationID'},
+                };
+            }
+        }
+
+        #while(my $dref = $q->fetchrow_hashref()) {
+        #    $count++;
+        #    my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+        #    my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
+        #    push @memarray, {
+        #        id => $dref->{'intPersonID'} || next,
+        #        name => $name,
+        #        link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$dref->{'strNationalNum'}&amp;transfer_type=",
+        #        otherdetails => {
+        #            dob => $dref->{'dtDOB'},
+        #            dtadded => $dref->{'dtadded'},
+        #            ma_id => $dref->{'strNationalNum'} || '',
+        #            org => $dref->{'EntityName'} || '',
+        #        },
+        #        inProgressRequestExists => $dref->{'existingInProgressRequestID'},
+        #        acceptedRequestLink => $acceptedRequestLink,
+        #        submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
+        #    };
+        #}
 
         if($raw){
             return \@memarray;
         }
         else {
-            return $self->displayResultGrid(\@memarray) if $count;
+
+            my %filters = (
+                sports => \@sportsFilter,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
 
             return $count;
         }

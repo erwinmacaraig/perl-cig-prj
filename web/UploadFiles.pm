@@ -467,6 +467,7 @@ sub deleteFile	{
 		$fileID,
 	) = @_;
 
+    return 0 if (!$fileID);
 	my $st = qq[
 		SELECT * 
 		FROM tblUploadedFiles
