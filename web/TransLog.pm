@@ -169,6 +169,7 @@ sub delTransLog	{
 	my ($Data) = @_;
 	my $intPersonID = $Data->{'clientValues'}{'personID'} || 0;
 	my $intLogID = $Data->{'params'}{'tlID'} || 0;
+    return '' if (! $intLogID);
 	my $db = $Data->{'db'};
 	my $st = qq[
 		DELETE FROM tblTransLog
