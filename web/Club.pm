@@ -90,14 +90,14 @@ sub club_details  {
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
   my $client=setClient($Data->{'clientValues'}) || '';
 
-  #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
-  my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
+  my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+  #my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
   my $allowadd = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ZONE ? 1 : 0;
 
     $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
 
     my $option='display';
-
+      
    $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e') && $allowedit;
    $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
@@ -203,7 +203,7 @@ sub club_details  {
 
         ];
     }
-
+    my $countries = Countries::getISOCountriesHash();
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
@@ -303,8 +303,8 @@ sub club_details  {
         label => "Entity Type",
         value => $field->{strEntityType},
         type => 'lookup',
-        options => \%Defs::clubLevelSubtype,
-        firstoption => [ '', 'Hello' ],
+        options => \%Defs::entityType,
+        firstoption => [ '', 'Select Type' ],
         compulsory => 1,
      },
       strStatus => {
@@ -350,7 +350,7 @@ sub club_details  {
           label       => 'Country of Address',
           value       => $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
-          options     => \%Mcountriesonly,
+          options     => $countries,
           firstoption => [ '', 'Select Country' ],
         compulsory => 1,
       },
@@ -398,7 +398,7 @@ sub club_details  {
           label       => 'Country of Organisation',
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
-          options     => \%Mcountriesonly,
+          options     => $countries,
           firstoption => [ '', 'Select Country' ],
         compulsory => 1,
       },
@@ -578,6 +578,7 @@ sub club_details  {
     carryfields =>  {
       client => $client,
       a=> $action,
+      clubID => $clubID
     },
   );
   my $fieldperms=$Data->{'Permissions'};
@@ -594,11 +595,12 @@ my $resultHTML='' ;
   my $scMenu = '';#(allowedAction($Data, 'c_e')) ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS) : '';
   my $logodisplay = '';
   my $editlink = (allowedAction($Data, 'c_e')) ? 1 : 0;
+  #( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );#
   if($option eq 'display')  {
 #    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
-    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
-
+    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE&clubID=$clubID">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if ( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) ); #allowedAction($Data, 'c_e');
+    #
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
     $logodisplay = showLogo(
@@ -644,15 +646,15 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
-    strContactISOCountry,
-      strContact,
+     strContactISOCountry,
+     strContact,
      strContactCity,
      intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
-    strState,
-        strCity,
+     strState,
+     strCity,
      strAddress,
      strAddress2,
      strWebURL,
@@ -792,7 +794,7 @@ sub postClubUpdate {
       \%clubchars,
     );
   }
-
+    
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
   ### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
   resetStatus($clubID,$db);
