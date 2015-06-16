@@ -1,9 +1,13 @@
 <div class="report-wrapper table-responsive">
 <table class="sreport-table table tableboxheader table-striped table-bordered table-condensed [% IF Labels.size > 7 %]shrink-table[% END %]">
+<caption>
+    <div class="report-numrows">[% Lang.txt('Records returned:') %] [% RecordCount %] </div>
+</caption>
+
 	<thead>
 		<tr>
 [% FOREACH i = Labels %]
-			<th>[% i.1 %]</th>
+			<th>[% Lang.txt(i.1) %]</th>
 [% END %]
 		</tr>
 	</thead>
@@ -13,7 +17,14 @@
   [% class = loop.index % 2 ? 'even' : 'odd' %]
 		<tr class="[% class %]">
 [% FOREACH i = Labels %]
+            [% IF i.2 and i.2 == 'date' %]
+			<td>[% DateFormat.format(r.item(i.0),'MEDIUM','') %]</td>
+            [% ELSIF i.3 and i.3 == 'translate' %]
+			<td>[% Lang.txt(r.item(i.0)) %]</td>
+            [% ELSE %] 
 			<td>[% r.item(i.0) %]</td>
+
+            [% END %]
 [% END %]
 		</tr>
 [% END %]

@@ -20,6 +20,33 @@ use Reg_common;
 use Utils;
 use L10n::DateFormat;
 use L10n::CurrencyFormat;
+
+sub getSelfRegoMatrixOptions    {
+
+    my ($Data) = @_;
+
+    my $st = qq[
+        SELECT DISTINCT strPersonType
+        FROM tblMatrix
+        WHERE
+            intRealmID=?
+            AND intOriginLevel=1
+            AND strWFRuleFor='REGO'
+            AND strRegistrationNature='NEW'
+            AND intLocked=0
+    ];
+    
+	my $q = $Data->{'db'}->prepare($st);
+	$q->execute($Data->{'Realm'});
+    my %OptionsOn=();
+	while(my $dref = $q->fetchrow_hashref()){
+        $OptionsOn{$dref->{'strPersonType'}} = 1;
+    }
+
+    return \%OptionsOn;
+}
+
+    
 sub showHome {
 	my (
 		$Data,
@@ -60,6 +87,7 @@ sub showHome {
 		'selfrego/accordion.templ',		
 		 );
 	}
+    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	
     my $resultHTML = runTemplate(
         $Data,
@@ -69,7 +97,8 @@ sub showHome {
             People => $people,
             Found => $found,
             srp => $srp,	
-			Accordion => $accordion,
+            selfRegoMatrixOptions => $selfRegoMatrixOptions,
+	    Accordion => $accordion,
             OldSystemLinkage => $Data->{'SystemConfig'}{'OldSystemLinkage'} || 0,
             OldSystemUsername => $Data->{'SystemConfig'}{'OldSystemUsername'} || '',
             OldSystemPassword => $Data->{'SystemConfig'}{'OldSystemPassword'} || '',
@@ -112,6 +141,7 @@ my ($Data, $previousRegos) = @_;
 			push @{$history{'regohist'}}, {
 				NationalPeriodName => $regoDetail->{'strNationalPeriodName'},
 				RegistrationType => $Defs::registrationNature{$regoDetail->{'strRegistrationNature'}},
+				RegistrationNature => $regoDetail->{'strRegistrationNature'},
 				Status => $Defs::entityStatus{$regoDetail->{'strStatus'}},
 				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
 				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
@@ -121,6 +151,8 @@ my ($Data, $previousRegos) = @_;
 				NPdtFrom => $regoDetail->{'NPdtFrom'},
 				NPdtTo => $regoDetail->{'NPdtTo'},
 				Certifications => $regoDetail->{'regCertifications'},
+				dtFrom => $regoDetail->{'dtFrom'},
+				dtTo => $regoDetail->{'dtTo'},
 			};
 		}
 		
@@ -205,6 +237,7 @@ sub getPreviousRegos {
             P.strStatus as PersonStatus,
             NP.strNationalPeriodName,
             NP.dtTo as NPdtTo,
+            NP.dtFrom as NPdtFrom,
             prq.intOpenLoan,
             existprq.intOpenLoan as existOpenLoan
         FROM
@@ -260,7 +293,7 @@ sub getPreviousRegos {
         $found{$type} = 1;
         $dref->{'strPersonTypeName'} = $Defs::personType{$dref->{'strPersonType'}} || '';
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
-        
+        $dref->{'strSportType'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'renewlink'} = '';
 		$dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;

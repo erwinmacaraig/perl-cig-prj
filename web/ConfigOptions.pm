@@ -63,7 +63,6 @@ sub GetPermissions {
             WHERE
                 T.intRealmID = ? 
                 AND intChildID = ?
-            LIMIT 1
         ];
         
         
@@ -109,7 +108,6 @@ sub GetPermissions {
     ];
     my $q = $db->prepare($st);
    
-    
     $q->execute(@vals);
     my %PermissionsRaw = ();
     my %fields_by_type = ();

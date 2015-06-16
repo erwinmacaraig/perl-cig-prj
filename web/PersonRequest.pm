@@ -171,9 +171,9 @@ sub handlePersonRequest {
             ($body, $title) = displayCompletedRequest($Data);
         }
         case 'PRA_CL' {
-            cancelPlayerLoan($Data);
-            my $query = new CGI;
-            print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
+            ($body, $title) = cancelPlayerLoan($Data);
+            #my $query = new CGI;
+            #print $query->redirect("$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME");
         }
         else {
         }
@@ -273,6 +273,7 @@ sub listPersonRecord {
     my $dob = $params{'dob'} || '';
     my $request_type = $params{'request_type'} || '';
     my $transferType = safe_param('transfer_type', 'word') || '';
+    my $targetPRID = safe_param('tprID', 'number') || '';
 
     my $title = $Data->{'lang'}->txt('Search Result');
     my %result;
@@ -310,6 +311,7 @@ sub listPersonRecord {
     }
     elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
+        $joinCondition .= qq [ AND PR.intPersonRegistrationID = $targetPRID ] if $targetPRID;
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
         $orderBy = qq[
             ORDER BY
@@ -371,6 +373,7 @@ sub listPersonRecord {
         LEFT JOIN tblPersonRequest as eRQ
             ON  (
                 eRQ.intPersonRequestID = PR.intPersonRequestID
+                AND eRQ.intPersonID= PR.intPersonID
                 )
         LEFT JOIN tblPersonRegistration_$Data->{'Realm'} ePR
             ON (
@@ -989,7 +992,13 @@ sub listRequests {
         }
     }
 
-    return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
+           
+    return( qq[<div class="alert alert-warning" role="alert">
+		  <div>
+		    <span class="fa fa-info"></span>
+		    <p>] . $Data->{'lang'}->txt("No transfer history found") . 
+	    qq[.</p> </div> </div>] , $title) if !$found;
+    #return ($Data->{'lang'}->txt("Records found").': '. $found, $title) if !$found;
 
     my @headers = (
         {
@@ -1251,7 +1260,7 @@ sub viewRequest {
         \%TemplateData,
         $templateFile
     );
-
+    
     return ($body, $title);
 }
 
@@ -1442,7 +1451,7 @@ sub getRequests {
     my ($Data, $filter) = @_;
 
     my $where = '';
-    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
+    my $personRegoJoin = qq[ LEFT JOIN tblPersonRegistration_$Data->{'Realm'} pr ON (pr.intPersonID=pq.intPersonID and pr.intPersonRequestID = pq.intPersonRequestID AND pr.intEntityID = intRequestFromEntityID AND pr.strStatus NOT IN ('INPROGRESS')) ];
     my @values = (
         $Data->{'Realm'}
     );
@@ -1608,13 +1617,15 @@ sub getRequests {
             $where
     ];
 
+    my @personRequests = ();
+    return (\@personRequests) if (! $where);
+
 
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st);
     $q->execute(@values) or query_error($st);
 
-    my @personRequests = ();
       
     while(my $dref = $q->fetchrow_hashref()) {
         $dref->{'currentAge'} = personAge($Data, $dref->{'dtDOB'});
@@ -1628,6 +1639,7 @@ sub getRequests {
 
 sub finaliseTransfer {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -1635,6 +1647,7 @@ sub finaliseTransfer {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
     my $db = $Data->{'db'};
 
 #    my $st = qq[
@@ -2283,6 +2296,7 @@ sub loanRequiredFields {
 
 sub finalisePlayerLoan {
     my ($Data, $requestID) = @_;
+    return if ! $requestID;
 
     my %reqFilters = (
         'requestID' => $requestID
@@ -2295,6 +2309,7 @@ sub finalisePlayerLoan {
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
+    return if ! $personRequest->{'intPersonID'};
 
     my($year_req,$month_req,$day_req) = $personRequest->{'dtLoanFromFormatted'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     my($year_today,$month_today,$day_today) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
@@ -2320,6 +2335,8 @@ sub finalisePlayerLoan {
                 WHERE
                     intPersonRequestID = ?
                     AND strStatus IN ('ACTIVE', 'PENDING')
+                    AND intPersonID = ?
+                    AND intPersonRequestID > 0
             ];
             #called when dtLoanFrom/dtLoanTo is in the future
             setPlayerLoanValidDate($Data, $requestID, $personRequest->{'intPersonID'}, undef);
@@ -2327,7 +2344,8 @@ sub finalisePlayerLoan {
             my $db = $Data->{'db'};
             my $query = $db->prepare($st) or query_error($st);
             $query->execute(
-                $personRequest->{'intPersonRequestID'}
+                $personRequest->{'intPersonRequestID'},
+                $personRequest->{'intPersonID'}
             ) or query_error($st);
 
             if ($personRequest->{'intPersonID'})    {
@@ -2353,7 +2371,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+            tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
         INNER JOIN
             tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
         SET
@@ -2385,7 +2403,7 @@ sub activatePlayerLoan {
         UPDATE
             tblPersonRegistration_$Data->{'Realm'} PR
         INNER JOIN
-            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID)
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
         SET
             PR.strPreLoanedStatus = PR.strStatus,
             PR.strStatus = IF(PR.strStatus = 'ACTIVE', 'PASSIVE', PR.strStatus),
@@ -2413,6 +2431,8 @@ sub deactivatePlayerLoan {
 
     my $db = $Data->{'db'};
     my $idset = join(', ', @{$requestIDs});
+    my $peopleIds= join(', ', @{$personIDs});
+    return if (! $idset or ! $peopleIds);
     my $bst = qq [
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -2421,7 +2441,10 @@ sub deactivatePlayerLoan {
             dtTo = IF(NOW() < dtTo, NOW(), dtTo)
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonRequestID > 0
+            AND intPersonID IN ($peopleIds)
             AND strStatus IN ('PENDING', 'ACTIVE', 'PASSIVE')
+            AND intOnLoan=1
     ];
     my $query = $db->prepare($bst) or query_error($bst);
     $query->execute() or query_error($bst);
@@ -2433,6 +2456,7 @@ sub deactivatePlayerLoan {
             intOpenLoan=0
         WHERE
             intPersonRequestID IN ($idset)
+            AND intPersonID IN ($peopleIds)
             AND intOpenLoan=1
     ];
     $query = $db->prepare($st) or query_error($st);
@@ -2472,7 +2496,7 @@ sub setPlayerLoanValidDate {
             UPDATE
                 tblPersonRegistration_$Data->{'Realm'} PR
             INNER JOIN
-                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID)
+                tblPersonRequest PRQ ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
             INNER JOIN
                 tblNationalPeriod NP ON (PRQ.dtLoanFrom BETWEEN NP.dtFrom AND NP.dtTo)
             SET
@@ -2533,10 +2557,25 @@ sub cancelPlayerLoan {
 
     my $query = new CGI;
     my $preqid = safe_param('prqid', 'number') || '';
+    my $personid= safe_param('pid', 'number') || 0;
 
     my %reqFilters = (
-        'requestID' => $preqid
+        'requestID' => $preqid,
+        'personID' => $personid,
     );
+    if (! $personid or ! $preqid)   {
+        my $title = $Data->{'lang'}->txt('Cancel Player Loan');
+        my $errMsg= $Data->{'lang'}->txt("Error Cancelling Loan");
+        my $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
+        return ($body,$title);
+    }
 
     my $personRequest = getRequests($Data, \%reqFilters);
     $personRequest = $personRequest->[0];
@@ -2546,8 +2585,24 @@ sub cancelPlayerLoan {
 
     push @requestIDs, $preqid;
     push @personIDs, $personRequest->{'intPersonID'};
-
     deactivatePlayerLoan($Data, \@requestIDs, \@personIDs);
+    my ($body, $title) = displayCancelPlayerLoanConfirmationMessage($Data, \@personIDs);
+    return ($body,$title);
+    
+    
 }
+sub displayCancelPlayerLoanConfirmationMessage {
 
+  my ($Data, $personIDs) = @_;
+  my $personObj = getInstanceOf($Data, 'person', $personIDs->[0]);
+  my $body = runTemplate($Data, {
+      'url' => "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME",
+      'PersonSummaryPanel' => personSummaryPanel($Data, $personIDs->[0]),
+      'player' => $personObj->getValue('strLocalFirstname') . " " . $personObj->getValue('strLocalSurname'), 
+    }, 
+    'dashboards/cancelplayerloanmsg.templ'    
+    );
+    my $title = 'Cancel Player Loan';
+    return ($body, $title);
+}
 1;

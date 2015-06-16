@@ -2,10 +2,9 @@ package TermsConditions;
 
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT= qw(getTerms);
-@EXPORT_OK = qw(getTerms);
+@EXPORT= qw(getTerms logTermsAcceptance);
+@EXPORT_OK = qw(getTerms logTermsAcceptance);
 use lib "..",".";
-use LangBase;
 use Defs;
 
 
@@ -38,5 +37,43 @@ sub getTerms {
         $terms || '',
     );
 }
+
+sub logTermsAcceptance {
+    my ($Data, $type, $userID, $personID, $termsID) = @_;
+
+    return 0 if !$type;
+    return 0 if (!$userID and !$personID);
+
+    if(!$termsID)   {
+        ($termsID,undef) = getTerms($Data, $type);    
+    }
+    return 0 if !$termsID;
+    
+    my $st = qq[
+        INSERT INTO 
+            tblTermsConditionsLog
+        (
+            intTermsID,
+            intUserID,
+            intPersonID,
+            tAgreed
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            NOW()
+        )
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(
+        $termsID,
+        $userID || 0,
+        $personID || 0,
+    );
+    $q->finish();
+    return 1;
+}
+
 
 1;

@@ -306,8 +306,8 @@ sub showPersonHome	{
         next if ($rego->{'strStatus'} !~ /$Defs::PERSONREGO_STATUS_ACTIVE|$Defs::PERSONREGO_STATUS_PASSIVE/);
 
         #enable early deactivation of a player loan
-        if($rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
-            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}";
+        if($rego->{'intPersonRequestID'} and $rego->{'intOnLoan'} and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE and ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL)) {
+            $rego->{'cancel_loan_link'} =  "$Data->{'target'}?client=$client&amp;a=PRA_CL&amp;prqid=$rego->{'intPersonRequestID'}&amp;pid=$rego->{'intPersonID'}";
         }
 
         next if ($rego->{'intEntityID'} != getLastEntityID($Data->{'clientValues'}));

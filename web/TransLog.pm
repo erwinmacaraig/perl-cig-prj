@@ -127,14 +127,14 @@ sub resolveHoldPayment  {
     if ($resolveStatus == $Defs::TXNLOG_SUCCESS)   {
         my $st = qq[
             UPDATE tblTransactions
-            SET intStatus = 1
+            SET intStatus = 1,  intPaymentGatewayResponded=1
             WHERE intTransLogID = ?
         ];
         my $query = $Data->{'db'}->prepare($st);
         $query->execute($logID);
         $st = qq[
             UPDATE tblTransLog
-            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED', strText = 'Resolved'
+            SET intStatus = 1, strResponseCode = 'OK', strResponseText = 'PAYMENT_HOLD_RESOLVED', strText = 'Resolved',  intPaymentGatewayResponded=1
             WHERE intLogID = ?
         ];
         $query = $Data->{'db'}->prepare($st);
@@ -169,6 +169,7 @@ sub delTransLog	{
 	my ($Data) = @_;
 	my $intPersonID = $Data->{'clientValues'}{'personID'} || 0;
 	my $intLogID = $Data->{'params'}{'tlID'} || 0;
+    return '' if (! $intLogID);
 	my $db = $Data->{'db'};
 	my $st = qq[
 		DELETE FROM tblTransLog
@@ -529,9 +530,9 @@ sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
-	#if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){
-		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getEntityID($Data->{'clientValues'});
-	#}
+	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
+		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
+	}
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
@@ -571,6 +572,7 @@ sub getTransList {
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
+      tl.strOnlinePayReference,
 	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
@@ -656,6 +658,11 @@ sub getTransList {
     {
         name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
+        width => 20,
+    },
+    {
+        name => $lang->txt('Payment Reference Number'), 
+        field => 'strOnlinePayReference', 
         width => 20,
     },
     {
@@ -758,6 +765,7 @@ sub getTransList {
                 #$row_data->{'TaxTotal'} =sprintf("%.2f",($row->{'dblTaxRate'} * $row_data->{'NetAmount'}));  
             }     
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
+            $row_data->{'strOnlinePayReference'} = $row->{'strOnlinePayReference'} || $row->{'intTransLogID'} || '';
             $row_data->{'curAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($row->{'curAmount'});
             push @rowdata, $row_data if $row_data;
             $i++;

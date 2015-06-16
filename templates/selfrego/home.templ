@@ -15,31 +15,49 @@
         [% IF !Found.adult %]
             <a href = "#" id = "btn-myself" class = "btn-main">[% Lang.txt('Myself') %]</a>
         [% END %]
-        [% IF !Found.minor %]
-        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
-        [% ELSE %]
-        <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+        [% IF selfRegoMatrixOptions.PLAYER %]
+            [% IF !Found.minor %]
+            <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('A minor in my care') %]</a>
+            [% ELSE %]
+            <a href = "?a=REG_NEW&amp;minorRego=1&amp;dtype=PLAYER&amp;srp=[% srp %]" class = "btn-main">[% Lang.txt('Another minor in my care') %]</a>
+            [% END %]
         [% END %]
     </div>
     <div class = "col-md-5">&nbsp;</div>
 </div>
 
 <div class = "row additional-person">
-    <div class = "selfreg-regwho col-md-7">
+[% IF !Found.adult %]
+    <div id = "selfreg-myselfoptions">
+        <h3>[% Lang.txt('What type of registration do you want?') %]</h3>
+        <div class = "col-md-5">
+        [% IF selfRegoMatrixOptions.PLAYER %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=PLAYER" class = "btn-main">[% Lang.txt('Player') %]</a><br>
+        [% END %]
+        [% IF selfRegoMatrixOptions.COACH %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=COACH" class = "btn-main">[% Lang.txt('Coach') %]</a><br>
+        [% END %]
+        [% IF selfRegoMatrixOptions.REFEREE %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
+        [% END %]
+         </div>
+    </div>
+[% END %]
+
 [% IF OldSystemLinkage %]
-    <div class = "col-md-12">
+    <div class = "selfreg-regwho col-md-12">
         <h2>[% Lang.txt('or') %]</h2>
 
         <p>[% Lang.txt('You can link an account from your old system into your new self registration account.') %]</p>
          <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
             <div class = "form-group">
-                <label class="col-md-2" for="link-un">[% Lang.txt(OldSystemUsername) %]</label>
+                <label class="col-md-5" for="link-un">[% Lang.txt(OldSystemUsername) %]</label>
                 <div class="col-md-6 control-fields">
                     <input type = "text" name = "un" value = "" id = "link-un"  class="form-control fields required" title="[% Lang.txt(OldSystemUsername) %]">
                 </div>
             </div>
             <div class = "form-group">
-                <label class="col-md-2" for="link-pw">[% Lang.txt(OldSystemPassword) %]</label>
+                <label class="col-md-5" for="link-pw">[% Lang.txt(OldSystemPassword) %]</label>
                 <div class="col-md-6 control-fields">
                     <input type = "text" name = "pw" value = "" size = "50" id = "link-pw"  class="form-control fields required" title="[% Lang.txt(OldSystemPassword) %]">
                 </div>
@@ -48,20 +66,9 @@
             <input type = "hidden" name = "a" value = "link">
             <input type = "hidden" name = "srp" value = "[% srp %]">
           </form>
-        </div>
     </div>
+[% END %]
 </div>
-[% END %]
-
-[% IF !Found.adult %]
-    <div id = "selfreg-myselfoptions">
-    <h3>[% Lang.txt('What type of registration do you want?') %]</h3>
-    <div class = "col-md-5">
-        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=PLAYER" class = "btn-main">[% Lang.txt('Player') %]</a><br>
-        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=COACH" class = "btn-main">[% Lang.txt('Coach') %]</a><br>
-        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
-    </div>
-[% END %]
  
 <script>
 jQuery(document).ready(function()  {

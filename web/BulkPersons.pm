@@ -39,6 +39,12 @@ sub bulkPersonRollover {
     my $client = setClient($Data->{'clientValues'});
     my $realmID = $Data->{'Realm'};
 
+    my $surname = param('d_surname') || '';
+    my $surnameFilter = '';
+    if ($surname)   {
+        $surnameFilter = qq[ AND P.strLocalSurname LIKE '$surname%'];
+    }
+    my $maxCount = $Data->{'SystemConfig'}{'BulkRenewalsMaxCount'} || 100000;
 
     #my $st = qq[
     #    SELECT DISTINCT
@@ -99,11 +105,13 @@ sub bulkPersonRollover {
                 AND PRto.intNationalPeriodID = ?
             )
             LEFT JOIN tblPersonRequest prq ON (
-                prq.intPersonRequestID = PR.intPersonRequestID
+                prq.intPersonID= PR.intPersonID
+                AND prq.intPersonRequestID = PR.intPersonRequestID
                 AND prq.strRequestType = 'LOAN'
             )
             LEFT JOIN tblPersonRequest existprq ON (
-                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+                existprq.intPersonID= PR.intPersonID
+                AND existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
                 AND existprq.strRequestType = 'LOAN'
             )
         WHERE 
@@ -116,6 +124,7 @@ sub bulkPersonRollover {
                 OR (PR.intIsLoanedOut = 1 AND (existprq.intPersonRequestID IS NULL OR existprq.intOpenLoan = 0))
                 OR (PR.intOnLoan = 1 AND prq.intOpenLoan= 1)
             )
+            $surnameFilter
                 
         ORDER BY strLocalSurname, strLocalFirstname
     ];
@@ -141,6 +150,7 @@ sub bulkPersonRollover {
         my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         next if $newAgeLevel ne $bulk_ref->{'ageLevel'};
         $count++;
+        last if ($count > $maxCount);
         my %row = ();
         
         for my $i (qw(intPersonID strLocalSurname strLocalFirstname dtDOB dtDOB_RAW strNationalNum))    {
@@ -154,6 +164,19 @@ sub bulkPersonRollover {
     #Depends on the call
     #if countOnly == 1, simply return the number of records
     return $count if($countOnly);
+    my $title = $Data->{'lang'}->txt('Bulk Registration');
+    if ($count > $maxCount) {
+        my $errMsg = $Data->{'lang'}->txt("Too many records returned - You must enter a Family Name filter");
+        $body = qq[
+            <div class="alert">
+                <div>
+                    <span class="fa fa-exclamation"></span>
+                    <p>$errMsg</p>
+                </div>
+            </div>
+        ];
+        return ($body, $title);
+    }
 
     my $memfieldlabels=FieldLabels::getFieldLabels($Data,$Defs::LEVEL_PERSON);
     my @headers = (
@@ -202,7 +225,6 @@ sub bulkPersonRollover {
     );
     $body = runTemplate($Data, \%PageData, 'registration/bulkpersons.templ') || '';
 
-    my $title = $Data->{'lang'}->txt('Bulk Registration');
     return ($body, $title);
 }
 1;
