@@ -61,7 +61,8 @@ sub readCSVFile{
     elsif($format eq 'csv'){
     	$csv_config->{sep_char} = qq|,|;
     }
-	$csv_config->{'encoding_in'} = "iso-8859-1";
+    #$csv_config->{'encoding_in'} = "iso-8859-1";
+    $csv_config->{'encoding_in'} = "utf-8";
 	$csv_config->{'encoding_out'} = "cp1252";
 	$csv_config->{binary} = 1;
 	$csv_config->{'allow_loose_quotes'} = 1;
@@ -74,10 +75,12 @@ sub readCSVFile{
     my $tblPRFlag = 0;
     my $tblPersonFlag = 0;
     my $tblOrgFlag = 0;
+    my $tblVenueFlag = 0;
 
     $tblPersonFlag = 1 if ($object eq "tblPerson");
     $tblOrgFlag = 1 if ($object eq "tblEntity.organisation");
-    print STDERR Dumper $tblOrgFlag;
+    $tblVenueFlag = 1 if ($object eq "tblEntity.venue");
+
 
 	if( $object =~ /(\w+)_(\d+)/ && $1 eq "tblPersonRegistration") {
         $tblPRFlag = 1;
@@ -92,12 +95,18 @@ sub readCSVFile{
     my $ctr = 0;
 
     while (my $hashref = $csv->getline_hr($fh)) {
+        my @dtDOB = split("\/", $hashref->{'dtDOB'});
+        if(scalar(@dtDOB)) {
+            $hashref->{'dtDOB'} = $dtDOB[2] . '-' . $dtDOB[0] . '-' . $dtDOB[1];
+        }
+
         if($tblPRFlag) {
             #ordering of tblPersonRegistration_x.dtFrom matters
             my @dtFrom = split('-', $hashref->{'dtFrom'});
             @dtFrom = split('/', $hashref->{'dtFrom'}) if scalar(@dtFrom) < 3; #failover if diff format
 
             $hashref->{'dtFromSortValue'} = join('', @dtFrom);
+
         }
 
 	    push @records, $hashref;
@@ -116,13 +125,12 @@ sub readCSVFile{
     }
 
     say 'Total Input Records: #'.$ctr;
-    #print STDERR Dumper @records;
 
     if($tblPersonFlag) {
         insertBatch($db,$tbl,\@records,$importId, $realmID);
     }
 
-    if($tblOrgFlag) {
+    if($tblOrgFlag or $tblVenueFlag) {
         my $records = ApplyPreRules($config->{"rules"},\@records);
         my $inserts = ApplyRemoveLinks($config->{"rules"},$records);
 

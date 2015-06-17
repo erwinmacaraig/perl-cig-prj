@@ -35,16 +35,20 @@
 			"rule" : "defaultValue",
 			"field" : "dtAdded",
 			"value" : "NOW()"
+		},
+		"strImportEntityParentCode" : {
+			"rule" : "entityLink2"
 		}
 	},
 	"mapping" : {
 		"VenueCode" : "strImportEntityCode",
+		"ParentEntityCode" : "strImportEntityParentCode",
 		"StateName" : "strStateLocalName",
 		"RegionName" : "strRegionLocalName",
 		"ZoneName" : "strZoneLocalName",
+		"Status" : "strStatus",
 		"EntityType" : "strEntityType",
 		"VenueType" : "intFacilityTypeID",
-		"Status" : "strStatus",
 		"LocalName" : "strLocalName",
 		"LocalShortName" : "strLocalShortName",
 		"LocalLanguageCode" : "intLocalLanguage",
@@ -55,7 +59,7 @@
 		"Country" : "strISOCountry",
 		"Region" : "strRegion",
 		"PostalCode" : "strPostalCode",
-		"State" : "strTown",
+		"City" : "strCity",
 		"Address1" : "strAddress",
 		"Address2" : "strAddress2",
 		"WebURL" : "strWebURL",
