@@ -215,8 +215,8 @@ sub getTransfer {
         if(scalar(%personRegMapping)) {
             foreach my $pID (keys %personRegMapping) {
                 foreach my $sport (keys %Defs::sportType) {
-                    #no records exist for $sport (e.g. BEACHSOCCER)
-                    next if !$personRegMapping{$pID}{$sport};
+                    #no records exist for $sport (e.g. BEACHSOCCER), allow to SEARCH from other Clubs
+                    $flag++ if !$personRegMapping{$pID}{$sport};
 
                     $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
                 }
@@ -230,6 +230,8 @@ sub getTransfer {
         else {
             $valid_person_list = join(',', @persons);
         }
+
+        return if(!$valid_person_list or $valid_person_list eq '');
 
         my $entity_list = '';
         $entity_list = join(',', @{$subNodes});
@@ -250,6 +252,7 @@ sub getTransfer {
                 E.intEntityID,
                 E.intEntityLevel,
                 PR.intPersonRegistrationID,
+                PR.intPersonID,
                 PR.dtFrom,
                 PR.dtTo,
                 PR.strSport,
@@ -308,6 +311,7 @@ sub getTransfer {
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
 
+                #print STDERR Dumper $st;
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
