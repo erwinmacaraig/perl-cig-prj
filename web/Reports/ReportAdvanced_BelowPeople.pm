@@ -431,6 +431,42 @@ sub _getConfiguration {
                     allowgrouping => 1,
                 }
             ],
+            PRintOnLoan=> [
+                $lang->txt('On Loan ?'),
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => { 0 => 'No', 1 => 'Yes' },
+                    dropdownorder => [ 0, 1 ],
+                    dbfield       => 'PR.intOnLoan',
+                    defaultcomp   => 'equal',
+                    defaultvalue  => '0',
+                    active        => 1,
+                    optiongroup   => 'regos',
+                    translate       => 1,
+                    allowsort   => 1,
+                    allowgrouping => 1,
+                }
+            ],
+            PRintIsLoanedOut=> [
+                $lang->txt('Loaned out ?'),
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => { 0 => 'No', 1 => 'Yes' },
+                    dropdownorder => [ 0, 1 ],
+                    dbfield       => 'PR.intIsLoanedOut',
+                    defaultcomp   => 'equal',
+                    defaultvalue  => '0',
+                    active        => 1,
+                    optiongroup   => 'regos',
+                    translate       => 1,
+                    allowsort   => 1,
+                    allowgrouping => 1,
+                }
+            ],
+
+
 
 
            PRstrLocalName=> [
@@ -1680,6 +1716,8 @@ sub _getConfiguration {
                 PRdtTo
                 PRstrRegistrationNature
                 PRintPaymentRequired
+                PRintOnLoan
+                PRintIsLoanedOut
                 PRstrLocalName
                 strClubName 
                 strRegionName 
