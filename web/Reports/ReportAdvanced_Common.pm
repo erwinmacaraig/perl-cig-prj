@@ -21,6 +21,7 @@ use FieldLabels;
 use FormHelpers;
 use ClubCharacteristics;
 use Log;
+use NationalReportingPeriod;
 
 
 sub getCommonValues {
@@ -78,6 +79,11 @@ sub getCommonValues {
 		$optvalues{'LegalTypes'} = \%LegalTypes;
 	}
 
+	if($options->{'NationalPeriods'})	{
+        my $natPeriods = getPeriods($Data);
+		$optvalues{'NationalPeriods'} = $natPeriods;
+	}
+
 	if($options->{'SubRealms'})	{
 		my %AssocTypes=();
 		my $statement=qq[
@@ -92,6 +98,7 @@ sub getCommonValues {
 		}
 		$optvalues{'SubRealms'} = \%AssocTypes;
 	}
+
 
 	if($options->{'Seasons'})	{
 		my $AssocSeasons=Seasons::getDefaultAssocSeasons($Data);
