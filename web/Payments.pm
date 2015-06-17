@@ -1003,23 +1003,32 @@ sub EmailPaymentConfirmation	{
 		$query->execute($intLogID);
 
 		my $orgname = '';
-        my $from_email_to_use = '';
+                my $from_email_to_use = '';
 		my $dref = $query->fetchrow_hashref();
-        if (defined $dref)  {
-            my $clubEmail = '';
-            if($dref->{'SoldBy'} eq 'CLUB')	{
-                $from_email_to_use = 'club';
-                $orgname = $dref->{'EntityName'} || '';
-                $clubEmail = $dref->{'EntityEmail'} || '';
-            }
-            if ($dref->{'intPaymentByLevel'} > $Defs::LEVEL_PERSON) {
-                $to_address = $dref->{'EntityEmail'};
-            }
+                if (defined $dref)  {
+                    my $clubEmail = '';
+                    if($dref->{'SoldBy'} eq 'CLUB')	{
+                        $from_email_to_use = 'club';
+                        $orgname = $dref->{'EntityName'} || '';
+                        $clubEmail = $dref->{'EntityEmail'} || '';
+                    }
+                    if ($dref->{'intPaymentByLevel'} > $Defs::LEVEL_PERSON) {
+                        $to_address = $dref->{'EntityEmail'};
+                    }
+            
 
-			$TransData{'OrgName'} = $orgname || '';
-			$paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
+                    $TransData{'OrgName'} = $orgname || '';
+                    $paymentSettings->{notification_address} =$dref->{'PaymentNotificationAddress'} || $paymentSettings->{notification_address};
 			
-		}
+                }
+                else {
+                    $st = qq[SELECT DISTINCT CONCAT(tblSelfUser.strFamilyName, ' ', tblSelfUser.strFirstName) as EntityName, tblSelfUser.strEmail FROM tblSelfUser INNER JOIN tblSelfUserAuth ON tblSelfUser.intSelfUserID = tblSelfUserAuth.intSelfUserID INNER JOIN tblTransLog ON tblTransLog.intEntityPaymentID = tblSelfUserAuth.intEntityID WHERE tblTransLog.intLogID = ? AND intPaymentByLevel = $Defs::LEVEL_PERSON];
+                    $query= $Data->{db}->prepare($st);
+                    $query->execute($intLogID);
+                    $dref = $query->fetchrow_hashref(); 
+                    $TransData{'OrgName'} = $dref->{'EntityName'} || '';
+                    $to_address = $dref->{'strEmail'};
+                }
 		$Data->{'SystemConfig'}=getSystemConfig($Data);
 	}
 	my $templateWrapper = $Data->{'SystemConfig'}{'EmailNotificationWrapperTemplate'};
@@ -1036,7 +1045,7 @@ sub EmailPaymentConfirmation	{
         MA_HelpDeskEmail => $Data->{'SystemConfig'}{'help_desk_email'},
         MA_Website => $Data->{'SystemConfig'}{'ma_website'},
         MA_HeaderName => $Data->{'SystemConfig'}{'EmailNotificationSysName'},
-		MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
+	MA_PhoneNumber => $Data->{'SystemConfig'}{'ma_phone_number'},
     );
 	sendTemplateEmail(
 		$Data,
