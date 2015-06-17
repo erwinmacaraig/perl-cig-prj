@@ -1597,8 +1597,7 @@ sub resolveHoldPaymentForm  {
 
   my $st_previous = qq[
     SELECT
-      *,
-DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
+      *
     FROM
       tblTransLog_Retry
     WHERE
@@ -1608,12 +1607,15 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
   ];
   my $qry_previous= $db->prepare($st_previous);
     $qry_previous->execute($intTransLogID);
+    my $previousCode = '';
   while (my $pref = $qry_previous->fetchrow_hashref())  {
+    next if ($pref->{'strResponseCode'} eq $previousCode);
+    $previousCode = $pref->{'strResponseCode'};
     $previousCount++;
     $previousAttemptsBody .= qq[
       <tr>
         <td>] .$lang->txt($Defs::paymentTypes{$pref->{intPaymentType}}) . qq[</td>
-        <td>$pref->{AttemptDateTime}</td>
+        <td>]. $Data->{'l10n'}{'date'}->TZformat($pref->{'dtLog'},'MEDIUM','SHORT') . qq[</td>
         <td>] . $lang->txt($Defs::paymentResponseText{$pref->{strResponseText}}) . qq[</td>
         <td>].$Data->{'l10n'}{'currency'}->format($pref->{'intAmount'}) . qq[</td>
       </tr>
@@ -1883,8 +1885,7 @@ sub viewTransLog	{
 
   my $st_previous = qq[
     SELECT
-      *,
-DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
+      *
     FROM
       tblTransLog_Retry
     WHERE
@@ -1894,12 +1895,15 @@ DATE_FORMAT(dtLog,'%d/%m/%Y %H:%i') as AttemptDateTime
   ];
   my $qry_previous= $db->prepare($st_previous);
     $qry_previous->execute($intTransLogID);
+    my $previousCode = '';
   while (my $pref = $qry_previous->fetchrow_hashref())  {
+    next if ($pref->{'strResponseCode'} eq $previousCode);
+    $previousCode = $pref->{'strResponseCode'};
     $previousCount++;
     $previousAttemptsBody .= qq[
       <tr>
         <td>].$lang->txt($Defs::paymentTypes{$pref->{intPaymentType}}) . qq[</td>
-        <td>$pref->{AttemptDateTime}</td>
+        <td>]. $Data->{'l10n'}{'date'}->TZformat($pref->{'dtLog'},'MEDIUM','SHORT') . qq[</td>
         <td>].$lang->txt($Defs::paymentResponseText{$pref->{strResponseText}}) . qq[</td>
         <td>].  $Data->{'l10n'}{'currency'}->format($pref->{'intAmount'}).qq[
       </tr>
