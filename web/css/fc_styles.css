@@ -1875,14 +1875,14 @@ a.HTdisabled, a.HTdisabled:hover {
 	list-style: none;
 	margin:0;
 	padding:0;
-	display:table;
+	display: block;
+	width:  100%;
 }
 
 .button-row ul.row-btn-complete li {
-	float:left;
-	display: table-cell;
-	/*padding-right:25px;*/
-	padding-right:83px;
+	height: 70px;      width:31%;    display: table;        float: left;      
+	margin: 0px 1%;
+	vertical-align: middle;
 }
 
 .button-row ul.row-btn-complete li:last-child {
@@ -1890,15 +1890,14 @@ a.HTdisabled, a.HTdisabled:hover {
 }
 
 .button-row ul.row-btn-complete li a {
-	display:block;
-	width:227px;
-	height:60px;
-	padding:12px 3px 15px 3px;
+	display: table-cell;    vertical-align: middle;      text-align: center;      width: 98%;
+	padding:  3px;
 }
 
 .button-row ul.row-btn-complete li:nth-child(1) a, .button-row ul.row-btn-complete li:nth-child(3) a {
-	padding-top:20px;
+
 }
+
 
 /*summary screen labels width*/
 
