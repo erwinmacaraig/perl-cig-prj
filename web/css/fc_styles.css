@@ -161,6 +161,11 @@ header .logo-area {
 header .logo-area.notloginlevel    {
     margin: 30px 0 -20px 0;
 }
+
+.header-contacts a {
+	color: #fff
+}
+
 #pageholder #contentholder {
     background-color: #fff;
     margin-top: 20px;

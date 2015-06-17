@@ -36,16 +36,16 @@
           <div class="row">
             <div class="col-md-12">
               <a class="logo-container" href="#" title=""><img class="header-logo" src="[% DirPrefix %][% SystemConfig.MA_logo %]" alt="" /></a><h1>[% SystemConfig.HeaderSystemName %]</h1>
-              <ul>
+              <ul class="header-contacts">
                 <li>
                   <strong>[% Lang.txt('Member Association') %]</strong><br/>
                   [% Lang.txt('Phone') %]: <strong>[% SystemConfig.ma_phone_number %]</strong><br/>
-                  [% Lang.txt('Website') %]: <strong>[% SystemConfig.ma_website %]</strong>
+                  [% Lang.txt('Website') %]: <strong><a href="[% SystemConfig.ma_website %]">[% SystemConfig.ma_website %]</a></strong>
                 </li>
                 <li>
                   <strong>[% Lang.txt('Help Desk') %]</strong><br/>
                   [% Lang.txt('Phone') %]: <strong>[% SystemConfig.help_desk_phone_number %]</strong><br/>
-                  [% Lang.txt('Email') %]: <strong>[% SystemConfig.help_desk_email %]</strong><br/>
+                  [% Lang.txt('Email') %]: <strong><a href="mailto:[% SystemConfig.help_desk_email %]">[% SystemConfig.help_desk_email %]</a></strong><br/>
                 </li>
               </ul>
             </div>
