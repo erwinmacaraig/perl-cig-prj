@@ -13,6 +13,9 @@ use DBI;
 use CGI qw(unescape);
 use SystemConfig;
 use ImporterPersonRego;
+use ImporterCommon;
+use Switch;
+use Data::Dumper;
                                                                                                     
 main();
 1;
@@ -20,7 +23,20 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='PeopleRegistrationsCombined.csv';
+    my $maCode = getImportMACode($db) || '';
+    my $infile1;
+
+    switch($maCode) {
+        case 'FAF' {
+            $infile1 = 'PeopleRegistrationsCombined.csv';
+        }
+        case 'HKG' {
+            $infile1 = 'tblPersonRegistration2.txt';
+        }
+        else {
+            $infile1 = 'PeopleRegistrationsCombined.csv';
+        }
+    }
 
     importPRFile($db, $countOnly, 'COMBINED', $infile1);
 
