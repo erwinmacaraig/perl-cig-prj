@@ -37,6 +37,7 @@ sub _getConfiguration {
             AgeGroups        => 1,
             Products         => 1,
             RecordTypes      => 1,
+            NationalPeriods  => 1,
         },
     );
     my $hideSeasons = $CommonVals->{'Seasons'}{'Hide'} || 0;
@@ -373,6 +374,20 @@ sub _getConfiguration {
                     ",
                 }
             ],
+            PRintNationalPeriodID=> [
+                $lang->txt('Registration Period'),
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => $CommonVals->{'NationalPeriods'},
+                    allowsort       => 1,
+                    optiongroup     => 'regos',
+                    dbfield         => 'PR.intNationalPeriodID',
+                    allowgrouping   => 1
+                }
+            ],
+
+
             PRdtFrom=> [
                 'Date From',
                 {
@@ -1377,20 +1392,16 @@ sub _getConfiguration {
                 }
               ],
               intProductNationalPeriodID => [
-                $lang->txt("Product Reporting"),
+                $lang->txt('Product Reporting'),
                 {
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
-                    dropdownoptions => $CommonVals->{'Seasons'}{'Options'},
-                    dropdownorder   => $CommonVals->{'Seasons'}{'Order'},
+                    dropdownoptions => $CommonVals->{'NationalPeriods'},
                     allowsort       => 1,
                     optiongroup     => 'transactions',
-                    active          => 0,
-                    multiple        => 1,
-                    size            => 3,
-                    disable         => $hideSeasons
+                    allowgrouping   => 1
                 }
-              ],
+            ],
               intProductID => [
                 $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product') : '',
                 {
@@ -1438,7 +1449,7 @@ sub _getConfiguration {
               ],
               TLstrReceiptRef => [
                 $SystemConfig->{'AllowTXNrpts'}
-                ? $lang->txt('Manual Receipt Reference')
+                ? $lang->txt('Receipt Reference')
                 : '',
                 {
                     displaytype => 'text',
@@ -1476,6 +1487,17 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     optiongroup => 'transactions',
                     dbfield     => 'TL.intLogID'
+                }
+              ],
+            intTransLogStatusID => [
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Status') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::TransLogStatus,
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    dbfield         => 'TL.intStatus'
                 }
               ],
               intAmount => [
@@ -1628,6 +1650,7 @@ sub _getConfiguration {
                 PRstrPersonEntityRole
                 PRstrStatus
                 PRstrSport
+                PRintNationalPeriodID
                 PRdtFrom
                 PRdtTo
                 PRstrRegistrationNature
@@ -1723,6 +1746,7 @@ sub _getConfiguration {
               strTransNotes
               strTLNotes
               intLogID
+                intTransLogStatusID
               payment_type
               TLstrReceiptRef
               strTXN
