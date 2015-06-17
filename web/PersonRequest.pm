@@ -262,7 +262,7 @@ sub listPersonRecord {
 	my %params = $p->Vars();
 
     my $client = setClient( $Data->{'clientValues'} ) || '';
-	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
 
     my $searchKeyword = safe_param('search_keyword','words') || '';
     $searchKeyword =~ s/\h+/ /g;
@@ -2594,10 +2594,17 @@ sub cancelPlayerLoan {
 }
 sub displayCancelPlayerLoanConfirmationMessage {
 
-  my ($Data, $personIDs) = @_;
-  my $personObj = getInstanceOf($Data, 'person', $personIDs->[0]);
-  my $body = runTemplate($Data, {
-      'url' => "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_HOME",
+    my ($Data, $personIDs) = @_;
+    my $personObj = getInstanceOf($Data, 'person', $personIDs->[0]);
+    my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
+    my $cl = setClient($Data->{'clientValues'}) || '';
+    my %cv = getClient($cl);
+    $cv{'entityID'} = $entityID; ## As its getLastEntityID
+    $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
+    my $client = setClient(\%cv);
+    
+    my $body = runTemplate($Data, {
+      'url' => "$Defs::base_url/" . $Data->{'target'} . "?client=$client&a=E_HOME",
       'PersonSummaryPanel' => personSummaryPanel($Data, $personIDs->[0]),
       'player' => $personObj->getValue('strLocalFirstname') . " " . $personObj->getValue('strLocalSurname'), 
     }, 
