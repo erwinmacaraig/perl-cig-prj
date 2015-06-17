@@ -328,6 +328,7 @@ sub listPersonRecord {
             $level_list = join(",",@levels);
         }
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' and PR.strPersonLevel IN ($level_list) ];
+        $joinCondition .= qq [ AND PR.intPersonRegistrationID = $targetPRID ] if $targetPRID;
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
         $orderBy = qq[
             ORDER BY personLevelWeight
