@@ -5,15 +5,29 @@ mysql -u root XXX -p < ma_config/cleanDB.sql
 
 
 ### JERVY UPDATE BELOW
-perl CSVReader.pl -directory=csv/singapore -format=csv -realmid=1 -notes=import test -national=0
+perl CSVReader.pl -directory=csv/hongkong -format=csv -realmid=1 -notes=import test -national=0
 
 ###### TEMP TABLE IMPORT SCRIPTS
 ./import_Person.pl
+
+###### check for empty dtFrom, dtTo, National Season for ACTIVE records
+###### delete rows for name in registration csv files (not needed for importing rego records and somehow affects delimited values)
 ./import_PersonRego.pl
+
+-- run after import_PersonRego.pl
+UPDATE tmpPersonRego set strAgeLevel = '' where strAgeLevel not in ('ADULT','MINOR');
+UPDATE tmpPersonRego set strAgeLevel = '' where strAgeLevel is null;
+
 ./import_PersonRegoCoaches.pl
 
 #CLEAN
 ./import_cleanPersonRego.pl
+
+# run if there's no existing dummy national period for PASSIVE record
+INSERT INTO `tblNationalPeriod` (`intNationalPeriodID`, `strNationalPeriodName`, `strSport`, `intRealmID`, `intSubRealmID`, `dtFrom`, `dtTo`, `intCurrentNew`, `intCurrentRenewal`, `strPersonType`, `intCurrentTransfer`, `strImportPeriodCode`, `intDontUseForLoans`) VALUES (0,'Previous Coach Registrations','',1,0,'','',0,0,'',0,'',0);
+
+# 37 must be the value of the inserted record above
+UPDATE tmpPersonRego SET intNationalPeriodID = 37 WHERE intNationalPeriodID = 0 AND strStatus = 'PASSIVE' and strPersonType = 'COACH';
 
 #INSERT INTO MAIN TABLES
 ./import_insertPerson.pl
@@ -38,7 +52,10 @@ UPDATE tblPersonRegistration_1 SET strPersonLevel ="" WHERE strPersonLevel IS NU
 UPDATE tblPerson SET intSystemStatus =1;
 UPDATE tblPersonRegistration_1 SET dtApproved=dtFrom;
 UPDATE tblPersonRegistration_1 SET strShortNotes=CONCAT(IF(tmpPaymentRef, CONCAT(tmpPaymentRef, " "), ""), IF(tmpdtPaid, CONCAT(tmpdtPaid, " "), ""), tmpProductCode, " ",  tmpAmount, " ", tmpisPaid);
-
+insert into tblOldSystemAccounts (intPersonID, strUsername, strPassword) select DISTINCT P.intPersonID, strNationalNum, DATE_FORMAT(dtDOB,"%y%m%d") from tblPerson as  P INNER JOIN tblPersonRegistration_1 as PR ON (PR.intPersonID=P.intPersonID) where strNationalNum <> ''
+Update tblPersonRegistration_1 set strSport='' where strPersonType='MAOFFICIAL';
+UPDATE tblPerson SET strStatus = 'REGISTERED' where strStatus = 'ACTIVE';
+UPDATE tblEntity SET intRealmApproved = 1;
 
 
 ./importer_AuditLog.pl

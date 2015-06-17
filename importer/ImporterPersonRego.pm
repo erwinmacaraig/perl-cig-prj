@@ -47,6 +47,22 @@ sub insertCertification {
     my %certs=();
     if ($maCode eq 'HKG')   {
         ## HKG Mapping
+        $certs{'HKFA D Coaching Certificate'} = 61;
+        $certs{'AFC C Coaching Certificate'} = 57;
+        $certs{'Class 1 Referee'} = 39;
+        $certs{'Class 3 Referee'} = 41;
+        $certs{'Class 2 Referee'} = 40;
+        $certs{'HKFA Youth Football Leader Certificate Level 2'} = 64;
+        #$certs{'HKFA Goalkeeper Trainer'} = ;
+        $certs{'New Referee'} = 42;
+        #$certs{'AFC Goalkeeper Coaching Certificate Level 1'} = ;
+        $certs{'AFC B Coaching Certificate'} = 56;
+        $certs{'HKFA Futsal Coaching Certificate'} = 62;
+        $certs{'HKFA Youth Football Leader Certificate Level 1'} = 64;
+        $certs{'AFC A Coaching Certificate'} = 55;
+        $certs{'AFC Futsal Coaching Certificate Level 1'} = 58;
+        $certs{'AFC Pro Diploma Coaching Certificate'} = 54;
+        #$certs{'AFC Fitness Coaching Certificate Level 1'} = ;
     }
     else    {
         ## Finland at moment
@@ -131,12 +147,26 @@ sub insertPersonRegoRecord {
     ];
     my $qryINS= $db->prepare($stINS) or query_error($stINS);
 
+    my $orderBy;
+    my $selectWeight;
+    if ($maCode eq 'HKG')   {
+        $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
+        $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
+    }
+
     my $st = qq[
-        SELECT * FROM tmpPersonRego
+        SELECT
+            *
+            $selectWeight
+        FROM
+            tmpPersonRego
+        $orderBy
     ];
 print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
+    my %existingRecord;
+
     while (my $dref= $qry->fetchrow_hashref())    {
         #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
 
@@ -158,6 +188,14 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
         my $personRole = $dref->{'strPersonRole'};
         if ($maCode eq 'HKG')   {
             ## Config here for HKG
+            my $certification = $dref->{'strCertifications'};
+            $certification =~ s/^\s+//;
+            $certification =~ s/\s+$//;
+
+            if($certification ne 'AFC Goalkeeper Coaching Certificate Level 1') {
+                insertCertification($db, $dref->{'intPersonID'}, $certification, $dref->{'dtFrom'}, $dref->{'dtTo'});
+            }
+
         }
         else    {
             ## Finland at moment
@@ -172,31 +210,65 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             }
         }
 
-        
-        $qryINS->execute(
-            $dref->{'intID'},
-            $dref->{'intPersonID'},
-            $dref->{'intEntityID'},
-            $dref->{'intNationalPeriodID'},
-            $dref->{'strPersonType'},
-            $dref->{'strPersonLevel'},
-            $personRole,
-            $status,
-            $dref->{'strSport'},
-            $dref->{'strAgeLevel'},
-            $dref->{'strRegoNature'},
-            $dtFrom,
-            $dtTo,
-            $isLoanedOut, 
-            $onLoan,
-            $dref->{'strTransactionNo'},
-            $dref->{'strProductCode'},
-            $dref->{'intProductID'},
-            $dref->{'curProductAmount'},
-            $dref->{'strPaid'},
-            $dref->{'dtPaid'}
-        );
-        my $ID = $qryINS->{mysql_insertid} || 0;
+        my $ID = 0;
+        my $personLevel = $dref->{'strPersonLevel'} || "_PERSON_LEVEL_";
+
+        if($maCode eq 'HKG'
+                and !$existingRecord{$dref->{'intPersonID'}}{$dref->{'strPersonType'}}{$dref->{'strSport'}}{$personLevel}{$dref->{'intNationalPeriodID'}}
+        ) {
+            $qryINS->execute(
+                $dref->{'intID'},
+                $dref->{'intPersonID'},
+                $dref->{'intEntityID'},
+                $dref->{'intNationalPeriodID'},
+                $dref->{'strPersonType'},
+                $dref->{'strPersonLevel'},
+                $personRole,
+                $status,
+                $dref->{'strSport'},
+                $dref->{'strAgeLevel'},
+                $dref->{'strRegoNature'},
+                $dtFrom,
+                $dtTo,
+                $isLoanedOut, 
+                $onLoan,
+                $dref->{'strTransactionNo'},
+                $dref->{'strProductCode'},
+                $dref->{'intProductID'},
+                $dref->{'curProductAmount'},
+                $dref->{'strPaid'},
+                $dref->{'dtPaid'}
+            );
+            $ID = $qryINS->{mysql_insertid} || 0;
+            $existingRecord{$dref->{'intPersonID'}}{$dref->{'strPersonType'}}{$dref->{'strSport'}}{$personLevel}{$dref->{'intNationalPeriodID'}} = $ID;
+        }
+        elsif($maCode ne 'HKG') {
+             $qryINS->execute(
+                $dref->{'intID'},
+                $dref->{'intPersonID'},
+                $dref->{'intEntityID'},
+                $dref->{'intNationalPeriodID'},
+                $dref->{'strPersonType'},
+                $dref->{'strPersonLevel'},
+                $personRole,
+                $status,
+                $dref->{'strSport'},
+                $dref->{'strAgeLevel'},
+                $dref->{'strRegoNature'},
+                $dtFrom,
+                $dtTo,
+                $isLoanedOut, 
+                $onLoan,
+                $dref->{'strTransactionNo'},
+                $dref->{'strProductCode'},
+                $dref->{'intProductID'},
+                $dref->{'curProductAmount'},
+                $dref->{'strPaid'},
+                $dref->{'dtPaid'}
+            );
+            $ID = $qryINS->{mysql_insertid} || 0;       
+        }
+
         if ($dref->{'strProductCode'})  {
             my $st_up = qq[
                 UPDATE tblPersonRegistration_1
@@ -207,6 +279,8 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
             $qry_up->execute($ID);
         }
     }
+
+    print STDERR Dumper $existingRecord{'370'};
 }
  sub linkPRNationalPeriods{
     my ($db) = @_;
@@ -358,41 +432,48 @@ while (<INFILE>)	{
         $fields[0] = "COACH" if $fields[0] eq 'Coach';
         $fields[0] = "REFEREE" if $fields[0] eq 'Referee';
 
-        $fields[5] = "ACTIVE" if $fields[5] eq 'Active';
-        $fields[5] = "PASSIVE" if $fields[5] eq 'Passive';
+        $fields[1] = "MAREFASSESSOR" if $fields[1] eq 'Referee Assessor';
+        $fields[1] = "MABALLBOY" if $fields[1] eq 'Ballboy';
+        $fields[1] = "MADUTYOFCR" if $fields[1] eq 'Duty Officer';
+        $fields[1] = "MAGRNDSTAFF" if $fields[1] eq 'Ground Staff';
+        $fields[1] = "MASELLER" if $fields[1] eq 'Seller';
+        $fields[1] = "MAOFFICIAL" if $fields[1] eq 'Supervisor';
 
-        $fields[7] = "NEW" if $fields[7] eq 'New';
-        $fields[7] = "RENEWAL" if $fields[7] eq 'Renewal';
-        $fields[7] = "TRANSFER" if $fields[7] eq 'Transfer';
+        $fields[13] = "ACTIVE" if $fields[13] eq 'Active';
+        $fields[13] = "PASSIVE" if $fields[13] eq 'Passive';
 
-        $fields[8] = "AMATEUR" if $fields[8] eq 'Amateur';
-        $fields[8] = "PROFESSIONAL" if $fields[8] eq 'Professional';
+        $fields[15] = "NEW" if $fields[15] eq 'New';
+        $fields[15] = "RENEWAL" if $fields[15] eq 'Renewal';
+        $fields[15] = "TRANSFER" if $fields[15] eq 'Transfer';
 
-        $fields[9] = "FOOTBALL" if $fields[9] eq 'Football';
-        $fields[9] = "FUTSAL" if $fields[9] eq 'Futsal';
-        $fields[9] = "WOMENSFOOTBALL" if $fields[9] eq 'Women\'s Football';
+        $fields[16] = "AMATEUR" if $fields[16] eq 'Amateur';
+        $fields[16] = "PROFESSIONAL" if $fields[16] eq 'Professional';
 
-        $fields[10] = "ADULT" if $fields[10] eq 'senior';
-        $fields[10] = "MINOR" if $fields[10] eq 'minor';
+        $fields[17] = "FOOTBALL" if $fields[17] eq 'Football';
+        $fields[17] = "FUTSAL" if $fields[17] eq 'Futsal';
+        $fields[17] = "WOMENSFOOTBALL" if $fields[17] eq 'Women\'s Football';
 
-        if($fields[11] and $fields[12]) {
-            my @dtFrom = split("\/", $fields[11]);
-            my @dtTo = split("\/", $fields[12]);
+        $fields[18] = "ADULT" if $fields[18] eq 'senior';
+        $fields[18] = "MINOR" if $fields[18] eq 'minor';
 
-            $fields[11] = (scalar(@dtFrom)) ? $dtFrom[2] . '-' . $dtFrom[0] . '-' . $dtFrom[1] : $fields[11];
-            $fields[12] = (scalar(@dtTo)) ? $dtTo[2] . '-' . $dtTo[0] . '-' . $dtTo[1] : $fields[12];
+        if($fields[19] and $fields[20]) {
+            my @dtFrom = split("\/", $fields[19]);
+            my @dtTo = split("\/", $fields[20]);
+
+            $fields[19] = (scalar(@dtFrom)) ? $dtFrom[2] . '-' . $dtFrom[0] . '-' . $dtFrom[1] : $fields[19];
+            $fields[20] = (scalar(@dtTo)) ? $dtTo[2] . '-' . $dtTo[0] . '-' . $dtTo[1] : $fields[20];
         }
 
         #print STDERR Dumper @fields;
         my $natPeriod = '';
-        my $sportFill = (!$fields[9] || $fields[0] eq 'MAOFFICIAL' || $fields[0] eq 'CLUBOFFICIAL') ? '_SPORT_' : $fields[9];
-        my $sport = ($sportFill eq '_SPORT_') ? '' : $fields[9];
+        my $sportFill = (!$fields[17] || $fields[0] eq 'MAOFFICIAL' || $fields[0] eq 'CLUBOFFICIAL') ? '_SPORT_' : $fields[17];
+        my $sport = ($sportFill eq '_SPORT_') ? '' : $fields[17];
 
-        if($fields[13]) {
-            my @nationalPeriod = split('-', $fields[13]);
+        if($fields[21]) {
+            my @nationalPeriod = split('-', $fields[21]);
 
             if(! $existingNationalPeriod{$nationalPeriod[0]}{$sportFill}) {
-                my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($db, 1, 0, $sport, $fields[0], $fields[7]);
+                my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($db, 1, 0, $sport, $fields[0], $fields[15]);
                 $existingNationalPeriod{$nationalPeriod[0]}{$sportFill} = $nationalPeriodID;
                 $natPeriod = $nationalPeriodID;
             } else {
@@ -402,26 +483,26 @@ while (<INFILE>)	{
 
         #Person;Role;Code;Organization ID;Level;Status;Current;RegistrationNature;Level;Sport;AgeLevel;DateFrom;DateTo;National Season
         $parts{'PERSONCODE'} = $fields[2];
-	    $parts{'ENTITYCODE'} = $fields[3];
-        $parts{'STATUS'} = $fields[5];
-        $parts{'REGNATURE'} = $fields[7];
+	    $parts{'ENTITYCODE'} = $fields[9];
+        $parts{'STATUS'} = $fields[13];
+        $parts{'REGNATURE'} = $fields[15];
         $parts{'PERSONTYPE'} = $fields[0];
         $parts{'PERSONROLE'} = $fields[1];
-        $parts{'PERSONLEVEL'} = $fields[8];
-        $parts{'SPORT'} = $fields[9];
-        $parts{'AGELEVEL'} = $fields[10];
-        $parts{'DATEFROM'} = $fields[11];
-        $parts{'DATETO'} = $fields[12];
+        $parts{'PERSONLEVEL'} = $fields[16];
+        $parts{'SPORT'} = $fields[17];
+        $parts{'AGELEVEL'} = $fields[18];
+        $parts{'DATEFROM'} = $fields[19];
+        $parts{'DATETO'} = $fields[20];
         $parts{'DATETRANSFERRED'} = '';
         $parts{'ISLOAN'} = '';
-        $parts{'NATIONALPERIOD'} = $fields[13] || '';
+        $parts{'NATIONALPERIOD'} = $fields[21] || '';
         $parts{'NATIONALPERIODID'} = $natPeriod;
         $parts{'PRODUCTCODE'} = '';
         $parts{'PRODUCTAMOUNT'} = '';
         $parts{'ISPAID'} = '';
         $parts{'TRANSACTIONNO'} = '';
         $parts{'DATEPAID'} = '';
-        $parts{'CERTIFICATIONS'} = $fields[4] || '';
+        $parts{'CERTIFICATIONS'} = $fields[12] || '';
 
         ## Update field mapping for HKG 
     }

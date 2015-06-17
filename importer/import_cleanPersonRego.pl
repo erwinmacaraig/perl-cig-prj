@@ -13,6 +13,8 @@ use DBI;
 use CGI qw(unescape);
 use SystemConfig;
 use ImporterPersonRego;
+use ImporterCommon;
+use Switch;
 
 main();
 1;
