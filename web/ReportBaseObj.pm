@@ -121,9 +121,11 @@ sub runReport {
 		$output_array = $module->$fnname($self->{'Data'}, $self->{'FormParams'});
 	}
 	else	{
-		my $data_array = $self->runQuery($sql);
+        my @DataArray=();
+		$self->runQuery($sql, \@DataArray);
 		#print STDERR $sql;
-		$output_array = $self->processData($data_array);
+		$output_array = $self->processData(\@DataArray);
+        undef @DataArray;
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
@@ -147,6 +149,8 @@ sub runReport {
     # Write to a file:
     #$pdf->write_file('/tmp/target.pdf');
   my $output = $self->deliverReport($formatted);
+    undef $output_array;
+    undef $formatted;
 	return ($output, 1);
 }
 
@@ -354,7 +358,7 @@ sub processData {
 sub _processrow	{
   my $self = shift;
 	my ($totalRowCount, $dataref, $groupfield) = @_;
-    my $maxRows = 10000;
+    my $maxRows = 5000;
 	my $activefields = $self->{'RunParams'}{'ActiveFields'};
 	for my $field (@{$self->{'RunParams'}{'Order'}}) {
 		if(
@@ -429,7 +433,7 @@ sub _getConfiguration {
 
 sub runQuery {
   my $self = shift;
-  my($sql) = @_;
+  my($sql, $data_array) = @_;
 
 
   #attempt to fix some common sql syntax errors
@@ -441,16 +445,15 @@ sub runQuery {
   my $q = $self->{'dbRun'}->prepare($sql);
   $q->execute();
 
-  my @data_array = ();
   while(my $dref = $q->fetchrow_hashref())	{
 		#for my $k (keys %{$dref})	{
 			#$dref->{$k} = '' if !defined $dref->{$k};
 		#}
-  	push @data_array, $dref;
+        push @{$data_array}, $dref;
 	}
   $q->finish();
 	warn("REPORT DEBUG: ".tv_interval($debugtime)." DB Run End ") if $self->{'DEBUG'};
-  return \@data_array || undef;
+  #return \@data_array || undef;
 }
 
 sub setCarryFields {
