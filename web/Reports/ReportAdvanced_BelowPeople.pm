@@ -309,6 +309,18 @@ sub _getConfiguration {
                     allowgrouping   => 1
                 }
             ],
+            PRstrAgeLevel=> [
+                'Age Level',
+                {
+                    dbfield         => 'PR.strAgeLevel',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::ageLevel,
+                    translate       => 1,
+                    optiongroup     => 'regos',
+                    allowgrouping   => 1
+                }
+            ],
             PRstrPersonLevel=> [
                 'Level',
                 {
@@ -1708,6 +1720,7 @@ sub _getConfiguration {
 
                 PRstrPersonType 
                 PRstrPersonLevel
+                PRstrAgeLevel
                 PRstrPersonEntityRole
                 PRstrStatus
                 PRstrSport
