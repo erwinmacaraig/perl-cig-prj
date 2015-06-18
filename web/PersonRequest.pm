@@ -390,12 +390,15 @@ sub listPersonRecord {
         WHERE
             P.intRealmID = ?
             AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
-            AND
-                (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
+            AND P.strNationalNum = ?
         $groupBy
         $orderBy
         $limit
     ];
+
+    # removing LIKE in the condition as we're only passing strNationalNum from search result (Search/Person.pm - action = PRA_getrecord, param search_keyword)
+
+    #(P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
     #(P.strNationalNum = ? OR P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
 
     my $db = $Data->{'db'};
@@ -404,8 +407,6 @@ sub listPersonRecord {
         $entityID,
         $entityID,
         $Data->{'Realm'},
-        $searchKeyword,
-        $searchKeyword,
         $searchKeyword
     ) or query_error($st);
 
