@@ -112,23 +112,23 @@ sub runReport {
 	warn $sql;
 	return ($msg , $continue) if !$continue;
 	return ('',1) if !$sql;
-	#my $output_array = undef;
+	my $output_array = undef;
     my @OutputArray=();
 	if($self->{'Config'}{'DataFromFunction'})	{
 		my ($module, $fnname)  = $self->{'Config'}{'DataFromFunction'} =~/(.*)::(.*)/;
 		if($module)	{
 			eval "require $module";
 		}
-		my $output_array = $module->$fnname($self->{'Data'}, $self->{'FormParams'});
-        @OutputArray = @{$output_array};
-        undef $output_array;
+		$output_array = $module->$fnname($self->{'Data'}, $self->{'FormParams'});
+        #@OutputArray = @{$output_array};
+        #undef $output_array;
         
 	}
 	else	{
         my @DataArray=();
 		$self->runQuery($sql, \@DataArray);
 		#print STDERR $sql;
-		$self->processData(\@DataArray, \@OutputArray);
+		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
         undef @DataArray;
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
@@ -136,12 +136,13 @@ sub runReport {
 		my $retdata = $self->_runFunction(
 			$self->{'Config'}{'ProcessReturnDataFunction'} || undef,
 			$self->{'Config'}{'ProcessReturnDataFunctionParams'} || undef,
-			\@OutputArray,
+			$output_array,
 		);
 		return ($retdata, 1);
 	}
-	return \@OutputArray if $self->{'FormParams'}{'ReturnData'};
-  my $formatted = $self->formatOutput(\@OutputArray);
+	return $output_array if $self->{'FormParams'}{'ReturnData'};
+  my $formatted = $self->formatOutput($output_array);
+    undef $output_array;
     undef @OutputArray;
 #use PDF::FromHTML;
  #my $pdf = PDF::FromHTML->new( encoding => 'utf-8' );
@@ -264,8 +265,8 @@ sub formatOutput {
 
 sub processData {
   my $self = shift;
-  my($data_array, $output_array) = @_;
-#	my $output_array = undef;
+  my($data_array) = @_;
+my $output_array = undef;
 
   #First do sort
 	my @sortparams = ();
@@ -357,7 +358,7 @@ sub processData {
 	warn("REPORT DEBUG: ".tv_interval($debugtime)." Process End ") if $self->{'DEBUG'};
 
 	$self->{'RunParams'}{'RecordCount'} = scalar(@{$output_array});
-  #return $output_array || undef;
+return $output_array || undef;
 }
 
 sub _processrow	{
