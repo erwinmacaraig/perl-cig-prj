@@ -403,16 +403,16 @@ sub _processrow	{
 				and !($displaytype eq 'lookup' and $outvalue eq '')
 			) { $outvalue=$dataref->{$field}; }
 			if($displaytype eq 'currency' and $self->{'Config'}->{'Config'}{'CurrencySymbol'})  {
-				$outvalue= $self->{'Config'}{'Config'}{'CurrencySymbol'} . $outvalue;
+			#	$outvalue= $self->{'Config'}{'Config'}{'CurrencySymbol'} . $outvalue;
 			}
 			if($fieldopts->{'datetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
                 my @p = @{$fieldopts->{'datetimeformat'}};
                 my $obj = $self->{'Config'}->{'Config'}{'DateTimeFormatObject'};
                 unshift @p, $outvalue;
-                $outvalue = $obj->format(@p);
+                #$outvalue = $obj->format(@p);
             }
 			if($fieldopts->{'translate'} and $self->{'Lang'})   {
-                $outvalue = $self->{'Lang'}->txt($outvalue);
+                #$outvalue = $self->{'Lang'}->txt($outvalue);
             }
 			$dataref->{$field} = $outvalue;
 
