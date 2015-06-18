@@ -354,7 +354,7 @@ sub processData {
 sub _processrow	{
   my $self = shift;
 	my ($totalRowCount, $dataref, $groupfield) = @_;
-    my $maxRows = 5000;
+    my $maxRows = 10000;
 	my $activefields = $self->{'RunParams'}{'ActiveFields'};
 	for my $field (@{$self->{'RunParams'}{'Order'}}) {
 		if(
