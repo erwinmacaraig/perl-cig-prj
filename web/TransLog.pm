@@ -146,7 +146,7 @@ sub resolveHoldPayment  {
     if ($resolveStatus == $Defs::TXNLOG_FAILED) {
         my $st = qq[
             UPDATE tblTransactions
-            SET intStatus = 0, intTransLogID = 0, dtPaid = NULL
+            SET intStatus = 0, intTransLogID = 0, dtPaid = NULL, intPaymentGatewayResponded=1
             WHERE intTransLogID = ?
         ];
         my $query = $Data->{'db'}->prepare($st);

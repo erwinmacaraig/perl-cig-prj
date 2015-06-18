@@ -114,6 +114,7 @@ sub runReport {
 	return ('',1) if !$sql;
 	my $output_array = undef;
     my @OutputArray=();
+    my @DataArray=();
 	if($self->{'Config'}{'DataFromFunction'})	{
 		my ($module, $fnname)  = $self->{'Config'}{'DataFromFunction'} =~/(.*)::(.*)/;
 		if($module)	{
@@ -125,11 +126,8 @@ sub runReport {
         
 	}
 	else	{
-        my @DataArray=();
 		$self->runQuery($sql, \@DataArray);
-		#print STDERR $sql;
 		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
-        undef @DataArray;
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
@@ -141,9 +139,10 @@ sub runReport {
 		return ($retdata, 1);
 	}
 	return $output_array if $self->{'FormParams'}{'ReturnData'};
-  my $formatted = $self->formatOutput($output_array);
+    my $formatted = $self->formatOutput($output_array);
     undef $output_array;
     undef @OutputArray;
+    undef @DataArray;
 #use PDF::FromHTML;
  #my $pdf = PDF::FromHTML->new( encoding => 'utf-8' );
 #$pdf->load_file(\$formatted);
