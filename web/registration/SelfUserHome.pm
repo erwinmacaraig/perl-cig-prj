@@ -235,9 +235,13 @@ sub getPreviousRegos {
             P.dtDOB,
             P.intGender,
             P.strStatus as PersonStatus,
+            PR.strStatus as RegistrationStatus,
+            PR.dtTo as PRdtTo,
             NP.strNationalPeriodName,
             NP.dtTo as NPdtTo,
             NP.dtFrom as NPdtFrom,
+            prq.intPersonRequestID,
+            prq.dtLoanTo,
             prq.intOpenLoan,
             existprq.intOpenLoan as existOpenLoan
         FROM
@@ -251,10 +255,12 @@ sub getPreviousRegos {
                 NP.intNationalPeriodID = PR.intNationalPeriodID
             )
             LEFT JOIN tblPersonRequest prq ON (
-                prq.intPersonRequestID = PR.intPersonRequestID
+                prq.intPersonID = PR.intPersonID
+                AND prq.intPersonRequestID = PR.intPersonRequestID
             )
             LEFT JOIN tblPersonRequest existprq ON (
-                existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
+                existprq.intPersonID = PR.intPersonID
+                AND existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
             )
             INNER JOIN tblEntity AS E
                 ON PR.intEntityID = E.intEntityID
@@ -268,6 +274,7 @@ sub getPreviousRegos {
             dtApproved DESC, 
             dtAdded DESC
     ];
+    #IF(PR.strStatus = 'ACTIVE', NP.dtTo, IF(PR.strStatus = 'PENDING' AND prq.intPersonRequestID > 0 AND prq.dtLoanTo IS NOT NULL, prq.dtLoanTo, IF(PR.strStatus = 'PASSIVE' AND PR.dtTo IS NOT NULL, PR.dtTo, NP.dtTo))) as validUntil,
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $userID,

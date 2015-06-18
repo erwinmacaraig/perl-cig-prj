@@ -41,7 +41,20 @@
                                         [% IF rego.strSportType %] <br /> [% Lang.txt(rego.strSportType) %] [% END %]
                                         </td>
                                         <td>[% rego.EntityName %]</td>
-                                        <td> [% Lang.txt('valid until') %] [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]</td>
+                                        <td>
+                                            [% Lang.txt('valid until') %]
+                                            [% IF rego.RegistrationStatus == 'ACTIVE' AND rego.intPersonRequestID %]
+                                                [% DateFormat.format(rego.PRdtTo,'MEDIUM','NONE') %]
+                                            [% ELSIF rego.RegistrationStatus == 'ACTIVE' %]
+                                                [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]
+                                            [% ELSIF rego.RegistrationStatus == 'PASSIVE' %]
+                                                [% DateFormat.format(rego.PRdtTo,'MEDIUM','NONE') %]
+                                            [% ELSIF rego.RegistrationStatus == 'PENDING' AND rego.intOpenLoan == 1 %]
+                                                [% DateFormat.format(rego.dtLoanTo,'MEDIUM','NONE') %]
+                                            [% ELSE %]
+                                                [% DateFormat.format(rego.NPdtTo,'MEDIUM','NONE') %]
+                                            [% END %]
+                                        </td>
                                         <td>[% rego.PRStatus %]</td>
                                         <td>
                                         [% IF rego.renewlink %]
