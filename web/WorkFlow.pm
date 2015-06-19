@@ -1128,7 +1128,8 @@ sub addWorkFlowTasks {
   	    $q->execute($documentID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
     }
 
-
+    
+    print STDERR "$itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature ";
     my $emailNotification = new EmailNotifications::WorkFlow();
 	
     if ($checkOk)   {
@@ -1136,17 +1137,19 @@ sub addWorkFlowTasks {
 			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = 0;
-
+            print STDERR "\$originLevel = $originLevel";
             if($originLevel == 1) {
                 $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
+                $emailNotification->setFromSelfUserID($problemEntityID);
             }
             else {
                 $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+                $emailNotification->setFromEntityID($problemEntityID);
             }
 
             next if (! $approvalEntityID and ! $problemEntityID);
-print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
-			
+            print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
+            
             $qINS->execute(
                 $dref->{'intWFRuleID'},
                 $dref->{'intRealmID'},
@@ -1185,7 +1188,7 @@ print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID
 	    $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
-            $emailNotification->setFromEntityID($problemEntityID);
+            #$emailNotification->setFromEntityID(0);####################################################### 
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($notificationType);

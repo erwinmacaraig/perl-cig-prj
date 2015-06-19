@@ -115,7 +115,7 @@ sub retrieve {
                 fromEntity.intNotifications as fromEntityNotification,
                 totc.strContactEmail as toClubContactEmail,
                 frtc.strContactEmail as fromClubContactEmail,
-                CONCAT_WS(' ', tsu.strFirstName, tsu.strFamilyName) as fromSelfUserName
+                CONCAT_WS(' ', tsu.strFamilyName, tsu.strFirstName) as fromSelfUserName
             FROM tblEmailTemplateTypes ett
                 INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
                 INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
@@ -137,7 +137,7 @@ sub retrieve {
 
         push @params, $self->{_notificationObj}->getToEntityID();
         push @params, $self->{_notificationObj}->getFromEntityID();
-        push @params, $self->{_notificationObj}->getFromEntityID();
+        push @params, $self->{_notificationObj}->getFromEntityID() || $self->{_notificationObj}->getFromSelfUserID();
         push @params, $self->{_notificationObj}->getRealmID();
         push @params, $self->{_notificationObj}->getSubRealmID();
         push @params, $self->{_notificationObj}->getNotificationType();
@@ -148,7 +148,7 @@ sub retrieve {
     #ADD LOCALE CHECK ON tblLanguages or SystemConfig->DefaultLocale or Cookie_Locale
     my $q = $self->{_notificationObj}->getDbh()->prepare($st);
     $q->execute(@params) or query_error($st);
-
+    print STDERR @params;
     my $config = $q->fetchrow_hashref();
     $self->setConfig($config);
 
@@ -200,7 +200,7 @@ sub build {
             VenueRegisterTo => $self->{_notificationObj}->getWorkTaskDetails()->{'VenueRegisterTo'},
 
             Originator => $config->{'fromEntityName'} || $config->{'fromSelfUserName'},
-            SenderName => $config->{'fromEntityName'} || $self->{_notificationObj}->getDefsName() || 'Admin',
+            SenderName => $config->{'fromEntityName'} || $self->{_notificationObj}->getData()->{'SystemConfig'}{'EmailNotificationSysName'} || $self->{_notificationObj}->getDefsName() || 'Admin',
             TemplateFile => $templateFile,
             Reason => $self->{_notificationObj}->getWorkTaskDetails()->{'Reason'},
             Status => $config->{'strStatus'},
@@ -215,7 +215,7 @@ sub build {
 
             #Person Request below
             CurrentClub => $self->{_notificationObj}->getWorkTaskDetails()->{'CurrentClub'},
-			Requestor => $self->{_notificationObj}->getWorkTaskDetails()->{'Requestor'},
+	    Requestor => $self->{_notificationObj}->getWorkTaskDetails()->{'Requestor'},
             RequestingClub => $self->{_notificationObj}->getWorkTaskDetails()->{'RequestingClub'} || $config->{'fromEntityName'},
             MA => $self->{_notificationObj}->getWorkTaskDetails()->{'MA'} || '',
         );
