@@ -148,7 +148,7 @@ sub retrieve {
     #ADD LOCALE CHECK ON tblLanguages or SystemConfig->DefaultLocale or Cookie_Locale
     my $q = $self->{_notificationObj}->getDbh()->prepare($st);
     $q->execute(@params) or query_error($st);
-    print STDERR @params;
+    
     my $config = $q->fetchrow_hashref();
     $self->setConfig($config);
 

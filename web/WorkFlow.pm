@@ -888,12 +888,12 @@ sub addWorkFlowTasks {
     $originLevel ||= 0;
     $personRegistrationID ||= 0;
     $documentID ||= 0;
-	#
-	my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; 
-	# 
+    #
+    my $notificationType = $Defs::NOTIFICATION_WFTASK_ADDED; 
+    # 
 	
-	my $q = '';
-	my $db=$Data->{'db'};
+    my $q = '';
+    my $db=$Data->{'db'};
     my $checkOk = 1;
 
 
@@ -934,37 +934,37 @@ sub addWorkFlowTasks {
 			intWFRuleID,
 			intRealmID,
 			intSubRealmID,
-            intCreatedByUserID,
+                        intCreatedByUserID,
 			intApprovalEntityID,
 			strTaskType,
-            strWFRuleFor,
-            strRegistrationNature,
+                        strWFRuleFor,
+                        strRegistrationNature,
 			intDocumentTypeID,
 			strTaskStatus,
 			intProblemResolutionEntityID,
-            intEntityID,
+                        intEntityID,
 			intPersonID,
 			intPersonRegistrationID,
-            intDocumentID
+                        intDocumentID
 		)
-        VALUES (
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?,
-            ?
-        )
-    ];
+                VALUES (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?
+                )
+            ];
 	my $qINS = $db->prepare($stINS);
 
     my $st = '';
@@ -978,25 +978,25 @@ sub addWorkFlowTasks {
 			r.intSubRealmID,
 			r.intApprovalEntityLevel,
 			r.strTaskType,
-            r.strWFRuleFor,
+                        r.strWFRuleFor,
 			r.intDocumentTypeID,
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			p.intPersonID,
 			0 as intPersonRegistrationID,
-            $entityID as RegoEntity,
-            0 as DocumentID
+                        $entityID as RegoEntity,
+                        0 as DocumentID
 		FROM tblPerson as p
 		INNER JOIN tblWFRule AS r ON (
-			p.intRealmID = r.intRealmID
-        )
+                    p.intRealmID = r.intRealmID
+                )
 		WHERE
-            p.intPersonID= ?
-            AND r.strWFRuleFor = 'PERSON'
-            AND r.intRealmID = ?
-            AND r.intSubRealmID IN (0, ?)
-            AND r.intOriginLevel = ?
-			AND r.strRegistrationNature = ?
+                    p.intPersonID= ?
+                    AND r.strWFRuleFor = 'PERSON'
+                    AND r.intRealmID = ?
+                    AND r.intSubRealmID IN (0, ?)
+                    AND r.intOriginLevel = ?
+                    AND r.strRegistrationNature = ?
 		];
         #0 as RegoEntity,
 	    $q = $db->prepare($st);
@@ -1129,7 +1129,6 @@ sub addWorkFlowTasks {
     }
 
     
-    print STDERR "$itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature ";
     my $emailNotification = new EmailNotifications::WorkFlow();
 	
     if ($checkOk)   {
@@ -1137,7 +1136,7 @@ sub addWorkFlowTasks {
 			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = 0;
-            print STDERR "\$originLevel = $originLevel";
+           
             if($originLevel == 1) {
                 $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
                 $emailNotification->setFromSelfUserID($problemEntityID);
@@ -1188,7 +1187,6 @@ sub addWorkFlowTasks {
 	    $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($approvalEntityID);
-            #$emailNotification->setFromEntityID(0);####################################################### 
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($notificationType);

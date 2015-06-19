@@ -150,9 +150,6 @@ sub send {
         $templateData->{'From'}{'email'},
         $templateData->{'CC'}{'email'},
     );
-    
-    #print STDERR Dumper "SENT STATUS ". $emailsentOK;
-    #print STDERR Dumper "MESSAGE ". $message;
 }
 
 sub setRealmID {
