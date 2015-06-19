@@ -17,8 +17,12 @@
                                 <dl class="dl-horizontal">
                                   <dt>[% Lang.txt('First name') %]</dt>
                                   <dd>[% person.strLocalFirstname %]</dd>
-                                  <dt>[% Lang.txt('Family name') %]</dt>
+                                  <dt>[% Lang.txt('Family name') %]</dt>                                  
                                   <dd>[% person.strLocalSurname %]</dd>
+                                  [% IF person.NationalNum %]
+                                  <dt>[% Lang.txt('Member ID') %]</dt>
+                                  <dd>[% person.NationalNum %]</dd>
+                                  [% END %]
                                   <dt>[% Lang.txt('DOB') %]</dt>
                                   <dd>[% DateFormat.format(person.dtDOB,'MEDIUM') %]</dd>
                                   <dt>[% Lang.txt('Gender') %]</dt>
