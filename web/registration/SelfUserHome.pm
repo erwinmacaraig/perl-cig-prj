@@ -71,6 +71,7 @@ sub showHome {
 	my $registrationHist = '';
 	my $transactions = '';
 	#
+    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	foreach my $person (@{$people}){
 		$count++;
 		$documents = getUploadedSelfRegoDocuments($Data,$person->{'intPersonID'});
@@ -83,11 +84,11 @@ sub showHome {
 			Documents => $documents,
 			History => $registrationHist,
 			Transactions => $transactions,
+            selfRegoMatrixOptions => $selfRegoMatrixOptions,
 		},
 		'selfrego/accordion.templ',		
 		 );
 	}
-    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	
     my $resultHTML = runTemplate(
         $Data,

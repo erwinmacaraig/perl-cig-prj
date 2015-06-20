@@ -59,11 +59,19 @@
                             </div><!-- end selfreg-details -->
                             <div class = "selfreg-actions col-md-4 text-center">
                                 [% IF person.intMinor %]
+                                    [% IF selfRegoMatrixOptions.PLAYER %]
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;minor=1&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a>
+                                    [% END %]
                                 [% ELSE %]
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                    [% IF selfRegoMatrixOptions.PLAYER %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.COACH %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.REFEREE %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                    [% END %]
                                 [% END %]
                             </div><!-- end selfreg-actions -->
 
