@@ -187,7 +187,9 @@ sub deliverReport {
 	)	{
 		#Deliver by email
 
-		my $sendoutput = $self->sendDataByEmail($reportoutput);
+        if ($self->{'RunParams'}{'TooManyRows'})    {
+		    my $sendoutput = $self->sendDataByEmail($reportoutput);
+        }
 		$output = runTemplate(
 			$self->{'Data'},
 			{
