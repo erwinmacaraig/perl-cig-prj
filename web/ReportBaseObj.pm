@@ -127,6 +127,7 @@ sub runReport {
         
 	}
 	else	{
+        $self->{'RunParams'}{'TooManyRows'} = 0;
 		$self->runQuery($sql, \@DataArray);
 		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
         #if(scalar(@DataArray)  > $maxRows) {
@@ -187,7 +188,7 @@ sub deliverReport {
 	)	{
 		#Deliver by email
 
-        if ($self->{'RunParams'}{'TooManyRows'})    {
+        if (! $self->{'RunParams'}{'TooManyRows'})    {
 		    my $sendoutput = $self->sendDataByEmail($reportoutput);
         }
 		$output = runTemplate(
