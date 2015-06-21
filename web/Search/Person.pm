@@ -215,8 +215,8 @@ sub getTransfer {
         if(scalar(%personRegMapping)) {
             foreach my $pID (keys %personRegMapping) {
                 foreach my $sport (keys %Defs::sportType) {
-                    #no records exist for $sport (e.g. BEACHSOCCER)
-                    next if !$personRegMapping{$pID}{$sport};
+                    #no records exist for $sport (e.g. BEACHSOCCER), allow to SEARCH from other Clubs
+                    $flag++ if !$personRegMapping{$pID}{$sport};
 
                     $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
                 }
@@ -230,6 +230,8 @@ sub getTransfer {
         else {
             $valid_person_list = join(',', @persons);
         }
+
+        return if(!$valid_person_list or $valid_person_list eq '');
 
         my $entity_list = '';
         $entity_list = join(',', @{$subNodes});
@@ -250,6 +252,7 @@ sub getTransfer {
                 E.intEntityID,
                 E.intEntityLevel,
                 PR.intPersonRegistrationID,
+                PR.intPersonID,
                 PR.dtFrom,
                 PR.dtTo,
                 PR.strSport,
@@ -308,6 +311,7 @@ sub getTransfer {
                 #AND PRQinprogress.intRequestFromEntityID = "$clubID"
                 #AND PRQinprogress.strRequestStatus = "INPROGRESS" AND PRQinprogress.strRequestResponse IS NULL
 
+                #print STDERR Dumper $st;
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
         my %origClientValues = %{$self->getData()->{'clientValues'}};
@@ -425,6 +429,64 @@ sub getPlayerLoan {
         my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
         $clubID = 0 if $clubID == $Defs::INVALID_ID;
 
+        my %personRegMapping = ();
+
+        my $pst = qq [
+            SELECT
+                intPersonID,
+                intEntityID,
+                intPersonRegistrationID,
+                strStatus,
+                strSport
+            FROM
+                tblPersonRegistration_1
+            WHERE
+                intPersonID IN ($person_list)
+                AND intEntityID = $filters->{'club'}
+            ORDER BY
+                intPersonID, dtFrom DESC, dtTo DESC
+        ];
+
+
+        my $precheck = $self->getData->{'db'}->prepare($pst);
+        $precheck->execute();
+
+        while(my $pdref = $precheck->fetchrow_hashref()) {
+            next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
+
+            #we're only interested in the status of the registration per person per sport
+            #if there's no TRANSFERRED on each of the sports, then we remove the person in the list
+            #that means that person is registered under the requestor (logged in club)
+            $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = $pdref->{'strStatus'};
+        }
+
+        my $flag = 0;
+        my @includePersonList = ();
+        my $valid_person_list;
+
+        if(scalar(%personRegMapping)) {
+            foreach my $pID (keys %personRegMapping) {
+                foreach my $sport (keys %Defs::sportType) {
+                    #no records exist for $sport (e.g. BEACHSOCCER), allow to SEARCH from other Clubs
+                    $flag++ if !$personRegMapping{$pID}{$sport};
+
+                    $flag++ if($personRegMapping{$pID}{$sport} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+                }
+
+                push @includePersonList, $pID if $flag > 0;
+                $flag = 0;
+            }
+
+            $valid_person_list = join(',', @includePersonList);
+        }
+        else {
+            $valid_person_list = join(',', @persons);
+        }
+
+        return if(!$valid_person_list or $valid_person_list eq '');
+
+
+
         my $allowedPeriods = $self->getData()->{'SystemConfig'}{'loan_newLoanAllowedPeriods'};
         my $periodSQL='';
         if ($allowedPeriods)    {
@@ -452,6 +514,12 @@ sub getPlayerLoan {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                PR.intPersonRegistrationID,
+                PR.intPersonID,
+                PR.dtFrom,
+                PR.dtTo,
+                PR.strSport,
+                PR.strStatus,
                 PRQinprogress.intPersonRequestID as existingInProgressRequestID,
                 PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
                 PRQactive.intPersonRequestID as existingPersonRegistrationID,
@@ -460,19 +528,12 @@ sub getPlayerLoan {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','ROLLED_OVER')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING','ROLLED_OVER')
                 AND
                     (PR.strPersonType = 'PLAYER')
                 AND PR.intEntityID <> $filters->{'club'}
                 $levelSQL
                 $periodSQL
-            )
-            LEFT JOIN tblPersonRegistration_$realmID AS PRAlready ON (
-                tblPerson.intPersonID = PRAlready.intPersonID
-                AND PRAlready.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
-                AND PRAlready.intEntityID = $filters->{'club'}
-                AND PRAlready.strSport =  PR.strSport
-                AND PRAlready.strPersonType = 'PLAYER'
             )
             INNER JOIN tblEntity AS E ON (
                 PR.intEntityID = E.intEntityID
@@ -485,7 +546,7 @@ sub getPlayerLoan {
                 AND PRQinprogress.strRequestStatus NOT IN ("COMPLETED", "DENIED", "REJECTED", "CANCELLED")
             )
             LEFT JOIN tblPersonRequest AS PRQaccepted ON (
-                PRQaccepted.strRequestType = "TRANSFER"
+                PRQaccepted.strRequestType = "LOAN"
                 AND PRQaccepted.intPersonID = tblPerson.intPersonID
                 AND PRQaccepted.strSport =  PR.strSport
                 AND PRQaccepted.strPersonType = PR.strPersonType
@@ -505,15 +566,14 @@ sub getPlayerLoan {
             ON  (
                 PRQactive.intPersonRequestID = PR.intPersonRequestID
                 )
-            WHERE tblPerson.intPersonID IN ($person_list)
+            WHERE tblPerson.intPersonID IN ($valid_person_list)
                 AND tblPerson.strStatus IN ('REGISTERED')
-                AND PRQinprogress.intPersonRequestID IS NULL
-                AND PRAlready.intPersonRegistrationID IS NULL
             ORDER BY 
-                strLocalSurname, 
-                strLocalFirstname
+                PR.intPersonID,
+                PR.dtFrom DESC
             LIMIT 100
         ];
+
 		 
         my $q = $self->getData->{'db'}->prepare($st);
         $q->execute();
@@ -522,31 +582,74 @@ sub getPlayerLoan {
         my $count = 0;
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
+
+        my %validRecords = ();
+        my @sportsFilter;
+
         while(my $dref = $q->fetchrow_hashref()) {
-            $count++;
-            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
-            my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
-            push @memarray, {
-                id => $dref->{'intPersonID'} || next,
-                name => $name,
-                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=loan&amp;search_keyword=$dref->{'strNationalNum'}&amp;transfer_type=",
-                otherdetails => {
-                    dob => $dref->{'dtDOB'},
-                    dtadded => $dref->{'dtadded'},
-                    ma_id => $dref->{'strNationalNum'} || '',
-                    org => $dref->{'EntityName'} || '',
-                },
-                inProgressRequestExists => $dref->{'existingInProgressRequestID'},
-                acceptedRequestLink => $acceptedRequestLink,
-                submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
-            };
+            next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
+
+            $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
         }
+
+
+        foreach my $resPersonID (keys %validRecords) {
+            foreach my $personSport (keys %{$validRecords{$resPersonID}}) {
+                push @sportsFilter, $Defs::sportType{$personSport} if !(grep /$Defs::sportType{$personSport}/, @sportsFilter);
+
+                my $result = $validRecords{$resPersonID}{$personSport};
+
+                $count++;
+                my $name = "$result->{'strLocalFirstname'} $result->{'strLocalSurname'}" || '';
+                my $acceptedRequestLink = ($result->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$result->{'existingAcceptedRequestID'}" : '';
+                push @memarray, {
+                    id => $result->{'intPersonID'} || next,
+                    name => $name,
+                    sport => $Defs::sportType{$personSport},
+                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=loan&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
+                    otherdetails => {
+                        dob => $result->{'dtDOB'},
+                        dtadded => $result->{'dtadded'},
+                        ma_id => $result->{'strNationalNum'} || '',
+                        org => $result->{'EntityName'} || '',
+                    },
+                    inProgressRequestExists => $result->{'existingInProgressRequestID'},
+                    acceptedRequestLink => $acceptedRequestLink,
+                    submittedPersonRegistrationExists => $result->{'existingPendingRegistrationID'},
+                };
+            }
+        }
+
+
+        #while(my $dref = $q->fetchrow_hashref()) {
+        #    $count++;
+        #    my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+        #    my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
+        #    push @memarray, {
+        #        id => $dref->{'intPersonID'} || next,
+        #        name => $name,
+        #        link => "$target?client=$client&amp;a=PRA_getrecord&request_type=loan&amp;search_keyword=$dref->{'strNationalNum'}&amp;transfer_type=",
+        #        otherdetails => {
+        #            dob => $dref->{'dtDOB'},
+        #            dtadded => $dref->{'dtadded'},
+        #            ma_id => $dref->{'strNationalNum'} || '',
+        #            org => $dref->{'EntityName'} || '',
+        #        },
+        #        inProgressRequestExists => $dref->{'existingInProgressRequestID'},
+        #        acceptedRequestLink => $acceptedRequestLink,
+        #        submittedPersonRegistrationExists => $dref->{'existingPendingRegistrationID'},
+        #    };
+        #}
 
         if($raw){
             return \@memarray;
         }
         else {
-            return $self->displayResultGrid(\@memarray) if $count;
+            my %filters = (
+                sports => \@sportsFilter,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
 
             return $count;
         }

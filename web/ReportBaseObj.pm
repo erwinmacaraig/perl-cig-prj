@@ -108,22 +108,36 @@ sub displayOptions {
 
 sub runReport {
   my $self = shift;
+    my $maxRows = 30000;
   my ($sql, $continue, $msg) = $self->makeSQL();
 	warn $sql;
 	return ($msg , $continue) if !$continue;
 	return ('',1) if !$sql;
 	my $output_array = undef;
+    my @OutputArray=();
+    my @DataArray=();
 	if($self->{'Config'}{'DataFromFunction'})	{
 		my ($module, $fnname)  = $self->{'Config'}{'DataFromFunction'} =~/(.*)::(.*)/;
 		if($module)	{
 			eval "require $module";
 		}
 		$output_array = $module->$fnname($self->{'Data'}, $self->{'FormParams'});
+        #@OutputArray = @{$output_array};
+        #undef $output_array;
+        
 	}
 	else	{
-		my $data_array = $self->runQuery($sql);
-		#print STDERR $sql;
-		$output_array = $self->processData($data_array);
+        $self->{'RunParams'}{'TooManyRows'} = 0;
+		$self->runQuery($sql, \@DataArray);
+		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
+        #if(scalar(@DataArray)  > $maxRows) {
+         if(scalar(@{$output_array})  > $maxRows) {
+            $output_array = [];
+            $self->{'RunParams'}{'TooManyRows'} = 1;
+        }
+        else    {
+        }
+        
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
@@ -135,7 +149,10 @@ sub runReport {
 		return ($retdata, 1);
 	}
 	return $output_array if $self->{'FormParams'}{'ReturnData'};
-  my $formatted = $self->formatOutput($output_array );
+    my $formatted = $self->formatOutput($output_array);
+    undef $output_array;
+    undef @OutputArray;
+    undef @DataArray;
 #use PDF::FromHTML;
  #my $pdf = PDF::FromHTML->new( encoding => 'utf-8' );
 #$pdf->load_file(\$formatted);
@@ -147,6 +164,8 @@ sub runReport {
     # Write to a file:
     #$pdf->write_file('/tmp/target.pdf');
   my $output = $self->deliverReport($formatted);
+    #undef $output_array;
+    undef $formatted;
 	return ($output, 1);
 }
 
@@ -169,7 +188,9 @@ sub deliverReport {
 	)	{
 		#Deliver by email
 
-		my $sendoutput = $self->sendDataByEmail($reportoutput);
+        if (! $self->{'RunParams'}{'TooManyRows'})    {
+		    my $sendoutput = $self->sendDataByEmail($reportoutput);
+        }
 		$output = runTemplate(
 			$self->{'Data'},
 			{
@@ -181,6 +202,7 @@ sub deliverReport {
 				Totals => $self->{'RunParams'}{'Totals'},
 				GroupField => $self->{'RunParams'}{'GroupBy'},
 				Email => $self->{'RunParams'}{'SendToEmail'},
+                TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
 			},
 			"reports/email_confirmation.templ",
 		);
@@ -246,6 +268,7 @@ sub formatOutput {
 			Summarise => $self->{'RunParams'}{'Summarise'} || 0,
 			Options => $self->{'OtherOptions'},
             LimitView => $self->{'Config'}{'Config'}{'limitView'} || 0,
+            TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
     },
     "reports/$templatename.templ",
   );
@@ -256,7 +279,7 @@ sub formatOutput {
 sub processData {
   my $self = shift;
   my($data_array) = @_;
-	my $output_array = undef;
+my $output_array = undef;
 
   #First do sort
 	my @sortparams = ();
@@ -340,7 +363,7 @@ sub processData {
 			}
 
 			if($self->{'Config'}{'Fields'})	{ #Has detailed field configuration
-				$self->_processrow($row, $groupfield);
+				$self->_processrow(scalar(@{$output_array}), $row, $groupfield);
 			}
 			$index++;
 		}
@@ -348,12 +371,13 @@ sub processData {
 	warn("REPORT DEBUG: ".tv_interval($debugtime)." Process End ") if $self->{'DEBUG'};
 
 	$self->{'RunParams'}{'RecordCount'} = scalar(@{$output_array});
-  return $output_array || undef;
+return $output_array || undef;
 }
 
 sub _processrow	{
   my $self = shift;
-	my ($dataref, $groupfield) = @_;
+	my ($totalRowCount, $dataref, $groupfield) = @_;
+    my $maxRows = 5000;
 	my $activefields = $self->{'RunParams'}{'ActiveFields'};
 	for my $field (@{$self->{'RunParams'}{'Order'}}) {
 		if(
@@ -402,16 +426,16 @@ sub _processrow	{
 				or $outvalue eq ''
 				and !($displaytype eq 'lookup' and $outvalue eq '')
 			) { $outvalue=$dataref->{$field}; }
-			if($displaytype eq 'currency' and $self->{'Config'}->{'Config'}{'CurrencySymbol'})  {
+			if($totalRowCount < $maxRows and $displaytype eq 'currency' and $self->{'Config'}->{'Config'}{'CurrencySymbol'})  {
 				$outvalue= $self->{'Config'}{'Config'}{'CurrencySymbol'} . $outvalue;
 			}
-			if($fieldopts->{'datetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
+			if($totalRowCount < $maxRows and $fieldopts->{'datetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
                 my @p = @{$fieldopts->{'datetimeformat'}};
                 my $obj = $self->{'Config'}->{'Config'}{'DateTimeFormatObject'};
                 unshift @p, $outvalue;
                 $outvalue = $obj->format(@p);
             }
-			if($fieldopts->{'translate'} and $self->{'Lang'})   {
+			if($totalRowCount < $maxRows and $fieldopts->{'translate'} and $self->{'Lang'})   {
                 $outvalue = $self->{'Lang'}->txt($outvalue);
             }
 			$dataref->{$field} = $outvalue;
@@ -428,7 +452,7 @@ sub _getConfiguration {
 
 sub runQuery {
   my $self = shift;
-  my($sql) = @_;
+  my($sql, $data_array) = @_;
 
 
   #attempt to fix some common sql syntax errors
@@ -440,16 +464,15 @@ sub runQuery {
   my $q = $self->{'dbRun'}->prepare($sql);
   $q->execute();
 
-  my @data_array = ();
   while(my $dref = $q->fetchrow_hashref())	{
 		#for my $k (keys %{$dref})	{
 			#$dref->{$k} = '' if !defined $dref->{$k};
 		#}
-  	push @data_array, $dref;
+        push @{$data_array}, $dref;
 	}
   $q->finish();
 	warn("REPORT DEBUG: ".tv_interval($debugtime)." DB Run End ") if $self->{'DEBUG'};
-  return \@data_array || undef;
+  #return \@data_array || undef;
 }
 
 sub setCarryFields {
