@@ -1,3 +1,6 @@
+[% IF TooManyRows %]
+   [% Lang.txt('There are too many rows to be delivered in this report. You should attempt to simplify the report') %]
+[% ELSE %]
 <div style="padding:20px;">
 <div class="pageHeading">[% Lang.txt('Your Data has been sent') %]</div>
 <p>[% Lang.txt('Your data export has been processed and emailed to') %] <b>[% Email %]</b>.
@@ -7,3 +10,4 @@
 <p>[% Lang.txt('The data contains') %] <b>[% RecordCount %]</b> [% Lang.txt('rows') %].
 
 </div>
+[% END %]
