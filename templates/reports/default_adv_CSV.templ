@@ -40,4 +40,7 @@
 [% END %]
 [% END %]
 [% IF Summarise -%]"[% SummaryCount.All %]"[% END %]
+[% IF TooManyRows %]
+   [% Lang.txt('There are too many rows to be delivered in this report. You should attempt to simplify the report') %]
+[% END %]
 

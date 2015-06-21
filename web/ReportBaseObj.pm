@@ -108,6 +108,7 @@ sub displayOptions {
 
 sub runReport {
   my $self = shift;
+    my $maxRows = 30000;
   my ($sql, $continue, $msg) = $self->makeSQL();
 	warn $sql;
 	return ($msg , $continue) if !$continue;
@@ -126,8 +127,17 @@ sub runReport {
         
 	}
 	else	{
+        $self->{'RunParams'}{'TooManyRows'} = 0;
 		$self->runQuery($sql, \@DataArray);
 		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
+        #if(scalar(@DataArray)  > $maxRows) {
+         if(scalar(@{$output_array})  > $maxRows) {
+            $output_array = [];
+            $self->{'RunParams'}{'TooManyRows'} = 1;
+        }
+        else    {
+        }
+        
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
@@ -178,7 +188,9 @@ sub deliverReport {
 	)	{
 		#Deliver by email
 
-		my $sendoutput = $self->sendDataByEmail($reportoutput);
+        if (! $self->{'RunParams'}{'TooManyRows'})    {
+		    my $sendoutput = $self->sendDataByEmail($reportoutput);
+        }
 		$output = runTemplate(
 			$self->{'Data'},
 			{
@@ -190,6 +202,7 @@ sub deliverReport {
 				Totals => $self->{'RunParams'}{'Totals'},
 				GroupField => $self->{'RunParams'}{'GroupBy'},
 				Email => $self->{'RunParams'}{'SendToEmail'},
+                TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
 			},
 			"reports/email_confirmation.templ",
 		);
@@ -255,6 +268,7 @@ sub formatOutput {
 			Summarise => $self->{'RunParams'}{'Summarise'} || 0,
 			Options => $self->{'OtherOptions'},
             LimitView => $self->{'Config'}{'Config'}{'limitView'} || 0,
+            TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
     },
     "reports/$templatename.templ",
   );
