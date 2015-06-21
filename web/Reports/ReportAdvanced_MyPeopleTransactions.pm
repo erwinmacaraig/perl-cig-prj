@@ -124,7 +124,7 @@ sub _getConfiguration {
 				}
 			],
 			strReceiptRef => [
-				'Manual Receipt Reference',
+				'Receipt Reference',
 				{
 					displaytype=>'text', 
 					fieldtype=>'text', 
@@ -160,6 +160,16 @@ sub _getConfiguration {
 					allowsort=>1, 
 				}
 			],
+            intTransLogStatusID => [
+                'Payment Status',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::TransLogStatus,
+                    allowsort       => 1,
+                    dbfield         => 'TL.intStatus'
+                }
+              ],
 			intAmount => [
 				'Order Total',
 				{
@@ -262,6 +272,7 @@ sub _getConfiguration {
 			intPaymentType
 			strTXN
 			intLogID
+            intTransLogStatusID
 			TLComments
 			intAmount
 			dtTransaction

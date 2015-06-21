@@ -39,5 +39,5 @@ DELETE FROM tblRegoState;
 DELETE FROM tblSavedReports;
 
 DELETE FROM tblSelfUser;
-DELETE FROM tblUserAuth;
-DELETE FROM tblUserHash;
+DELETE FROM tblSelfUserAuth;
+DELETE FROM tblSelfUserHash;
