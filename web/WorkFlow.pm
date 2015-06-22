@@ -564,6 +564,12 @@ sub listTasks {
         if($dref->{'strRegistrationNature'} =~ /_LOAN/) {
             $taskCounts{$Defs::PERSON_REQUEST_LOAN}++;
         }
+        elsif($dref->{'intInternationalTransfer'} == 1 and $dref->{'intNewBaseRecord'} == 1) {
+            $taskCounts{$Defs::PERSON_REQUEST_TRANSFER}++;
+        }
+        elsif($dref->{'intInternationalLoan'} == 1 and $dref->{'intNewBaseRecord'} == 1) {
+            $taskCounts{$Defs::PERSON_REQUEST_LOAN}++;
+        }
         else {
             $taskCounts{$dref->{'strRegistrationNature'}}++;
         }
@@ -616,6 +622,8 @@ sub listTasks {
         my $taskTypeLabel = '';
 
         my $ruleForType = "";
+        my $registrationNatureLabel = "";
+
         if($dref->{'strWFRuleFor'} eq "ENTITY" and $dref->{'intEntityLevel'} == $Defs::LEVEL_CLUB){
             $ruleForType = $dref->{'strRegistrationNature'} . "_CLUB";
         }
@@ -624,7 +632,17 @@ sub listTasks {
 			$viewTaskURL = "$Data->{'target'}?client=$client&amp;a=WF_View&TID=$dref->{'intWFTaskID'}";
         }
         elsif($dref->{'strWFRuleFor'} eq "REGO") {
-            $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+            if($dref->{'intInternationalTransfer'} == 1 and $dref->{'intNewBaseRecord'}) {
+                $ruleForType = "INTERNATIONAL_TRANSFER_" . $dref->{'strPersonType'};
+                $registrationNatureLabel = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+            }
+            elsif($dref->{'intInternationalLoan'} == 1 and $dref->{'intNewBaseRecord'}) {
+                $ruleForType = "INTERNATIONAL_LOAN_" . $dref->{'strPersonType'};
+                $registrationNatureLabel = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+            }
+            else {
+                $ruleForType = $dref->{'strRegistrationNature'} . "_" . $dref->{'strPersonType'};
+            }
         }
         elsif($dref->{'strWFRuleFor'} eq "PERSON") {
             $ruleForType = $dref->{'strRegistrationNature'} . "_PERSON";
@@ -645,7 +663,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel}) || $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
