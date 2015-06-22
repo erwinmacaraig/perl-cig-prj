@@ -15,6 +15,7 @@ sub new {
         _realmID            => $args{realmID},
         _subRealmID         => $args{subRealmID},
         _fromEntityID       => $args{fromEntityID} || undef,
+        _fromSelfUserID     => $args{fromSelfUserID} || undef,
         _toEntityID         => $args{toEntityID} || undef,
         _notificationType   => $args{notificationType},
         _dbh                => $args{dbh},
@@ -48,6 +49,11 @@ sub getSubRealmID {
 sub getFromEntityID {
     my ($self) = shift;
     return $self->{_fromEntityID};
+}
+
+sub getFromSelfUserID {
+    my ($self) = shift;
+    return $self->{_fromSelfUserID};
 }
 
 sub getToEntityID {
@@ -144,9 +150,6 @@ sub send {
         $templateData->{'From'}{'email'},
         $templateData->{'CC'}{'email'},
     );
-    
-    #print STDERR Dumper "SENT STATUS ". $emailsentOK;
-    #print STDERR Dumper "MESSAGE ". $message;
 }
 
 sub setRealmID {
@@ -166,7 +169,11 @@ sub setFromEntityID {
     my ($fromEntityID) = @_;
     $self->{_fromEntityID} = $fromEntityID if defined $fromEntityID;
 }
-
+sub setFromSelfUserID {
+    my $self = shift;
+    my ($fromSelfUserID) = @_;
+    $self->{_fromSelfUserID} = $fromSelfUserID if defined $fromSelfUserID;
+}
 sub setToEntityID {
     my $self = shift;
     my ($toEntityID) = @_;
