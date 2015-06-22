@@ -15,10 +15,14 @@
                         <div id="regtab[% count %]" class="tab-pane fade in active">
                             <div class = "selfreg-details col-md-8">
                                 <dl class="dl-horizontal">
+                                  [% IF person.NationalNum %]
+                                    <dt>[% Lang.txt('Member ID') %]</dt>
+                                    <dd>[% person.NationalNum %]</dd>
+                                  [% END %]
                                   <dt>[% Lang.txt('First name') %]</dt>
                                   <dd>[% person.strLocalFirstname %]</dd>
-                                  <dt>[% Lang.txt('Family name') %]</dt>
-                                  <dd>[% person.strLocalSurname %]</dd>
+                                  <dt>[% Lang.txt('Family name') %]</dt>                                  
+                                  <dd>[% person.strLocalSurname %]</dd>                                  
                                   <dt>[% Lang.txt('DOB') %]</dt>
                                   <dd>[% DateFormat.format(person.dtDOB,'MEDIUM') %]</dd>
                                   <dt>[% Lang.txt('Gender') %]</dt>

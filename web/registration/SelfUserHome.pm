@@ -236,6 +236,7 @@ sub getPreviousRegos {
             P.dtDOB,
             P.intGender,
             P.strStatus as PersonStatus,
+            P.strNationalNum,
             NP.strNationalPeriodName,
             NP.dtTo as NPdtTo,
             NP.dtFrom as NPdtFrom,
@@ -288,6 +289,7 @@ sub getPreviousRegos {
                 dtDOB => $dref->{'dtDOB'} || '',
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
+                NationalNum => $dref->{'strNationalNum'},
             };
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';
