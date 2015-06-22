@@ -38,6 +38,8 @@ sub main	{
     my $defaultEntityRole= param('dentityrole') || '';
     my $defaultNature= param('dnat') || '';
     my $etype = param('etype') || '';
+    my $itc = param('itc') || 0;
+    my $preqType = param('preqtype') || '';
 
     $etype= '' if (! defined $etype or $etype eq 'null');
     $entityID= '' if (! defined $entityID or $entityID eq 'null');
@@ -100,6 +102,8 @@ sub main	{
             $etype,
             getLastEntityLevel(\%clientValues),
             getLastEntityID(\%clientValues),
+            $itc,
+            $preqType,
         );
 	}
 

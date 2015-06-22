@@ -25,6 +25,9 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&dnat=' + jQuery('#dnat').val();
     qstring = qstring + '&dlevel=' + jQuery('#dlevel').val();
 
+    qstring = qstring + '&itc=' + jQuery('#itc').val();
+    qstring = qstring + '&preqtype=' + jQuery('#preqtype').val();
+
     if(currentoption != '' && currentoption === optionType && optiontrigger === currentoption) {
         //do nothing to avoid duplicate call
     }
