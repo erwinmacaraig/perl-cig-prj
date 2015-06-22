@@ -8,7 +8,7 @@
         <h3 class="panel-header">[% personDetails.firstname %] [% personDetails.surname %]</h3>
         <div class="panel-body">
             [% FOREACH request IN personRequests %]
-            <label>[% Lang.txt('The [_1] for [_2] has been sent to [_3]',Lang.txt(request.requestType),personDetails.firstname _ ' ' _ personDetails.surname, request.requestTo) %].</label>
+            <label>[% Lang.txt('The [_1] [_2] has been sent to [_3]',Lang.txt(request.requestType),personDetails.firstname _ ' ' _ personDetails.surname, request.requestTo) %].</label>
             <br/>
             [% END %]
             <div class="row top-bottom-spacer">

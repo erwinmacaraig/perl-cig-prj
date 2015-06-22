@@ -15,10 +15,14 @@
                         <div id="regtab[% count %]" class="tab-pane fade in active">
                             <div class = "selfreg-details col-md-8">
                                 <dl class="dl-horizontal">
+                                  [% IF person.NationalNum %]
+                                    <dt>[% Lang.txt('Member ID') %]</dt>
+                                    <dd>[% person.NationalNum %]</dd>
+                                  [% END %]
                                   <dt>[% Lang.txt('First name') %]</dt>
                                   <dd>[% person.strLocalFirstname %]</dd>
-                                  <dt>[% Lang.txt('Family name') %]</dt>
-                                  <dd>[% person.strLocalSurname %]</dd>
+                                  <dt>[% Lang.txt('Family name') %]</dt>                                  
+                                  <dd>[% person.strLocalSurname %]</dd>                                  
                                   <dt>[% Lang.txt('DOB') %]</dt>
                                   <dd>[% DateFormat.format(person.dtDOB,'MEDIUM') %]</dd>
                                   <dt>[% Lang.txt('Gender') %]</dt>
@@ -59,11 +63,19 @@
                             </div><!-- end selfreg-details -->
                             <div class = "selfreg-actions col-md-4 text-center">
                                 [% IF person.intMinor %]
+                                    [% IF selfRegoMatrixOptions.PLAYER %]
                                     <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;minor=1&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a>
+                                    [% END %]
                                 [% ELSE %]
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
-                                    <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                    [% IF selfRegoMatrixOptions.PLAYER %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=PLAYER" class = "btn-inside-panels">[% Lang.txt('Add Player Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.COACH %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=COACH" class = "btn-inside-panels">[% Lang.txt('Add Coach Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.REFEREE %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                    [% END %]
                                 [% END %]
                             </div><!-- end selfreg-actions -->
 
