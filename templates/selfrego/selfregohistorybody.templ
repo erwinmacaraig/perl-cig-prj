@@ -9,7 +9,7 @@
 							[% IF rego.NationalPeriodName%]
 								<tr>
 									<td class="">[% Lang.txt('Registration Period') %]:</td>
-                                    <td>[% Lang.txt(rego.NationalPeriodName) %]</td>
+                                    <td>[% IF rego.strStatus != 'PENDING' %][% Lang.txt(rego.NationalPeriodName) %][% END %]</td>
                                 </tr>
                             [% END %]
 
