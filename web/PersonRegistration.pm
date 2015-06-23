@@ -743,8 +743,8 @@ sub getRegistrationData	{
     my @reg_docs = ();  
     my $locale = $Data->{'lang'}->getLocale();
     while(my $dref= $query->fetchrow_hashref()) {
-        my $internationalTransfer = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) ? 1 : 0;
-        my $internationalLoan = ($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) ? 1 : 0;
+        my $internationalTransfer = (($dref->{'intNewBaseRecord'} and $dref->{'intInternationalTransfer'}) or ($dref->{'strStatus'} eq 'INPROGRESS' and $dref->{'intInternationalTransfer'})) ? 1 : 0;
+        my $internationalLoan = (($dref->{'intNewBaseRecord'} and $dref->{'intInternationalLoan'}) or ($dref->{'strStatus'} eq 'INPROGRESS' and $dref->{'intInternationalLoan'})) ? 1 : 0;
 
         $count++;
         $dref->{'sport'} = $dref->{'strSport'} || '';
