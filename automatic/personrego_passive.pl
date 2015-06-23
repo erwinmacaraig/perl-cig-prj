@@ -29,10 +29,10 @@ use Data::Dumper;
 			    (
 				    PR.dtTo > '1900-01-01'
 				    AND PR.dtTo < DATE(NOW())
-                    AND intOnLoan=0
 			    )
 		    )
             AND PR.strStatus = 'ACTIVE'
+            AND intOnLoan=0
     ];
 
     my $q = $db->prepare($st);
