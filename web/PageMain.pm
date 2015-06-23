@@ -526,6 +526,7 @@ sub regoPageForm {
         HeaderSystemName => $Data->{'SystemConfig'}{'HeaderSystemName'},
         DefaultSystemConfig => $Data->{'SystemConfig'},
         LanguageChooser => genLanguageChooser($Data),
+        HelpLink => retrieveHelpLink($Data),
       },
       'user/globalnav.templ',
     );
