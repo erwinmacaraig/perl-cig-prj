@@ -2,16 +2,16 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-06-19 15:20+0800\n"
+"POT-Creation-Date: 2015-06-23 09:35+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: jescoto <j.escoto@sportingpulseinternational.com>\n"
 "Language-Team: \n"
-"Language: EN\n"
+"Language: en\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 1.8.1\n"
 "X-Poedit-KeywordsList: txt\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: /home/jescoto/src/spil/FIFASPOnline/web\n"
@@ -1493,7 +1493,7 @@ msgstr ""
 
 #: web/Flow_ClubBackend.pm Line:734
 msgid "Submit to Member Association"
-msgstr ""
+msgstr "Submit"
 
 #: web/Flow_ClubBackend.pm Line:112
 msgid "Submitted"
@@ -1550,7 +1550,7 @@ msgstr "New Registration"
 
 #: web/Club.pm Line:946
 msgid "Clubs in [_1]"
-msgstr ""
+msgstr "MAs in [_1]"
 
 #: web/Flow_BulkRenewalsBackend.pm Line:76
 msgid "Confirm License"
@@ -1903,7 +1903,7 @@ msgstr "Add MA"
 #: web/Navbar.pm Line:248
 #: Line:860
 msgid "Add Club Official"
-msgstr ""
+msgstr "Add MA Official"
 
 #: web/Navbar.pm Line:224
 #: Line:836
@@ -2630,7 +2630,7 @@ msgstr ""
 
 #: web/EntityDocuments.pm Line:192
 msgid "Add a new document to this club"
-msgstr ""
+msgstr "Add a new document to this club"
 
 #: web/EntityRegistrationAllowedEdit.pm Line:387
 #: Line:399
@@ -2890,27 +2890,27 @@ msgstr ""
 msgid "An error has been encountered."
 msgstr ""
 
-#: web/WorkFlow.pm Line:3839
-#: Line:3951
+#: web/WorkFlow.pm Line:3840
+#: Line:3952
 #, fuzzy
 msgid "Approval"
 msgstr "Approvals"
 
-#: web/WorkFlow.pm Line:4712
+#: web/WorkFlow.pm Line:4713
 #, fuzzy
 msgid "Approval by Club"
 msgstr "Approvals"
 
-#: web/WorkFlow.pm Line:4720
+#: web/WorkFlow.pm Line:4721
 #, fuzzy
 msgid "Approval by Member Association"
 msgstr "Registration Authorisation"
 
-#: web/WorkFlow.pm Line:4716
+#: web/WorkFlow.pm Line:4717
 msgid "Approval by Regional Association"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3791
+#: web/WorkFlow.pm Line:3792
 msgid "Approved"
 msgstr ""
 
@@ -2931,7 +2931,7 @@ msgstr "Run Report"
 msgid "Cancel Payment"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3036
+#: web/WorkFlow.pm Line:3037
 msgid "Club Registration"
 msgstr "MA Registration"
 
@@ -3010,12 +3010,12 @@ msgstr ""
 msgid "List of Payment Records"
 msgstr "List of Payment Records"
 
-#: web/WorkFlow.pm Line:2916
-#: Line:2933
-#: Line:2952
-#: Line:3040
-#: Line:3051
-#: Line:3160
+#: web/WorkFlow.pm Line:2917
+#: Line:2934
+#: Line:2953
+#: Line:3041
+#: Line:3052
+#: Line:3161
 msgid "Locking Approval: Payment required."
 msgstr ""
 
@@ -3023,28 +3023,28 @@ msgstr ""
 msgid "Logo Updated"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3397
+#: web/WorkFlow.pm Line:3398
 msgid "MISSING"
 msgstr ""
 
-#: web/WorkFlow.pm Line:4736
-#: Line:4737
+#: web/WorkFlow.pm Line:4737
+#: Line:4738
 msgid "N/A"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3872
-#: Line:3970
+#: web/WorkFlow.pm Line:3873
+#: Line:3971
 msgid "New Club Registration - Approval"
 msgstr "New MA Registration - Approval"
 
-#: web/WorkFlow.pm Line:3878
-#: Line:3975
+#: web/WorkFlow.pm Line:3879
+#: Line:3976
 #, fuzzy
 msgid "New Facility Registration - Approval"
 msgstr "New Registration"
 
-#: web/WorkFlow.pm Line:3839
-#: Line:3951
+#: web/WorkFlow.pm Line:3840
+#: Line:3952
 #, fuzzy
 msgid "New [_1] Registration"
 msgstr "New Registration"
@@ -3053,8 +3053,8 @@ msgstr "New Registration"
 msgid "No Payment Records can be found in the database."
 msgstr "No Payment Records can be found in the database."
 
-#: web/WorkFlow.pm Line:2660
-#: Line:4804
+#: web/WorkFlow.pm Line:2661
+#: Line:4805
 msgid "No data retrieved/no access"
 msgstr ""
 
@@ -3066,11 +3066,11 @@ msgstr "No outstanding tasks"
 msgid "No records were found with this filter"
 msgstr ""
 
-#: web/WorkFlow.pm Line:4094
+#: web/WorkFlow.pm Line:4095
 msgid "On-Hold"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3400
+#: web/WorkFlow.pm Line:3401
 msgid "Optional. Not Provided."
 msgstr ""
 
@@ -3099,7 +3099,7 @@ msgstr "Payment Type"
 msgid "Payment Record"
 msgstr ""
 
-#: web/WorkFlow.pm Line:1257
+#: web/WorkFlow.pm Line:1258
 #, fuzzy
 msgid "Payment required"
 msgstr "Payment Type"
@@ -3113,7 +3113,7 @@ msgstr ""
 msgid "Person Request"
 msgstr "Personal Details"
 
-#: web/WorkFlow.pm Line:3811
+#: web/WorkFlow.pm Line:3812
 msgid "Player Loan - Approved"
 msgstr ""
 
@@ -3175,7 +3175,7 @@ msgstr ""
 msgid "Resolve Payment Hold"
 msgstr "Payment Type"
 
-#: web/WorkFlow.pm Line:4261
+#: web/WorkFlow.pm Line:4262
 msgid "Resolved"
 msgstr ""
 
@@ -3216,7 +3216,7 @@ msgstr "Other Fields"
 msgid "Task has been put on-hold."
 msgstr ""
 
-#: web/WorkFlow.pm Line:2364
+#: web/WorkFlow.pm Line:2365
 msgid "Task has been resolved."
 msgstr ""
 
@@ -3272,7 +3272,7 @@ msgstr ""
 msgid "Update Logo"
 msgstr ""
 
-#: web/WorkFlow.pm Line:3047
+#: web/WorkFlow.pm Line:3048
 #, fuzzy
 msgid "Venue Registration"
 msgstr "New Registration"
@@ -3286,19 +3286,19 @@ msgstr ""
 msgid "View Receipt"
 msgstr "View Receipt"
 
-#: web/WorkFlow.pm Line:4801
+#: web/WorkFlow.pm Line:4802
 msgid "Work Flow History"
 msgstr ""
 
-#: web/WorkFlow.pm Line:1973
+#: web/WorkFlow.pm Line:1974
 msgid "Work Flow task updated."
 msgstr ""
 
-#: web/WorkFlow.pm Line:2104
+#: web/WorkFlow.pm Line:2105
 msgid "Work task notes"
 msgstr ""
 
-#: web/WorkFlow.pm Line:1804
+#: web/WorkFlow.pm Line:1805
 msgid "Work task notes Updated"
 msgstr ""
 
@@ -3310,160 +3310,160 @@ msgstr ""
 msgid "You have Transfers to view"
 msgstr ""
 
-#: web/WorkFlow.pm Line:4159
+#: web/WorkFlow.pm Line:4160
 msgid "You have placed this Club Official Renewal On Hold, the [_1] will be informed."
-msgstr ""
+msgstr "You have placed this MA Official Renewal On Hold, the [_1] will be informed."
 
-#: web/WorkFlow.pm Line:4162
+#: web/WorkFlow.pm Line:4163
 msgid "You have placed this MA Official Renewal On Hold, the [_1] will be informed."
-msgstr ""
+msgstr "You have placed this BSWW Official Renewal On Hold, the [_1] will be informed."
 
-#: web/WorkFlow.pm Line:4156
+#: web/WorkFlow.pm Line:4157
 msgid "You have placed this Player Renewal On Hold, the [_1] will be informed."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4165
+#: web/WorkFlow.pm Line:4166
 msgid "You have placed this Team Official Renewal On Hold, the [_1] will be informed."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4168
+#: web/WorkFlow.pm Line:4169
 msgid "You have placed this [_1] Renewal On Hold, the [_1] will be informed."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4142
+#: web/WorkFlow.pm Line:4143
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Amendment of Person Details process."
 
-#: web/WorkFlow.pm Line:4126
+#: web/WorkFlow.pm Line:4127
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Club Official Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process."
 
-#: web/WorkFlow.pm Line:4109
+#: web/WorkFlow.pm Line:4110
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Coach Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Coach Registration process."
 
-#: web/WorkFlow.pm Line:4138
+#: web/WorkFlow.pm Line:4139
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the New Club Registration process."
 
-#: web/WorkFlow.pm Line:4134
+#: web/WorkFlow.pm Line:4135
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Facility Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the New Facility Registration process."
 
-#: web/WorkFlow.pm Line:4101
+#: web/WorkFlow.pm Line:4102
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Player Loan process."
 
-#: web/WorkFlow.pm Line:4105
+#: web/WorkFlow.pm Line:4106
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Player Registration process."
 
-#: web/WorkFlow.pm Line:4130
+#: web/WorkFlow.pm Line:4131
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Team Official Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Team Official Registration process."
 
-#: web/WorkFlow.pm Line:4097
+#: web/WorkFlow.pm Line:4098
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Transfer process."
 
-#: web/WorkFlow.pm Line:4118
+#: web/WorkFlow.pm Line:4119
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the BSWW Official Registration process."
 
-#: web/WorkFlow.pm Line:4114
+#: web/WorkFlow.pm Line:4115
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4146
+#: web/WorkFlow.pm Line:4147
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Club Details process."
-msgstr ""
+msgstr "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of MA Details process."
 
-#: web/WorkFlow.pm Line:4150
+#: web/WorkFlow.pm Line:4151
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Venue Details process."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4122
+#: web/WorkFlow.pm Line:4123
 msgid "You have put this task on-hold, once the submitting RA resolves the issue, you would be able to verify and continue with the RA Official Registration process."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4184
+#: web/WorkFlow.pm Line:4185
 #, fuzzy
 msgid "You have rejected the player loan of [_1] [_2]"
 msgstr "Transfer"
 
-#: web/WorkFlow.pm Line:4231
+#: web/WorkFlow.pm Line:4232
 msgid "You have rejected this Amendment of Person Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4209
+#: web/WorkFlow.pm Line:4210
 msgid "You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
-msgstr ""
+msgstr "You have rejected this MA Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 
-#: web/WorkFlow.pm Line:4240
+#: web/WorkFlow.pm Line:4241
 msgid "You have rejected this Club Official Renewal. To proceed with this Renewal, start a new Renewal."
-msgstr ""
+msgstr "You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal."
 
-#: web/WorkFlow.pm Line:4227
+#: web/WorkFlow.pm Line:4228
 msgid "You have rejected this Club Registration. To proceed with this Registration, start a new Registration."
-msgstr ""
+msgstr "You have rejected this MA Registration. To proceed with this Registration, start a new Registration."
 
-#: web/WorkFlow.pm Line:4192
+#: web/WorkFlow.pm Line:4193
 msgid "You have rejected this Coach Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
-msgstr ""
+msgstr "You have rejected this Coach Registration. To proceed with this Registration the MA will need to start a new Registration."
 
-#: web/WorkFlow.pm Line:4200
+#: web/WorkFlow.pm Line:4201
 msgid "You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration."
-msgstr ""
+msgstr "You have rejected this BSWW Official Registration. To proceed with this Registration, start a new Registration."
 
-#: web/WorkFlow.pm Line:4243
+#: web/WorkFlow.pm Line:4244
 msgid "You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal."
-msgstr ""
+msgstr "You have rejected this BSWW Official Renewal. To proceed with this Renewal, start a new Renewal."
 
-#: web/WorkFlow.pm Line:4188
+#: web/WorkFlow.pm Line:4189
 msgid "You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
-msgstr ""
+msgstr "You have rejected this Player Registration. To proceed with this Registration the Member Association needs to start a new Registration."
 
-#: web/WorkFlow.pm Line:4237
+#: web/WorkFlow.pm Line:4238
 msgid "You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4204
+#: web/WorkFlow.pm Line:4205
 msgid "You have rejected this RA Official Registration. To proceed with this Registration, start a new Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4246
+#: web/WorkFlow.pm Line:4247
 msgid "You have rejected this RA Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4196
+#: web/WorkFlow.pm Line:4197
 msgid "You have rejected this Referee Registration. To proceed with this Registration, start a new Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4213
+#: web/WorkFlow.pm Line:4214
 msgid "You have rejected this Team Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4249
+#: web/WorkFlow.pm Line:4250
 msgid "You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4221
+#: web/WorkFlow.pm Line:4222
 msgid "You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4219
+#: web/WorkFlow.pm Line:4220
 msgid "You have rejected this Venue Registration. To proceed with this Registration start a new Registration."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4252
+#: web/WorkFlow.pm Line:4253
 msgid "You have rejected this [_1] Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4180
+#: web/WorkFlow.pm Line:4181
 msgid "You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer."
 msgstr ""
 
-#: web/WorkFlow.pm Line:4260
+#: web/WorkFlow.pm Line:4261
 msgid "You have resolved this task."
 msgstr ""
 
@@ -3480,7 +3480,7 @@ msgstr ""
 msgid "for"
 msgstr "or"
 
-#: web/WorkFlow.pm Line:2361
+#: web/WorkFlow.pm Line:2362
 msgid "has been rejected."
 msgstr ""
 
@@ -3822,7 +3822,7 @@ msgstr "Birth Certificate Number"
 msgid "Birth Certificate Valid To"
 msgstr "Birth Certificate Number"
 
-#: web/PersonRequest.pm Line:2568
+#: web/PersonRequest.pm Line:2564
 #, fuzzy
 msgid "Cancel Player Loan"
 msgstr "Access"
@@ -3878,7 +3878,7 @@ msgstr "Entity ID"
 msgid "Entity Not Allowed To View List"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2569
+#: web/PersonRequest.pm Line:2565
 #, fuzzy
 msgid "Error Cancelling Loan"
 msgstr "Access"
@@ -3908,7 +3908,7 @@ msgstr "Identifications"
 msgid "Imported Person Code"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2142
+#: web/PersonRequest.pm Line:2138
 msgid "International Transfer Certificate request has been sent"
 msgstr ""
 
@@ -3937,11 +3937,11 @@ msgstr ""
 msgid "List of people registered with the Club"
 msgstr "List of people registered with the MA"
 
-#: web/PersonRequest.pm Line:2265
+#: web/PersonRequest.pm Line:2261
 msgid "Loan End Date"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2255
+#: web/PersonRequest.pm Line:2251
 #, fuzzy
 msgid "Loan Start Date"
 msgstr "Start Date"
@@ -3952,7 +3952,7 @@ msgstr ""
 
 #: web/PersonRequest.pm Line:1006
 msgid "MA ID"
-msgstr ""
+msgstr "BSWW ID"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1859
 #, fuzzy
@@ -4009,13 +4009,13 @@ msgstr "Payment Type"
 msgid "Pending request has been found."
 msgstr ""
 
-#: web/PersonRequest.pm Line:2221
+#: web/PersonRequest.pm Line:2217
 #, fuzzy
 msgid "Person Request History"
 msgstr "Personal Details"
 
 #: web/PersonRequest.pm Line:1081
-#: Line:2176
+#: Line:2172
 msgid "Person Request not found."
 msgstr ""
 
@@ -4092,9 +4092,9 @@ msgstr ""
 msgid "Request a Transfer - Submitted to Current Club"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2023
-#: Line:2057
-#: Line:2083
+#: web/PersonRequest.pm Line:2019
+#: Line:2053
+#: Line:2079
 msgid "Request for an International Transfer Certificate"
 msgstr ""
 
@@ -4108,7 +4108,7 @@ msgstr ""
 
 #: web/PersonRequest.pm Line:922
 #: Line:989
-#: Line:2208
+#: Line:2204
 #, fuzzy
 msgid "Requested"
 msgstr "Access"
@@ -4145,16 +4145,16 @@ msgstr "Search Results"
 msgid "Settlement Date"
 msgstr "Payment Type"
 
-#: web/PersonRequest.pm Line:2246
+#: web/PersonRequest.pm Line:2242
 #, fuzzy
 msgid "Source Club"
 msgstr "Current Level"
 
-#: web/PersonRequest.pm Line:2018
+#: web/PersonRequest.pm Line:2014
 msgid "Submit"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2275
+#: web/PersonRequest.pm Line:2271
 #, fuzzy
 msgid "TMS Reference"
 msgstr "Referee"
@@ -4193,11 +4193,11 @@ msgstr ""
 msgid "Year of Birth"
 msgstr "Date of Birth"
 
-#: web/PersonRequest.pm Line:1385
+#: web/PersonRequest.pm Line:1386
 msgid "You have [_1] the [_2] of [_3] [_4]."
 msgstr ""
 
-#: web/PersonRequest.pm Line:1391
+#: web/PersonRequest.pm Line:1392
 msgid "You will be notified once the transfer is effective and approved by "
 msgstr ""
 
@@ -4367,7 +4367,7 @@ msgstr "Last Updated"
 
 #: web/registration/SelfUserTransfer.pm Line:100
 msgid "Please select from the list of Clubs"
-msgstr ""
+msgstr "Please select from the list of Member Associations"
 
 #: web/registration/SelfUserTransfer.pm Line:74
 #: Line:136
@@ -4479,7 +4479,7 @@ msgstr "Custom Fields"
 msgid "Columns"
 msgstr ""
 
-#: templates/reports/default_adv.templ Line:23
+#: templates/reports/default_adv.templ Line:28
 #, fuzzy
 msgid "Count"
 msgstr "Country"
@@ -4488,7 +4488,7 @@ msgstr "Country"
 msgid "Discipline"
 msgstr ""
 
-#: templates/reports/default_adv.templ Line:9
+#: templates/reports/default_adv.templ Line:14
 msgid "Download CSV"
 msgstr ""
 
@@ -4531,11 +4531,11 @@ msgstr "Logout"
 
 #: templates/flow/club_summary.templ Line:13
 msgid "Organisation dissolution date"
-msgstr ""
+msgstr "Member Association Dissolution Date"
 
 #: templates/flow/club_summary.templ Line:12
 msgid "Organisation foundation date"
-msgstr ""
+msgstr "Member Association Foundation Date"
 
 #: templates/flow/club_summary.templ Line:10
 #, fuzzy
@@ -4578,7 +4578,7 @@ msgstr "Postal Code"
 
 #: templates/reports/default.templ Line:4
 #: templates/reports/default_adv.templ
-#: Line:15
+#: Line:20
 msgid "Records returned:"
 msgstr ""
 
@@ -4589,13 +4589,18 @@ msgstr "Deceased?"
 
 #: templates/reports/default.templ Line:33
 #: templates/reports/default_adv.templ
-#: Line:89
+#: Line:94
 #, fuzzy
 msgid "Report Run"
 msgstr "Reports"
 
 #: templates/flow/default.templ Line:66
 msgid "Save and Exit"
+msgstr ""
+
+#: templates/reports/default_adv_CSV.templ Line:44
+#: templates/reports/default_adv.templ Line:3
+msgid "There are too many rows to be delivered in this report. You should attempt to simplify the report"
 msgstr ""
 
 #: templates/flow/flow_cancelsave.templ Line:20
@@ -4612,7 +4617,7 @@ msgstr "Registration Number"
 msgid "Toggle navigation"
 msgstr ""
 
-#: templates/reports/default_adv.templ Line:4
+#: templates/reports/default_adv.templ Line:9
 msgid "Too many records"
 msgstr ""
 
@@ -4634,11 +4639,11 @@ msgstr "Sport Name"
 msgid "Width of Field (m)"
 msgstr "Other Fields"
 
-#: templates/reports/default_adv.templ Line:6
+#: templates/reports/default_adv.templ Line:11
 msgid "You can download the report or have it sent to you via email."
 msgstr ""
 
-#: templates/reports/default_adv.templ Line:5
+#: templates/reports/default_adv.templ Line:10
 msgid "Your report has returned [_1] records. This is too many to display on the screen."
 msgstr ""
 
@@ -4745,7 +4750,7 @@ msgstr ""
 
 #: templates/person/list.templ Line:86
 msgid "Request Access sent to Club"
-msgstr ""
+msgstr "Request Access sent to Member Association"
 
 #: templates/club/required_docs.templ Line:1
 msgid "Required Club Documents"
@@ -4789,11 +4794,11 @@ msgstr ""
 msgid "Thank You"
 msgstr ""
 
-#: templates/reports/email_confirmation.templ Line:5
+#: templates/reports/email_confirmation.templ Line:8
 msgid "The attached file is a comma seperated text file that can be opened in most spreadsheet applications (including Microsoft Excel)"
 msgstr ""
 
-#: templates/reports/email_confirmation.templ Line:7
+#: templates/reports/email_confirmation.templ Line:10
 msgid "The data contains"
 msgstr ""
 
@@ -4832,12 +4837,12 @@ msgstr ""
 msgid "Youngest"
 msgstr ""
 
-#: templates/reports/email_confirmation.templ Line:2
+#: templates/reports/email_confirmation.templ Line:5
 #, fuzzy
 msgid "Your Data has been sent"
 msgstr "Registration Number"
 
-#: templates/reports/email_confirmation.templ Line:3
+#: templates/reports/email_confirmation.templ Line:6
 msgid "Your data export has been processed and emailed to"
 msgstr ""
 
@@ -4849,7 +4854,7 @@ msgstr ""
 msgid "filtered from _MAX_ records"
 msgstr ""
 
-#: templates/reports/email_confirmation.templ Line:7
+#: templates/reports/email_confirmation.templ Line:10
 msgid "rows"
 msgstr ""
 
@@ -5268,7 +5273,7 @@ msgstr ""
 
 #: templates/search/form.templ Line:4
 msgid "To add a role to a person not at your club, search below"
-msgstr ""
+msgstr "To add a role to a person not at this Member Association, search below"
 
 #: templates/workflow/summary/transfer.templ Line:35
 #, fuzzy
@@ -5310,7 +5315,7 @@ msgstr "Police Check Date"
 
 #: templates/user/index.templ Line:41
 msgid "Member Association"
-msgstr ""
+msgstr "BSWW"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:73
 #, fuzzy
@@ -5456,18 +5461,18 @@ msgstr ""
 msgid "A minor in my care"
 msgstr ""
 
-#: templates/selfrego/accordion.templ Line:65
+#: templates/selfrego/accordion.templ Line:74
 #, fuzzy
 msgid "Add Coach Role"
 msgstr "Coach"
 
-#: templates/selfrego/accordion.templ Line:62
-#: Line:64
+#: templates/selfrego/accordion.templ Line:67
+#: Line:71
 #, fuzzy
 msgid "Add Player Role"
 msgstr "Player"
 
-#: templates/selfrego/accordion.templ Line:66
+#: templates/selfrego/accordion.templ Line:77
 #, fuzzy
 msgid "Add Referee Role"
 msgstr "Referee"
@@ -5521,7 +5526,7 @@ msgstr ""
 msgid "Current Club"
 msgstr "Current Level"
 
-#: templates/selfrego/accordion.templ Line:22
+#: templates/selfrego/accordion.templ Line:26
 msgid "DOB"
 msgstr ""
 
@@ -5564,7 +5569,7 @@ msgstr ""
 msgid "Passwords must follow these rules"
 msgstr ""
 
-#: templates/selfrego/accordion.templ Line:33
+#: templates/selfrego/accordion.templ Line:37
 #, fuzzy
 msgid "Period"
 msgstr "Identifications"
@@ -5586,7 +5591,7 @@ msgstr ""
 msgid "Remind Me"
 msgstr ""
 
-#: templates/selfrego/accordion.templ Line:48
+#: templates/selfrego/accordion.templ Line:52
 #, fuzzy
 msgid "Renew"
 msgstr "Renewal"
@@ -5625,7 +5630,7 @@ msgstr ""
 msgid "Transfer To"
 msgstr "Transfer"
 
-#: templates/selfrego/accordion.templ Line:31
+#: templates/selfrego/accordion.templ Line:35
 #, fuzzy
 msgid "Type/Level"
 msgstr "Personal Details"
@@ -5688,7 +5693,7 @@ msgstr ""
 msgid "re-enter password"
 msgstr ""
 
-#: templates/selfrego/accordion.templ Line:44
+#: templates/selfrego/accordion.templ Line:48
 #, fuzzy
 msgid "valid until"
 msgstr "Invalid Date"
@@ -6559,7 +6564,7 @@ msgstr "Personal Details"
 #: templates/personrequest/access/current_club_view.templ Line:25
 #: Line:128
 msgid "Requesting Club Details"
-msgstr "Requesting Club Details"
+msgstr "Requesting MA Details"
 
 #: templates/personrequest/access/view.templ Line:36
 #: Line:177
@@ -6568,7 +6573,7 @@ msgid "Response By"
 msgstr "Response Code"
 
 #: templates/personrequest/generic/completed.templ Line:11
-msgid "The [_1] for [_2] has been sent to [_3]"
+msgid "The [_1] [_2] has been sent to [_3]"
 msgstr ""
 
 #: templates/personrequest/access/current_club_view.templ Line:14
@@ -6967,7 +6972,7 @@ msgstr "New Registration"
 
 #: templates/registration/summary.templ Line:104
 msgid "Submit for approval"
-msgstr ""
+msgstr "Submit"
 
 #: templates/dashboards/worktasks.templ Line:276
 #: Line:323
