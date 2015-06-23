@@ -153,6 +153,7 @@ my ($Data, $previousRegos) = @_;
 				Certifications => $regoDetail->{'regCertifications'},
 				dtFrom => $regoDetail->{'dtFrom'},
 				dtTo => $regoDetail->{'dtTo'},
+				strStatus => $regoDetail->{'strStatus'},
 			};
 		}
 		
