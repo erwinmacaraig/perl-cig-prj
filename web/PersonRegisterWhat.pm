@@ -45,6 +45,8 @@ sub displayPersonRegisterWhat   {
     my $defaultEntityRole= param('dentityrole') || '';
     my $defaultNature= param('dnat') || '';
     my $defaultLevel= param('dlevel') || '';
+    my $itc = param('itc') || '';
+    my $preqtype = param('preqtype') || '';
 
     my $systemConfig = getSystemConfig($Data);
 
@@ -70,6 +72,8 @@ sub displayPersonRegisterWhat   {
         ClientID => getLastEntityID($Data->{'clientValues'}) || 0,
         ClientLevel => getLastEntityLevel($Data->{'clientValues'}) || 0,
         AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
+        itc => $itc,
+        preqtype => $preqtype,
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
@@ -151,6 +155,8 @@ sub optionsPersonRegisterWhat {
         $etype,
         $currentLevel,
         $currentEntityID,
+        $itc,
+        $preqtype,
     ) = @_;
     $bulk ||= 0;
 
@@ -451,6 +457,16 @@ sub optionsPersonRegisterWhat {
             if(defined $registrationNature and $registrationNature) {
                 $MATRIXwhere .= qq[ AND strRegistrationNature = ? ];
                 push @MATRIXvalues, $registrationNature;
+            }
+
+            my $internationalTransfer = ($itc and $preqtype eq $Defs::PERSON_REQUEST_TRANSFER) ? 1 : 0;
+            my $internationalLoan = ($itc and $preqtype eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0;
+
+            if($internationalLoan == 1) {
+                $MATRIXwhere .= qq[ AND intUseForInternationalLoan = 1 ];
+            }
+            elsif($internationalTransfer == 1) {
+                $MATRIXwhere .= qq[ AND intUseForInternationalTransfer = 1 ];
             }
 
             $Data->{'Realm'} = $Data->{'Realm'} || $realmID;
