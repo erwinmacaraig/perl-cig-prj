@@ -25,16 +25,16 @@ use Data::Dumper;
 				    NP.dtTo > '1900-01-01'
 				    AND NP.dtTo < DATE(NOW())
 			    )
-			    OR
-			    (
-				    PR.dtTo > '1900-01-01'
-				    AND PR.dtTo < DATE(NOW())
-			    )
 		    )
             AND PR.strStatus = 'ACTIVE'
-            AND intOnLoan=0
     ];
 
+			    #OR
+			    #(
+				#    PR.dtTo > '1900-01-01'
+				#    AND PR.dtTo < DATE(NOW())
+                #    AND intOnLoan=0
+			    #)
     my $q = $db->prepare($st);
     $q->execute(
         $Defs::PERSONREGO_STATUS_PASSIVE
