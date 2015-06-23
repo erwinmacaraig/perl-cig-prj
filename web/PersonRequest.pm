@@ -1382,7 +1382,8 @@ sub setRequestResponse {
         #print STDERR Dumper $request;
         my $templateFile = "";
         $title = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}) . ' - ' . $Data->{'lang'}->txt($requestResponseSuffix);
-        my $notifDetails = $Data->{'lang'}->txt("You have [_1] the [_2] of [_3] [_4]." . lc($Data->{'lang'}->txt($requestResponseSuffix)), $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}), $request->{'strLocalFirstname'}, $request->{'strLocalSurname'});
+        
+        my $notifDetails = $Data->{'lang'}->txt("You have [_1] the [_2] of [_3] [_4]." , lc($Data->{'lang'}->txt($requestResponseSuffix)), $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}}), $request->{'strLocalFirstname'}, $request->{'strLocalSurname'});
 
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -1573,7 +1574,7 @@ sub getRequests {
             p.strRegionOfBirth,
             p.strPhoneHome,
             p.strEmail,
-		    TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
+	    TIMESTAMPDIFF(YEAR, p.dtDOB, CURDATE()) as currentAge,
             ef.strLocalName as requestFrom,
             ef.strDiscipline as requestFromDiscipline,
             ef.strISOCountry as requestFromISOCountry,
@@ -1583,7 +1584,6 @@ sub getRequests {
             ef.strPostalCode as requestFromPostal,
             ef.strRegion as requestFromRegion,
             ef.strPhone as requestFromPhone,
-
             et.strLocalName as requestTo,
             et.strDiscipline as requestToDiscipline,
             et.strISOCountry as requestToISOCountry,
@@ -1593,11 +1593,9 @@ sub getRequests {
             et.strPostalCode as requestToPostal,
             et.strRegion as requestToRegion,
             et.strPhone as requestToPhone,
-
             erb.strLocalName as responseBy,
             pr.intPersonRegistrationID,
             pr.strStatus as personRegoStatus,
-
             realm.strRealmName
         FROM
             tblPersonRequest pq
@@ -1620,8 +1618,6 @@ sub getRequests {
 
     my @personRequests = ();
     return (\@personRequests) if (! $where);
-
-
 
     my $db = $Data->{'db'};
     my $q = $db->prepare($st);

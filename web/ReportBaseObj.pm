@@ -108,12 +108,14 @@ sub displayOptions {
 
 sub runReport {
   my $self = shift;
+    my $maxRows = 30000;
   my ($sql, $continue, $msg) = $self->makeSQL();
 	warn $sql;
 	return ($msg , $continue) if !$continue;
 	return ('',1) if !$sql;
 	my $output_array = undef;
     my @OutputArray=();
+    my @DataArray=();
 	if($self->{'Config'}{'DataFromFunction'})	{
 		my ($module, $fnname)  = $self->{'Config'}{'DataFromFunction'} =~/(.*)::(.*)/;
 		if($module)	{
@@ -125,11 +127,17 @@ sub runReport {
         
 	}
 	else	{
-        my @DataArray=();
+        $self->{'RunParams'}{'TooManyRows'} = 0;
 		$self->runQuery($sql, \@DataArray);
-		#print STDERR $sql;
 		$output_array = $self->processData(\@DataArray); #, \@OutputArray);
-        undef @DataArray;
+        #if(scalar(@DataArray)  > $maxRows) {
+         if(scalar(@{$output_array})  > $maxRows) {
+            $output_array = [];
+            $self->{'RunParams'}{'TooManyRows'} = 1;
+        }
+        else    {
+        }
+        
 	}
 	if($self->{'Config'}{'ProcessReturnDataFunction'})	{
 
@@ -141,9 +149,10 @@ sub runReport {
 		return ($retdata, 1);
 	}
 	return $output_array if $self->{'FormParams'}{'ReturnData'};
-  my $formatted = $self->formatOutput($output_array);
+    my $formatted = $self->formatOutput($output_array);
     undef $output_array;
     undef @OutputArray;
+    undef @DataArray;
 #use PDF::FromHTML;
  #my $pdf = PDF::FromHTML->new( encoding => 'utf-8' );
 #$pdf->load_file(\$formatted);
@@ -179,7 +188,9 @@ sub deliverReport {
 	)	{
 		#Deliver by email
 
-		my $sendoutput = $self->sendDataByEmail($reportoutput);
+        if (! $self->{'RunParams'}{'TooManyRows'})    {
+		    my $sendoutput = $self->sendDataByEmail($reportoutput);
+        }
 		$output = runTemplate(
 			$self->{'Data'},
 			{
@@ -191,6 +202,7 @@ sub deliverReport {
 				Totals => $self->{'RunParams'}{'Totals'},
 				GroupField => $self->{'RunParams'}{'GroupBy'},
 				Email => $self->{'RunParams'}{'SendToEmail'},
+                TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
 			},
 			"reports/email_confirmation.templ",
 		);
@@ -256,6 +268,7 @@ sub formatOutput {
 			Summarise => $self->{'RunParams'}{'Summarise'} || 0,
 			Options => $self->{'OtherOptions'},
             LimitView => $self->{'Config'}{'Config'}{'limitView'} || 0,
+            TooManyRows => $self->{'RunParams'}{'TooManyRows'} || 0,
     },
     "reports/$templatename.templ",
   );

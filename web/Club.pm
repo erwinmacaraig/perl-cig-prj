@@ -38,7 +38,9 @@ use PersonLanguages;
 
 use ClubFlow;
 use ListAuditLog;
-
+use Flow_DisplayFields;
+use EntityFieldsSetup;
+use FieldLabels;
 
 sub handleClub  {
   my ($action, $Data, $parentID, $clubID, $typeID)=@_;
@@ -52,8 +54,12 @@ sub handleClub  {
   }
   elsif ($action =~/^C_DT/) {
     #Club Details
-      ($resultHTML,$title)=club_details($action, $Data, $clubID);
+    ($resultHTML,$title)=club_details($action, $Data, $clubID);
   }
+   elsif ($action =~/^C_VW/) {
+     #Club Details
+     ($resultHTML,$title)=view_pending_club_details($action, $Data, $clubID);
+   }
   elsif ($action =~/C_CFG_/) {
     #Club Configuration
   }
@@ -82,7 +88,43 @@ sub handleClub  {
   return ($resultHTML,$title);
 }
 
+ sub view_pending_club_details {
+     my ($action, $Data, $clubID)=@_;
+     my $client = $Data->{'client'};
+     my $entityObj = new EntityObj(db => $Data->{'db'}, ID => $clubID, cache => $Data->{'cache'});
+     $entityObj->load();
+     my $values = {};
+     my $fields = EntityEdit::getFieldNames();
+     if($entityObj->ID())    {
+         for my $f (@{$fields}) {
+             $values->{$f} = $entityObj->getValue($f);
+         }
+     }
+     my $body;
+     my $permissionType = 'Entity';
+     my $fieldset = undef;
+     $permissionType = 'Club';
+     my @sections = ('core', 'contactdetails','roledetails');
+        
+     $fieldset = clubFieldsSetup($Data, $values);
+        for my $section (@sections) {
+            my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$section}, $permissionType,);
+            my $obj = new Flow_DisplayFields(
+              Data => $Data,
+              Lang => $Data->{'lang'},
+              SystemConfig => $Data->{'SystemConfig'},
+              Fields => $fieldset->{$section},
+            );
+            my ($output, undef, $headJS, undef) = $obj->build($permissions,'display',1);
+              $body .= qq[
+                    $output
+            ];
+        }
+        $body = qq[ <div class="col-md-12">$body</div>];
 
+        my $pageHeading = $entityObj->name();
+        return ($body, $pageHeading);
+ }
 sub club_details  {
   my ($action, $Data, $clubID)=@_;
 
@@ -90,14 +132,14 @@ sub club_details  {
   my $field=loadClubDetails($Data->{'db'}, $clubID,$Data->{'clientValues'}{'assocID'}) || ();
   my $client=setClient($Data->{'clientValues'}) || '';
 
-  #my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
-  my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
+  my $allowedit =( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
+  #my $allowedit =($field->{strStatus} eq 'ACTIVE' ? 1 : 0);
   my $allowadd = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ZONE ? 1 : 0;
 
     $Data->{'ReadOnlyLogin'} ? $allowedit = 0 : undef;
 
     my $option='display';
-
+      
    $option='edit' if $action eq 'C_DTE' and allowedAction($Data, 'c_e') && $allowedit;
    $option='add' if $action eq 'C_DTA' and allowedAction($Data, 'c_a')  && $allowadd;
    $clubID=0 if $option eq 'add';
@@ -203,11 +245,11 @@ sub club_details  {
 
         ];
     }
-
+    my $countries = Countries::getISOCountriesHash();
   my %FieldDefinitions=(
     fields=>  {
       strFIFAID => {
-        label => 'FIFA ID',
+        label => $Data->{'lang'}->txt('FIFA ID'),
         value => $field->{strFIFAID} || ' ',
         type  => 'text',
         size  => '40',
@@ -215,7 +257,7 @@ sub club_details  {
 
       },
       strLocalName => {
-        label => 'Organisation Name',
+        label => $Data->{'lang'}->txt('Organisation Name'),
         value => $field->{strLocalName},
         type  => 'text',
         size  => '40',
@@ -223,28 +265,28 @@ sub club_details  {
         compulsory => 1,
       },
       strLocalShortName => {
-        label => 'Organisation Short Name',
+        label => $Data->{'lang'}->txt('Organisation Short Name'),
         value => $field->{strLocalShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strLatinName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? $Data->{'lang'}->txt('International Organisation Name') : '',
         value => $field->{strLatinName},
         type  => 'text',
         size  => '40',
         maxsize => '150',
       },
       strLatinShortName => {
-        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? 'International Organisation Short Name' : '',
+        label => $Data->{'SystemConfig'}{'entity_strLatinNames'} ? $Data->{'lang'}->txt('International Organisation Short Name') : '',
         value => $field->{strLatinShortName},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strMAID => {
-      	label => 'MA Organisation ID',
+      	label => $Data->{'lang'}->txt('MA Organisation ID'),
       	value => $field->{strMAID},
       	type => 'text',
       	size => '30',
@@ -252,7 +294,7 @@ sub club_details  {
         compulsory => 1,
       },
       dtFrom => {
-        label       => 'Organisation Foundation Date',
+        label       => $Data->{'lang'}->txt('Organisation Foundation Date'),
         value       => $field->{dtFrom},
         type        => 'date',
         datetype    => 'dropdown',
@@ -261,7 +303,7 @@ sub club_details  {
         compulsory => 1,
       },
       dtTo => {
-        label       => 'Organisation Dissolution Date',
+        label       => $Data->{'lang'}->txt('Organisation Dissolution Date'),
         value       => $field->{dtTo},
         type        => 'date',
         datetype    => 'dropdown',
@@ -270,29 +312,29 @@ sub club_details  {
         readonly    => $dissDateReadOnly,
       },
       strGender => {
-          label => "Gender",
+          label => $Data->{'lang'}->txt("Gender"),
           value => $field->{strGender},
           type  => 'lookup',
           options => \%Defs::genderEntityInfo,
-          firstoption => [ '', 'Select Type' ],
+          firstoption => [ '', $Data->{'lang'}->txt('Select Type') ],
       },
       strDiscipline => {
-      	 label => "Sport",
+      	 label => $Data->{'lang'}->txt("Sport"),
       	 value => $field->{strDiscipline},
          type  => 'lookup',
          options => \%Defs::entitySportType,
-         firstoption => [ '', 'Select Type' ],
+         firstoption => [ '', $Data->{'lang'}->txt('Select Type') ],
       },
       intLegalTypeID => {
-        label => "Type of Legal Entity",
+        label => $Data->{'lang'}->txt("Type of Legal Entity"),
         value => $field->{intLegalTypeID},
         type => 'lookup',
         options => \%legalTypeOptions,
-        firstoption => [ '', 'Select Type' ],
+        firstoption => [ '', $Data->{'lang'}->txt('Select Type') ],
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),       
      },
      strLegalID => {
-        label => "Legal Type Identification Number",
+        label =>$Data->{'lang'}->txt( "Legal Type Identification Number"),
         value => $field->{strLegalID},
         type  => 'text',
         size  => '30',
@@ -300,15 +342,15 @@ sub club_details  {
         compulsory => 1,
       },
       strEntityType => {
-        label => "Entity Type",
+        label => $Data->{'lang'}->txt("Entity Type"),
         value => $field->{strEntityType},
         type => 'lookup',
-        options => \%Defs::clubLevelSubtype,
-        firstoption => [ '', 'Hello' ],
+        options => \%Defs::entityType,
+        firstoption => [ '', $Data->{'lang'}->txt('Select Type') ],
         compulsory => 1,
      },
       strStatus => {
-          label => 'Status',
+          label => $Data->{'lang'}->txt('Status'),
           value => $field->{strStatus},
           type => 'lookup',
           options => \%Defs::entityStatus,
@@ -316,7 +358,7 @@ sub club_details  {
           noadd         => 1,
      },
       strContact => {
-        label => 'Contact Person',
+        label => $Data->{'lang'}->txt('Contact Person'),
         value => $field->{strContact},
         type  => 'text',
         size  => '30',
@@ -331,7 +373,7 @@ sub club_details  {
       },
         
       strAddress => {
-        label => 'Address 1',
+        label => $Data->{'lang'}->txt('Address 1'),
         value => $field->{strAddress},
         type  => 'text',
         size  => '40',
@@ -339,7 +381,7 @@ sub club_details  {
         compulsory => 1,
       },
     strAddress2=> {
-        label => 'Address 2',
+        label => $Data->{'lang'}->txt('Address 2'),
         value => $field->{strAddress2},
         type  => 'text',
         size  => '40',
@@ -347,15 +389,15 @@ sub club_details  {
         compulsory => 1,
       },
       strContactISOCountry => {
-          label       => 'Country of Address',
+          label       => $Data->{'lang'}->txt('Country of Address'),
           value       => $field->{strContactISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
-          options     => \%Mcountriesonly,
-          firstoption => [ '', 'Select Country' ],
+          options     => $countries,
+          firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
         compulsory => 1,
       },
       strContactCity=> {
-        label => 'City',
+        label => $Data->{'lang'}->txt('City'),
         value => $field->{strContactCity},
         type  => 'text',
         size  => '40',
@@ -364,7 +406,7 @@ sub club_details  {
       },
 
       strCity=> {
-        label => 'City',
+        label => $Data->{'lang'}->txt('City'),
         value => $field->{strCity},
         type  => 'text',
         size  => '40',
@@ -372,7 +414,7 @@ sub club_details  {
         compulsory => 1,
       },
       strState => {
-        label => 'State of Organisation',
+        label => $Data->{'lang'}->txt('State of Organisation'),
         value => $field->{strState},
         type  => 'text',
         size  => '30',
@@ -380,7 +422,7 @@ sub club_details  {
         compulsory => 1,
       },
       strTown => {
-        label => 'Town of Organisation',
+        label => $Data->{'lang'}->txt('Town of Organisation'),
         value => $field->{strTown},
         type  => 'text',
         size  => '30',
@@ -388,38 +430,38 @@ sub club_details  {
         compulsory => 1,
       },
       strRegion => {
-        label => 'Region of Organisation',
+        label => $Data->{'lang'}->txt('Region of Organisation'),
         value => $field->{strRegion},
         type  => 'text',
         size  => '30',
         maxsize => '50',
       },
       strISOCountry => {
-          label       => 'Country of Organisation',
+          label       => $Data->{'lang'}->txt('Country of Organisation'),
           value       => $field->{strISOCountry} ||  $Data->{'SystemConfig'}{'DefaultCountry'} || '',
           type        => 'lookup',
-          options     => \%Mcountriesonly,
-          firstoption => [ '', 'Select Country' ],
+          options     => $countries,
+          firstoption => [ '', $Data->{'lang'}->txt('Select Country') ],
         compulsory => 1,
       },
       intLocalLanguage => {
-          label       => 'Language the name is written in',
+          label       => $Data->{'lang'}->txt('Language the name is written in'),
           type        => 'lookup',
           value       => $field->{intLocalLanguage},
           options     => \%languageOptions,
-          firstoption => [ '', 'Select Language' ],
+          firstoption => [ '', $Data->{'lang'}->txt('Select Language') ],
           compulsory => 1,
           posttext => $nonlatinscript,
       },
       strPostalCode => {
-        label => 'Postcode',
+        label => $Data->{'lang'}->txt('Postcode'),
         value => $field->{strPostalCode},
         type  => 'text',
         size  => '15',
         maxsize => '15',
       },
       strPhone => {
-        label => 'Contact Number',
+        label => $Data->{'lang'}->txt('Contact Number'),
         value => $field->{strPhone},
         type  => 'text',
         size  => '20',
@@ -433,7 +475,7 @@ sub club_details  {
         maxsize => '20',
       },
       strEmail => {
-        label => 'Contact Email',
+        label => $Data->{'lang'}->txt('Contact Email'),
         value => $field->{strEmail},
         type  => 'text',
         size  => '35',
@@ -441,7 +483,7 @@ sub club_details  {
         validate => 'EMAIL',
       },
       strMANotes => {
-      	label => 'MA Comment',
+      	label => $Data->{'lang'}->txt('MA Comment'),
       	value => $field->{strMANotes},
         type => 'textarea',
         rows => '10',
@@ -449,28 +491,28 @@ sub club_details  {
         readonly =>($Data->{'clientValues'}{authLevel} < $Defs::LEVEL_NATIONAL),
       },
       strAssocNature => {
-      	label => 'Association Nature',
+      	label => $Data->{'lang'}->txt('Association Nature'),
       	value => $field->{strAssocNature},
         type => 'text',
         size => 40,
         compulsory => 1,
       },
       strWebURL => {
-        label => 'Web',
+        label => $Data->{'lang'}->txt('Web'),
         value => $field->{strWebURL},
         type  => 'text',
         size  => '35',
         maxsize => '250',
       },
       strShortNotes => {
-        label => 'Notes',
+        label => $Data->{'lang'}->txt('Notes'),
         value => $field->{strShortNotes},
         type => 'textarea',
         rows => '10',
         cols => '40',
       },
       intNotifications => {
-        label => "Notifications",
+        label => $Data->{'lang'}->txt("Notifications"),
         value => $field->{intNotifications},
         type => 'lookup',
         options => \%Defs::notificationToggle,
@@ -479,7 +521,7 @@ sub club_details  {
         type =>'_SPACE_',
       },
       clubcharacteristics => {
-        label => 'Which of the following are appropriate to your club?',
+        label => $Data->{'lang'}->txt('Which of the following are appropriate to your club?'),
         value => $club_chars,
         type  => 'htmlblock',
         sectionname => 'clubdetails',
@@ -578,6 +620,7 @@ sub club_details  {
     carryfields =>  {
       client => $client,
       a=> $action,
+      clubID => $clubID
     },
   );
   my $fieldperms=$Data->{'Permissions'};
@@ -594,11 +637,12 @@ my $resultHTML='' ;
   my $scMenu = '';#(allowedAction($Data, 'c_e')) ? getServicesContactsMenu($Data, $Defs::LEVEL_CLUB, $clubID, $Defs::SC_MENU_SHORT, $Defs::SC_MENU_CURRENT_OPTION_DETAILS) : '';
   my $logodisplay = '';
   my $editlink = (allowedAction($Data, 'c_e')) ? 1 : 0;
+  #( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );#
   if($option eq 'display')  {
 #    $resultHTML .= showContacts($Data,0, $editlink);
     my $chgoptions='';
-    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if allowedAction($Data, 'c_e');
-
+    $chgoptions.=qq[<span class = "btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DTE&clubID=$clubID">Edit $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}</a></span>] if ( ($field->{strStatus} eq 'ACTIVE' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) ); #allowedAction($Data, 'c_e');
+    #
     $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
     $title=$chgoptions.$title;
     $logodisplay = showLogo(
@@ -644,15 +688,15 @@ sub loadClubDetails {
      strLatinShortName,
      strLatinFacilityName,
      strISOCountry,
-    strContactISOCountry,
-      strContact,
+     strContactISOCountry,
+     strContact,
      strContactCity,
      intLocalLanguage,
      strRegion,
      strPostalCode,
      strTown,
-    strState,
-        strCity,
+     strState,
+     strCity,
      strAddress,
      strAddress2,
      strWebURL,
@@ -792,7 +836,7 @@ sub postClubUpdate {
       \%clubchars,
     );
   }
-
+    
   $Data->{'cache'}->delete('swm',"ClubObj-$clubID") if $Data->{'cache'};
   ### Change strStatus to DE-REGISTERED When Dissolution date is less than current date ###
   resetStatus($clubID,$db);

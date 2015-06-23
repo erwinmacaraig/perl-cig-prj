@@ -71,6 +71,7 @@ sub showHome {
 	my $registrationHist = '';
 	my $transactions = '';
 	#
+    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	foreach my $person (@{$people}){
 		$count++;
 		$documents = getUploadedSelfRegoDocuments($Data,$person->{'intPersonID'});
@@ -83,11 +84,11 @@ sub showHome {
 			Documents => $documents,
 			History => $registrationHist,
 			Transactions => $transactions,
+            selfRegoMatrixOptions => $selfRegoMatrixOptions,
 		},
 		'selfrego/accordion.templ',		
 		 );
 	}
-    my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	
     my $resultHTML = runTemplate(
         $Data,
@@ -238,6 +239,7 @@ sub getPreviousRegos {
             P.strStatus as PersonStatus,
             PR.strStatus as RegistrationStatus,
             PR.dtTo as PRdtTo,
+            P.strNationalNum,
             NP.strNationalPeriodName,
             NP.dtTo as NPdtTo,
             NP.dtFrom as NPdtFrom,
@@ -295,6 +297,7 @@ sub getPreviousRegos {
                 dtDOB => $dref->{'dtDOB'} || '',
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
+                NationalNum => $dref->{'strNationalNum'},
             };
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';

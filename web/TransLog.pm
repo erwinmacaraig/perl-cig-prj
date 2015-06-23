@@ -146,7 +146,7 @@ sub resolveHoldPayment  {
     if ($resolveStatus == $Defs::TXNLOG_FAILED) {
         my $st = qq[
             UPDATE tblTransactions
-            SET intStatus = 0, intTransLogID = 0, dtPaid = NULL
+            SET intStatus = 0, intTransLogID = 0, dtPaid = NULL, intPaymentGatewayResponded=1
             WHERE intTransLogID = ?
         ];
         my $query = $Data->{'db'}->prepare($st);
@@ -518,12 +518,14 @@ EOS
 
    auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
    my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
-	return (qq[ $resultHTML
-		<br>
+	$resultHTML .= qq[
 		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
-	<br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
+    ] if ($success == $Defs::TXNLOG_SUCCESS);
+	$resultHTML .= qq[
+	    <br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
+    ];
 
-	], '');		
+	return ($resultHTML, '');		
 }
 
 sub getTransList {
