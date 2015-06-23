@@ -20,6 +20,7 @@ use Reg_common;
 use Utils;
 use L10n::DateFormat;
 use L10n::CurrencyFormat;
+use Data::Dumper;
 
 sub getSelfRegoMatrixOptions    {
 

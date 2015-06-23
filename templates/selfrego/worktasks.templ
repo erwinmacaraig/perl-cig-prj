@@ -1,0 +1,174 @@
+[% IF FlashMessage.flash.type %]
+<div class="col-md-12">
+    <div class="alert alert-warning" role="alert">
+        <div>
+        [% IF FlashMessage.flash.type == 'success' %]
+            <span class="fa flash_success fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% ELSIF FlashMessage.flash.type == 'error' %]
+            <span class="fa flash_error fa-exclamation"></span>
+            <p>[% FlashMessage.flash.message %]</p>
+        [% END %]
+        <br/>
+        </div>
+    </div>
+</div>
+[% END %]
+
+
+[% IF Notifications.size %]
+    <div class="col-md-9">
+        <div class="alert alert-info" role="alert">
+            <ul>
+            [% FOREACH message IN Notifications %]
+                <li>[% message.value %]</li>
+            [% END %]
+            </ul>
+        </div>
+    </div>
+[% END %]
+
+<div class="col-md-12 tasklist-content dashboard-tasklist">
+	<table id="worktasks" cellpadding="5" width="100%">
+		<thead>
+			<tr class="box-header">
+				<th>[% Lang.txt('Tasklist') %] [% IF TaskCounts.newTasks %]<div class="taskListCounter">[% TaskCounts.newTasks %]</div>[% END %]</th>
+				<th>[% Lang.txt('Started') %]</th>
+				<th>[% Lang.txt('Status') %]</th>
+				<th>[% Lang.txt('Actions') %]</th>
+			</tr>
+			<tr style="display: none" class="box-header">
+				<th>[% Lang.txt('Tasklist') %]</th>
+				<th>[% Lang.txt('Started') %]</th>
+				<th>[% Lang.txt('Status') %]</th>
+				<th>[% Lang.txt('Actions') %]</th>
+			</tr>
+
+		</thead>
+		<tbody>
+		    [% FOREACH task IN TaskList %]
+                <tr class="task-list [% IF task.newTask %]new-task[% END %]">
+                    [% IF task.TaskType == 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.personRequestLabel %]<br/>
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] [% Lang.txt('has requested a transfer for') %] [% task.Name %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'LOAN' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.personRequestLabel %]<br/>
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] [% Lang.txt('has requested a player loan for') %] [% task.Name %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'ACCESS' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.personRequestLabel %]<br/>
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% task.requestTo %] [% Lang.txt('has accepted request for') %] [% task.Name %]
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% task.requestFrom %] [% Lang.txt('has requested access for') %] [% task.Name %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature == 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% Lang.txt('Review Transfer of') %] [% task.Name %]<br/>
+                            From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            [% IF task.changeLevelDescription %]
+                                [% task.changeLevelDescription %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND (task.RegistrationNature == 'DOMESTIC_LOAN' OR task.RegistrationNature == 'INTERNATIONAL_LOAN') %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% Lang.txt('Review Player loan of') %] [% task.Name %]<br/>
+                            From [% task.RequestToClub %] to [% task.RequestFromClub %]<br/>
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'REGO' AND task.RegistrationNature != 'TRANSFER' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]<br/>
+                            [% task.LocalEntityName %]
+                            [% IF task.changeLevelDescription %]
+                                <br/>[% task.changeLevelDescription %]
+                            [% END %]
+                            [% IF task.InternationalTransferDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalTransferDescription %]
+                            [% END %]
+                            [% IF task.InternationalLoanDescription AND task.NewBaseRecord %]
+                                <br/>[% task.InternationalLoanDescription %]
+                            [% END %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'ENTITY' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]
+                            </div>
+                        </td>
+                    [% ELSIF task.TaskType == 'APPROVAL' AND task.RuleFor == 'PERSON' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span class="fa fa-user" style="float: left"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.RegistrationNatureLabel %]<br/>
+                            [% task.Name %]<br/>
+                            [% task.LocalEntityName %]
+                            </div>
+                        </td>
+		            [% ELSE %]
+                        <td><span class="fa fa-user"></span>Rego [% task.Name %]</td>
+		            [% END %]
+                    <td data-order = "[% task.taskDate_RAW %]">[% task.taskDate %]</td>
+
+                    <td><span class="fa fa-clock-o"></span>[% Lang.txt(task.TaskStatusLabel) %]</td>
+
+                    [% IF task.TaskType == 'APPROVAL' %]
+
+                        [% IF CurrentLevel == 100 OR CurrentLevel == 20 %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
+                        [% ELSE %]
+                            <td class="just-view-text"><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
+                        [% END %]
+
+                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' or task.TaskType == 'LOAN' %]
+
+                        [% IF task.currentClubView == 1 %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
+                        [% ELSE %]
+                            <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Process') %]</a></td>
+                        [% END %]
+
+                    [% ELSE %]
+                        <td></td>
+                    [% END %]
+                </tr>
+		    [% END %]
+
+		</tbody>
+	</table>
+</div>
