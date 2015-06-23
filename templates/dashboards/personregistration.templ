@@ -7,12 +7,18 @@
             <div class="panel-heading">
                 <h4 class="panel-title">
                     <a href="#panel[% index %]" data-toggle="collapse" data-parent="#accordion">
-                    [% IF entity.strLocalName %]
-                       
+                    [% IF entity.strLocalName %]                       
                             [% Lang.txt('Registered to [_1] as [_2]', entity.strLocalName, Lang.txt(entity.PersonType)) %]
-                       
+                            [% IF entity.registrationNature == 'DOMESTIC_LOAN' %]
+                             <span style="padding-left: 45px;">
+                                [% Lang.txt('Loan - Valid to ') %][% DateFormat.format(entity.dtTo,'MEDIUM') %]
+                            [% ELSIF entity.intNewBaseRecord == 1 AND entity.intInternationalLoan == 1 %]
+                                [% Lang.txt('      Loan - Valid to ') %] [% DateFormat.format(entity.dtInternationalLoanToDate,'MEDIUM') %]
+                             </span>
+                            [% END %]
                     [% END %]
                     </a>
+                    
                     <i class="indicator fa fa-chevron-right pull-right"></i>
                 </h4>
             </div>
