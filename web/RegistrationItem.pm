@@ -177,7 +177,31 @@ strItemType
             $Rego_ref->{'InternationalLoan'} || 0,
 		    $itc
 		) or query_error($st); 
-	
+
+    print STDERR "
+                \$Rego_ref->{'intPersonRegistrationID'} = $Rego_ref->{'intPersonRegistrationID'}
+                \$Data->{'Realm'} = $Data->{'Realm'}, 
+                \$Data->{'RealmSubType'}= $Data->{'RealmSubType'}, 
+                \$ruleFor = $ruleFor,
+                \$originLevel = $originLevel,
+                \$regNature = $regNature,
+                \$regNature2 = $regNature2,
+                \$Rego_ref->{'strEntityType'} = $Rego_ref->{'strEntityType'},
+                \$entityLevel = $entityLevel,
+                \$Rego_ref->{'strPersonType'} = $Rego_ref->{'strPersonType'},
+                \$Rego_ref->{'strPersonLevel'} = $Rego_ref->{'strPersonLevel'},
+                \$Rego_ref->{'strPersonEntityRole'} = $Rego_ref->{'strPersonEntityRole'},
+                \$Rego_ref->{'strSport'} = $Rego_ref->{'strSport'},
+                \$Rego_ref->{'strAgeLevel'} = $Rego_ref->{'strAgeLevel'},
+                \$itemType = $itemType, 
+                \$Rego_ref->{'Nationality'} = $Rego_ref->{'Nationality'},
+                \$Rego_ref->{'Nationality'} = $Rego_ref->{'Nationality'},
+                \$Rego_ref->{'currentAge'} = $Rego_ref->{'currentAge'},
+                \$Rego_ref->{'currentAge'} = $Rego_ref->{'currentAge'},
+                \$Rego_ref->{'InternationalTransfer'} = $Rego_ref->{'InternationalTransfer'},
+                \$Rego_ref->{'InternationalLoan'} = $Rego_ref->{'InternationalLoan'},
+                \$itc = $itc
+    ";		
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -194,7 +218,31 @@ strItemType
     push @values,$itemType;
     push @values,$Rego_ref->{'Nationality'} || '';
     push @values,$Rego_ref->{'Nationality'} || '';
-    
+    open FH, ">dumpfile2.txt";
+     print FH "
+                \$Rego_ref->{'intPersonRegistrationID'} = $Rego_ref->{'intPersonRegistrationID'}
+                \$Data->{'Realm'} = $Data->{'Realm'}, 
+                \$Data->{'RealmSubType'}= $Data->{'RealmSubType'}, 
+                \$ruleFor = $ruleFor,
+                \$originLevel = $originLevel,
+                \$regNature = $regNature,
+                \$regNature2 = $regNature2,
+                \$Rego_ref->{'strEntityType'} = $Rego_ref->{'strEntityType'},
+                \$entityLevel = $entityLevel,
+                \$Rego_ref->{'strPersonType'} = $Rego_ref->{'strPersonType'},
+                \$Rego_ref->{'strPersonLevel'} = $Rego_ref->{'strPersonLevel'},
+                \$Rego_ref->{'strPersonEntityRole'} = $Rego_ref->{'strPersonEntityRole'},
+                \$Rego_ref->{'strSport'} = $Rego_ref->{'strSport'},
+                \$Rego_ref->{'strAgeLevel'} = $Rego_ref->{'strAgeLevel'},
+                \$itemType = $itemType, 
+                \$Rego_ref->{'Nationality'} = $Rego_ref->{'Nationality'},
+                \$Rego_ref->{'Nationality'} = $Rego_ref->{'Nationality'},
+                \$Rego_ref->{'currentAge'} = $Rego_ref->{'currentAge'},
+                \$Rego_ref->{'currentAge'} = $Rego_ref->{'currentAge'},
+                \$Rego_ref->{'InternationalTransfer'} = $Rego_ref->{'InternationalTransfer'},
+                \$Rego_ref->{'InternationalLoan'} = $Rego_ref->{'InternationalLoan'},
+                \$itc = $itc \n
+    ";  
     my @Items=();
     while (my $dref = $q->fetchrow_hashref())   {
         next if($itemType eq 'DOCUMENT' and $documentFor and ($documentFor ne $dref->{'strDocumentFor'}));
@@ -237,6 +285,7 @@ strItemType
             $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
+        print FH Dumper(\%Item);
         push @Items, \%Item;
     }
     return \@Items;
