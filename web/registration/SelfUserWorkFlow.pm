@@ -53,7 +53,7 @@ sub handleSelfUserWorkFlow {
                     }
                     else {
                         $Data->{'RedirectTo'} = "$Defs::base_url/registration/" . $Data->{'target'} . "?a=WF_PR_S&TID=$WFTaskID";
-                        my ($body, $title) = redirectTemplate($Data);
+                        my ($body, $title) = WorkFlow::redirectTemplate($Data);
                         return ($body, $title);
                     }
                 }
