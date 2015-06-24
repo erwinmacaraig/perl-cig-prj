@@ -99,6 +99,7 @@ sub rolloverExistingPersonRegistrations {
 
     my ($Data, $personID, $personRegistrationID) = @_;
 
+    return if (! $personID or ! $personRegistrationID);
     my %Reg = (
         personRegistrationID=> $personRegistrationID || 0,
     );

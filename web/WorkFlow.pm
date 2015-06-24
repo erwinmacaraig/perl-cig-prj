@@ -118,7 +118,10 @@ sub checkRulePaymentFlagActions {
                         intPersonID = ?
                         AND intEntityID = ?
                         AND intPersonRegistrationID = ?
-                        AND strStatus = 'PENDING'
+                        AND (
+                            strStatus = 'PENDING'
+                            OR (strStatus = 'ACTIVE' and dtApproved = '0000-00-00 00:00:00')
+                        )
                         AND intPaymentRequired=0
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);

@@ -1793,7 +1793,7 @@ sub viewTransLog	{
                                         readonly => '1',
                                 },
                                 dtLog=> {
-                                        label => 'Date Paid',
+                                        label => ($TLref->{'intStatus'} == $Defs::TXNLOG_SUCCESS) ? 'Date Paid' : 'Date Attempted',
                                         value => $Data->{'l10n'}{'date'}->TZformat($TLref->{'dtLog'},'MEDIUM','SHORT'),
                                         readonly => '1',
                                 },
