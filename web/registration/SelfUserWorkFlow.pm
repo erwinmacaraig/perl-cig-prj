@@ -242,10 +242,10 @@ sub listTasks {
     $body = runTemplate(
         $Data,
         \%TemplateData,
-        'dashboards/worktasks.templ',
+        'selfrego/worktasks.templ',
     );
 
-    return ($body, $Data->{'lang'}->txt('Dashboard'));
+    return ($body, $Data->{'lang'}->txt('Work Tasks'));
 
 }
 
