@@ -291,17 +291,17 @@ sub listPendingRegistrations    {
     $query = $Data->{db}->prepare($st);
     $query->execute( $entityID, $Data->{Realm} );
     while (my $dref = $query->fetchrow_hashref) {
-        print STDERR Dumper $dref;
         $tempClientValues{currentLevel} = $dref->{intEntityLevel};
         setClientValue(\%tempClientValues, $dref->{intEntityLevel}, $dref->{intEntityID});
         my $tempClient = setClient(\%tempClientValues);
         switch($dref->{intEntityLevel}){
         	case -47 {
-        		$tempaction = "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=".$dref->{intEntityID};
+        		#$tempaction = "$Data->{'target'}?client=$client&amp;a=VENUE_DTE&amp;venueID=".$dref->{intEntityID};
+        		$tempaction = "$Data->{'target'}?client=$client&amp;a=FE_D&amp;venueID=".$dref->{intEntityID};
         	}
         	case 3 {
         		#$tempaction = "$Data->{'target'}?client=$tempClient&amp;a=C_DTE"; -> enable to set your entity level to 3 which is Club level
-        		$tempaction = "$Data->{'target'}?client=$client&amp;a=C_DTE"; # used this one for having the original entity level
+        		$tempaction = "$Data->{'target'}?client=$client&amp;a=C_VW&amp;clubID=".$dref->{'intEntityID'}; # used this one for having the original entity level
         		 
         	}
         }

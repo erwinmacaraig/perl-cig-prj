@@ -28,7 +28,7 @@ sub handleFacilityEdit {
     my $e_action = param('e_a') || '';
     my $back_screen = param('bscrn') || '';
     my $entityID = param('venueID') || 0;
-	
+    my $venueStatus;	
     if(!doesUserHaveEntityAccess($Data, $entityID,'WRITE')) {
         return ('Invalid User',0);
     }
@@ -45,12 +45,29 @@ sub handleFacilityEdit {
         }
     }
 
+    
+    
     my $fieldset = undef;
     my @sections = ('core', 'contactdetails','roledetails');
-    if($action eq 'FE_D')   {
-        $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=core&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
-        $values->{'footer-contactdetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=contactdetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
-        $values->{'footer-roledetails'} = qq[<div class = "fieldSectionGroupFooter"><a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=roledetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a></div>];
+    if($action eq 'FE_D')   {    
+        my $q = qq[ SELECT strStatus FROM tblEntity WHERE intEntityID = ? AND intEntityLevel = $Defs::LEVEL_VENUE AND intRealmID = ? ];
+        my $sth = $Data->{'db'}->prepare($q);
+        $sth->execute($entityID, $Data->{'Realm'});
+        my $dref = $sth->fetchrow_hashref();
+        $venueStatus = $dref->{'strStatus'};
+        my $allowEditCoreLink;
+        my $allowEditContactDetailsLink;
+        my $allowEditRoleDetailsLink;
+        if($venueStatus eq 'ACTIVE'){
+            $allowEditCoreLink  =  qq [<a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=core&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a>];
+        
+            $allowEditContactDetailsLink = qq[<a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=contactdetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a>];
+        
+            $allowEditRoleDetailsLink = qq[<a href = "$Data->{'target'}?client=$Data->{'client'}&a=FE_E&e_a=roledetails&amp;venueID=$entityID">].$Data->{'lang'}->txt('edit').qq[</a>];
+        }
+        $values->{'footer-core'} = qq[<div class = "fieldSectionGroupFooter"> $allowEditCoreLink </div>];
+        $values->{'footer-contactdetails'} = qq[<div class = "fieldSectionGroupFooter">$allowEditContactDetailsLink</div>];
+        $values->{'footer-roledetails'} = qq[<div class = "fieldSectionGroupFooter">$allowEditRoleDetailsLink</div>];
     }
     $fieldset = facilityFieldsSetup($Data, $values);
     if(!scalar(@sections))  {
@@ -135,8 +152,8 @@ sub handleFacilityEdit {
             </form>
         ];
     }
-    if($action eq 'FE_D')    {
-        for my $section (@sections) {
+    if($action eq 'FE_D')    { 
+       for my $section (@sections) {
             my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$section}, 'Entity',);
             my $obj = new Flow_DisplayFields(
               Data => $Data,
@@ -161,19 +178,18 @@ sub handleFacilityEdit {
 	    ); 
         my $fields_summary = runTemplate($Data,\%templateData,'entity/venue_fields_summary.templ');
         if($fields_summary) {
-            
+            my $controls = qq[<a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add</a> |
+                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPD&amp;venueID=$entityID">delete</a>] if($venueStatus eq 'ACTIVE');
             $body .= qq[
                 <div class="fieldSectiopGroupWrapper fieldSectionGroupWrapper-DisplayOnly">
                     <h3 class="panel-header sectionheader">].$Data->{'lang'}->txt('Fields') .qq[</h3>
                     <div class="panel-body fieldSectionGroup">
-                        $fields_summary
+                        $fields_summary 
                         <div class="fieldSectionGroupFooter">
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_Flist&amp;venueID=$entityID">edit</a> |
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPA&amp;venueID=$entityID">add</a> |
-                            <a href = "$Data->{'target'}?client=$client&amp;a=VENUE_FPD&amp;venueID=$entityID">delete</a>
-                        </div>
-                    </div>
-                    
+                            $controls
+                        </div>                        
+                    </div>                    
                 </div>
             ];
 
