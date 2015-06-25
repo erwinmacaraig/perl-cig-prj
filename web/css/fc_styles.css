@@ -1673,7 +1673,7 @@ span.fa-user{
 }
 
 .reg-complete-text {
-	float:left;
+	/* float:left; */
 }
 
 .reg-complete-buttons {
