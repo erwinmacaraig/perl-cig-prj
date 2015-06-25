@@ -2416,6 +2416,8 @@ sub apply_product_rules {
                        SET dtStart = $dtStart, dtEnd = $dtEnd
                        WHERE intProductID = $productID
                        AND intTransLogID = $transID
+                       AND  intTableType = $Defs::LEVEL_PERSON
+                        AND intID = $personID
                    ];
     
     
