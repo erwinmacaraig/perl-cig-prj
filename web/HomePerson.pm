@@ -70,7 +70,7 @@ sub showPersonHome	{
 		}
 
 	}
-    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1";
+        my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -328,7 +328,7 @@ sub showPersonHome	{
         if (! $rego->{'intOnLoan'} && $Data->{'SystemConfig'}{'changeLevel_' . $rego->{'strPersonType'}})  {
             $changelevel= "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1&amp;dtype=$rego->{'strPersonType'}&amp;dsport=$rego->{'strSport'}&amp;dentityrole=$rego->{'strPersonEntityRole'}&nat=NEW&dnat=NEW&amp;oldlevel=$rego->{'strPersonLevel'}";
         }
-        $rego->{'changelevel_link'} = $changelevel;
+        #$rego->{'changelevel_link'} = $changelevel;
         my $pType = $Data->{'lang'}->txt($Defs::personType{$rego->{'strPersonType'}});
         $rego->{'changelevel_button'} = $Data->{'lang'}->txt("Change [_1] Level", $pType);
 
@@ -340,22 +340,22 @@ sub showPersonHome	{
         #check PersonRequest::deactivatePlayerLoan
         $rego->{'intOnLoan'} ||= 0;
         $rego->{'existOpenLoan'} ||= 0;
-        if(
-            ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
-            or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
-            or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
+        #if(
+        #    ($rego->{'intIsLoanedOut'} == 0 and $rego->{'intOnLoan'} == 0)
+        #    or ($rego->{'intIsLoanedOut'} == 1 and $rego->{'existOpenLoan'} == 0)
+        #    or ($rego->{'intOnLoan'} == 1 and $rego->{'intOpenLoan'} == 1)) {
             $rego->{'renew_link'} = $renew;
-        }
-        else    {
-            $rego->{'renew_link'} = '';
-            $rego->{'changelevel_link'} = '';
-        }
+        #}
+        #else    {
+        #    $rego->{'renew_link'} = '';
+        #    $rego->{'changelevel_link'} = '';
+        #}
 
     }
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
-	#push @{$Reg_ref},\%reg_docs;
-	
+	#push @{$Reg_ref},\%reg_docs; $personID
+    PersonRegistration::hasPendingRegistration($Data, $personID, $Reg_ref);
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
 

@@ -15,6 +15,7 @@ require Exporter;
     checkIsSuspended
     getRegistrationDetail
     cleanPlayerPersonRegistrations
+    hasPendingRegistration
 );
 use strict;
 use lib "..",".";
@@ -1174,5 +1175,49 @@ sub getRegistrationDetail {
     }
     return (\@RegistrationDetail);
 }
-
+#
+sub hasPendingRegistration {
+    my ($Data, $personID, $existingRegos) = @_;
+    open FH, ">dumpfile.txt";
+    if(scalar @{$existingRegos}){
+        #At this point, the order in which the resultset is retrieve does not matter
+        # there is a problem when the query had Pending as its first record ???
+        my $count = 0;
+        my %renewalCtrlForRego = ();
+        foreach my $rego (@{$existingRegos}){
+            #check for sport        
+            if(!exists $renewalCtrlForRego{$rego->{'strSport'}}){
+                $renewalCtrlForRego{$rego->{'strSport'}} = {
+                    regoID => $rego->{'intPersonRegistrationID'},
+                    enableRenewButton => $rego->{'strStatus'} eq 'ACTIVE' ? 1 : 0 ,   
+                    index => $count,
+                    status => $rego->{'strStatus'},  #PENDING and una kong nakita
+                };
+            }
+            else{
+            #elsif($renewalCtrlForRego{$rego->{'strSport'}}{'status'} eq 'ACTIVE'){
+                #if($renewalCtrlForRego{$rego->{'strSport'}}{'status'} eq 'ACTIVE'){
+                    $renewalCtrlForRego{$rego->{'strSport'}}{'enableRenewButton'} = 0;  
+                    #print FH Dumper( $renewalCtrlForRego{$rego->{'strSport'}});
+                    #$existingRegos->[$renewalCtrlForRego{$rego->{'strSport'}}{'index'}]->{'renew_link'} = '';
+                    #print FH Dumper($existingRegos->[$renewalCtrlForRego{$rego->{'strSport'}}{'index'}]);
+                #}
+                
+            }
+            #else {
+            #    $rego->{'renew_link'} = '';
+            #}
+            #print FH Dumper($rego->{'renew_link'}) . "==== \n === \n";
+            
+            $count++;
+            
+        }
+         #print FH Dumper($existingRegos);
+         print FH Dumper(%renewalCtrlForRego);
+    }
+   
+    return 1;  
+    
+}
+#
 1;
