@@ -245,7 +245,7 @@ sub listTasks {
         'selfrego/worktasks.templ',
     );
 
-    return ($body, $Data->{'lang'}->txt('Work Tasks'));
+    return ($body, $Data->{'lang'}->txt('Self Registration Work Tasks'));
 
 }
 
