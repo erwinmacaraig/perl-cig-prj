@@ -286,6 +286,8 @@ sub getPreviousRegos {
     my %regos = ();
     my %found = ();
     my @people = ();
+    my %renewLinks = ();
+    my %disabledRenewalLinks = ();
     my $allowTransferShown=0;
     while(my $dref = $q->fetchrow_hashref())    {
         my $pID = $dref->{'intPersonID'} || next;
@@ -299,7 +301,18 @@ sub getPreviousRegos {
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
                 NationalNum => $dref->{'strNationalNum'},
+               
             };
+        } 
+        if(!exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}){
+            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}} = {
+                regoID => $dref->{'intPersonRegistrationID'},
+                enableRenewButton => 1,
+                nature => $dref->{'strRegistrationNature'},
+            };
+        }        
+        else{
+            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}{'enableRenewButton'} = 0;
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';
         $found{$type} = 1;
@@ -307,7 +320,7 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         $dref->{'strSportType'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'renewlink'} = '';
-		$dref->{'transferlink'} = '';
+	$dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
@@ -336,9 +349,17 @@ sub getPreviousRegos {
             }
         }
 
-        push @{$regos{$pID}}, $dref;
+        push @{$regos{$pID}}, $dref; #$renewLinks{$dref . $dref->{'strSport'} . $dref . $dref}
     }
-    
+   
+    #do some processing with regards to displaying renewal button    
+    foreach my $person (@people){
+        foreach my $r (@{$regos{$person->{'intPersonID'}}}){
+            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} == $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
+                    $r->{'renewlink'} = '';
+            }
+        }
+    }
     return (
         \%regos,
         \@people,
