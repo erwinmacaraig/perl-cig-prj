@@ -33,6 +33,7 @@ sub personAge {
     my($dateAs_y,$dateAs_m,$dateAs_d) = $dateAs =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     my($y,$m,$d) = $dob =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
     return 0 if(!$y or !$m or !$d);
+    return 0 if($y eq '0000' or $m eq '00' or $d eq '00');
     my ( $age_year, $age_month, $age_day ) = Delta_YMD( $y, $m, $d, $dateAs_y, $dateAs_m, $dateAs_d);
     $age_year-- unless (sprintf("%02d%02d",$dateAs_m,$dateAs_d) >= sprintf("%02d%02d",$m,$d));
     return $age_year || 0;
