@@ -138,7 +138,7 @@ sub main	{
   }
 
   $resultHTML ||= textMessage("An invalid Action Code has been passed to me.");
-  printBasePage($resultHTML, 'Sportzware Membership');
+  printBasePage($resultHTML, $Defs::page_title);
   disconnectDB($db);
 
 }
