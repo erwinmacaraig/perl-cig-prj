@@ -27,6 +27,7 @@ require Exporter;
     updateTaskNotes
     updateTaskScreen
     getInitialTaskAssignee
+    redirectTemplate
 );
 
 use strict;
