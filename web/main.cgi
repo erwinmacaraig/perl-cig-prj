@@ -184,6 +184,7 @@ sub main {
             ( $resultHTML, $pageHeading ) = handleWorkflow($action, \%Data) if ($action eq 'C_HOME');
         }
         else    {
+            $clubID = param('clubID') if param('clubID');
             ( $resultHTML, $pageHeading ) = handleClub( $action, \%Data, $entityID, $clubID, $typeID );
         }
     }
@@ -327,7 +328,7 @@ use LoanFlow;
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});
         ( $resultHTML, $pageHeading ) = handlePendingRegistrations($action, \%Data, $entityID, $prID);
-       # $pageHeading = $pageHeading . "entityID = " . $entityID;    
+        #$pageHeading = $pageHeading . "entityID = " . $entityID;    
     }
     elsif ( $action =~ /^INCOMPLPR_/ ) {
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});

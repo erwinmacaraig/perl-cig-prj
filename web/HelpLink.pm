@@ -20,10 +20,7 @@ sub retrieveHelpLink {
     my $currentLanguage = $Data->{'lang'}->generateLocale($Data->{'SystemConfig'});
     my $currentLevel = $Data->{'clientValues'}{'authLevel'};
 
-    if($currentLevel > 3) {
-        return $Data->{'SystemConfig'}{$currentLanguage . $sysConfigSuffix} || $defaultHelpLink; 
-    }
-    else {
+    if($currentLevel == 3) {
 	    my $localLanguage;
 	    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
         my $clubObj = getInstanceOf($Data, 'club', $entityID);
@@ -40,7 +37,9 @@ sub retrieveHelpLink {
 
         return $Data->{'SystemConfig'}{$localLanguage . $sysConfigSuffix} || $defaultHelpLink;
     }
-
+    else {
+        return $Data->{'SystemConfig'}{$currentLanguage . $sysConfigSuffix} || $defaultHelpLink; 
+    }
 }
 
 1;
