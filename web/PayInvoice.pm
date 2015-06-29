@@ -105,8 +105,11 @@ sub handlePayInvoice {
 		else {
 			$resultHTML .= qq[<br>
 							 <br><a href="$receiptLink" target="receipt">]. $Data->{'lang'}->txt('Print Receipt') .qq[</a><br>
+            ] if ($success == $Defs::TXNLOG_SUCCESS);
+			$resultHTML .= qq[<br>
 							 <br><a href="$Data->{'target'}?client=$client&amp;a=P_TXN_LIST">]. $Data->{'lang'}->txt('Return to Transactions') .
-							qq[</a><br>];
+							qq[</a><br>
+            ];
 		}		
 
 
