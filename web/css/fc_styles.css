@@ -773,6 +773,7 @@ table tr.new-task {
 	padding-bottom: 5px;
 	/*border-bottom:1px solid #ccc;*/
 	font-size: 14px;
+	clear: both;
 }
 
 .read-only ul li span.details-value {
@@ -1065,6 +1066,8 @@ h2.section-header {
 
 .detail-value {
 	font-weight: bold;
+	width: 48%;
+	float:  right;
 }
 
 .panel-heading {
@@ -1706,6 +1709,7 @@ span.fa-user{
 .document-upload.summary .details-left{
 	/*changing this may affect self -reg summary*/
 	float: none; 
+	margin-right: 2% !important;;
 }
 
 span.circleBg {
@@ -1911,6 +1915,7 @@ a.HTdisabled, a.HTdisabled:hover {
 
 .document-upload.summary .registration-details .details-left {
 	width:30%;
+	/* margin-right:  2% !important; */
 }
 
 .document-upload.summary .club-details .details-left {
