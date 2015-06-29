@@ -1127,7 +1127,7 @@ sub UpdateCart	{
 
 
 	while (my $dref = $qry->fetchrow_hashref())	{
-		if ($dref->{'intStatus'} >= 1 and $dref->{'intTransLogID'} != $intLogID)	{
+		if ($status == 1 and $dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} != $intLogID)	{
 			##OOPS , ALREADY PAID, LETS MAKE A COPY OF TRANSACTION FOR RECODS
 			copyTransaction($Data, $dref->{'intTXNID'}, $intLogID);
 		}
@@ -1180,7 +1180,9 @@ sub copyTransaction	{
       intTXNEntityID,
       intRenewed,
         intPersonRegistrationID,
-        intInvoiceID
+        intInvoiceID,
+        intSentToGateway,
+        intPaymentGatewayResponded
 		)
 		SELECT
 			1,
@@ -1206,7 +1208,9 @@ sub copyTransaction	{
       intTXNEntityID,
       intRenewed,
         intPersonRegistrationID,
-        intInvoiceID
+        intInvoiceID,
+        intSentToGateway,
+        intPaymentGatewayResponded
 		FROM
 			tblTransactions
 		WHERE
