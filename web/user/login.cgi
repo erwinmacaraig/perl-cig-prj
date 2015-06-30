@@ -42,7 +42,7 @@ sub main {
         push @{$Data{'WriteCookies'}}, [
             $Defs::COOKIE_LOGIN,
             $sessionKey,
-            '3h',
+            '+3h',
         ];
 
         my $user = new UserSession(
@@ -79,7 +79,7 @@ sub main {
                 push @{$Data{'WriteCookies'}}, [
                     $Defs::COOKIE_LASTLOGIN_TIMESTAMP,
                     $lastLogin,
-                    '1h',
+                    '+1h',
                 ];
 
                 $Data{'RedirectTo'} = "$Defs::base_url/authenticate.cgi?i=$id&amp;t=$type";
