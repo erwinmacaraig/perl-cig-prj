@@ -139,13 +139,14 @@ sub bulkPersonRollover {
         $bulk_ref->{'nationalPeriodID'} || '',
         $realmID
     );
-
+       
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@values);
     my $count = 0;
     my @rowdata    = ();
 
     while (my $dref = $q->fetchrow_hashref()) {
+        next if(PersonRegistration::hasPendingTransferRegistration($Data,$dref->{'intPersonID'},$bulk_ref->{'sport'},[]));
         $dref->{'currentAge'} = personAge($Data,$dref->{'dtDOB'});
         my $newAgeLevel = Person::calculateAgeLevel($Data, $dref->{'currentAge'});
         next if $newAgeLevel ne $bulk_ref->{'ageLevel'};

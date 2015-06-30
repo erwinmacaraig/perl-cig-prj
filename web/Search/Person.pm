@@ -322,8 +322,10 @@ sub getTransfer {
 
         my %validRecords = ();
         my @sportsFilter;
-
-        while(my $dref = $q->fetchrow_hashref()) {
+        my %sportrenewals = ();
+        $sportrenewals{'FOOTBALL'} = 1;
+        while(my $dref = $q->fetchrow_hashref()) {            
+            next if(PersonRegistration::hasPendingRegistration($self->getData(), $dref->{'intPersonID'}, $dref->{'strSport'}, [] ));
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;

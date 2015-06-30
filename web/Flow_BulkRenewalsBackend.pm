@@ -162,6 +162,7 @@ sub display_person_select   {
 
     ($bulk_ref->{'nationalPeriodID'}, undef, undef) = getNationalReportingPeriod($self->{'Data'}->{db}, $self->{'Data'}->{'Realm'}, $self->{'Data'}->{'RealmSubType'}, $bulk_ref->{'sport'}, $bulk_ref->{'personType'}, $bulk_ref->{'registrationNature'});
     my ($listPersons_body, undef) = bulkPersonRollover($self->{'Data'}, 'PREGFB_SPU', $bulk_ref, \%Hidden, 0);
+    
     my $content = $listPersons_body;
 	my $toggleCount =  bulkPersonRollover($self->{'Data'}, 'PREGFB_SPU', $bulk_ref, \%Hidden, 1) ? 0 : 1;
     my %PageData = (
@@ -173,8 +174,8 @@ sub display_person_select   {
         TextTop => '',
         TextBottom => '',
         processStatus => 1,
-		NoContinueButton => $toggleCount,
-		BackButtonURLOverride => "$Defs::base_url/$self->{'Data'}{'target'}?client=$client&amp;a=PFB_",
+	NoContinueButton => $toggleCount,
+	BackButtonURLOverride => "$Defs::base_url/$self->{'Data'}{'target'}?client=$client&amp;a=PFB_",
     );
 	my $pagedata = $self->display(\%PageData);
 
