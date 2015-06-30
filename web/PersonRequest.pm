@@ -235,8 +235,7 @@ sub listPeople {
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
         ->setGridTemplate($resultTemplate);
-    open FH, ">dumpfile.txt";
-   
+     
     my $resultGrid = $personSearchObj->process();
      print FH Dumper($resultGrid);
     if(!$resultGrid){
