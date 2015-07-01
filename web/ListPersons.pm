@@ -131,7 +131,6 @@ sub listPersons {
                 $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_DELETED
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED 
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS
-                or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_SUSPENDED
                 or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_DELETED
                 or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED
             )
