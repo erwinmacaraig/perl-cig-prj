@@ -575,6 +575,7 @@ sub getTransList {
     SELECT 
       t.intTransactionID, 
       tl.strOnlinePayReference,
+        tl.strReceiptRef,
 	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
@@ -668,14 +669,14 @@ sub getTransList {
         width => 20,
     },
     {
+        name => $lang->txt('Receipt Reference'), 
+        field => 'strReceiptRef', 
+        width => 20,
+    },
+    {
         name => $lang->txt('Item'), 
         field => 'strName',
         defaultShow => 1,
-    },
-    {
-        name => $lang->txt('Quantity'), 
-        field => 'intQty', 
-        width => 15
     },
     {
         field => 'curAmount', 
@@ -705,6 +706,12 @@ sub getTransList {
         hide => $displayonly
     }
     );
+
+    #{
+    #    name => $lang->txt('Quantity'), 
+    #    field => 'intQty', 
+    #    width => 15
+    #},
     my @rowdata = ();
     my @transCurrency = ();
     my @transAmount = ();
