@@ -1209,7 +1209,7 @@ sub hasPendingRegistration {
     }
     
     if($personID){
-        my $query = qq[SELECT intPersonRegistrationID FROM tblPersonRegistration_$Data->{'Realm'} WHERE intPersonID = ? AND strSport = ? AND strRegistrationNature = 'RENEWAL' AND strStatus = 'PENDING'];        
+        my $query = qq[SELECT intPersonRegistrationID FROM tblPersonRegistration_$Data->{'Realm'} WHERE intPersonID = ? AND strSport = ? AND strRegistrationNature = 'RENEWAL' AND strStatus = 'PENDING' AND strPersonType = 'PLAYER'];        
         my $st = $Data->{'db'}->prepare($query);
         $st->execute($personID,$sport);
         my $dref = $st->fetchrow_hashref();
@@ -1226,7 +1226,7 @@ sub hasPendingTransferRegistration {
     my $count = 0;
     if(scalar @{$existingRegos}){
         foreach my $rego (@{$existingRegos}){
-            my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest where intPersonID = ? AND strRequestType = 'TRANSFER' AND intExistingPersonRegistrationID = ? AND strSport = ? AND strRequestStatus = 'INPROGRESS'];
+            my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest WHERE intPersonID = ? AND strRequestType = 'TRANSFER' AND intExistingPersonRegistrationID = ? AND strSport = ? AND strRequestStatus = 'INPROGRESS' AND strPersonType = 'PLAYER'];
             my $st = $Data->{'db'}->prepare($query);
             $st->execute($personID,$rego->{'intPersonRegistrationID'},$rego->{'strSport'});
             my $dref = $st->fetchrow_hashref();
@@ -1238,7 +1238,7 @@ sub hasPendingTransferRegistration {
         }
     }
     if($personID){
-        my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest WHERE intPersonID = ? AND strRequestType = 'TRANSFER' AND strSport = ? AND strRequestStatus = 'INPROGRESS'];
+        my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest WHERE intPersonID = ? AND strRequestType = 'TRANSFER' AND strSport = ? AND strRequestStatus = 'INPROGRESS' AND strPersonType = 'PLAYER'];
          my $st = $Data->{'db'}->prepare($query);
          $st->execute($personID,$sport);
          my $dref = $st->fetchrow_hashref();

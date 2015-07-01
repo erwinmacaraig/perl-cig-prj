@@ -237,7 +237,7 @@ sub listPeople {
         ->setGridTemplate($resultTemplate);
      
     my $resultGrid = $personSearchObj->process();
-     print FH Dumper($resultGrid);
+
     if(!$resultGrid){
         $TemplateData{'searchResultGrid'}{'count'} = 0;
     }
