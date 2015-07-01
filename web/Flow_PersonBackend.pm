@@ -1747,6 +1747,7 @@ sub deleteExistingReg {
             AND (intStatus = 0 OR (intStatus=1 AND curAmount = 0))
             AND intRealmID = ?
             AND intID = ?
+            AND intSentToGateway = 0
     ];
     $q = $self->{'Data'}->{'db'}->prepare($st);
     $q->execute($regoID, $realmID, $personID);

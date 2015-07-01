@@ -41,7 +41,7 @@ sub main {
         push @{$Data{'WriteCookies'}}, [
             $Defs::COOKIE_SRLOGIN,
             $sessionKey,
-            '3h',
+            '+3h',
         ];
 
         my $user = new SelfUserSession(
