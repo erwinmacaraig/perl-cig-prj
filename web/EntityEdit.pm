@@ -16,6 +16,7 @@ use FieldLabels;
 use Data::Dumper;
 use AuditLog;
 use FieldMessages;
+use AssocTime;
 
 sub handleEntityEdit {
     my ($action, $Data) = @_;
@@ -105,7 +106,22 @@ sub handleEntityEdit {
             if($dissolved)  {
                 $userData->{'strStatus'} = $Defs::ENTITY_STATUS_DE_REGISTERED;
             }
+
             delete($userData->{'dissolved'});
+
+            #comparing date - set strStatus to DE-REGISTERED if dtTo <= today
+            my $timezone = $Data->{'SystemConfig'}{'Timezone'} || 'UTC';
+            my $today = dateatAssoc($timezone);
+
+            my ($y, $m, $d) = $userData->{'dtTo'} =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+            my ($yt, $mt, $dt) = $today =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
+
+            if(Date::Calc::check_date($y, $m, $d) and Date::Calc::check_date($yt, $mt, $dt)) {
+                my $deltaDays = Date::Calc::Delta_Days($yt, $mt, $dt, $y, $m, $d);
+                if($deltaDays <= 0) {
+                    $userData->{'strStatus'} = $Defs::ENTITY_STATUS_DE_REGISTERED;
+                }
+            }
 
             $entityObj->setValues($userData);
             $entityObj->write();

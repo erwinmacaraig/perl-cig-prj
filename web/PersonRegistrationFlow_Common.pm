@@ -121,6 +121,7 @@ sub displayRegoFlowSummaryBulk  {
         my %personData = ();
         $regoID = $hidden_ref->{"regoID_$pID"} || 0;
         my ($txnCountSingle, $amountDueSingle, $logIDsSingle, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
+        next if ! $regoID;
         $txnCount += $txnCountSingle;
         $amountDue += $amountDueSingle;
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
