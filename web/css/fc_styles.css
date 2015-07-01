@@ -1068,15 +1068,19 @@ h2.section-header {
 	display:  block;
 }
 
-.task-list .detail-value {
-	float:  left;
-}
 
 .detail-value {
 	font-weight: bold;
 	width: 48%;
 	float:  right;
 }
+
+.task-list .detail-value {
+	float:  left;
+	width: 98%;
+	padding-left: 10px;
+}
+
 
 .panel-heading {
 	border-bottom-left-radius:3px;
@@ -1264,6 +1268,14 @@ div.transfertabs.tab-content > .active {
 	background: #ddthand;
 	color: #000;
 	font-size: 14px;
+}
+
+.res-headers th, .document-table-header th{
+	text-align: left !important;
+}
+
+.member-data {
+	padding-left: 10px;
 }
 
 a.btn-inside-docs-panel {
