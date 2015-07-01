@@ -1064,8 +1064,9 @@ h2.section-header {
 .edit-container {
 	text-align: right;
 	position:  relative;
-	padding: 0px 20px;
-	display:  block;
+	/* padding: 0px 20px; */
+	/* display:  block; */
+	clear:  both;
 }
 
 .task-list .detail-value {
