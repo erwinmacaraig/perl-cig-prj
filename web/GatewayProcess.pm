@@ -154,7 +154,7 @@ sub gatewayProcess {
 		VALUES (?, NOW(), ?)
 	];
 	my $qry= $db->prepare($st);
-	$qry->execute($logID, $returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
+	#$qry->execute($logID, $returnVals_ref->{'GATEWAY_RESPONSE_CODE'});
 
 
 	my ($Order, $Transactions) = gatewayTransactions($Data, $logID);

@@ -36,15 +36,15 @@ sub savePlayerPassport{
             PR.strPersonType, 
             PR.strPersonLevel, 
             PR.dtFrom, 
-            IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), PR.dtFrom, DATE_ADD(dtDOB,INTERVAL 12 YEAR)) as WhenFrom,
-            IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 12 YEAR), DATE_FORMAT(PR.dtFrom, "%Y%m%d"), DATE_FORMAT(DATE_ADD(dtDOB,INTERVAL 12 YEAR), "%Y%m%d")) as WhenFrom_,
+            IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 10 YEAR), PR.dtFrom, DATE_ADD(dtDOB,INTERVAL 10 YEAR)) as WhenFrom,
+            IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 10 YEAR), DATE_FORMAT(PR.dtFrom, "%Y%m%d"), DATE_FORMAT(DATE_ADD(dtDOB,INTERVAL 10 YEAR), "%Y%m%d")) as WhenFrom_,
             IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo) as orderdtTo,
             PR.dtTo,
             DATE_FORMAT(PR.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(PR.dtFrom, "%Y%m%d") as dtFrom_,
             PR.intNationalPeriodID, 
             PR.strAgeLevel, 
-            DATE_ADD(dtDOB,INTERVAL 12 YEAR) as When12,
+            DATE_ADD(dtDOB,INTERVAL 10 YEAR) as When10,
             E.strLocalName as EntityName,
             IF(PR.dtTo > '1900-01-01', PR.dtTo, NOW()) as PRToCalc
         FROM tblPersonRegistration_$Data->{'Realm'} as PR
@@ -58,7 +58,7 @@ sub savePlayerPassport{
             AND PR.strStatus IN ('PASSIVE', 'ACTIVE', 'ROLLED_OVER', 'TRANSFERRED')
             AND PR.dtFrom IS NOT NULL
         HAVING
-            PRToCalc > When12
+            PRToCalc > When10
             ORDER BY PR.dtFrom, orderdtTo
     ];	
     #ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom
@@ -71,7 +71,7 @@ sub savePlayerPassport{
 	$sth->execute($personID); 
 	
 	#get all Possible Registration candidate to be placed in tblPlayerPassport 
-	# FROM these records choose the ones in which PersonAge >= 12 
+	# FROM these records choose the ones in which PersonAge >= 10 
 
     my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
     my $yearBorn = $pref->{'dtDOB_year'};     
@@ -118,7 +118,7 @@ sub savePlayerPassport{
      while(my $dref = $sth->fetchrow_hashref()){
         $dref->{'strRealmName'} = $MAName;
      	
-#     	next if( ($dref->{'yrDtTo'} - $yearBorn) < 12 );
+#     	next if( ($dref->{'yrDtTo'} - $yearBorn) < 10 );
      	if($rowCount == 0){
      		$eID = $dref->{'intEntityID'};
      		$level = $dref->{'strPersonLevel'}; 

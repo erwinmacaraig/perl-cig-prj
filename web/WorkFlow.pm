@@ -4551,6 +4551,7 @@ sub deleteRegoTransactions {
             AND intPersonRegistrationID = ?
             AND intRealmID = ?
             AND intStatus = 0
+            AND intSentToGateway = 0
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
