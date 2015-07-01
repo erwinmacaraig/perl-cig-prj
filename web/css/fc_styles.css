@@ -796,6 +796,7 @@ table tr.new-task {
     background-color: transparent;
   	border-radius: 4px;
     margin-top:20px;
+		clear: both;
 }
 
 .fieldSectionGroupWrapper-DisplayOnly .panel-header{
