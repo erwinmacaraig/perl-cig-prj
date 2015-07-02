@@ -987,6 +987,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
+            sport => $Defs::sportType{$request->{'strSport'}} || '',
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
             Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
@@ -1019,8 +1020,8 @@ sub listRequests {
             field => 'requestTo',
         }, 
         {
-            name => $Data->{'lang'}->txt('Type'),
-            field => 'requestType',
+            name => $Data->{'lang'}->txt('Sport'),
+            field => 'sport',
         }, 
         {
             name => $Data->{'lang'}->txt('Response Status'),
@@ -2200,9 +2201,10 @@ sub viewRequestHistory {
         }
     }
 
+    $request->{'sport'} = $Defs::sportType{$request->{'strSport'}} || '';
     if($readonly) {
         $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested');
-        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
+        $request->{'RequestStatus'} = $Defs::personRequestStatus{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
 
         my %readonlyTemplateData = (
             request => $request,
