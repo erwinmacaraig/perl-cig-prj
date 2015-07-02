@@ -2201,8 +2201,8 @@ sub viewRequestHistory {
         }
     }
 
-    $request->{'sport'} = $Defs::sportType{$request->{'strSport'}} || '';
     if($readonly) {
+        $request->{'sport'} = $Defs::sportType{$request->{'strSport'}} || '';
         $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested');
         $request->{'RequestStatus'} = $Defs::personRequestStatus{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
 
