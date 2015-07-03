@@ -1,0 +1,156 @@
+    <div class = "selfreg-details col-md-8">
+        <fieldset class="read-only-field">
+            <legend>[% Lang.txt('Personal Information') %]</legend>
+            <table class = "table">
+                [% IF LastName %]
+                    <tr>
+                        <td class="">[% Lang.txt("Family Name") %]:</td>
+                        <td>[% LastName %]</td>
+                    </tr>                                 
+                [% END %]
+                            
+                                
+                [% IF FirstName %]
+                    <tr>
+                        <td class="">[% Lang.txt("First Name") %]:</td>
+                        <td>[% FirstName %]</td>
+                    </tr>
+                [% END %]
+
+                [% IF LanguageOfName %]
+                    <tr>
+                        <td class="">[% Lang.txt("Language of Name") %]:</td>
+                        <td>[% LanguageOfName %]</td>
+                    </tr>
+                [% END %]            
+
+                            [% IF DOB %]
+                                <tr>
+                                  <td class="">[% Lang.txt('Date of Birth') %]:</span>
+                                  <td>[% DateFormat.format(DOB,'MEDIUM') %]</td>
+                                </tr>
+                            [% END %]
+
+                            
+                            
+                            [% IF Gender %]
+                                <tr>
+                                    <td class="">[% Lang.txt('Gender') %]:</td>
+                                    <td>[% Gender %]</td>
+                                </tr>
+                            [% END %]
+                            
+                            [% IF Nationality %]
+                                <tr>
+                                  <td class="">[% Lang.txt('Nationality') %]:</td>
+                                  <td>[% Nationality %]</td>
+                                </tr>
+                            [% END %]
+                           
+                            [% IF CountryOfBirth %]
+                                <tr>
+                                  <td class="">[% Lang.txt('Country of Birth') %]:</td>
+                                  <td>[% CountryOfBirth %]</td>
+                                </span>
+                            [% END %]
+                             
+                            [% IF RegionOfBirth %]
+                                <tr>
+                                  <td class="">[% Lang.txt('Region') %]:</td>
+                                  <td>[% RegionOfBirth %]</td>
+                                </tr>
+                            [% END %]
+            </table>
+                            <!-- 
+                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=core" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=core&bscrn=a%3D" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
+                            [% END %]
+                            -->
+        </fieldset>
+        
+        <fieldset class="read-only-field">
+                                <legend>
+                                [% Lang.txt('Contact Details') %]
+                                </legend>
+                                 <table class = "table">
+                                    [% IF Address1 %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Address 1') %]:</td>
+                                            <td>[% Address1 %]</td>
+                                        </tr>
+                                    [% END %]
+                                    
+                                    [% IF Address2 %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Address 2') %]:</td>
+                                            <td>[% Address2 %]</td>
+                                        </tr>
+                                    [% END %]
+                                    
+                                    [% IF City %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('City') %]:</td>
+                                            <td>[% City %]</td>
+                                        </tr>
+                                    [% END %]
+                                    
+                                    [% IF State %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('State') %]:</td>
+                                            <td>[% State %]</td>
+                                        </tr>
+                                    [% END %]
+                                    
+                                    [% IF PostalCode %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Postal Code') %]:</td>
+                                            <td>[% PostalCode %]</td>
+                                        </tr>
+                                    [% END %] 
+                                    
+                                    [% IF ContactISOCountry %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Country') %]:</td>
+                                            <td>[% ContactISOCountry %]</td>
+                                        </tr>
+                                    [% END %]
+
+                                    [% IF ContactPhone %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Phone Number') %]:</td>
+                                            <td>[% ContactPhone %]</td>
+                                        </tr>
+                                    [% END %]
+                            
+                                    [% IF Email %]
+                                        <tr>
+                                            <td class="">[% Lang.txt('Email Address') %]:</span>
+                                            <td>[% Email %]</span>
+                                        </tr>
+                                    [% END %]
+                                </table>
+                               
+                            [% IF EditDetailsLink and !ReadOnlyLogin  %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=con" class="edit-link">[% Lang.txt('Edit') %]</a>
+                                    <!-- &bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2 -->
+                                </span>
+                            [% ELSIF parentEntityID == childEntityID %]
+                                <span style="float: right" class="">
+                                    <a href = "[% EditDetailsLink %]&e_a=con&bscrn=a%3DWF_View%26TID%3D[% WFTaskID %]%26at%3D2" class="edit-link">
+                                        [% Lang.txt('Edit') %]
+                                    </a>
+                                </span>
+                            [% END %]
+        </fieldset>   
+    </div>

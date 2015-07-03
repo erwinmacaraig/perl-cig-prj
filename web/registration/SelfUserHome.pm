@@ -21,7 +21,8 @@ use Utils;
 use L10n::DateFormat;
 use L10n::CurrencyFormat;
 use Data::Dumper;
-
+use Countries;
+use CGI  qw(param);
 sub getSelfRegoMatrixOptions    {
 
     my ($Data) = @_;
@@ -71,11 +72,19 @@ sub showHome {
 	my $documents = '';
 	my $registrationHist = '';
 	my $transactions = '';
+	my $memberdetail = '';
+	my $activeTab = param('act_acc') || 0;
+	my $activeAccordion = param('act_acc') || 0;
+	my $tempAccordion = 0;
 	#
     my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	foreach my $person (@{$people}){
 		$count++;
+		if(!$activeAccordion && !$tempAccordion){
+                    $tempAccordion = $person->{'intPersonID'};
+		}
 		$documents = getUploadedSelfRegoDocuments($Data,$person->{'intPersonID'});
+		$memberdetail = getMemberDetail($Data, $person->{'intPersonID'});
 		$registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos->{$person->{'intPersonID'}});
 		$transactions = getSelfRegoTransactionHistory($Data, $previousRegos->{$person->{'intPersonID'}});
 		$accordion .= runTemplate($Data, {
@@ -85,12 +94,17 @@ sub showHome {
 			Documents => $documents,
 			History => $registrationHist,
 			Transactions => $transactions,
-            selfRegoMatrixOptions => $selfRegoMatrixOptions,
+			PersonDetails => $memberdetail,
+                        selfRegoMatrixOptions => $selfRegoMatrixOptions,
+                        count => $person->{'intPersonID'},
+                        activeAccordion =>  $activeAccordion || $tempAccordion,
+                        activeTab => $activeTab,
+                        
 		},
 		'selfrego/accordion.templ',		
 		 );
 	}
-	
+    #my $resultHTML = '<div class = "panel panel-default">';        
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -107,8 +121,55 @@ sub showHome {
         },
         'selfrego/home.templ',
     );    
-
+    #$resultHTML .= '</div><!-- panel -->';
     return $resultHTML;
+}
+
+sub getMemberDetail {
+    my ($Data,$personID) = @_;
+    my $persondetails = '';
+    
+    my $query = qq[SELECT strLocalSurname, strLocalFirstname, intLocalLanguage, dtDOB, intGender, strISONationality, strISOCountryOfBirth, strRegionOfBirth, strAddress1, strAddress2, strSuburb, strState,strPostalCode,strISOCountry,strPhoneHome, strEmail, intMinorProtection FROM tblPerson WHERE intPersonID = ? AND intRealmID = ?];
+    my $q = $Data->{'db'}->prepare($query);
+    $q->execute($personID, $Data->{'Realm'});
+    my $dref = $q->fetchrow_hashref();
+    
+    my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $dref->{'intLocalLanguage'}){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+    
+    my $isocountries  = getISOCountriesHash();
+    my %TemplateData = (
+        LastName => $dref->{'strLocalSurname'} || '',
+        FirstName => $dref->{'strLocalFirstname'} || '',
+        LanguageOfName => $selectedLanguage || '',
+        DOB => $dref->{'dtDOB'} || '',
+        Gender => $Defs::PersonGenderInfo{$dref->{'intGender'}} || '',
+        Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
+        CountryOfBirth => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '',
+        RegionOfBirth => $dref->{'strRegionOfBirth'} || '',
+        Address1 => $dref->{'strAddress1'} || '',
+        Address2 => $dref->{'strAddress2'} || '',
+        City => $dref->{'strSuburb'} || '',
+        State => $dref->{'strState'} || '',
+        PostalCode => $dref->{'strPostalCode'} || '',
+        ContactISOCountry => $isocountries->{$dref->{'strISOCountry'}} || '',
+        ContactPhone =>$dref->{'strPhoneHome'} || '',        
+        Email => $dref->{'strEmail'} || '',
+        EditDetailsLink => "$Data->{'target'}?client=$Data->{'client'}&amp;a=SPE_&amp;pID=$personID&amp;dtype=$dref->{'strPersonType'}",
+    );
+    $persondetails = runTemplate(
+                        $Data,
+                        \%TemplateData,
+                        'selfrego/selfregopersondetails.templ',
+                     );
+    return $persondetails;
+    
 }
 
 sub getUploadedSelfRegoDocuments {
