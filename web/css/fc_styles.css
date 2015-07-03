@@ -790,11 +790,13 @@ table tr.new-task {
 	border: 1px solid #aeaeae;
 	padding: 30px 15px 15px;
 	/*height: 345px;*/
+	overflow:  auto;
 }
 .fieldSectionGroupWrapper-DisplayOnly .panel-body {
     background-color: transparent;
   	border-radius: 4px;
     margin-top:20px;
+		clear: both;
 }
 
 .fieldSectionGroupWrapper-DisplayOnly .panel-header{
@@ -1062,6 +1064,14 @@ h2.section-header {
 
 .edit-container {
 	text-align: right;
+	position:  relative;
+	/* padding: 0px 20px; */
+	/* display:  block; */
+	clear:  both;
+}
+
+.task-list .detail-value {
+	float:  left;
 }
 
 .detail-value {
