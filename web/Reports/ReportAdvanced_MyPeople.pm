@@ -298,7 +298,19 @@ sub _getConfiguration {
                 }
             ],
 
-            PRstrPersonType=> [
+            PRintOriginLevel=> [
+                'Record Creation',
+                {
+                    dbfield         => 'PR.intOriginLevel',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::originLevelTypes,
+                    translate       => 1,
+                    optiongroup     => 'regos',
+                    allowgrouping   => 1
+                }
+            ],
+             PRstrPersonType=> [
                 'Role',
                 {
                     dbfield         => 'PR.strPersonType',
@@ -1692,6 +1704,7 @@ sub _getConfiguration {
               intEthnicityID
               intMinorProtection
 
+                PRintOriginLevel
                 PRstrPersonType 
                 PRstrPersonLevel
                 PRstrAgeLevel

@@ -1127,7 +1127,7 @@ sub UpdateCart	{
 
 
 	while (my $dref = $qry->fetchrow_hashref())	{
-		if ($dref->{'intStatus'} >= 1 and $dref->{'intTransLogID'} != $intLogID)	{
+		if ($status == 1 and $dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} != $intLogID)	{
 			##OOPS , ALREADY PAID, LETS MAKE A COPY OF TRANSACTION FOR RECODS
 			copyTransaction($Data, $dref->{'intTXNID'}, $intLogID);
 		}
@@ -1180,7 +1180,9 @@ sub copyTransaction	{
       intTXNEntityID,
       intRenewed,
         intPersonRegistrationID,
-        intInvoiceID
+        intInvoiceID,
+        intSentToGateway,
+        intPaymentGatewayResponded
 		)
 		SELECT
 			1,
@@ -1206,7 +1208,9 @@ sub copyTransaction	{
       intTXNEntityID,
       intRenewed,
         intPersonRegistrationID,
-        intInvoiceID
+        intInvoiceID,
+        intSentToGateway,
+        intPaymentGatewayResponded
 		FROM
 			tblTransactions
 		WHERE
@@ -1318,7 +1322,7 @@ sub processTransLog    {
 		processTransLogFailure($db, $intLogID, $gatewayresponsecode, $otherRef1, $otherRef2, $otherRef3, $otherRef4, $otherRef5, $authID, $text);
 	}
 	else	{
-		if ($existingResponseCode and $existingLogID)	{
+	    if ($existingResponseCode and $existingResponseCode ne $fields{responsecode} and $existingLogID)	{
 			logRetry($db, $intLogID);
 		}
     	$statement = qq[
@@ -1345,9 +1349,9 @@ sub processTransLog    {
          or query_error($statement);
 	}
 
-	$intLogID=0 if ($chkvalue ne $passedChkValue);
-
-	return $intLogID || 0;
+    return $intLogID;
+	#$intLogID=0 if ($chkvalue ne $passedChkValue);
+	#return $intLogID || 0;
 }
 
 sub getVerifiedBankAccount   {

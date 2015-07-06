@@ -126,6 +126,11 @@ sub clubFieldsSetup {
         $entityTypeOptions{$eType} = $Defs::entityType{$eType} || '';
     }
 
+    my %entityStatusOptions = ();
+    for my $eStatus ( keys %Defs::entityStatus ) {
+        $entityStatusOptions{$eStatus} = $Defs::entityStatus{$eStatus} || '';
+    }
+
     my %dissolvedOptions = (
         0 => 'No',
         1 => 'Yes',
@@ -158,6 +163,16 @@ sub clubFieldsSetup {
                     maxsize     => '50',
                     compulsory  => 1,
                     sectionname => 'core',
+                },
+                strStatus    => {
+                    label       => $FieldLabels->{'strStatus'},
+                    value       => $values->{'strStatus'} || $Defs::ENTITY_STATUS_INPROGRESS,
+                    type        => 'lookup',
+                    options     => \%entityStatusOptions,
+                    compulsory  => 1,
+                    sectionname => 'core',
+                    readonly    => $Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_REGION ? 1 : 0,
+                    class       => 'chzn-select',
                 },
                 strLocalShortName => {
                     label       => $FieldLabels->{'strLocalShortName'},
@@ -284,6 +299,7 @@ sub clubFieldsSetup {
                 strCity
                 strRegion
                 strISOCountry
+                strStatus
             )],
             sections => [
                 [ 'core',        $Data->{'lang'}->txt('Club Details'),'','',$values->{'footer-core'} ],
@@ -501,7 +517,6 @@ sub entityFieldsSetup {
     $values ||= {};
 
     my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_CLUB );
-    print STDERR Dumper $FieldLabels;
     my $isocountries  = getISOCountriesHash();
     my %countriesonly = ();
     my %Mcountriesonly = ();

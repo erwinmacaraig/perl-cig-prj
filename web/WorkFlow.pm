@@ -27,6 +27,7 @@ require Exporter;
     updateTaskNotes
     updateTaskScreen
     getInitialTaskAssignee
+    redirectTemplate
 );
 
 use strict;
@@ -143,7 +144,7 @@ sub checkRulePaymentFlagActions {
         if ($dref->{'intRemoveTaskOnPayment'} == 1) {
             my $stUPD = qq[
                 UPDATE tblWFTask
-                SET strTaskStatus = 'DELETED'
+                SET strTaskStatus = 'DELETED', intPaymentGatewayResponded = 1
                 WHERE 
                     intRealmID = ?
                     AND intWFTaskID = ?
@@ -152,7 +153,18 @@ sub checkRulePaymentFlagActions {
             $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
             $countTaskSkipped++;
         }
-        GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
+        else    {
+            my $stUPD = qq[
+                UPDATE tblWFTask
+                SET intPaymentGatewayResponded = 1
+                WHERE 
+                    intRealmID = ?
+                    AND intWFTaskID = ?
+            ];
+            my $qUPD= $Data->{'db'}->prepare($stUPD);
+            $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
+        }
+        #GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
@@ -4548,6 +4560,7 @@ sub deleteRegoTransactions {
             AND intPersonRegistrationID = ?
             AND intRealmID = ?
             AND intStatus = 0
+            AND intSentToGateway = 0
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);

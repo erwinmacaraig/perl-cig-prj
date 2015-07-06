@@ -52,9 +52,11 @@ sub handleSelfUserWorkFlow {
                         return displayGenericError($Data, $Data->{'lang'}->txt("Error"), $Data->{'lang'}->txt("Invalid access"));
                     }
                     else {
-                        $Data->{'RedirectTo'} = "$Defs::base_url/registration/" . $Data->{'target'} . "?a=WF_PR_S&TID=$WFTaskID";
-                        my ($body, $title) = WorkFlow::redirectTemplate($Data);
+                        my ($body, $title) = selfUserUpdateTaskScreen($Data, "WF_PR_S", $user);
                         return ($body, $title);
+                        #$Data->{'RedirectTo'} = "$Defs::base_url/registration/" . $Data->{'target'} . "?a=WF_PR_S&TID=$WFTaskID";
+                        #my ($body, $title) = redirectTemplate($Data);
+                        #return ($body, $title);
                     }
                 }
                 else {
@@ -245,7 +247,7 @@ sub listTasks {
         'selfrego/worktasks.templ',
     );
 
-    return ($body, $Data->{'lang'}->txt('Work Tasks'));
+    return ($body, $Data->{'lang'}->txt('Self Registration Work Tasks'));
 
 }
 

@@ -6,10 +6,12 @@ use warnings;
 use lib '.', '..', '../..',"../comp", '../RegoForm', "../dashboard", "../RegoFormBuilder",'../PaymentSplit', "../user", "../Clearances";
 use CGI qw(param);
 use Defs;
+use Localisation;
 use Reg_common;
 use Utils;
 use JSON;
 use Lang;
+use SystemConfig;
 use PersonRegisterWhat;
 
 main();	
@@ -61,18 +63,23 @@ sub main	{
     $registrationNature = 'NEW' if (!$defaultNature and ! $bulk);
     $registrationNature ||= $defaultNature;
 
+    my $db=connectDB();
+
     my %Data=();
+    $Data{'db'} = $db;
+
+    ($Data{'Realm'}, $Data{'RealmSubType'}) = getRealm(\%Data);
+    $Data{'Realm'} ||= 1;
+
     my $target='aj_person_registerwhat.cgi';
     $Data{'target'}=$target;
     my %clientValues = getClient($client);
     $Data{'clientValues'} = \%clientValues;
-    my $db=connectDB();
-    $Data{'db'} = $db;
-    my $lang= Lang->get_handle() || die "Can't get a language handle!";
-    $Data{'lang'}=$lang;
 
-    ($Data{'Realm'}, $Data{'RealmSubType'})=getRealm(\%Data);
-    $Data{'Realm'} ||= 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
+    my $lang = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    #my $lang= Lang->get_handle() || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
 
     my $options = undef;
     my $error = '';

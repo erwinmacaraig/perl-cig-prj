@@ -880,6 +880,7 @@ sub loadObjectValues    {
     my %values = ();
     if($object) {
         for my $field (qw(
+            strStatus
             strLocalName
             strLocalShortName
             intLocalLanguage
