@@ -94,7 +94,7 @@ sub main {
     $Data{'UserID'} = $userID;
 
     $action = 'LOGIN' if(!$userID and $action ne 'activate' and $action !~/FORGOT/);
-    open FH, ">test.txt";
+    
    
     if(!$action and $userID)  {
         $action = 'HOME';
@@ -127,8 +127,7 @@ sub main {
             $resultHTML .= showHome(\%Data, $user, $srp);
         }
     }
-    elsif($action =~ /SPE_/){
-         print FH "\nI was here: \$action = $action\n";
+    elsif($action =~ /SPE_/){         
         ($resultHTML, $pageHeading) = handleSelfRegoPersonEdit(\%Data, $action);
     }
     elsif ($action =~ /TRANSFER_/) {

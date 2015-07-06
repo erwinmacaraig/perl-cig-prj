@@ -104,7 +104,6 @@ sub showHome {
 		'selfrego/accordion.templ',		
 		 );
 	}
-    #my $resultHTML = '<div class = "panel panel-default">';        
     my $resultHTML = runTemplate(
         $Data,
         {
@@ -121,7 +120,6 @@ sub showHome {
         },
         'selfrego/home.templ',
     );    
-    #$resultHTML .= '</div><!-- panel -->';
     return $resultHTML;
 }
 
