@@ -1104,7 +1104,15 @@ sub displayRegoFlowProducts {
 
     }
     else    {
-        return '';
+        #return '';
+        return qq[
+        <div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>] . $Data->{'lang'}->txt('No license fees required for this registration, click '). q[<strong>] . $Data->{'lang'}->txt('Continue') . q[</strong>] . $Data->{'lang'}->txt(' to proceed') . q[.</p>
+            </div>
+        </div>
+        ];
     }
         my $displayPayment = $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'};
         $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
@@ -1123,11 +1131,11 @@ sub displayRegoFlowProducts {
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
-		amountCheck => $totalamountchk,
+	amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
-		AssociationName => $maName,
-		payMethod => $rego_ref->{'payMethod'},
-		productTerms => $product_terms || '',
+	AssociationName => $maName,
+	payMethod => $rego_ref->{'payMethod'},
+	productTerms => $product_terms || '',
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
