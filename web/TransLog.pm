@@ -569,23 +569,25 @@ sub getTransList {
   ];
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
-
+    open FH, ">dumpfile.txt";
+    
+    
     my $locale = $Data->{'lang'}->getLocale();
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
       tl.strOnlinePayReference,
-        tl.strReceiptRef,
-	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
+      tl.strReceiptRef,
+      IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
       t.intTransLogID, 
       t.intID, 
-	  i.strInvoiceNumber,
-	  t.dtPaid,
+      i.strInvoiceNumber,
+      t.dtPaid,
       intQty, 
-	  CONCAT(Person.strLocalFirstname, ' ', Person.strLocalSurname) as strPerson,
-	  PR.strPersonType,
+      CONCAT(Person.strLocalFirstname, ' ', Person.strLocalSurname) as strPerson,
+      PR.strPersonType,
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
       t.dtEnd as dtEnd_RAW, 
@@ -617,12 +619,12 @@ sub getTransList {
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
 		$TXNEntityID		
       $whereClause
-        $prodSellLevel
+      $prodSellLevel  
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
   ];
-	
+    print FH "\$statement = $statement \n";
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     my $query = $db->prepare($statement);
