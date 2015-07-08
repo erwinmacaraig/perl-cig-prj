@@ -1,6 +1,6 @@
 [% USE Dumper %]
 <h3 class="panel-header"><b>[% Lang.txt('Summary') %]</b></h3>
-	<div class="panel-body">
+	<div class="panel-body summary-page">
 		<div class="document-upload summary">
 			<div class="col-md-6">
 				<div class="read-only personal-information">
@@ -78,7 +78,6 @@
     	[% END %]
 
 		[% IF registration.documents.size %]
-			<div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 		<div class="read-only">
 			 <h4>[% Lang.txt('Documents') %]</h4>
