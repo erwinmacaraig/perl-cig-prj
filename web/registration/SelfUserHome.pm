@@ -126,16 +126,14 @@ sub showHome {
 sub getMemberDetail {
     my ($Data,$personID) = @_;
     my $persondetails = '';
-    
-    my $query = qq[SELECT strLocalSurname, strLocalFirstname, intLocalLanguage, dtDOB, intGender, strISONationality, strISOCountryOfBirth, strRegionOfBirth, strAddress1, strAddress2, strSuburb, strState,strPostalCode,strISOCountry,strPhoneHome, strEmail, intMinorProtection FROM tblPerson WHERE intPersonID = ? AND intRealmID = ?];
-    my $q = $Data->{'db'}->prepare($query);
-    $q->execute($personID, $Data->{'Realm'});
-    my $dref = $q->fetchrow_hashref();
-    
+       
+    my $personObj = new PersonObj(db => $Data->{'db'}, ID => $personID, cache => $Data->{'cache'});
+    $personObj->load(); 
+        
     my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
     my $selectedLanguage;
     for my $l ( @{$languages} ) {
-        if($l->{intLanguageID} == $dref->{'intLocalLanguage'}){
+        if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
              $selectedLanguage = $l->{'language'};
             last
         }
@@ -143,23 +141,23 @@ sub getMemberDetail {
     
     my $isocountries  = getISOCountriesHash();
     my %TemplateData = (
-        LastName => $dref->{'strLocalSurname'} || '',
-        FirstName => $dref->{'strLocalFirstname'} || '',
+        LastName => $personObj->getValue('strLocalSurname')|| '',
+        FirstName => $personObj->getValue('strLocalFirstname') || '',
         LanguageOfName => $selectedLanguage || '',
-        DOB => $dref->{'dtDOB'} || '',
-        Gender => $Defs::PersonGenderInfo{$dref->{'intGender'}} || '',
-        Nationality => $isocountries->{$dref->{'strISONationality'}} || '',
-        CountryOfBirth => $isocountries->{$dref->{'strISOCountryOfBirth'}} || '',
-        RegionOfBirth => $dref->{'strRegionOfBirth'} || '',
-        Address1 => $dref->{'strAddress1'} || '',
-        Address2 => $dref->{'strAddress2'} || '',
-        City => $dref->{'strSuburb'} || '',
-        State => $dref->{'strState'} || '',
-        PostalCode => $dref->{'strPostalCode'} || '',
-        ContactISOCountry => $isocountries->{$dref->{'strISOCountry'}} || '',
-        ContactPhone =>$dref->{'strPhoneHome'} || '',        
-        Email => $dref->{'strEmail'} || '',
-        EditDetailsLink => "$Data->{'target'}?client=$Data->{'client'}&amp;a=SPE_&amp;pID=$personID&amp;dtype=$dref->{'strPersonType'}",
+        DOB => $personObj->getValue('dtDOB') || '',
+        Gender => $Defs::PersonGenderInfo{$personObj->getValue('intGender')} || '',
+        Nationality => $isocountries->{$personObj->getValue('strISONationality')} || '',
+        CountryOfBirth => $isocountries->{$personObj->getValue('strISOCountryOfBirth')} || '',
+        RegionOfBirth => $personObj->getValue('strRegionOfBirth') || '',
+        Address1 => $personObj->getValue('strAddress1') || '',
+        Address2 => $personObj->getValue('strAddress2') || '',
+        City => $personObj->getValue('strSuburb') || '',
+        State => $personObj->getValue('strState') || '',
+        PostalCode => $personObj->getValue('strPostalCode') || '',
+        ContactISOCountry => $isocountries->{$personObj->getValue('strISOCountry')} || '',
+        ContactPhone => $personObj->getValue('strPhoneHome') || '',        
+        Email => $personObj->getValue('strEmail') || '',
+        EditDetailsLink => "$Data->{'target'}?client=$Data->{'client'}&amp;a=SPE_&amp;pID=$personID&amp;dtype=" . $personObj->getValue('strPersonType'),
     );
     $persondetails = runTemplate(
                         $Data,

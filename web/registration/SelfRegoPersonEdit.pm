@@ -67,9 +67,9 @@ sub handleSelfRegoPersonEdit {
     }
     
     if($fieldsetType)   {
-        my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}{'core'}, 'PersonRegoForm',);
+        #my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}{'core'}, 'PersonRegoForm',);
         my $fieldMessages = getFieldMessages($Data, 'person', $Data->{'lang'}->getLocale());
-        #my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}, 'Person',);
+        my $permissions = ProcessPermissions($Data->{'Permissions'}, $fieldset->{$fieldsetType}, 'PersonRegoForm',);
         my $obj = new Flow_DisplayFields(
           Data => $Data,
           Lang => $Data->{'lang'},
@@ -137,6 +137,6 @@ sub handleSelfRegoPersonEdit {
         
     
     } # end $fieldsetType
-    my $pageHeading = 'Edit Person - ' . $personID;
+    my $pageHeading = 'Edit Person';
     return ($body, $pageHeading);
 }
