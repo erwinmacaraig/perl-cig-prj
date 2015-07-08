@@ -91,6 +91,7 @@ sub retrieve {
         push @params, $self->{_notificationObj}->getRealmID();
         push @params, $self->{_notificationObj}->getSubRealmID();
         push @params, $self->{_notificationObj}->getNotificationType();
+        
 
     }
     else {
