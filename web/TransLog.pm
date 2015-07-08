@@ -33,9 +33,14 @@ my $entityNameURL    = 'P_TXNLog';
 
 
 sub handleTransLogs {
-  my($action, $Data, $entityID, $personID) = @_;
+  my($action, $Data, $entityID, $personID, $ignoreUnpaidFlag) = @_;
   my $q=new CGI;
   $Data->{'params'} = $q->Vars();
+  
+  if(!$ignoreUnpaidFlag){
+    $ignoreUnpaidFlag = 1 if($Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_PERSON);
+  } 
+ 
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
 
@@ -75,8 +80,8 @@ sub handleTransLogs {
 	  $action='list';
   }
   if ($action=~/list/) {
-	  setupStandardList($Data);
-	  ($body, $header) = listTransactions($Data, $db, $entityID, $personID, $clientValues_ref, $action, $resultMessage);
+	setupStandardList($Data);
+        ($body, $header) = listTransactions($Data, $db, $entityID, $personID, $clientValues_ref, $action, $resultMessage, $ignoreUnpaidFlag);
   }
   if ($action=~/payLIST/) {
 	  ($body, $header) = listTransLog($Data, $entityID, $personID);
@@ -529,12 +534,13 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay, $ignoreUnpaidFlag) = @_;
 	#
 	my $TXNEntityID = '';
 	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
 		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
 	}
+	
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
@@ -569,7 +575,7 @@ sub getTransList {
   ];
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
-    open FH, ">dumpfile.txt";
+   
     
     
     my $locale = $Data->{'lang'}->getLocale();
@@ -618,15 +624,18 @@ sub getTransList {
 			AND P.intProductType<>2
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
 		$TXNEntityID		
-      $whereClause
+      $whereClause      
       $prodSellLevel  
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
   ];
-    print FH "\$statement = $statement \n";
+    
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
+    
+    open FH, ">dumpfile.txt";
+    print FH $statement;
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
@@ -901,7 +910,7 @@ sub generateTXNListLink {
 #}
 
 sub listTransactions {
-    my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
+    my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage, $ignoreUnpaidFlag) = @_;
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
 	my $lang = $Data->{'lang'};
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
@@ -924,7 +933,11 @@ sub listTransactions {
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
    # $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
-
+    
+    if($ignoreUnpaidFlag){ 
+        #show only Paid and Onhold Transaction 
+        $whereClause .= qq[ AND (t.intStatus IN (1,3) AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}) ];
+    }
 
 	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
