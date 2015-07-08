@@ -532,7 +532,7 @@ EOS
 }
 
 sub getTransList {
-	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay, $ignoreUnpaidFlag) = @_;
+	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
 	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
