@@ -93,8 +93,7 @@ sub handleTransactions	{
  	my $clm = setClient(\%cv);
 	my $resultHTML_ = '';
 	($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID,$ignoreUnpaidFlag);
-	$resultHTML = 'Damn';
-    	$heading = $Data->{'lang'}->txt('List Transactions');
+	$heading = $Data->{'lang'}->txt('List Transactions');
 	$resultHTML_ .= qq[<br />
             <div>
 		<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> ] . $lang->txt('Go to your dashboard') . qq[ </a>

@@ -36,10 +36,8 @@ sub handleTransLogs {
   my($action, $Data, $entityID, $personID, $ignoreUnpaidFlag) = @_;
   my $q=new CGI;
   $Data->{'params'} = $q->Vars();
-  
-  if(!$ignoreUnpaidFlag){
-    $ignoreUnpaidFlag = 1 if($Data->{'clientValues'}{'authLevel'} > $Defs::LEVEL_PERSON);
-  } 
+  $ignoreUnpaidFlag ||= 1;
+  $ignoreUnpaidFlag = 0 if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
  
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
@@ -634,8 +632,7 @@ sub getTransList {
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     
-    open FH, ">dumpfile.txt";
-    print FH $statement;
+   
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
