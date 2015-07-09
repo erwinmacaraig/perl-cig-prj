@@ -1483,6 +1483,7 @@ header nav ul li a {
 }
 #flowFormID .col-md-6 {
 	position: relative;
+	width: 50%;
 }
 
 #flowFormID {
@@ -2331,6 +2332,12 @@ header .navbar-brand {
 .products-table .product-row:last-child {
     background: rgb(214, 214, 214);
 }
+@media (max-width: 1240px){
+	#flowFormID .col-md-6{
+		width: 100% !important;
+	}
+}
+
 @media (max-width: 992px){
 	.result-message { padding: 0; }
 }
