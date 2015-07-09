@@ -126,11 +126,20 @@ sub handleSelfRegoPersonEdit {
                     'Update Person',
                     'Person',
                 );
-
-                $body = 'updated';
-                
+                my $url = "$Defs::base_url/registration/index.cgi?client=$Data->{'client'}&amp;a=HOME&amp;act_acc=". $personObj->ID();
+                $body = qq[
+                 <div class="alert existingReg">
+                    <div>
+                        <span class="fa fa-info"></span>
+                        <p>] .$Data->{'lang'}->txt('Contact details successfully updated.') . qq[</p>
+                    </div>
+                </div>
+                <div class="txtright">
+                <a href = "$url" class = "btn-main btn-proceed">] . $Data->{'lang'}->txt('Continue') . qq[ </a>
+                </div>                
+                ];
             }
-            $Data->{'RedirectTo'} = "$Defs::base_url/registration/index.cgi?client=$Data->{'client'}&amp;a=HOME&amp;act_acc=". $personObj->ID();
+            #$Data->{'RedirectTo'} = "$Defs::base_url/registration/index.cgi?client=$Data->{'client'}&amp;a=HOME&amp;act_acc=". $personObj->ID();
             
         } # end SPE_U 
         
