@@ -131,8 +131,7 @@ sub handleSelfRegoPersonEdit {
                 
             }
             $Data->{'RedirectTo'} = "$Defs::base_url/registration/index.cgi?client=$Data->{'client'}&amp;a=HOME&amp;act_acc=". $personObj->ID();
-            my $header = $p->redirect(-uri => $Data->{'RedirectTo'});
-            print $header;
+            
         } # end SPE_U 
         
     
