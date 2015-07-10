@@ -2317,7 +2317,39 @@ sub product_apply_transaction {
 
 sub apply_product_rules {
     my ($Data,$productID,$personID,$transID) = @_;
-        
+ 
+    {
+
+        my $st = qq[
+            UPDATE tblTransactions as T
+                INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
+                INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = P.intProductNationalPeriodID)
+            SET
+                T.dtStart = NP.dtFrom,
+                T.dtEnd= NP.dtTo
+            WHERE
+                T.intTransLogID= ?
+                AND T.intRealmID = ?
+                AND (
+                    NOT T.dtStart
+                    OR T.dtStart IS NULL
+                    OR T.dtStart = '0000-00-00'
+                )
+                AND T.intTableType = $Defs::LEVEL_PERSON
+                AND T.intID = ?
+        ];
+
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $transID,
+            $Data->{'Realm'},
+            $personID
+        );
+    }
+
+    return;
+    
+       
     
     # For each product purchased apply appropriate rules.
     #foreach my $id(@{$IDs}){
@@ -2453,36 +2485,6 @@ sub apply_product_rules {
     #        $personID
 	#	);
     #}
-
-    {
-
-        my $st = qq[
-            UPDATE tblTransactions as T
-                INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
-                INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = P.intProductNationalPeriodID)
-            SET
-                T.dtStart = NP.dtFrom,
-                T.dtEnd= NP.dtTo
-            WHERE
-                T.intTransLogID= ?
-                AND T.intRealmID = ?
-                AND (
-                    NOT T.dtStart
-                    OR T.dtStart IS NULL
-                    OR T.dtStart = '0000-00-00'
-                )
-                AND T.intTableType = $Defs::LEVEL_PERSON
-                AND T.intID = ?
-        ];
-
-        my $q = $Data->{'db'}->prepare($st);
-        $q->execute(
-            $transID,
-            $Data->{'Realm'},
-            $personID
-        );
-    }
-
 }
 
 sub getFormProductAttributes {
