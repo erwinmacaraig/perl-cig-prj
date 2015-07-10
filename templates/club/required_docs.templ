@@ -1,7 +1,8 @@
-<h3 class="panel-header">[% Lang.txt('Required Club Documents') %]</h3>
-<div class="panel-body">
-	<div class="document-notes">
+
 	[% IF documents.size %]
+            <h3 class="panel-header">[% Lang.txt('Required Club Documents') %]</h3>
+                <div class="panel-body">
+                    <div class="document-notes">
 		<table class="table documents-table">
 			[% FOREACH doc IN documents %]
 			<tr>
@@ -84,10 +85,10 @@
 			</tr>
 			[% END %]
 		</table>
-	[% END %]
+	
 	</div>
 </div>
-
+[% END %]
 
 <div class="clearfix">&nbsp;</div>
 [% IF optionaldocs.size %]
@@ -182,4 +183,12 @@
 	</div>
 </div>
 
+[% END %]
+[% IF !documents.size && !optionaldocs.size %]
+<div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>[% Lang.txt('No documents required for this registration, click') %] <strong>[% Lang.txt('Continue') %]</strong> [% Lang.txt('to proceed') %].</p>
+            </div>
+        </div>  
 [% END %]

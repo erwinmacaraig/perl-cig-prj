@@ -167,3 +167,11 @@
 </div>
 
 [% END %]
+[% IF !documents.size && !optionaldocs.size %]
+<div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>[% Lang.txt('No documents required for this registration, click') %] <strong>[% Lang.txt('Continue') %]</strong> [% Lang.txt('to proceed') %].</p>
+            </div>
+        </div>  
+[% END %]
