@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-01 11:41+0800\n"
+"POT-Creation-Date: 2015-07-02 12:27+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1761,7 +1761,7 @@ msgstr "Färdig"
 msgid "Continue"
 msgstr "Fortsätt"
 
-#: web/ListPersons.pm Line:193
+#: web/ListPersons.pm Line:192
 msgid "DUPLICATE"
 msgstr "DUPLIKAT"
 
@@ -1831,19 +1831,19 @@ msgstr "Felaktig sida begärd"
 msgid "Last"
 msgstr "Sista"
 
-#: web/ListPersons.pm Line:289
+#: web/ListPersons.pm Line:288
 msgid "List of people registered directly with the Member Association"
 msgstr "Lista på personer som är registrerade direkt till förbundet"
 
-#: web/ListPersons.pm Line:292
+#: web/ListPersons.pm Line:291
 msgid "List of people registered directly with the Region"
 msgstr "Lista på personer som är registrerade direkt till distriktet"
 
-#: web/ListPersons.pm Line:295
+#: web/ListPersons.pm Line:294
 msgid "List of people registered with the Club"
 msgstr "Lista på personer som är registrerade till föreningen"
 
-#: web/ListPersons.pm Line:335
+#: web/ListPersons.pm Line:334
 msgid "N"
 msgstr "N"
 
@@ -1867,7 +1867,7 @@ msgstr "Personens nivå"
 msgid "Person Type"
 msgstr "Personens typ"
 
-#: web/ListPersons.pm Line:287
+#: web/ListPersons.pm Line:286
 msgid "Persons in [_1]"
 msgstr "Personer i [_1]"
 
@@ -1912,7 +1912,7 @@ msgstr "Registreringstyp tillsatt"
 msgid "Registrations accepted by my organisation"
 msgstr "Registreringar godkända av min organisation"
 
-#: web/ListPersons.pm Line:145
+#: web/ListPersons.pm Line:144
 msgid "SUSPENDED"
 msgstr "AVSTÄNGD"
 
@@ -1945,7 +1945,7 @@ msgstr "Inga dokument"
 msgid "Upload Documents"
 msgstr "Skicka dokument"
 
-#: web/ListPersons.pm Line:335
+#: web/ListPersons.pm Line:334
 msgid "Y"
 msgstr "J"
 
@@ -2450,28 +2450,28 @@ msgstr "Lägg till klassificering"
 msgid "Additional Information"
 msgstr "Tilläggsuppgifter"
 
-#: web/WorkFlow.pm Line:328
+#: web/WorkFlow.pm Line:339
 msgid "An error has been encountered."
 msgstr "Ett fel har inträffat."
 
-#: web/WorkFlow.pm Line:3862
-#: Line:3974
+#: web/WorkFlow.pm Line:3873
+#: Line:3985
 msgid "Approval"
 msgstr "Godkännande"
 
-#: web/WorkFlow.pm Line:4736
+#: web/WorkFlow.pm Line:4747
 msgid "Approval by Club"
 msgstr "Godkännande av förening"
 
-#: web/WorkFlow.pm Line:4744
+#: web/WorkFlow.pm Line:4755
 msgid "Approval by Member Association"
 msgstr "Godkännande av förbundet"
 
-#: web/WorkFlow.pm Line:4740
+#: web/WorkFlow.pm Line:4751
 msgid "Approval by Regional Association"
 msgstr "Godkännande av distriktet"
 
-#: web/WorkFlow.pm Line:3814
+#: web/WorkFlow.pm Line:3825
 msgid "Approved"
 msgstr "Godkänd"
 
@@ -2495,7 +2495,7 @@ msgstr "Typ av klassificering"
 msgid "Certifications"
 msgstr "Klassificeringar"
 
-#: web/WorkFlow.pm Line:3059
+#: web/WorkFlow.pm Line:3070
 msgid "Club Registration"
 msgstr "Registrering av förening"
 
@@ -2527,7 +2527,7 @@ msgstr "Om du inte har ett internationellt speltillstånd (ITC) kan du begära e
 msgid "If you have the ITC then please start the transfer process here."
 msgstr "Om du har ett internationellt spelstillstånd (ITC) kan starta registreringsprocessen här."
 
-#: web/WorkFlow.pm Line:695
+#: web/WorkFlow.pm Line:706
 msgid "International Transfer"
 msgstr "Internationell spelarövergång"
 
@@ -2539,36 +2539,36 @@ msgstr "Förmyndare"
 msgid "Loan Information"
 msgstr "Information om tidsbunden spelarövergång"
 
-#: web/WorkFlow.pm Line:2939
-#: Line:2956
-#: Line:2975
-#: Line:3063
+#: web/WorkFlow.pm Line:2950
+#: Line:2967
+#: Line:2986
 #: Line:3074
-#: Line:3183
+#: Line:3085
+#: Line:3194
 msgid "Locking Approval: Payment required."
 msgstr "Godkännande låst: Väntar på betalning"
 
-#: web/WorkFlow.pm Line:3420
+#: web/WorkFlow.pm Line:3431
 msgid "MISSING"
 msgstr "FATTAS"
 
-#: web/WorkFlow.pm Line:4760
-#: Line:4761
+#: web/WorkFlow.pm Line:4771
+#: Line:4772
 msgid "N/A"
 msgstr "Inte tillgänglig"
 
-#: web/WorkFlow.pm Line:3895
-#: Line:3993
+#: web/WorkFlow.pm Line:3906
+#: Line:4004
 msgid "New Club Registration - Approval"
 msgstr "Registrering av nu förening - Godkännande"
 
-#: web/WorkFlow.pm Line:3901
-#: Line:3998
+#: web/WorkFlow.pm Line:3912
+#: Line:4009
 msgid "New Facility Registration - Approval"
 msgstr "Registrering av ny anläggning - Godkännande"
 
-#: web/WorkFlow.pm Line:3862
-#: Line:3974
+#: web/WorkFlow.pm Line:3873
+#: Line:3985
 msgid "New [_1] Registration"
 msgstr "Ny registrering av [_1] "
 
@@ -2576,20 +2576,20 @@ msgstr "Ny registrering av [_1] "
 msgid "New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level"
 msgstr "Registrering som ny misslyckades, en existerande registrering hittades. Starta en övergång för att fortsätta."
 
-#: web/WorkFlow.pm Line:2683
-#: Line:4828
+#: web/WorkFlow.pm Line:2694
+#: Line:4839
 msgid "No data retrieved/no access"
 msgstr "Inget hämtat / ingen åtkomst"
 
-#: web/WorkFlow.pm Line:795
+#: web/WorkFlow.pm Line:806
 msgid "No outstanding tasks"
 msgstr "Inga väntande arbetsuppgifter"
 
-#: web/WorkFlow.pm Line:4117
+#: web/WorkFlow.pm Line:4128
 msgid "On-Hold"
 msgstr "Returnerad"
 
-#: web/WorkFlow.pm Line:3423
+#: web/WorkFlow.pm Line:3434
 msgid "Optional. Not Provided."
 msgstr "Icke-obligatoriskt. Fattas."
 
@@ -2601,7 +2601,7 @@ msgstr "Förälder"
 msgid "Parent/Guardian Details"
 msgstr "Information om förälder/förmyndare"
 
-#: web/WorkFlow.pm Line:1280
+#: web/WorkFlow.pm Line:1291
 msgid "Payment required"
 msgstr "Betalning krävs"
 
@@ -2609,15 +2609,15 @@ msgstr "Betalning krävs"
 msgid "Person Certifications"
 msgstr "Personens klassificeringar"
 
-#: web/WorkFlow.pm Line:764
+#: web/WorkFlow.pm Line:775
 msgid "Person Request"
 msgstr "Begäran av person"
 
-#: web/WorkFlow.pm Line:3834
+#: web/WorkFlow.pm Line:3845
 msgid "Player Loan - Approved"
 msgstr "Tidsbunden spelarövergång - Godkänd"
 
-#: web/WorkFlow.pm Line:608
+#: web/WorkFlow.pm Line:619
 msgid "Please review this record"
 msgstr "Var god kontrollera denna post"
 
@@ -2629,7 +2629,7 @@ msgstr "Problem med att uppdatera fälten"
 msgid "Renewal failed, cannot find existing registration. Might have already been renewed"
 msgstr "Förnyandet misslyckades, hittar inte en existerande registrering. Det är också möjligt att förnyandet redan är gjort."
 
-#: web/WorkFlow.pm Line:4284
+#: web/WorkFlow.pm Line:4295
 msgid "Resolved"
 msgstr "Behandlad"
 
@@ -2642,11 +2642,11 @@ msgstr "Spara"
 msgid "Select Certification"
 msgstr "Välj klassificering"
 
-#: web/WorkFlow.pm Line:324
+#: web/WorkFlow.pm Line:335
 msgid "Task has been put on-hold."
 msgstr "Arbetsuppgiften returnerad"
 
-#: web/WorkFlow.pm Line:2387
+#: web/WorkFlow.pm Line:2398
 msgid "Task has been resolved."
 msgstr "Arbetsuppgiften behandlad"
 
@@ -2654,7 +2654,7 @@ msgstr "Arbetsuppgiften behandlad"
 msgid "Terms and Conditions"
 msgstr "Vilkor"
 
-#: web/WorkFlow.pm Line:798
+#: web/WorkFlow.pm Line:809
 msgid "The following are the outstanding tasks to be authorised"
 msgstr "Följande arbetsuppgifter väntar på godkännande"
 
@@ -2662,7 +2662,7 @@ msgstr "Följande arbetsuppgifter väntar på godkännande"
 msgid "The system does not allow this combination"
 msgstr "Systemet tillåter inte denna kombination"
 
-#: web/WorkFlow.pm Line:610
+#: web/WorkFlow.pm Line:621
 msgid "This person has been duplicate resolved and appears to have an incorrect Registration count"
 msgstr "Denna person som har varit ett duplikat tycks ha fel antal av registreringar"
 
@@ -2678,7 +2678,7 @@ msgstr "För att visa klassificeringsdetaljer"
 msgid "Transfer Information"
 msgstr "Information om spelarövergången"
 
-#: web/WorkFlow.pm Line:3070
+#: web/WorkFlow.pm Line:3081
 msgid "Venue Registration"
 msgstr "Registrering av arena"
 
@@ -2686,183 +2686,183 @@ msgstr "Registrering av arena"
 msgid "What is your relationship to the minor you are registering?"
 msgstr "Vilken är din relation till den minderåring du registrerar?"
 
-#: web/WorkFlow.pm Line:4825
+#: web/WorkFlow.pm Line:4836
 msgid "Work Flow History"
 msgstr "Arbetsflöde"
 
-#: web/WorkFlow.pm Line:1996
+#: web/WorkFlow.pm Line:2007
 msgid "Work Flow task updated."
 msgstr "Arbetsuppgiften uppdaterad"
 
-#: web/WorkFlow.pm Line:2127
+#: web/WorkFlow.pm Line:2138
 msgid "Work task notes"
 msgstr "Arbetsuppgiftens anteckningar"
 
-#: web/WorkFlow.pm Line:1827
+#: web/WorkFlow.pm Line:1838
 msgid "Work task notes Updated"
 msgstr "Arbetsuppgiftens anteckningar uppdaterade"
 
-#: web/WorkFlow.pm Line:725
+#: web/WorkFlow.pm Line:736
 msgid "You have Duplicates to resolve"
 msgstr "Du har duplikat att behandla"
 
-#: web/WorkFlow.pm Line:718
+#: web/WorkFlow.pm Line:729
 msgid "You have Transfers to view"
 msgstr "Du har spelarövergångar att behandla"
 
-#: web/WorkFlow.pm Line:4182
+#: web/WorkFlow.pm Line:4193
 msgid "You have placed this Club Official Renewal On Hold, the [_1] will be informed."
 msgstr "Du har returnerat detta förnyande av föreningsfunktionär. [_1] informeras."
 
-#: web/WorkFlow.pm Line:4185
+#: web/WorkFlow.pm Line:4196
 msgid "You have placed this MA Official Renewal On Hold, the [_1] will be informed."
 msgstr "Du har returnerat detta förnyande av förbundsfunktionär. [_1] informeras."
 
-#: web/WorkFlow.pm Line:4179
+#: web/WorkFlow.pm Line:4190
 msgid "You have placed this Player Renewal On Hold, the [_1] will be informed."
 msgstr "Du har returnerat detta förnyande av spelare. [_1] informeras."
 
-#: web/WorkFlow.pm Line:4188
+#: web/WorkFlow.pm Line:4199
 msgid "You have placed this Team Official Renewal On Hold, the [_1] will be informed."
 msgstr "Du har returnerat detta förnyande  av lagsfunktionär. [_1] informeras."
 
-#: web/WorkFlow.pm Line:4191
+#: web/WorkFlow.pm Line:4202
 msgid "You have placed this [_1] Renewal On Hold, the [_1] will be informed."
 msgstr "Du har returnerat detta förnyande av [_1]. [_1] informeras."
 
-#: web/WorkFlow.pm Line:4165
+#: web/WorkFlow.pm Line:4176
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att ändra på personens uppgifter."
 
-#: web/WorkFlow.pm Line:4149
+#: web/WorkFlow.pm Line:4160
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Club Official Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera föreningsfunktionär."
 
-#: web/WorkFlow.pm Line:4132
+#: web/WorkFlow.pm Line:4143
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Coach Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera tränare."
 
-#: web/WorkFlow.pm Line:4161
+#: web/WorkFlow.pm Line:4172
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera förening."
 
-#: web/WorkFlow.pm Line:4157
+#: web/WorkFlow.pm Line:4168
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Facility Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera facilitet."
 
-#: web/WorkFlow.pm Line:4124
+#: web/WorkFlow.pm Line:4135
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen på tidsbunden spelarövergång."
 
-#: web/WorkFlow.pm Line:4128
+#: web/WorkFlow.pm Line:4139
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera spelare."
 
-#: web/WorkFlow.pm Line:4153
+#: web/WorkFlow.pm Line:4164
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Team Official Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera lagsfunktionär."
 
-#: web/WorkFlow.pm Line:4120
+#: web/WorkFlow.pm Line:4131
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process."
 msgstr "Du har returnerat denna arbetsuppgift. När föreningen har korrigerat problemet, kan du kontrollera och fortsätta med spelarövergångsprocessen."
 
-#: web/WorkFlow.pm Line:4141
+#: web/WorkFlow.pm Line:4152
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När organisationen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera förbundsfunktionär."
 
-#: web/WorkFlow.pm Line:4137
+#: web/WorkFlow.pm Line:4148
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När organisationen har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera domare."
 
-#: web/WorkFlow.pm Line:4169
+#: web/WorkFlow.pm Line:4180
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Club Details process."
 msgstr "Du har returnerat denna arbetsuppgift. När organisationen har korrigerat problemet, kan du kontrollera och fortsätta med processen att ändra på föreningens uppgifter."
 
-#: web/WorkFlow.pm Line:4173
+#: web/WorkFlow.pm Line:4184
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Venue Details process."
 msgstr "Du har returnerat denna arbetsuppgift. När organisationen har korrigerat problemet, kan du kontrollera och fortsätta med processen att ändra på arenans uppgifter."
 
-#: web/WorkFlow.pm Line:4145
+#: web/WorkFlow.pm Line:4156
 msgid "You have put this task on-hold, once the submitting RA resolves the issue, you would be able to verify and continue with the RA Official Registration process."
 msgstr "Du har returnerat denna arbetsuppgift. När distriktet har korrigerat problemet, kan du kontrollera och fortsätta med processen att registrera distriktsfunktionär."
 
-#: web/WorkFlow.pm Line:4207
+#: web/WorkFlow.pm Line:4218
 msgid "You have rejected the player loan of [_1] [_2]"
 msgstr "Du har avslått den tidsbundna spelarövergången för [_1] [_2]"
 
-#: web/WorkFlow.pm Line:4254
+#: web/WorkFlow.pm Line:4265
 msgid "You have rejected this Amendment of Person Registration."
 msgstr "Du har avslått denna ändring på registrering av person."
 
-#: web/WorkFlow.pm Line:4232
+#: web/WorkFlow.pm Line:4243
 msgid "You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Du har avslått denna registrering av föreningsfunktionär. Föreningen kommer att informeras. För att fortsätta med registreringen, måste föreningen starta en ny registrering."
 
-#: web/WorkFlow.pm Line:4263
+#: web/WorkFlow.pm Line:4274
 msgid "You have rejected this Club Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av föreningsfunktionär. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4250
+#: web/WorkFlow.pm Line:4261
 msgid "You have rejected this Club Registration. To proceed with this Registration, start a new Registration."
 msgstr "Du har avslått denna registrering av förening. Starta en ny registrering för att fortsätta."
 
-#: web/WorkFlow.pm Line:4215
+#: web/WorkFlow.pm Line:4226
 msgid "You have rejected this Coach Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Du har avslått denna registrering av tränare. Föreningen kommer att informeras. För att fortsätta med registreringen, måste föreningen starta en ny registrering."
 
-#: web/WorkFlow.pm Line:4223
+#: web/WorkFlow.pm Line:4234
 msgid "You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration."
 msgstr "Du har avslått denna registrering av förbundsfunktionär. Starta en ny registrering för att fortsätta."
 
-#: web/WorkFlow.pm Line:4266
+#: web/WorkFlow.pm Line:4277
 msgid "You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av förbundsfunktionär. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4211
+#: web/WorkFlow.pm Line:4222
 msgid "You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Du har avslått denna registrering av spelare. Föreningen kommer att informeras. För att fortsätta med registreringen, måste föreningen starta en ny registrering."
 
-#: web/WorkFlow.pm Line:4260
+#: web/WorkFlow.pm Line:4271
 msgid "You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av spelare. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4227
+#: web/WorkFlow.pm Line:4238
 msgid "You have rejected this RA Official Registration. To proceed with this Registration, start a new Registration."
 msgstr "Du har avslått denna registrering av distriktsfunktionär. Starta en ny registrering för att fortsätta."
 
-#: web/WorkFlow.pm Line:4269
+#: web/WorkFlow.pm Line:4280
 msgid "You have rejected this RA Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av distriktsfunktionär. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4219
+#: web/WorkFlow.pm Line:4230
 msgid "You have rejected this Referee Registration. To proceed with this Registration, start a new Registration."
 msgstr "Du har avslått denna registrering av domare. Starta en ny registrering för att fortsätta."
 
-#: web/WorkFlow.pm Line:4236
+#: web/WorkFlow.pm Line:4247
 msgid "You have rejected this Team Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Du har avslått denna registrering av lagsfunktionär. Föreningen kommer att informeras. För att fortsätta med registreringen, måste föreningen starta en ny registrering."
 
-#: web/WorkFlow.pm Line:4272
+#: web/WorkFlow.pm Line:4283
 msgid "You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av lagsfunktionär. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4244
+#: web/WorkFlow.pm Line:4255
 msgid "You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Du har avslått denna registrering av arena. Föreningen kommer att informeras. För att fortsätta med registreringen, måste föreningen starta en ny registrering."
 
-#: web/WorkFlow.pm Line:4242
+#: web/WorkFlow.pm Line:4253
 msgid "You have rejected this Venue Registration. To proceed with this Registration start a new Registration."
 msgstr "Du har avslått denna registrering av arena. Starta en ny registrering för att fortsätta."
 
-#: web/WorkFlow.pm Line:4275
+#: web/WorkFlow.pm Line:4286
 msgid "You have rejected this [_1] Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Du har avslått detta förnyande av [_1]. Starta ett nytt förnyande för att fortsätta."
 
-#: web/WorkFlow.pm Line:4203
+#: web/WorkFlow.pm Line:4214
 msgid "You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer."
 msgstr "Du har avslått denna spelaröverång. Föreningarna kommer att informeras. För att fortsätta med spelarövergången, måste föreningen starta en ny spelarövergång."
 
-#: web/WorkFlow.pm Line:4283
+#: web/WorkFlow.pm Line:4294
 msgid "You have resolved this task."
 msgstr "Du har behandlat denna arbetsuppgift."
 
@@ -2870,7 +2870,7 @@ msgstr "Du har behandlat denna arbetsuppgift."
 msgid "You must choose one of the following options"
 msgstr "Du måste välja ett av följände allternativ"
 
-#: web/WorkFlow.pm Line:2384
+#: web/WorkFlow.pm Line:2395
 msgid "has been rejected."
 msgstr "har avslåtts."
 
@@ -2879,7 +2879,7 @@ msgstr "har avslåtts."
 msgid "or"
 msgstr "eller"
 
-#: web/WorkFlow.pm Line:659
+#: web/WorkFlow.pm Line:670
 msgid "with Level change from [_1] to [_2]"
 msgstr "ändrar på statusen från  [_1] till [_2]"
 
@@ -4513,19 +4513,19 @@ msgstr "Uppdateringen av lösenordet misslyckades på grund av"
 msgid "must be at least 6 characters long"
 msgstr "måste vara minst 6 tecken långt"
 
-#: templates/translation/outstanding.templ Line:32
+#: templates/translation/outstanding.templ Line:33
 msgid "Advanced Club"
 msgstr "Föreningsrapport"
 
-#: templates/translation/outstanding.templ Line:31
+#: templates/translation/outstanding.templ Line:32
 msgid "Advanced People (Below my level)"
 msgstr "Personrapportering (under min nivå)"
 
-#: templates/translation/outstanding.templ Line:30
+#: templates/translation/outstanding.templ Line:31
 msgid "Advanced People (My level)"
 msgstr "Personrapportering (min nivå)"
 
-#: templates/translation/outstanding.templ Line:34
+#: templates/translation/outstanding.templ Line:35
 msgid "Advanced Transfers Report"
 msgstr "Spelarövergångsrapportering"
 
@@ -4541,6 +4541,10 @@ msgstr "Tränarregistrering"
 msgid "Create a new user"
 msgstr "Skapa en ny användare"
 
+#: templates/translation/outstanding.templ Line:26
+msgid "DOB (YYYYMMDD)"
+msgstr "Födelsedatum (ÅÅMMDD)"
+
 #: templates/flow/facility_summary.templ Line:55
 msgid "Field Discipline"
 msgstr "Fältets sport"
@@ -4553,7 +4557,7 @@ msgstr "Fältets namn"
 msgid "Field number"
 msgstr "Fältets nummer"
 
-#: templates/translation/outstanding.templ Line:29
+#: templates/translation/outstanding.templ Line:30
 msgid "Finance"
 msgstr "Betalningsrapportering"
 
@@ -4593,59 +4597,59 @@ msgstr "Organisationens namn"
 msgid "Organisation type"
 msgstr "Typ av organisation"
 
-#: templates/translation/outstanding.templ Line:48
+#: templates/translation/outstanding.templ Line:49
 msgid "PERSON REQUEST ACCESS ACCEPTED:"
 msgstr "BEGÄRAN PÅ ÅTKOMST GODKÄND:"
 
-#: templates/translation/outstanding.templ Line:60
+#: templates/translation/outstanding.templ Line:61
 msgid "PERSON REQUEST ACCESS CANCELLED:"
 msgstr "BEGÄRAN PÅ ÅTKOMST AVBRUTEN:"
 
-#: templates/translation/outstanding.templ Line:52
+#: templates/translation/outstanding.templ Line:53
 msgid "PERSON REQUEST ACCESS COMPLETED:"
 msgstr "BEGÄRAN PÅ ÅTKOMST FÄRDIG:"
 
-#: templates/translation/outstanding.templ Line:49
+#: templates/translation/outstanding.templ Line:50
 msgid "PERSON REQUEST ACCESS DENIED:"
 msgstr "BEGÄRAN PÅ ÅTKOMST FÖRNEKAD:"
 
-#: templates/translation/outstanding.templ Line:50
+#: templates/translation/outstanding.templ Line:51
 msgid "PERSON REQUEST ACCESS OVERRIDDEN:"
 msgstr "BEGÄRAN PÅ ÅTKOMST ÅSIDOSATT:"
 
-#: templates/translation/outstanding.templ Line:51
+#: templates/translation/outstanding.templ Line:52
 msgid "PERSON REQUEST ACCESS REJECTED:"
 msgstr "BEGÄRAN PÅ ÅTKOMST AVSLAGEN:"
 
-#: templates/translation/outstanding.templ Line:58
+#: templates/translation/outstanding.templ Line:59
 msgid "PERSON REQUEST ACCESS SENT:"
 msgstr "BEGÄRAN PÅ ÅTKOMST SKICKAD:"
 
-#: templates/translation/outstanding.templ Line:53
+#: templates/translation/outstanding.templ Line:54
 msgid "PERSON REQUEST TRANSFER ACCEPTED:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG GODKÄND:"
 
-#: templates/translation/outstanding.templ Line:61
+#: templates/translation/outstanding.templ Line:62
 msgid "PERSON REQUEST TRANSFER CANCELLED:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG AVBRUTEN:"
 
-#: templates/translation/outstanding.templ Line:57
+#: templates/translation/outstanding.templ Line:58
 msgid "PERSON REQUEST TRANSFER COMPLETED:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG FÄRDIG:"
 
-#: templates/translation/outstanding.templ Line:54
+#: templates/translation/outstanding.templ Line:55
 msgid "PERSON REQUEST TRANSFER DENIED:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG FÖRNEKAD:"
 
-#: templates/translation/outstanding.templ Line:55
+#: templates/translation/outstanding.templ Line:56
 msgid "PERSON REQUEST TRANSFER OVERRIDDEN:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG ÅSIDOSATT:"
 
-#: templates/translation/outstanding.templ Line:56
+#: templates/translation/outstanding.templ Line:57
 msgid "PERSON REQUEST TRANSFER REJECTED:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG AVSLAGEN:"
 
-#: templates/translation/outstanding.templ Line:59
+#: templates/translation/outstanding.templ Line:60
 msgid "PERSON REQUEST TRANSFER SENT:"
 msgstr "BEGÖRAN PÅ SPELARÖVERGÅNG SKICKAD:"
 
@@ -4693,19 +4697,19 @@ msgstr "Begränsad åtkomst"
 msgid "Run Report"
 msgstr "Kör rapport"
 
-#: templates/translation/outstanding.templ Line:37
+#: templates/translation/outstanding.templ Line:38
 msgid "Set your own parameters etc for reporting on Clubs."
 msgstr "Välj dina egna inställningar för föreningsrapportering."
 
-#: templates/translation/outstanding.templ Line:36
+#: templates/translation/outstanding.templ Line:37
 msgid "Set your own parameters etc for reporting on People"
 msgstr "Välj dina egna inställningar för personrapportering."
 
-#: templates/translation/outstanding.templ Line:39
+#: templates/translation/outstanding.templ Line:40
 msgid "Set your own parameters etc for reporting on Transactions"
 msgstr "Välj dina egna inställningar för transaktionsrapportering."
 
-#: templates/translation/outstanding.templ Line:38
+#: templates/translation/outstanding.templ Line:39
 msgid "Set your own parameters etc for reporting on Transfers"
 msgstr "Välj dina egna inställningar för övergångsrapportering."
 
@@ -4721,11 +4725,11 @@ msgstr "Personal"
 msgid "The following users are authorised to login"
 msgstr "Följande användare är auktoriserade att logga in"
 
-#: templates/translation/outstanding.templ Line:35
+#: templates/translation/outstanding.templ Line:36
 msgid "Transactions (My People)"
 msgstr "Betalningsrapport (min nivå)"
 
-#: templates/translation/outstanding.templ Line:33
+#: templates/translation/outstanding.templ Line:34
 msgid "Transfers Below Report"
 msgstr "Spelarövergångar"
 
@@ -4737,27 +4741,27 @@ msgstr "Typ av juridisk person"
 msgid "Venue Short Name"
 msgstr "Förkortning på arenans namn"
 
-#: templates/translation/outstanding.templ Line:42
+#: templates/translation/outstanding.templ Line:43
 msgid "WORK TASK ADDED:"
 msgstr "ARBETSUPPGIFT TILLAGD:"
 
-#: templates/translation/outstanding.templ Line:43
+#: templates/translation/outstanding.templ Line:44
 msgid "WORK TASK APPROVED:"
 msgstr "ARBETSUPPGIFT GODKÄND:"
 
-#: templates/translation/outstanding.templ Line:46
+#: templates/translation/outstanding.templ Line:47
 msgid "WORK TASK HELD:"
 msgstr "ARBETSUPPGIFT RETURNERAD:"
 
-#: templates/translation/outstanding.templ Line:44
+#: templates/translation/outstanding.templ Line:45
 msgid "WORK TASK REJECTED:"
 msgstr "ARBETSUPPGIFT AVSLAGEN:"
 
-#: templates/translation/outstanding.templ Line:45
+#: templates/translation/outstanding.templ Line:46
 msgid "WORK TASK RESOLVED:"
 msgstr "ARBETSUPPGIFT BEHANDLAD:"
 
-#: templates/translation/outstanding.templ Line:47
+#: templates/translation/outstanding.templ Line:48
 msgid "WORK TASK RESUMED:"
 msgstr "ARBETSUPPGIFT ÅTERUPPTAGEN:"
 

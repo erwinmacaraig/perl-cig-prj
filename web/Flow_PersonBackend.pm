@@ -1069,10 +1069,10 @@ sub display_products {
             {},
             1,
         );
-        if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
+        #if (! $content)   {
+        #    $self->incrementCurrentProcessIndex();
+        #    return ('',2);
+        #}
     }
     else    {
         if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
