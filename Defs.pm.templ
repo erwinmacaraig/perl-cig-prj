@@ -351,6 +351,16 @@ $ORIGIN_REGION = 20;
 $ORIGIN_STATE = 30;
 $ORIGIN_NATIONAL = 100;
 
+%originLevelTypes= (
+  0=> 'Imported/Other',
+  $ORIGIN_SELF=> 'Self Registration',
+  $ORIGIN_CLUB=> 'Club',
+  $ORIGIN_ZONE=> 'Zone',
+  $ORIGIN_REGION=> 'Region',
+  $ORIGIN_STATE=> 'State',
+  $ORIGIN_NATIONAL=> 'Member Association',
+);
+
 $USER_STATUS_INVALID = 0,
 $USER_STATUS_NOTCONFIRMED = 1,
 $USER_STATUS_CONFIRMED = 2,

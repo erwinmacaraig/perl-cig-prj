@@ -390,12 +390,15 @@ sub listPersonRecord {
         WHERE
             P.intRealmID = ?
             AND P.strStatus IN ('REGISTERED', 'PASSIVE','PENDING')
-            AND
-                (P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
+            AND P.strNationalNum = ?
         $groupBy
         $orderBy
         $limit
     ];
+
+    # removing LIKE in the condition as we're only passing strNationalNum from search result (Search/Person.pm - action = PRA_getrecord, param search_keyword)
+
+    #(P.strNationalNum = ? OR CONCAT_WS(' ', P.strLocalFirstname, P.strLocalSurname) LIKE CONCAT('%',?,'%') OR CONCAT_WS(' ', P.strLocalSurname, P.strLocalFirstname) LIKE CONCAT('%',?,'%'))
     #(P.strNationalNum = ? OR P.strLocalFirstname LIKE CONCAT('%',?,'%') OR P.strLocalSurname LIKE CONCAT('%',?,'%'))
 
     my $db = $Data->{'db'};
@@ -404,8 +407,6 @@ sub listPersonRecord {
         $entityID,
         $entityID,
         $Data->{'Realm'},
-        $searchKeyword,
-        $searchKeyword,
         $searchKeyword
     ) or query_error($st);
 
@@ -987,6 +988,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
+            sport => $Defs::sportType{$request->{'strSport'}} || '',
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
             Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
@@ -1019,8 +1021,8 @@ sub listRequests {
             field => 'requestTo',
         }, 
         {
-            name => $Data->{'lang'}->txt('Type'),
-            field => 'requestType',
+            name => $Data->{'lang'}->txt('Sport'),
+            field => 'sport',
         }, 
         {
             name => $Data->{'lang'}->txt('Response Status'),
@@ -2201,8 +2203,9 @@ sub viewRequestHistory {
     }
 
     if($readonly) {
+        $request->{'sport'} = $Defs::sportType{$request->{'strSport'}} || '';
         $request->{'RequestResponse'} = $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested');
-        $request->{'RequestStatus'} = $Defs::personRequestResponse{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
+        $request->{'RequestStatus'} = $Defs::personRequestStatus{$request->{'strRequestStatus'}} || $Defs::personRegoStatus{$request->{'personRegoStatus'}};
 
         my %readonlyTemplateData = (
             request => $request,

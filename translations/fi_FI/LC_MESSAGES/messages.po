@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-01 11:41+0800\n"
+"POT-Creation-Date: 2015-07-02 12:27+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1762,7 +1762,7 @@ msgstr "Valmis"
 msgid "Continue"
 msgstr "Jatka"
 
-#: web/ListPersons.pm Line:193
+#: web/ListPersons.pm Line:192
 msgid "DUPLICATE"
 msgstr "TUPLA"
 
@@ -1833,19 +1833,19 @@ msgstr "Virheellinen sivupyyntö"
 msgid "Last"
 msgstr "Viimeinen"
 
-#: web/ListPersons.pm Line:289
+#: web/ListPersons.pm Line:288
 msgid "List of people registered directly with the Member Association"
 msgstr "Lista henkilöistä jotka on rekisteröity suoraan liittoon"
 
-#: web/ListPersons.pm Line:292
+#: web/ListPersons.pm Line:291
 msgid "List of people registered directly with the Region"
 msgstr "Lista henkilöistä jotka on rekisteröity suoraan piiriin"
 
-#: web/ListPersons.pm Line:295
+#: web/ListPersons.pm Line:294
 msgid "List of people registered with the Club"
 msgstr "Lista henkilöistä jotka on rekisteröity seuraan"
 
-#: web/ListPersons.pm Line:335
+#: web/ListPersons.pm Line:334
 msgid "N"
 msgstr "E"
 
@@ -1869,7 +1869,7 @@ msgstr "Henkilön taso"
 msgid "Person Type"
 msgstr "Henkilön tyyppi"
 
-#: web/ListPersons.pm Line:287
+#: web/ListPersons.pm Line:286
 msgid "Persons in [_1]"
 msgstr "Henkilöä kohteessa [_1]"
 
@@ -1914,7 +1914,7 @@ msgstr "Rekisteröintityyppi lisätty onnistuneesti"
 msgid "Registrations accepted by my organisation"
 msgstr "Organisaationi hyväksymät rekisteröinnit"
 
-#: web/ListPersons.pm Line:145
+#: web/ListPersons.pm Line:144
 msgid "SUSPENDED"
 msgstr "SULJETTU TOIMINNASTA"
 
@@ -1947,7 +1947,7 @@ msgstr "Ei dokumentteja"
 msgid "Upload Documents"
 msgstr "Lähetä dokumentteja"
 
-#: web/ListPersons.pm Line:335
+#: web/ListPersons.pm Line:334
 msgid "Y"
 msgstr "K"
 
@@ -2452,28 +2452,28 @@ msgstr "Lisää uusi luokitus"
 msgid "Additional Information"
 msgstr "Lisätiedot"
 
-#: web/WorkFlow.pm Line:328
+#: web/WorkFlow.pm Line:339
 msgid "An error has been encountered."
 msgstr "On tapahtunut virhe."
 
-#: web/WorkFlow.pm Line:3862
-#: Line:3974
+#: web/WorkFlow.pm Line:3873
+#: Line:3985
 msgid "Approval"
 msgstr "Hyväksyntä"
 
-#: web/WorkFlow.pm Line:4736
+#: web/WorkFlow.pm Line:4747
 msgid "Approval by Club"
 msgstr "Seuran hyväksyntä"
 
-#: web/WorkFlow.pm Line:4744
+#: web/WorkFlow.pm Line:4755
 msgid "Approval by Member Association"
 msgstr "Liiton hyväksyntä"
 
-#: web/WorkFlow.pm Line:4740
+#: web/WorkFlow.pm Line:4751
 msgid "Approval by Regional Association"
 msgstr "Piirin hyväksyntä"
 
-#: web/WorkFlow.pm Line:3814
+#: web/WorkFlow.pm Line:3825
 msgid "Approved"
 msgstr "Hyväksytty"
 
@@ -2497,7 +2497,7 @@ msgstr "Luokituksen tyyppi"
 msgid "Certifications"
 msgstr "Luokitukset"
 
-#: web/WorkFlow.pm Line:3059
+#: web/WorkFlow.pm Line:3070
 msgid "Club Registration"
 msgstr "Seuran rekisteröinti"
 
@@ -2529,7 +2529,7 @@ msgstr "Jos sinulla ei ole kansainvälistä pelilupaa (ITC), voit pyytää sitä
 msgid "If you have the ITC then please start the transfer process here."
 msgstr "Jos sinulla on kansainvälinen pelilupa (ITC), aloita rekisteröinti tästä."
 
-#: web/WorkFlow.pm Line:695
+#: web/WorkFlow.pm Line:706
 msgid "International Transfer"
 msgstr "Kansainvälinen pelaajasiirto"
 
@@ -2541,36 +2541,36 @@ msgstr "Huoltaja"
 msgid "Loan Information"
 msgstr "Määräaikaisen pelaajasiirron tiedot"
 
-#: web/WorkFlow.pm Line:2939
-#: Line:2956
-#: Line:2975
-#: Line:3063
+#: web/WorkFlow.pm Line:2950
+#: Line:2967
+#: Line:2986
 #: Line:3074
-#: Line:3183
+#: Line:3085
+#: Line:3194
 msgid "Locking Approval: Payment required."
 msgstr "Hyväksyntä lukittu: Odottaa maksua."
 
-#: web/WorkFlow.pm Line:3420
+#: web/WorkFlow.pm Line:3431
 msgid "MISSING"
 msgstr "PUUTTUU"
 
-#: web/WorkFlow.pm Line:4760
-#: Line:4761
+#: web/WorkFlow.pm Line:4771
+#: Line:4772
 msgid "N/A"
 msgstr "Ei saatavilla"
 
-#: web/WorkFlow.pm Line:3895
-#: Line:3993
+#: web/WorkFlow.pm Line:3906
+#: Line:4004
 msgid "New Club Registration - Approval"
 msgstr "Uuden seuran rekisteröinti - Hyväksyntä"
 
-#: web/WorkFlow.pm Line:3901
-#: Line:3998
+#: web/WorkFlow.pm Line:3912
+#: Line:4009
 msgid "New Facility Registration - Approval"
 msgstr "Uuden kentät rekisteröinti - Hyväksyntä"
 
-#: web/WorkFlow.pm Line:3862
-#: Line:3974
+#: web/WorkFlow.pm Line:3873
+#: Line:3985
 msgid "New [_1] Registration"
 msgstr "Uusi [_1]rekisteröinti"
 
@@ -2578,20 +2578,20 @@ msgstr "Uusi [_1]rekisteröinti"
 msgid "New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level"
 msgstr "Rekisteröinti uutena epäonnistui, olemassa oleva rekisteröinti löytyi. Tee siirto jatkaaksesi."
 
-#: web/WorkFlow.pm Line:2683
-#: Line:4828
+#: web/WorkFlow.pm Line:2694
+#: Line:4839
 msgid "No data retrieved/no access"
 msgstr "Tietoja ei haettu / ei pääsyä"
 
-#: web/WorkFlow.pm Line:795
+#: web/WorkFlow.pm Line:806
 msgid "No outstanding tasks"
 msgstr "Ei odottavia tehtäviä"
 
-#: web/WorkFlow.pm Line:4117
+#: web/WorkFlow.pm Line:4128
 msgid "On-Hold"
 msgstr "Palautettu"
 
-#: web/WorkFlow.pm Line:3423
+#: web/WorkFlow.pm Line:3434
 msgid "Optional. Not Provided."
 msgstr "Valinnainen. Ei toimitettu."
 
@@ -2603,7 +2603,7 @@ msgstr "Vanhempi"
 msgid "Parent/Guardian Details"
 msgstr "Vanhemman/huoltajan tiedot"
 
-#: web/WorkFlow.pm Line:1280
+#: web/WorkFlow.pm Line:1291
 msgid "Payment required"
 msgstr "Maksu vaaditaan"
 
@@ -2611,15 +2611,15 @@ msgstr "Maksu vaaditaan"
 msgid "Person Certifications"
 msgstr "Henkilön luokitukset"
 
-#: web/WorkFlow.pm Line:764
+#: web/WorkFlow.pm Line:775
 msgid "Person Request"
 msgstr "Henkilön pyyntö"
 
-#: web/WorkFlow.pm Line:3834
+#: web/WorkFlow.pm Line:3845
 msgid "Player Loan - Approved"
 msgstr "Määräaikainen pelaajasiirto - Hyväksytty"
 
-#: web/WorkFlow.pm Line:608
+#: web/WorkFlow.pm Line:619
 msgid "Please review this record"
 msgstr "Tarkista tämä tieto"
 
@@ -2631,7 +2631,7 @@ msgstr "Ongelma kenttien päivittämisessä"
 msgid "Renewal failed, cannot find existing registration. Might have already been renewed"
 msgstr "Uudistaminen epäonnistui, olemassa olevaa rekisteröintiä ei löytynyt. On myös mahdollista että uudistaminen on jo tehty."
 
-#: web/WorkFlow.pm Line:4284
+#: web/WorkFlow.pm Line:4295
 msgid "Resolved"
 msgstr "Käsittele"
 
@@ -2644,11 +2644,11 @@ msgstr "Tallenna "
 msgid "Select Certification"
 msgstr "Valitse luokitus"
 
-#: web/WorkFlow.pm Line:324
+#: web/WorkFlow.pm Line:335
 msgid "Task has been put on-hold."
 msgstr "Tehtävä on palautettu."
 
-#: web/WorkFlow.pm Line:2387
+#: web/WorkFlow.pm Line:2398
 msgid "Task has been resolved."
 msgstr "Tehtävä on käsitelty."
 
@@ -2656,7 +2656,7 @@ msgstr "Tehtävä on käsitelty."
 msgid "Terms and Conditions"
 msgstr "Ehdot"
 
-#: web/WorkFlow.pm Line:798
+#: web/WorkFlow.pm Line:809
 msgid "The following are the outstanding tasks to be authorised"
 msgstr "Seuraavat tehtävä odottavat hyväksyntää"
 
@@ -2664,7 +2664,7 @@ msgstr "Seuraavat tehtävä odottavat hyväksyntää"
 msgid "The system does not allow this combination"
 msgstr "Järjestelmä ei salli tätä yhdistelmää"
 
-#: web/WorkFlow.pm Line:610
+#: web/WorkFlow.pm Line:621
 msgid "This person has been duplicate resolved and appears to have an incorrect Registration count"
 msgstr "Tällä yhdistetyllä henkilöllä näyttää olevan väärä määrä rekisteröintejä"
 
@@ -2680,7 +2680,7 @@ msgstr "Nähdäksesi henkilön luokitukset"
 msgid "Transfer Information"
 msgstr "Pelaajasiirron tiedot"
 
-#: web/WorkFlow.pm Line:3070
+#: web/WorkFlow.pm Line:3081
 msgid "Venue Registration"
 msgstr "Kentän rekisteröinti"
 
@@ -2688,183 +2688,183 @@ msgstr "Kentän rekisteröinti"
 msgid "What is your relationship to the minor you are registering?"
 msgstr "Mikä on suhteesi alaikäiseen henkilöön jonka olet rekisteröimässä?"
 
-#: web/WorkFlow.pm Line:4825
+#: web/WorkFlow.pm Line:4836
 msgid "Work Flow History"
 msgstr "Työvaiheiden historia"
 
-#: web/WorkFlow.pm Line:1996
+#: web/WorkFlow.pm Line:2007
 msgid "Work Flow task updated."
 msgstr "Tehtävä päivitetty"
 
-#: web/WorkFlow.pm Line:2127
+#: web/WorkFlow.pm Line:2138
 msgid "Work task notes"
 msgstr "Työtehtävän merkinnät"
 
-#: web/WorkFlow.pm Line:1827
+#: web/WorkFlow.pm Line:1838
 msgid "Work task notes Updated"
 msgstr "Työtehtävän lisätiedot päivitetty"
 
-#: web/WorkFlow.pm Line:725
+#: web/WorkFlow.pm Line:736
 msgid "You have Duplicates to resolve"
 msgstr "Sinulla kaksoiskappaleita selvitettävänä"
 
-#: web/WorkFlow.pm Line:718
+#: web/WorkFlow.pm Line:729
 msgid "You have Transfers to view"
 msgstr "Sinulla on pelaajasiirtoja hyväksyttävänä"
 
-#: web/WorkFlow.pm Line:4182
+#: web/WorkFlow.pm Line:4193
 msgid "You have placed this Club Official Renewal On Hold, the [_1] will be informed."
 msgstr "Olet palauttanut tämän seuratoimihenkilön uudistamisen, [_1] saa tästä ilmoituksen."
 
-#: web/WorkFlow.pm Line:4185
+#: web/WorkFlow.pm Line:4196
 msgid "You have placed this MA Official Renewal On Hold, the [_1] will be informed."
 msgstr "Olet palauttanut tämän liiton toimihenkilön uudistamisen, [_1] saa tästä ilmoituksen."
 
-#: web/WorkFlow.pm Line:4179
+#: web/WorkFlow.pm Line:4190
 msgid "You have placed this Player Renewal On Hold, the [_1] will be informed."
 msgstr "Olet palauttanut tämän pelaajan uudistamisen, [_1] saa tästä ilmoituksen."
 
-#: web/WorkFlow.pm Line:4188
+#: web/WorkFlow.pm Line:4199
 msgid "You have placed this Team Official Renewal On Hold, the [_1] will be informed."
 msgstr "Olet palauttanut tämän joukkuetoimihenkilön uudistamisen, [_1] saa tästä ilmoituksen."
 
-#: web/WorkFlow.pm Line:4191
+#: web/WorkFlow.pm Line:4202
 msgid "You have placed this [_1] Renewal On Hold, the [_1] will be informed."
 msgstr "Olet palauttanut tämän [_1] uudistamisen, [_1] saa tästä ilmoituksen."
 
-#: web/WorkFlow.pm Line:4165
+#: web/WorkFlow.pm Line:4176
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Amendment of Person Details process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset tarkistamaan ja jatkamaan tietojen muutosprosessia."
 
-#: web/WorkFlow.pm Line:4149
+#: web/WorkFlow.pm Line:4160
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Club Official Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan seuratoimihenkilön rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4132
+#: web/WorkFlow.pm Line:4143
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Coach Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan valmentajan rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4161
+#: web/WorkFlow.pm Line:4172
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Club Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan uuden seuran rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4157
+#: web/WorkFlow.pm Line:4168
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the New Facility Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan uuden kentän rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4124
+#: web/WorkFlow.pm Line:4135
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan pelaajan rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4128
+#: web/WorkFlow.pm Line:4139
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan pelaajan rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4153
+#: web/WorkFlow.pm Line:4164
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Team Official Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan joukkueen toimihenkilön rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4120
+#: web/WorkFlow.pm Line:4131
 msgid "You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Transfer process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset jatkamaan pelaajasiirtoa."
 
-#: web/WorkFlow.pm Line:4141
+#: web/WorkFlow.pm Line:4152
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the MA Official Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä liitto on korjannut ongelman, pääset jatkamaan liiton toimihenkilön rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4137
+#: web/WorkFlow.pm Line:4148
 msgid "You have put this task on-hold, once the submitting MA resolves the issue, you would be able to verify and continue with the Referee Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä liitto on korjannut ongelman, pääset jatkamaan erotuomarin rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4169
+#: web/WorkFlow.pm Line:4180
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Club Details process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä organisaatio on korjannut ongelman, pääset tarkistamaan ja lisäämään seuran tietoja."
 
-#: web/WorkFlow.pm Line:4173
+#: web/WorkFlow.pm Line:4184
 msgid "You have put this task on-hold, once the submitting Organisation resolves the issue, you would be able to verify and continue with the Amendment of Venue Details process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä seura on korjannut ongelman, pääset tarkistamaan ja lisäämään kentän tietoja."
 
-#: web/WorkFlow.pm Line:4145
+#: web/WorkFlow.pm Line:4156
 msgid "You have put this task on-hold, once the submitting RA resolves the issue, you would be able to verify and continue with the RA Official Registration process."
 msgstr "Olet palauttanut tämän tehtävän. Kun lähettävä piiri on korjannut ongelman, pääset tarkistamaan ja jatkamaan piirin toimihenkilön rekisteröintiä."
 
-#: web/WorkFlow.pm Line:4207
+#: web/WorkFlow.pm Line:4218
 msgid "You have rejected the player loan of [_1] [_2]"
 msgstr "Olet hylännyt määräaikaisen pelaajasiirron [_1] [_2]"
 
-#: web/WorkFlow.pm Line:4254
+#: web/WorkFlow.pm Line:4265
 msgid "You have rejected this Amendment of Person Registration."
 msgstr "Olet hylännyt henkilön rekisteröinnin muutokset."
 
-#: web/WorkFlow.pm Line:4232
+#: web/WorkFlow.pm Line:4243
 msgid "You have rejected this Club Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Olet hylännyt tämän seuratoimihenkilön rekisteröinnin, tästä menee seuralle ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4263
+#: web/WorkFlow.pm Line:4274
 msgid "You have rejected this Club Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän seuratoimihenkilön uudistamisen. Aloita uusi uudistaminen jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4250
+#: web/WorkFlow.pm Line:4261
 msgid "You have rejected this Club Registration. To proceed with this Registration, start a new Registration."
 msgstr "Olet hylännyt tämän seuran rekisteröinnin. Aloita uusi rekisteröinti jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4215
+#: web/WorkFlow.pm Line:4226
 msgid "You have rejected this Coach Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Olet hylännyt tämän valmentajan rekisteröinnin, seuralle menee tästä ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4223
+#: web/WorkFlow.pm Line:4234
 msgid "You have rejected this MA Official Registration. To proceed with this Registration, start a new Registration."
 msgstr "Olet hylännyt tämän liiton toimihenkilön rekisteröinnin. Aloita uusi rekisteröinti jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4266
+#: web/WorkFlow.pm Line:4277
 msgid "You have rejected this MA Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän liiton toimihenkilön uudistamisen. Aloita uusi uudistaminen jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4211
+#: web/WorkFlow.pm Line:4222
 msgid "You have rejected this Player Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Olet hylännyt tämän pelaajan rekisteröinnin, tästä menee seuralle ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4260
+#: web/WorkFlow.pm Line:4271
 msgid "You have rejected this Player Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän pelaajan uudistamisen. Aloita uusi uudistaminen jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4227
+#: web/WorkFlow.pm Line:4238
 msgid "You have rejected this RA Official Registration. To proceed with this Registration, start a new Registration."
 msgstr "Olet hylännyt tämän piirin toimihenkilön rekisteröinnin. Aloita uusi rekisteröinti jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4269
+#: web/WorkFlow.pm Line:4280
 msgid "You have rejected this RA Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän piirin toimihenkilön uudistamisen. Aloita uusi uudistaminen jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4219
+#: web/WorkFlow.pm Line:4230
 msgid "You have rejected this Referee Registration. To proceed with this Registration, start a new Registration."
 msgstr "Olet hylännyt tämän erotuomarin rekisteröinnin. Aloita uusi rekisteröinti jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4236
+#: web/WorkFlow.pm Line:4247
 msgid "You have rejected this Team Official Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Olet hylännyt tämän joukkuetoimihenkilön rekisteröinnin, tästä menee seuralle ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4272
+#: web/WorkFlow.pm Line:4283
 msgid "You have rejected this Team Official Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän joukkuetoimihenkilön uudistamisen. Aloita uusi uudistaminen  jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4244
+#: web/WorkFlow.pm Line:4255
 msgid "You have rejected this Venue Registration, the club will be informed. To proceed with this Registration the club need to start a new Registration."
 msgstr "Olet hylännyt tämän kentän rekisteröinnin, tästä menee seuralle ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4242
+#: web/WorkFlow.pm Line:4253
 msgid "You have rejected this Venue Registration. To proceed with this Registration start a new Registration."
 msgstr "Olet hylännyt tämän kentän rekisteröinnin. Aloita uusi reksiteröinti jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4275
+#: web/WorkFlow.pm Line:4286
 msgid "You have rejected this [_1] Renewal. To proceed with this Renewal, start a new Renewal."
 msgstr "Olet hylännyt tämän [_1] uudistamisen. Aloita uusi uudistaminen jatkaaksesi."
 
-#: web/WorkFlow.pm Line:4203
+#: web/WorkFlow.pm Line:4214
 msgid "You have rejected this transfer, the clubs will be informed. To proceed with this transfer the clubs need to start a new transfer."
 msgstr "Olet hylännyt tämän pelaajasiirron, tästä menee seuralle ilmoitus. Jatkaakseen, seuran on käynnistettävä uusi rekisteröinti."
 
-#: web/WorkFlow.pm Line:4283
+#: web/WorkFlow.pm Line:4294
 msgid "You have resolved this task."
 msgstr "Tämä tehtävä on valmis."
 
@@ -2872,7 +2872,7 @@ msgstr "Tämä tehtävä on valmis."
 msgid "You must choose one of the following options"
 msgstr "Sinun on valittava yksi seuraavista vaihtoehdoista"
 
-#: web/WorkFlow.pm Line:2384
+#: web/WorkFlow.pm Line:2395
 msgid "has been rejected."
 msgstr "on hylätty."
 
@@ -2881,7 +2881,7 @@ msgstr "on hylätty."
 msgid "or"
 msgstr "tai"
 
-#: web/WorkFlow.pm Line:659
+#: web/WorkFlow.pm Line:670
 msgid "with Level change from [_1] to [_2]"
 msgstr "muuttaa statuksen [_1] statukseksi [_2]"
 
@@ -4521,19 +4521,19 @@ msgstr "Salasanan vaihtaminen epäonnistui seuraavista syistä"
 msgid "must be at least 6 characters long"
 msgstr "on oltava vähintään 6 merkkiä pitkä"
 
-#: templates/translation/outstanding.templ Line:32
+#: templates/translation/outstanding.templ Line:33
 msgid "Advanced Club"
 msgstr "Seuraraportti"
 
-#: templates/translation/outstanding.templ Line:31
+#: templates/translation/outstanding.templ Line:32
 msgid "Advanced People (Below my level)"
 msgstr "Henkilöraportti (oman tasoni alapuolella)"
 
-#: templates/translation/outstanding.templ Line:30
+#: templates/translation/outstanding.templ Line:31
 msgid "Advanced People (My level)"
 msgstr "Henkilöraportti (omalla tasollani)"
 
-#: templates/translation/outstanding.templ Line:34
+#: templates/translation/outstanding.templ Line:35
 msgid "Advanced Transfers Report"
 msgstr "Laaja pelaajasiirtoraportti"
 
@@ -4549,6 +4549,10 @@ msgstr "Valmentajan rekisteröinti"
 msgid "Create a new user"
 msgstr "Luo uusi käyttäjä"
 
+#: templates/translation/outstanding.templ Line:26
+msgid "DOB (YYYYMMDD)"
+msgstr "Syntymäpäivä (VVKKPP)"
+
 #: templates/flow/facility_summary.templ Line:55
 msgid "Field Discipline"
 msgstr "Kentän laji"
@@ -4561,7 +4565,7 @@ msgstr "Kentän nimi"
 msgid "Field number"
 msgstr "Kentän numero"
 
-#: templates/translation/outstanding.templ Line:29
+#: templates/translation/outstanding.templ Line:30
 msgid "Finance"
 msgstr "Maksut"
 
@@ -4601,61 +4605,61 @@ msgstr "Organisaation nimi"
 msgid "Organisation type"
 msgstr "Organisaation tyyppi"
 
-#: templates/translation/outstanding.templ Line:48
+#: templates/translation/outstanding.templ Line:49
 msgid "PERSON REQUEST ACCESS ACCEPTED:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ HYVÄKSYTTY:"
 
-#: templates/translation/outstanding.templ Line:60
+#: templates/translation/outstanding.templ Line:61
 msgid "PERSON REQUEST ACCESS CANCELLED:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ PERUTTU:"
 
-#: templates/translation/outstanding.templ Line:52
+#: templates/translation/outstanding.templ Line:53
 msgid "PERSON REQUEST ACCESS COMPLETED:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ VALMIS:"
 
-#: templates/translation/outstanding.templ Line:49
+#: templates/translation/outstanding.templ Line:50
 msgid "PERSON REQUEST ACCESS DENIED:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ KIELLETTY:"
 
-#: templates/translation/outstanding.templ Line:50
+#: templates/translation/outstanding.templ Line:51
 msgid "PERSON REQUEST ACCESS OVERRIDDEN:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ OHITETTU:"
 
-#: templates/translation/outstanding.templ Line:51
+#: templates/translation/outstanding.templ Line:52
 msgid "PERSON REQUEST ACCESS REJECTED:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ HYLÄTTY:"
 
-#: templates/translation/outstanding.templ Line:58
+#: templates/translation/outstanding.templ Line:59
 msgid "PERSON REQUEST ACCESS SENT:"
 msgstr "HENKILÖTIETOJEN PYYNTÖ LÄHETETTY:"
 
-#: templates/translation/outstanding.templ Line:53
+#: templates/translation/outstanding.templ Line:54
 msgid "PERSON REQUEST TRANSFER ACCEPTED:"
 msgstr "PELAAJASIIRTOPYYNTÖ HYVÄKSYTTY:"
 
-#: templates/translation/outstanding.templ Line:61
+#: templates/translation/outstanding.templ Line:62
 msgid "PERSON REQUEST TRANSFER CANCELLED:"
 msgstr "PELAAJASIIRTOPYYNTÖ PERUTTU:"
 
-#: templates/translation/outstanding.templ Line:57
+#: templates/translation/outstanding.templ Line:58
 msgid "PERSON REQUEST TRANSFER COMPLETED:"
 msgstr "PELAAJASIIRTOPYYNTÖ VALMIS:"
 
-#: templates/translation/outstanding.templ Line:54
+#: templates/translation/outstanding.templ Line:55
 msgid "PERSON REQUEST TRANSFER DENIED:"
 msgstr ""
 "PELAAJASIIRTOPYYNTÖ KIELLETTY\n"
 ":"
 
-#: templates/translation/outstanding.templ Line:55
+#: templates/translation/outstanding.templ Line:56
 msgid "PERSON REQUEST TRANSFER OVERRIDDEN:"
 msgstr "PELAAJASIIRTOPYYNTÖ OHITETTU:"
 
-#: templates/translation/outstanding.templ Line:56
+#: templates/translation/outstanding.templ Line:57
 msgid "PERSON REQUEST TRANSFER REJECTED:"
 msgstr "PELAAJASIIRTOPYYNTÖ HYLÄTTY:"
 
-#: templates/translation/outstanding.templ Line:59
+#: templates/translation/outstanding.templ Line:60
 msgid "PERSON REQUEST TRANSFER SENT:"
 msgstr "PELAAJASIIRTOPYYNTÖ LÄHETETTY:"
 
@@ -4703,19 +4707,19 @@ msgstr "Rajoitettu pääsy"
 msgid "Run Report"
 msgstr "Suorita raportti"
 
-#: templates/translation/outstanding.templ Line:37
+#: templates/translation/outstanding.templ Line:38
 msgid "Set your own parameters etc for reporting on Clubs."
 msgstr "Määritä omat asetuksesi seuraraporttia varten"
 
-#: templates/translation/outstanding.templ Line:36
+#: templates/translation/outstanding.templ Line:37
 msgid "Set your own parameters etc for reporting on People"
 msgstr "Määritä omat asetuksesi henkilöraporttia varten"
 
-#: templates/translation/outstanding.templ Line:39
+#: templates/translation/outstanding.templ Line:40
 msgid "Set your own parameters etc for reporting on Transactions"
 msgstr "Määritä omat asetuksesi maksuraporttia varten"
 
-#: templates/translation/outstanding.templ Line:38
+#: templates/translation/outstanding.templ Line:39
 msgid "Set your own parameters etc for reporting on Transfers"
 msgstr "Määritä omat asetuksesi pelaajasiirtoraporttia varten"
 
@@ -4732,11 +4736,11 @@ msgstr "Henkilökuntaa"
 msgid "The following users are authorised to login"
 msgstr "Seuraavilla käyttäjillä on oikeus kirjautua"
 
-#: templates/translation/outstanding.templ Line:35
+#: templates/translation/outstanding.templ Line:36
 msgid "Transactions (My People)"
 msgstr "Maksuraportti (omalla tasollani)"
 
-#: templates/translation/outstanding.templ Line:33
+#: templates/translation/outstanding.templ Line:34
 msgid "Transfers Below Report"
 msgstr "Pelaajasiirrot"
 
@@ -4748,27 +4752,27 @@ msgstr "Yhteisömuoto"
 msgid "Venue Short Name"
 msgstr "Kentän lyhenne"
 
-#: templates/translation/outstanding.templ Line:42
+#: templates/translation/outstanding.templ Line:43
 msgid "WORK TASK ADDED:"
 msgstr "TYÖTEHTÄVÄ LISÄTTY:"
 
-#: templates/translation/outstanding.templ Line:43
+#: templates/translation/outstanding.templ Line:44
 msgid "WORK TASK APPROVED:"
 msgstr "TYÖTEHTÄVÄ HYVÄKSYTTY:"
 
-#: templates/translation/outstanding.templ Line:46
+#: templates/translation/outstanding.templ Line:47
 msgid "WORK TASK HELD:"
 msgstr "TYÖTEHTÄVÄ PALAUTETTU:"
 
-#: templates/translation/outstanding.templ Line:44
+#: templates/translation/outstanding.templ Line:45
 msgid "WORK TASK REJECTED:"
 msgstr "TYÖTEHTÄVÄ HYLÄTTY:"
 
-#: templates/translation/outstanding.templ Line:45
+#: templates/translation/outstanding.templ Line:46
 msgid "WORK TASK RESOLVED:"
 msgstr "TYÖTEHTÄVÄ KÄSITELTY:"
 
-#: templates/translation/outstanding.templ Line:47
+#: templates/translation/outstanding.templ Line:48
 msgid "WORK TASK RESUMED:"
 msgstr "TYÖTEHTÄVÄ JATKETTU:"
 

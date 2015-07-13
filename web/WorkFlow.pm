@@ -2365,6 +2365,7 @@ sub rejectTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
@@ -4313,9 +4314,6 @@ sub updateTaskScreen {
         'CurrentViewLevel' => $currentViewLevel
     );
 
-    #open (my $FH,">test.txt");
-    #print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
-    #print $FH "Message: \n " . $action;
 	$body = runTemplate(
         $Data,
         \%TemplateData,

@@ -1080,6 +1080,17 @@ h2.section-header {
 	float:  right;
 }
 
+.task-list .detail-value {
+	float:  left;
+	width: 98%;
+	padding-left: 10px;
+}
+
+.task-list .status-col i span {
+	float:  left;
+	padding-left: 10px;
+}
+
 .panel-heading {
 	border-bottom-left-radius:3px;
 	border-bottom-right-radius:3px;
@@ -1267,6 +1278,14 @@ div.transfertabs.tab-content > .active {
 	color: #000;
 	font-size: 14px;
 }
+.res-headers th, .document-table-header th{
+	text-align: left !important;
+}
+
+.member-data {
+	padding-left: 10px;
+}
+
 
 a.btn-inside-docs-panel {
     /*width: 100%;*/
@@ -1311,6 +1330,9 @@ a.btn-inside-docs-panel:hover {
 .ver-dots {
 	font-size:1.3em;
 	margin-left:10px;
+	float: left;
+	margin-right: 5px;
+	
 }
 
 .ver-dots.green {
