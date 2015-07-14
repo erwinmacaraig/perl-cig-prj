@@ -1,18 +1,25 @@
 <div class = "panel panel-default">
-            <div class = "panel-heading" role = "tab" id = "heading[% count %]">
-                <h4 class="panel-title"><a href="#panel[% count %]" data-toggle="collapse" data-parent="#accordion" aria-expanded="[% IF count == 1 %]true[% ELSE %]false[% END %]" aria-controls="panel[% count %]">[% person.strLocalFirstname _ ' ' _ person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]<i class="indicator fa fa-chevron-right pull-right"></i></a></h4>
-            </div>
-            <div id = "panel[% count %]" class = "panel-collapse collapse [% IF count == 1 %]in[% END %]">
-                <div class = "panel-body">
 
+<div class = "panel-heading" role = "tab" id = "heading[% count %]">
+                <h4 class="panel-title">
+                    <a href="#panel[% count %]" data-toggle="collapse" data-parent="#accordion" aria-expanded="
+                    [% IF count == activeAccordion %] true [% ELSE %]false [% END %]" aria-controls="panel[% activeAccordion %]">
+                        [% person.strLocalFirstname _ ' ' _ person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]<i class="indicator fa fa-chevron-right pull-right"></i>
+                    </a>
+                </h4>
+            </div>
+            <div id = "panel[% count %]" class = "panel-collapse collapse [%  IF count == activeAccordion %]in[% END %]">
+                <div class = "panel-body">
                     <ul class="nav nav-tabs">
-                        <li class = "active"><a data-toggle="tab" href="#regtab[% count %]">[% Lang.txt('Registration details') %]</a></li>
+                        <li [% IF !activeTab %] class = "active" [% END %]><a data-toggle="tab" href="#regtab[% count %]">[% Lang.txt('Registration details') %]</a></li>
                         <li><a data-toggle="tab" href="#doctab[% count %]">[% Lang.txt('Documents') %]</a></li>
                         <li><a data-toggle="tab" href="#histtab[% count %]">[% Lang.txt('Registration History') %]</a></li>
-                        <li><a data-toggle="tab" href="#txnstab[% count %]">[% Lang.txt('Transactions') %]</a></li>
+                        <li><a data-toggle="tab" href="#txnstab[% count %]">[% Lang.txt('Transactions') %]</a></li>                           
+                        <li [%  IF activeTab %] class = "active" [% END %]><a data-toggle="tab" href="#memdetailstab[% count %]">[% Lang.txt('Member Detail Summary') %]</a></li>
+                    
                     </ul>
                     <div class="tab-content">
-                        <div id="regtab[% count %]" class="tab-pane fade in active">
+                        <div id="regtab[% count %]" class="tab-pane fade [% IF !activeTab %] in active [% END %]">
                             <div class = "selfreg-details col-md-8">
                                 <dl class="dl-horizontal">
                                   [% IF person.NationalNum %]
@@ -98,18 +105,22 @@
 
                         </div><!-- regtab -->
                         <div id="doctab[% count %]" class="tab-pane fade "><!-- Docs Tab -->
-							[% Documents %]
+                                                        [% Documents %]
                                 
-						</div><!-- End Docs Tab -->
+                        </div><!-- End Docs Tab -->
                         <div id="histtab[% count %]" class="tab-pane fade "> 
-						<!--Registration history list to go here --> 
-						[% History %]
-						</div>
+                                                <!--Registration history list to go here --> 
+                                                [% History %]
+                        </div>
+                        <div id="memdetailstab[% count %]" class="tab-pane fade [% IF activeTab %] in active [% END %] "><!-- transaction history list to go here --> 
+                                                        [% PersonDetails %]
+                        </div>
                         <div id="txnstab[% count %]" class="tab-pane fade "><!-- transaction history list to go here --> 
-							[% Transactions %]
-						</div>
+                                                        [% Transactions %]
+                        </div>
+                        
                     </div><!-- tabcontent -->
                 </div><!-- panel-body -->
             </div><!-- panel-collapse -->
-        </div><!-- panel -->
-
+        </div>
+                                                      
