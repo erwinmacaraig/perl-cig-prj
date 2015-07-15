@@ -23,6 +23,7 @@ use FormHelpers;
 use AuditLog;
 use Log;
 use TTTemplate;
+use PersonUtils;
 
 sub listPersons {
     my ($Data, $entityID, $action) = @_; 
@@ -70,6 +71,7 @@ sub listPersons {
             P.strNationalNum,
             P.strFIFAID,
             P.dtDOB,
+            P.intGender as PersonGender,
             PR.strPersonType AS PRstrPersonType,
             PR.strStatus AS PRStatus,
             PR.strPersonSubType AS PRstrPersonSubType,
@@ -194,6 +196,8 @@ sub listPersons {
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
         $dref->{'link'} = "$target?client=$tempClient&amp;a=$newaction";
+        $dref->{'name'} = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'});
+        
         push @rowdata, $dref;
         $found++;
     }
