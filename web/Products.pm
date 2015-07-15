@@ -2347,6 +2347,33 @@ sub apply_product_rules {
         );
     }
 
+    {
+        my $st = qq[
+            UPDATE tblTransactions as T
+                INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON ( PR.intPersonRegistrationID = T.intPersonRegistrationID)
+                INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+            SET
+                T.dtStart = NP.dtFrom,
+                T.dtEnd= NP.dtTo
+            WHERE
+                T.intTransLogID= ?
+                AND T.intRealmID = ?
+                AND (
+                    NOT T.dtStart
+                    OR T.dtStart IS NULL
+                    OR T.dtStart = '0000-00-00'
+                )
+				AND T.intTableType = $Defs::LEVEL_PERSON
+				AND T.intID = ?
+       ];
+
+		my $q = $Data->{'db'}->prepare($st);
+		$q->execute(
+		    $transID,
+    		$Data->{'Realm'},
+            $personID
+		);
+    }
     return;
     
        
