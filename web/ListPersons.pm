@@ -96,7 +96,7 @@ sub listPersons {
             ) 
         WHERE 
             P.strStatus <> 'DELETED' 
-            AND PR.strStatus = 'ACTIVE'
+            AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR (PR.intOnLoan = 1 AND PR.dtTo > NOW()))
             AND P.intRealmID = $realm_id
         ORDER BY 
             strLocalSurname, 
