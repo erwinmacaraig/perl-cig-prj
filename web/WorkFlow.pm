@@ -678,7 +678,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel}) || $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel})|| $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
@@ -707,6 +707,9 @@ sub listTasks {
             InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Player Loan").')' : "",
 		);
         #print STDERR Dumper \%single_row;
+        if($dref->{strRegistrationNature} eq 'NEW' and $dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'} ){
+            $single_row{'RegistrationNatureLabel'} = 'Player Registration <br />(Level Change)';
+        }
    
         if(!($Defs::workTaskTypeLabel{$ruleForType} ~~ @taskType)){
             push @taskType, $Defs::workTaskTypeLabel{$ruleForType};
