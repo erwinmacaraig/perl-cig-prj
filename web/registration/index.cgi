@@ -89,7 +89,8 @@ sub main {
     );
     $user->load();
     my $userID = $user->id() || 0;
-    $Data{'UserName'} = $user->name();
+    #$Data{'UserName'} = $user->name();
+    $Data{'UserName'} = $user->name() . ' '. $user->familyname();
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
 
