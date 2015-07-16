@@ -13,11 +13,23 @@ use lib '.', '..', 'Clearances';
 use Date::Calc qw(Today Delta_YMD Add_Delta_YM Add_Delta_Days);
 use Defs;
 use AssocTime;
+use Switch;
 
 sub formatPersonName {
 
-    my ($Data, $firstname, $surname, $gender) = @_;
-    
+    my ($Data, $firstname, $surname, $gender) = @_;    
+    my $locale = $Data->{'lang'}->getLocale();
+    switch($locale){
+        case ['en_US'] {
+            return "$surname $firstname";
+        }
+        case ['fi_FI','sv_FI'] {
+            return "$firstname $surname";
+        }
+        case 'zh_CN' {
+            return "$surname $firstname";
+        }
+    }
     return "$firstname $surname";
 }
 

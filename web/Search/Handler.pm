@@ -20,7 +20,7 @@ sub handle {
     switch ($action) {
         case 'INITSRCH_P' {
             $searchObj = new Search::Person();
-			$title = $Data->{'lang'}->txt('Request for Person Details Search') if($searchType eq 'access');
+            $title = $Data->{'lang'}->txt('Request for Person Details Search') if($searchType eq 'access');
 			
         }
         case 'INITSRCH_C' {
