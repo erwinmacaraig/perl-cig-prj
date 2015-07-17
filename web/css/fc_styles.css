@@ -1074,6 +1074,10 @@ h2.section-header {
 	float:  left;
 }
 
+.link-edit {
+    display: block;    clear: both;    margin-top: 10px;
+	
+}
 .detail-value {
 	font-weight: bold;
 	width: 48%;
