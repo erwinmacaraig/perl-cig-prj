@@ -68,6 +68,9 @@ use InstanceOf;
 
 use PersonLanguages;
 use GatewayProcess;
+
+use PersonRegistrationStatusChange;
+
 sub checkRulePaymentFlagActions {
 
     my(
@@ -1683,6 +1686,7 @@ sub checkForOutstandingTasks {
 
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
 
+                my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
 
                         #LEFT JOIN tblNationalPeriod as NP ON (PR.intNationalPeriodID = NP.intNationalPeriodID)
@@ -1750,6 +1754,9 @@ sub checkForOutstandingTasks {
                     PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
+                if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $Defs::PERSONREGO_STATUS_ACTIVE);
+                }
            ##############################################################################################################
         }
        	}
