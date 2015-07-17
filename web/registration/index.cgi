@@ -31,6 +31,8 @@ use SelfUserTransfer;
 use ForgottenPassword;
 use Data::Dumper;
 use SelfRegoPersonEdit;
+use PersonUtils;
+
 main();
 
 sub main {
@@ -89,13 +91,14 @@ sub main {
     );
     $user->load();
     my $userID = $user->id() || 0;
-    $Data{'UserName'} = $user->name();
+    
+    $Data{'UserName'} =  formatPersonName(\%Data, $user->name(), $user->familyname(), '');
+   
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
-
+    
     $action = 'LOGIN' if(!$userID and $action ne 'activate' and $action !~/FORGOT/);
     
-   
     if(!$action and $userID)  {
         $action = 'HOME';
     }

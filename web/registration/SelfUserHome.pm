@@ -23,6 +23,8 @@ use L10n::CurrencyFormat;
 use Data::Dumper;
 use Countries;
 use CGI  qw(param);
+use PersonUtils;
+
 sub getSelfRegoMatrixOptions    {
 
     my ($Data) = @_;
@@ -104,10 +106,11 @@ sub showHome {
 		'selfrego/accordion.templ',		
 		 );
 	}
+    my $name = formatPersonName($Data, $user->name(), $user->familyname(), '');
     my $resultHTML = runTemplate(
         $Data,
         {
-            Name => $user->fullname(),
+            Name => $name,
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
@@ -284,7 +287,7 @@ sub getPreviousRegos {
         $Data,
         $userID,
     ) = @_;
-
+    my $formattedName;
     my $st = qq[
         SELECT
             A.intMinor,
@@ -349,6 +352,7 @@ sub getPreviousRegos {
         my $pID = $dref->{'intPersonID'} || next;
         if(!exists $regos{$pID})    {
             $allowTransferShown=0;
+            $formattedName = formatPersonName($Data,$dref->{'strLocalFirstname'},$dref->{'strLocalSurname'},'');
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
                 strLocalSurname => $dref->{'strLocalSurname'} || '',
@@ -357,6 +361,7 @@ sub getPreviousRegos {
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
                 NationalNum => $dref->{'strNationalNum'},
+                formattedName => $formattedName,
                
             };
         } 
