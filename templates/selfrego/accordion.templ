@@ -4,7 +4,7 @@
                 <h4 class="panel-title">
                     <a href="#panel[% count %]" data-toggle="collapse" data-parent="#accordion" aria-expanded="
                     [% IF count == activeAccordion %] true [% ELSE %]false [% END %]" aria-controls="panel[% activeAccordion %]">
-                        [% person.strLocalFirstname _ ' ' _ person.strLocalSurname %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]<i class="indicator fa fa-chevron-right pull-right"></i>
+                        [% person.formattedName %] [% IF person.intMinor %]([% Lang.txt('Minor') %])[% END %]<i class="indicator fa fa-chevron-right pull-right"></i>
                     </a>
                 </h4>
             </div>

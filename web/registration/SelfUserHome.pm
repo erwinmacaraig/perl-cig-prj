@@ -287,7 +287,7 @@ sub getPreviousRegos {
         $Data,
         $userID,
     ) = @_;
-
+    my $formattedName;
     my $st = qq[
         SELECT
             A.intMinor,
@@ -352,6 +352,7 @@ sub getPreviousRegos {
         my $pID = $dref->{'intPersonID'} || next;
         if(!exists $regos{$pID})    {
             $allowTransferShown=0;
+            $formattedName = formatPersonName($Data,$dref->{'strLocalFirstname'},$dref->{'strLocalSurname'},'');
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
                 strLocalSurname => $dref->{'strLocalSurname'} || '',
@@ -360,6 +361,7 @@ sub getPreviousRegos {
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
                 NationalNum => $dref->{'strNationalNum'},
+                formattedName => $formattedName,
                
             };
         } 
