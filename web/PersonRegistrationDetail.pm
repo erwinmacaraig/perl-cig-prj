@@ -19,6 +19,7 @@ use HTMLForm;
 use FormHelpers;
 use GridDisplay;
 use RecordTypeFilter;
+use PersonRegistrationStatusChange;
 
 sub personRegistrationDetail   {
 
@@ -130,8 +131,8 @@ sub personRegistrationDetail   {
 
             afteraddFunction => ,
             afteraddParams => [$option, $Data, $Data->{'db'}],
-            afterupdateFunction => ,
-            afterupdateParams => [$option, $Data, $Data->{'db'}],
+            afterupdateFunction => \&postPersonRegistrationUpdate,
+            afterupdateParams => [$option, $Data, $Data->{'db'}, $personRegistrationID],
             LocaleMakeText => $Data->{'lang'},
         },
         carryfields =>  {
@@ -147,8 +148,9 @@ sub personRegistrationDetail   {
     ($resultHTML, undef) = handleHTMLForm(\%FieldDefinitions, undef, $option, '', $Data->{'db'});
 
     my $workTasks = personRegistrationWorkTasks($Data, $personRegistrationID);
+    my $regoStatusChangeLog = getPersonRegistrationStatusChangeLog($Data, $personRegistrationID);
 
-    return $resultHTML . $workTasks;
+    return $resultHTML . $workTasks . $regoStatusChangeLog;
 
     #print STDERR Dumper $RegistrationDetail;
 
@@ -168,6 +170,13 @@ sub personRegistrationDetail   {
     $Data->{'cache'}->delete('swm',"VenueObj-$entityID") if $Data->{'cache'};
   
   }
+
+sub postPersonRegistrationUpdate  {
+    my($id,$params,$action, $Data,$db, $personRegistrationID)=@_;
+
+    print STDERR Dumper "POST PERSON REG UPDATE " . $personRegistrationID;
+}
+
 sub personRegistrationWorkTasks {
 
     my ($Data, $personRegistrationID) = @_;
@@ -366,6 +375,7 @@ sub personRegistrationWorkTasks {
         gridid  => 'grid',
         width   => '100%',
         filters => $filterfields,
+        gridtitle => $Data->{'lang'}->txt('Work Task Log'),
     );
 
     my $resultHTML = qq[
