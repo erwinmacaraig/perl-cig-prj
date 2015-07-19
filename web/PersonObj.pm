@@ -5,6 +5,7 @@ use BaseObject;
 our @ISA =qw(BaseObject);
 use SphinxUpdate;
 
+
 sub setCachePrefix    {
     my $self = shift;
     $self->{'cachePrefix'} = 'PersonObj';
@@ -47,7 +48,16 @@ sub name {
 
     return "$firstname $surname";
 }
-
+sub firstname {
+    my $self = shift;
+    my $firstname = $self->getValue('strLocalFirstname');
+    return $firstname;
+}
+sub surname {
+    my $self = shift;
+    my $surname = $self->getValue('strLocalSurname');
+    return $surname;
+}
 
 # Across realm check to see there is an existing member with this firstname/surname/dob and with primary club set.
 # Static method.
