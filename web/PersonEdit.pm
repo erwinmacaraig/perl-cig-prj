@@ -3,6 +3,7 @@ require Exporter;
 @ISA = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     handlePersonEdit
+    triggerRule
 );
 
 use strict;
