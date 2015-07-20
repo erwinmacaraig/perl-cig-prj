@@ -23,7 +23,7 @@ use Digest::MD5;
 use MIME::Base64 qw(encode_base64url decode_base64url);
 use UserSession;
 use GlobalAuth;
-
+use PersonUtils;
 #use Data::Dumper;
 
 $Reg_common::keystr =
@@ -229,8 +229,9 @@ sub allowedTo {
             $readOnly = 0;
         }
     }
-    $UserName = $user->fullname();
-
+    #$UserName = $user->fullname();
+    $UserName = formatPersonName($Data, $user->name(),$user->lastname(),'');
+   
     ## ENSURE THE USER IS VALID FOR THE CURRENT LEVEL
 
     $clientValues_ref->{currentLevel} ||= kickThemOff();
