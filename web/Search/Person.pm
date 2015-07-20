@@ -192,7 +192,7 @@ sub getTransfer {
                 tblPersonRegistration_1
             WHERE
                 intPersonID IN ($person_list)
-                AND intEntityID = $filters->{'club'}
+                AND intEntityID != $filters->{'club'}
             ORDER BY
                 intPersonID, dtFrom DESC, dtTo DESC
         ];
