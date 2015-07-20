@@ -1082,6 +1082,7 @@ h2.section-header {
 	font-weight: bold;
 	width: 48%;
 	float:  right;
+	-webkit-font-smoothing: antialiased;
 }
 
 .task-list .detail-value {
