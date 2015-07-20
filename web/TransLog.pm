@@ -353,8 +353,8 @@ sub step2 {
 #Make DB Changes
     $strResponseText = 'PAYMENT_SUCCESSFUL';
 	my $statement = qq[
-			INSERT INTO tblTransLog (intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus, intPaymentByLevel) VALUES
-	($entityID, $dtLog, $intAmount, $strResponseCode, "$strResponseText", $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING, $currentLevel) 
+			INSERT INTO tblTransLog (dtTLCreated, intEntityPaymentID, dtLog, intAmount, strResponseCode, strResponseText, strComments, intPaymentType, strBSB, strBank, strAccountName, strAccountNum, intRealmID, intCurrencyID, strReceiptRef, intStatus, intPaymentByLevel) VALUES
+	(NOW(), $entityID, $dtLog, $intAmount, $strResponseCode, "$strResponseText", $strComments, $paymentType, $strBSB, $strBank, $strAccountName, $strAccountNum, $Data->{Realm}, $currencyID, $strReceiptRef, $Defs::TXNLOG_PENDING, $currentLevel) 
 	];
 	my $query = $db->prepare($statement);
   	$query->execute;

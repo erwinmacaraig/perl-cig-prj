@@ -37,6 +37,8 @@ CREATE TABLE tblTransLog (
     strSessionKey varchar(40) default '',
     intSentToGateway TINYINT default 0,
     intPaymentGatewayResponded TINYINT default 0,
+    intCheckOnceDaily TINYINT default 0,
+    dtTLCreated datetime default '0000-00-00 00:00:00',
   PRIMARY KEY  (intLogID),
   KEY index_realmID (intRealmID),
   KEY index_paymentType (intPaymentType),

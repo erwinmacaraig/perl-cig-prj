@@ -81,10 +81,10 @@ print STDERR "IN checkOpenPayments\n";
         WHERE
             TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
-	    	AND  TL.intSentToGateway = 1 
+		    AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
             AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
-            AND TL.intCheckOnceDaily = 0
+            AND TL.intCheckOnceDaily = 1
     ];
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)

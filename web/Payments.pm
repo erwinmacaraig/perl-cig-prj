@@ -549,8 +549,8 @@ sub createTransLog	{
     my $sessionID = $cgi->cookie($Defs::COOKIE_REGFORMSESSION) || '';
         my $st= qq[
                 INSERT INTO tblTransLog
-                (dtLog, intAmount, intPaymentType, intRealmID, intEntityPaymentID, intPaymentConfigID, intRegoFormID, intSWMPaymentAuthLevel, intPaymentByLevel, strSessionKey)
-                VALUES (SYSDATE(), $amount, $paymentType, $Data->{Realm}, $entityID, $paymentConfigID, $intRegoFormID, $authLevel,$authLevel, ?)
+                (dtTLCreated, dtLog, intAmount, intPaymentType, intRealmID, intEntityPaymentID, intPaymentConfigID, intRegoFormID, intSWMPaymentAuthLevel, intPaymentByLevel, strSessionKey)
+                VALUES (NOW(), SYSDATE(), $amount, $paymentType, $Data->{Realm}, $entityID, $paymentConfigID, $intRegoFormID, $authLevel,$authLevel, ?)
         ];
         my $qry = $db->prepare($st) or query_error($st);
 	$qry->execute($sessionID) or query_error($st);
