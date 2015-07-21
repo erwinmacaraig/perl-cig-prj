@@ -50,7 +50,7 @@ $(document).ready(function(){
 
     else if (param == "C_L" || param == "C_DTA") {
      
-      $("header nav ul li.subnav a:contains(Clubs)").addClass("active")
+      $("header nav ul li a:contains('Clubs')").addClass("active")
 
     }
     
@@ -66,9 +66,15 @@ $(document).ready(function(){
     
     }
 
-    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" || param == "TXN_PAY_INV" || pageHeading == "Search") {
+    else if (param == "INITSRCH_P" || param == "PF_" || param == "DUPL_L" || param == "PRA_T" || param == "PRA_R" || param == "PREGFB_T" ||  pageHeading == "Search") {
      
       $("header nav ul li.subnav a:contains(People)").addClass("active")
+
+    }
+
+    else if (param == "TXN_PAY_INV" ) {
+     
+      $("header nav ul li.subnav a:contains(Payments)").addClass("active")
 
     }
 
