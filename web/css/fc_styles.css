@@ -250,6 +250,9 @@ header ul#menu ul li a{
 header ul#menu li.hover, ul#menu li:hover  {
   /*background: none;*/
 }
+header ul#menu li.hover .dropdown-menu, ul#menu li:hover .dropdown-menu  {
+  display: block !important;
+}
 header nav ul li a {
 	border-left: 1px solid #085a8c;
 	color: #fff;
@@ -945,6 +948,16 @@ div.dataTables_filter label { color: #000; }
 
 header nav ul#menu ul {
 	top:50px;
+	position: absolute;
+}
+
+@media (max-width: 992px){
+	header nav ul#menu ul {
+		top:0px;
+		position: relative;
+		width: 100%;
+		margin-bottom: 5px
+	}
 }
 
 header ul#menu ul li a:hover {
