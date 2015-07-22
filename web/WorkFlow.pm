@@ -678,7 +678,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel}) || $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel})|| $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
@@ -707,6 +707,9 @@ sub listTasks {
             InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Player Loan").')' : "",
 		);
         #print STDERR Dumper \%single_row;
+        if($dref->{strRegistrationNature} eq 'NEW' and $dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'} ){
+            $single_row{'RegistrationNatureLabel'} = 'Player Registration <br />(Level Change)';
+        }
    
         if(!($Defs::workTaskTypeLabel{$ruleForType} ~~ @taskType)){
             push @taskType, $Defs::workTaskTypeLabel{$ruleForType};
@@ -1206,10 +1209,11 @@ sub addWorkFlowTasks {
 		$workTaskType .=  qq[ ($Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'}) ];
 		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT
             }
+            #'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'}            
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
-                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'Person' =>  formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'Club' => $task->{'strLocalName'},
                 'Venue' => $task->{'strLocalName'},
@@ -1385,10 +1389,12 @@ sub approveTask {
     else {
         my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
         my $cc = getCCRecipient($Data, $task);
+        formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
+        # 'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
         my %notificationData = (
             'Reason' => $task->{'holdNotes'},
             'WorkTaskType' => $workTaskType,
-            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'Person' =>  formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
             'Venue' => $task->{'strLocalName'},
@@ -1551,7 +1557,7 @@ sub checkForOutstandingTasks {
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
-                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'Club' => $task->{'strLocalName'},
                 'Venue' => $task->{'strLocalName'},
@@ -2200,7 +2206,7 @@ sub resolveTask {
     my %notificationData = (
         'Reason' => $nr->{'strNotes'},
         'WorkTaskType' => $workTaskType,
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),,
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
         'Venue' => $task->{'strLocalName'},
@@ -2351,7 +2357,7 @@ sub rejectTask {
         my %notificationData = (
             'Reason' => $task->{'rejectNotes'},
             'WorkTaskType' => $workTaskType,
-            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
             'Venue' => $task->{'strLocalName'},
@@ -4397,11 +4403,11 @@ sub holdTask {
 
     my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
     my $cc = getCCRecipient($Data, $task);
-
+    # 'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'}
     my %notificationData = (
         'Reason' => $task->{'holdNotes'},
         'WorkTaskType' => $workTaskType,
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''), 
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
         'Venue' => $task->{'strLocalName'},

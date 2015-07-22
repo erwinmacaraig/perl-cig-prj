@@ -121,7 +121,7 @@ sub getRegoProducts {
         UnPaidItems => \@unpaid_items,
         HideTotal => $hideTotal,
         client => $cl,
-		URLBaseFormatter => $Defs::base_url,
+	URLBaseFormatter => $Defs::base_url,
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');

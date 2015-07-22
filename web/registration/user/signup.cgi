@@ -19,6 +19,7 @@ use TemplateEmail;
 use ConfirmationEmail;
 use PasswordFormat;
 use TermsConditions;
+use Localisation;
 
 main();
 
@@ -27,15 +28,21 @@ sub main {
     my %Data = ();
     my $db   = connectDB();
     $Data{'db'} = $db;
-    my $lang = Lang->get_handle() || die "Can't get a language handle!";
+
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
+
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
+    initLocalisation(\%Data);
+
+    #my $lang = Lang->get_handle() || die "Can't get a language handle!";
+    #$Data{'lang'} = $lang;
     my $target = 'signup.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
     $Data{'AddToPage'} = new AddToPage();
 
-    $Data{'Realm'} = 1;
-    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $action = param('a') || '';
     my $srp = param('srp') || '';
 

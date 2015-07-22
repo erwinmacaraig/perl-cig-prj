@@ -11,7 +11,16 @@
             [% END %]
         </select></p>
 [% END %]
+[% IF product_body %]
 [% product_body %]
+[% ELSE %]
+<div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>[% Lang.txt('No license fees required for this registration, click ') %] <strong>[% Lang.txt('Continue') %]</strong>[% Lang.txt(' to proceed') %]</p>
+            </div>
+        </div>
+[% END %]
 [% IF productTerms %]
     <div class = "product-terms">
     [% productTerms %]

@@ -24,7 +24,7 @@ use DuplicatesUtils;
 use Data::Dumper;
 use PersonSummaryPanel;
 use WorkFlow;
-
+use PersonUtils;
 require AccreditationDisplay;
 
 sub showPersonHome	{
@@ -48,7 +48,8 @@ sub showPersonHome	{
 
 	my ($fields_grouped, $groupdata) = getMemFields($Data, $personID, $FieldDefinitions, $memperms, $personObj, \%configchanges);
 	my ($photo,undef)=handle_photo('P_PH_s',$Data,$personID);
-	my $name = $personObj->name();
+	#my $name = $personObj->name();
+	my $name = formatPersonName($Data,$personObj->getValue('strLocalFirstname'),$personObj->getValue('strLocalSurname'),'');
 	my $markduplicateURL = '';
 	my $adddocumentURL = '';
 	my $cardprintingURL = '';
@@ -84,6 +85,7 @@ sub showPersonHome	{
     $enableRenew = $enableAdd = 0 if $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_REGISTERED;
 
     my $c = Countries::getISOCountriesHash();
+    
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,
