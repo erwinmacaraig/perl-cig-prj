@@ -109,7 +109,10 @@ sub fullname {
     my $self = shift;
     return join( ' ', $self->{'Info'}{'FirstName'}, $self->{'Info'}{'FamilyName'} );
 }
-
+sub lastname {
+    my $self = shift;
+    return $self->{'Info'}{'FamilyName'} || '';
+}
 sub email {
     my $self = shift;
     return $self->{'Info'}{'Email'} || '';
