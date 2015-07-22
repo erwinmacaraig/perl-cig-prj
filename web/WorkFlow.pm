@@ -4891,15 +4891,25 @@ sub getInitialTaskAssignee {
                 AND tr.strRegistrationNature = tp.strRegistrationNature
                 AND tr.intOriginLevel = tp.intOriginLevel
             )
+            INNER JOIN tblEntity te
+            ON (
+                te.intEntityID = tp.intEntityID
+            )
             WHERE
                 tp.intPersonRegistrationID = ?
+                AND tr.intEntityLevel = te.intEntityLevel
+                AND tr.intRealmID = ?
                 AND tr.strTaskStatus = 'ACTIVE'
             ORDER BY
                 tr.intApprovalEntityLevel
             LIMIT 1
         ];
+
         my $q = $Data->{'db'}->prepare($st);
-        $q->execute($registrationID);
+        $q->execute(
+            $registrationID,
+            $Data->{'Realm'}
+        );
 
         my $dref = $q->fetchrow_hashref();
         return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
