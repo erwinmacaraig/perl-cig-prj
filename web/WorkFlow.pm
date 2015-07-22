@@ -4482,7 +4482,9 @@ sub holdTask {
         }
 
         #resetRelatedTasks($Data, $WFTaskID, 'PENDING');
-
+        #######################
+        auditLog($WFTaskID, $Data, 'Updated Work Task to On-Hold', 'WFTask');
+        #######################
         return 1;
     }
 
@@ -4547,6 +4549,7 @@ sub addMissingDocument {
     else {
         ($body, $title) = EntityDocuments::handle_entity_documents("C_DOCS_frm", $Data, $memberID, $documentTypeID, undef);
     }
+    auditLog($registrationID,$Data,'Add Missing Club Document','WFTask');    
 
     return ($body, $title);
 }
