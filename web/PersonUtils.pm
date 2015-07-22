@@ -20,10 +20,7 @@ sub formatPersonName {
     my ($Data, $firstname, $surname, $gender) = @_;    
     my $locale = $Data->{'lang'}->getLocale();
     switch($locale){
-        case ['en_US'] {
-            return "$surname $firstname";
-        }
-        case ['fi_FI','sv_FI'] {
+        case ['en_US', 'fi_FI','sv_FI'] {
             return "$firstname $surname";
         }
         case 'zh_CN' {

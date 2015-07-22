@@ -1335,7 +1335,9 @@ sub display_complete {
         my $hiddenFields = $self->getCarryFields();
         $hiddenFields->{'rfp'} = 'c';#$self->{'RunParams'}{'rfp'};
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
-print STDERR "COMPLETE: $regoID | Perso: $personID\n";
+	print STDERR "COMPLETE: $regoID | Perso: $personID\n";
+	open FH, ">test.txt";
+	print FH Dumper( $self->{'Data'});
         ($content, $gateways) = displayRegoFlowComplete(
             $self->{'Data'}, 
             $regoID, 
