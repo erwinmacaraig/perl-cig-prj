@@ -48,7 +48,7 @@ sub handle_documents {
    $resultHTML =  new_doc_form($Data, $client,$DocumentTypeID,$RegistrationID, $memberID); 
 	
   if ($action eq 'DOC_u') {
-		$DocumentTypeID = param('DocumentTypeID') || 0;
+	$DocumentTypeID = param('DocumentTypeID') || 0;
         my $toReplaceRegoDoc = param('fileId') || 0;  
 		
 		my $retvalue = process_doc_upload( 
@@ -102,6 +102,7 @@ sub handle_documents {
 		#}		
 		
 		$type = 'Add Document'; 
+		auditLog($memberID, $Data, $type, 'Document');
                 
 	}
   elsif ($action eq 'DOC_d') {
