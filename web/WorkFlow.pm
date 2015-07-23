@@ -4921,7 +4921,6 @@ sub getInitialTaskAssignee {
 
   	    $q->execute($entityID, $Data->{'Realm'}, , $originLevel, 'NEW');
         my $dref = $q->fetchrow_hashref();
-        print STDERR Dumper $dref;
         return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
     }
     elsif($personID and $registrationID){
@@ -4937,6 +4936,10 @@ sub getInitialTaskAssignee {
                 AND tr.strRegistrationNature = tp.strRegistrationNature
                 AND tr.intOriginLevel = tp.intOriginLevel
             )
+            INNER JOIN tblPerson p
+            ON (
+                p.intPersonID = tp.intPersonID
+            )
             INNER JOIN tblEntity te
             ON (
                 te.intEntityID = tp.intEntityID
@@ -4946,6 +4949,8 @@ sub getInitialTaskAssignee {
                 AND tr.intEntityLevel = te.intEntityLevel
                 AND tr.intRealmID = ?
                 AND tr.strTaskStatus = 'ACTIVE'
+                AND (tr.strISOCountry_IN IS NULL or tr.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+                AND (tr.strISOCountry_NOTIN IS NULL or tr.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
             ORDER BY
                 tr.intApprovalEntityLevel
             LIMIT 1
