@@ -4877,6 +4877,52 @@ sub getInitialTaskAssignee {
     ) = @_;
 
     if($entityID){
+        my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+        my $st = qq[
+            SELECT
+                r.intWFRuleID,
+                r.intRealmID,
+                r.intSubRealmID,
+                r.intApprovalEntityLevel,
+                r.strTaskType,
+                r.strWFRuleFor,
+                r.intDocumentTypeID,
+                r.strTaskStatus,
+                r.intProblemResolutionEntityLevel,
+                0 as intPersonID,
+                0 as intPersonRegistrationID,
+                e.intEntityID as RegoEntity,
+                0 as DocumentID
+            FROM tblEntity as e
+            INNER JOIN tblWFRule AS r ON (
+                e.intRealmID = r.intRealmID
+                AND e.intSubRealmID = r.intSubRealmID
+                AND r.strPersonType = ''
+                AND r.intEntityLevel = e.intEntityLevel
+            )
+            WHERE e.intEntityID= ?
+                AND r.strWFRuleFor = 'ENTITY'
+                AND r.intRealmID = ?
+                AND r.intSubRealmID IN (0, ?)
+                AND r.intOriginLevel = ?
+                AND r.strRegistrationNature = ?
+            ORDER BY
+                r.intApprovalEntityLevel
+            LIMIT 1
+		];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $entityID,
+            $Data->{'Realm'},
+            $Data->{'RealmSubType'},
+            $originLevel,
+            'NEW'
+        );
+
+  	    $q->execute($entityID, $Data->{'Realm'}, , $originLevel, 'NEW');
+        my $dref = $q->fetchrow_hashref();
+        print STDERR Dumper $dref;
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
     }
     elsif($personID and $registrationID){
         my $st = qq[
