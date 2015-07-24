@@ -17,8 +17,11 @@ use Switch;
 
 sub formatPersonName {
 
-    my ($Data, $firstname, $surname, $gender) = @_;    
-    my $locale = $Data->{'lang'}->getLocale();
+    my ($Data, $firstname, $surname, $gender) = @_;  
+    my $locale;
+    if(defined $Data->{'lang'}){
+        $locale = $Data->{'lang'}->getLocale();
+    }    
     switch($locale){
         case ['en_US', 'fi_FI','sv_FI'] {
             return "$firstname $surname";

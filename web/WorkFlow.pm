@@ -68,6 +68,8 @@ use InstanceOf;
 
 use PersonLanguages;
 use GatewayProcess;
+
+
 sub checkRulePaymentFlagActions {
 
     my(
@@ -2547,7 +2549,7 @@ sub viewTask {
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
-
+    
     $st = qq[
         SELECT
             t.intWFTaskID,
@@ -3248,6 +3250,7 @@ sub populateDocumentViewData {
             AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             AND tblRegistrationItem.intEntityLevel = ?
     ];
+     
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
     if ($dref->{'intOriginLevel'} && $dref->{'intOriginLevel'} > 0)   {
@@ -3271,6 +3274,7 @@ sub populateDocumentViewData {
         $internationalLoan,
         @levels
     );
+    
     while(my $adref = $sth->fetchrow_hashref()){
         next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
         next if exists $validdocs{$adref->{'intDocumentTypeID'}};
@@ -3304,8 +3308,8 @@ sub populateDocumentViewData {
 
     my %TemplateData = ();
 
-	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
-
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'}) || $Data->{'UserID'};
+      
     $dref->{'currentAge'} ||= 0;
     my $st = qq[
         SELECT
@@ -3395,8 +3399,7 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-
-	 
+    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
@@ -3408,7 +3411,7 @@ sub populateDocumentViewData {
 	my @RelatedDocuments = ();
 	my $rowCount = 0;
     my %DocoSeen = ();
-
+    
     my %DocumentAction = (
         'target' => 'main.cgi',
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -3503,7 +3506,7 @@ sub populateDocumentViewData {
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){
-                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;                
             }
             else {
                 $displayReplace = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
@@ -3518,7 +3521,7 @@ sub populateDocumentViewData {
                 $displayReplace = 1;
             }
         }
-
+        
         if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
