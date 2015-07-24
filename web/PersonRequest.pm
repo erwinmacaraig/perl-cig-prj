@@ -818,11 +818,12 @@ sub submitRequestPage {
             push @requestIDs, $requestID;
 
             my $notificationType = undef;
-
+            #
+            #Person => $regDetails->{'strLocalFirstname'} . ' ' . $regDetails->{'strLocalSurname'},
             my %notificationData = (
                 Reason => $notes,
                 WorkTaskType => $Defs::personRequest{$requestType},
-                Person => $regDetails->{'strLocalFirstname'} . ' ' . $regDetails->{'strLocalSurname'},
+                Person =>  formatPersonName($Data, $regDetails->{'strLocalFirstname'}, $regDetails->{'strLocalSurname'}, ''),
                 CurrentClub => $regDetails->{'strLocalName'} || '',
             );
 
@@ -838,7 +839,7 @@ sub submitRequestPage {
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($requestType, "SENT");
-            $emailNotification->setSubject($regDetails->{'strLocalFirstname'} . " " . $regDetails->{'strLocalSurname'});
+            $emailNotification->setSubject($notificationData{'Person'});
             $emailNotification->setLang($Data->{'lang'});
             $emailNotification->setDbh($Data->{'db'});
             $emailNotification->setData($Data);
@@ -1318,11 +1319,12 @@ sub setRequestResponse {
         }
     }
 
-
+    #
+    #Person => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
     my %notificationData = (
         Reason => $notes,
         WorkTaskType => $Defs::personRequest{$request->{'strRequestType'}},
-        Person => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
+        Person => formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, ''),
         CurrentClub => $request->{'requestTo'} || '',
         RequestingClub => $request->{'requestFrom'} || '',
     );
@@ -1894,7 +1896,7 @@ sub setRequestStatus {
     my %notificationData = (
         Reason => $task->{'rejectNotes'},
         WorkTaskType => $Defs::personRequest{$request->{'strRequestType'}},
-        Person => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
+        Person => formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, ''),,
         CurrentClub => $request->{'requestTo'} || '',
         RequestingClub => $request->{'requestFrom'} || '',
         MA => $maObj->name(),
@@ -1906,7 +1908,7 @@ sub setRequestStatus {
     $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
     $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
     $emailNotification->setDefsName($Defs::admin_email_name);
-    $emailNotification->setSubject($request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'});
+    $emailNotification->setSubject($notificationData{'Person'});
     $emailNotification->setLang($Data->{'lang'});
     $emailNotification->setDbh($Data->{'db'});
     $emailNotification->setData($Data);
