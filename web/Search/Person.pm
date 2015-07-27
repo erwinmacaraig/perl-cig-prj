@@ -10,6 +10,7 @@ use Data::Dumper;
 use Switch;
 use Reg_common;
 
+use PersonUtils;
 sub process {
     my ($self) = shift;
     my ($raw) = @_;
@@ -125,7 +126,8 @@ sub getUnique {
          #   $dref->{'intEntityID'},
          #   $dref->{'intEntityLevel'},
          # );            
-          my $name = "$dref->{'strLocalSurname'}, $dref->{'strLocalFirstname'}" || '';
+          
+          my $name = formatPersonName($self->getData(), $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '') || '';
           $name .= " #$dref->{'strNationalNum'}" if $dref->{'strNationalNum'};
           $name .= "  ($dref->{'EntityName'})" if $dref->{'EntityName'};
           push @memarray, {
@@ -338,7 +340,7 @@ sub getTransfer {
                 my $result = $validRecords{$resPersonID}{$personSport};
 
                 $count++;
-                my $name = "$result->{'strLocalFirstname'} $result->{'strLocalSurname'}" || '';
+                my $name = formatPersonName($self->getData(), $result->{'strLocalFirstname'}, $result->{'strLocalSurname'}, '') || '';
                 my $acceptedRequestLink = ($result->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$result->{'existingAcceptedRequestID'}" : '';
                 push @memarray, {
                     id => $result->{'intPersonID'} || next,
@@ -601,7 +603,8 @@ sub getPlayerLoan {
                 my $result = $validRecords{$resPersonID}{$personSport};
 
                 $count++;
-                my $name = "$result->{'strLocalFirstname'} $result->{'strLocalSurname'}" || '';
+                my $name = formatPersonName($self->getData(), $result->{'strLocalFirstname'}, $result->{'strLocalSurname'}, '') || '';
+                
                 my $acceptedRequestLink = ($result->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$result->{'existingAcceptedRequestID'}" : '';
                 push @memarray, {
                     id => $result->{'intPersonID'} || next,
@@ -773,7 +776,7 @@ sub getPersonRegistration {
             #);
 
             $count++;
-            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            my $name = formatPersonName($self->getData(), $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '') || '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,
                 ma_id => $dref->{'strNationalNum'} || $Defs::personStatus{$dref->{'PersonStatus'}} || '',
@@ -925,7 +928,7 @@ sub getPersonAccess {
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
             $count++;
-            my $name = "$dref->{'strLocalFirstname'} $dref->{'strLocalSurname'}" || '';
+            my $name = formatPersonName($self->getData(), $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '') || '';
             my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
             push @memarray, {
                 id => $dref->{'intPersonID'} || next,

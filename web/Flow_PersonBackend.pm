@@ -1069,10 +1069,10 @@ sub display_products {
             {},
             1,
         );
-        if (! $content)   {
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
+        #if (! $content)   {
+        #    $self->incrementCurrentProcessIndex();
+        #    return ('',2);
+        #}
     }
     else    {
         if (! $self->{'RunDetails'}{'Errors'} and  ! scalar(@{$self->{'RunDetails'}{'Errors'}})) {
@@ -1747,6 +1747,7 @@ sub deleteExistingReg {
             AND (intStatus = 0 OR (intStatus=1 AND curAmount = 0))
             AND intRealmID = ?
             AND intID = ?
+            AND intSentToGateway = 0
     ];
     $q = $self->{'Data'}->{'db'}->prepare($st);
     $q->execute($regoID, $realmID, $personID);

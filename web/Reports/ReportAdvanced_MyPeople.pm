@@ -298,7 +298,19 @@ sub _getConfiguration {
                 }
             ],
 
-            PRstrPersonType=> [
+            PRintOriginLevel=> [
+                'Record Creation',
+                {
+                    dbfield         => 'PR.intOriginLevel',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::originLevelTypes,
+                    translate       => 1,
+                    optiongroup     => 'regos',
+                    allowgrouping   => 1
+                }
+            ],
+             PRstrPersonType=> [
                 'Role',
                 {
                     dbfield         => 'PR.strPersonType',
@@ -1527,6 +1539,15 @@ sub _getConfiguration {
                     dbfield     => 'TL.strTXN'
                 }
               ],
+              strOnlinePayReference => [
+                $lang->txt('Payment Reference Number'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.strOnlinePayReference'
+                }
+              ],
               intLogID => [
                 $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Log ID') : '',
                 {
@@ -1673,7 +1694,7 @@ sub _getConfiguration {
           Order => [
             qw(
               strNationalNum
-                PstrImportCode
+              PstrImportCode
               PstrStatus
               strLocalFirstname
               strLocalSurname
@@ -1692,6 +1713,7 @@ sub _getConfiguration {
               intEthnicityID
               intMinorProtection
 
+                PRintOriginLevel
                 PRstrPersonType 
                 PRstrPersonLevel
                 PRstrAgeLevel
@@ -1800,6 +1822,7 @@ sub _getConfiguration {
               payment_type
               TLstrReceiptRef
               strTXN
+              strOnlinePayReference
               intAmount
               dtPaid
               dtSettlement
@@ -1891,7 +1914,6 @@ sub SQLBuilder {
             $current_where
             AND PR.intEntityID = $entityID
     ];
-
     return ( $sql, '' );
 }
 

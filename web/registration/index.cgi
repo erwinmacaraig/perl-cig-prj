@@ -30,6 +30,8 @@ use SelfUserFlow;
 use SelfUserTransfer;
 use ForgottenPassword;
 use Data::Dumper;
+use SelfRegoPersonEdit;
+use PersonUtils;
 
 main();
 
@@ -89,11 +91,14 @@ sub main {
     );
     $user->load();
     my $userID = $user->id() || 0;
-    $Data{'UserName'} = $user->name();
+    
+    $Data{'UserName'} =  formatPersonName(\%Data, $user->name(), $user->familyname(), '');
+   
     $Data{'User'} = $user;
     $Data{'UserID'} = $userID;
-
+    
     $action = 'LOGIN' if(!$userID and $action ne 'activate' and $action !~/FORGOT/);
+    
     if(!$action and $userID)  {
         $action = 'HOME';
     }
@@ -125,7 +130,10 @@ sub main {
             $resultHTML .= showHome(\%Data, $user, $srp);
         }
     }
- 	elsif ($action =~ /TRANSFER_/) {
+    elsif($action =~ /SPE_/){         
+        ($resultHTML, $pageHeading) = handleSelfRegoPersonEdit(\%Data, $action);
+    }
+    elsif ($action =~ /TRANSFER_/) {
         ($resultHTML, $pageHeading) = handleSelfUserTransfer(\%Data, $user, $action);
     }
     else {

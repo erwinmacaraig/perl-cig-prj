@@ -23,6 +23,7 @@ use FormHelpers;
 use AuditLog;
 use Log;
 use TTTemplate;
+use PersonUtils;
 
 sub listPersons {
     my ($Data, $entityID, $action) = @_; 
@@ -70,6 +71,7 @@ sub listPersons {
             P.strNationalNum,
             P.strFIFAID,
             P.dtDOB,
+            P.intGender as PersonGender,
             PR.strPersonType AS PRstrPersonType,
             PR.strStatus AS PRStatus,
             PR.strPersonSubType AS PRstrPersonSubType,
@@ -96,7 +98,7 @@ sub listPersons {
             ) 
         WHERE 
             P.strStatus <> 'DELETED' 
-            AND PR.strStatus = 'ACTIVE'
+            AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR (PR.intOnLoan = 1 AND PR.dtTo > NOW()))
             AND P.intRealmID = $realm_id
         ORDER BY 
             strLocalSurname, 
@@ -131,7 +133,6 @@ sub listPersons {
                 $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_DELETED
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED 
                 or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_INPROGRESS
-                or $dref->{'PRStatus'} eq $Defs::PERSONREGO_STATUS_SUSPENDED
                 or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_DELETED
                 or $dref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED
             )
@@ -195,6 +196,8 @@ sub listPersons {
         $tempClientValues{personID} = $dref->{intPersonID};
         my $tempClient = setClient(\%tempClientValues);
         $dref->{'link'} = "$target?client=$tempClient&amp;a=$newaction";
+        $dref->{'name'} = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'PersonGender'});
+        
         push @rowdata, $dref;
         $found++;
     }

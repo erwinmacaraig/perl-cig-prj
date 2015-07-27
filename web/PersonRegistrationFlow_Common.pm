@@ -121,6 +121,7 @@ sub displayRegoFlowSummaryBulk  {
         my %personData = ();
         $regoID = $hidden_ref->{"regoID_$pID"} || 0;
         my ($txnCountSingle, $amountDueSingle, $logIDsSingle, $originalAmount) = getPersonRegoTXN($Data, $pID, $regoID);
+        next if ! $regoID;
         $txnCount += $txnCountSingle;
         $amountDue += $amountDueSingle;
         $personData{'MAID'} = $personObj->getValue('strNationalNum');
@@ -844,7 +845,7 @@ sub displayRegoFlowDocuments{
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref, $noFormFields) = @_;
     my $lang=$Data->{'lang'};
 	$hidden_ref->{'pID'} = $personID;
-
+     
      my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_DU&amp;rID=$regoID"; 
      my $documents = getRegistrationItems(
         $Data,
@@ -857,9 +858,9 @@ sub displayRegoFlowDocuments{
         0,
         $rego_ref,
      );
-
+    
 	
-	my @docos = (); 
+    my @docos = (); 
 
     my %existingDocuments;
 	#check for uploaded documents present for a particular registration and person
@@ -935,9 +936,10 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
 	}
 	
 	my @diff = ();	
-
+       
 	#compare whats in the system and what docos are missing both required and optional
 	foreach my $doc_ref (@{$documents}){
+    
 		next if(!$doc_ref);	
         #next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
@@ -1102,7 +1104,15 @@ sub displayRegoFlowProducts {
 
     }
     else    {
-        return '';
+        #return '';
+        return qq[
+        <div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>] . $Data->{'lang'}->txt('No license fees required for this registration, click '). q[<strong>] . $Data->{'lang'}->txt('Continue') . q[</strong>] . $Data->{'lang'}->txt(' to proceed') . q[.</p>
+            </div>
+        </div>
+        ];
     }
         my $displayPayment = $Data->{'SystemConfig'}{'AllowTXNs_CCs_roleFlow'};
         $displayPayment = 0 if ($Data->{'SelfRego'} and ! $Data->{'SystemConfig'}{'SelfRego_PaymentOn'});
@@ -1121,11 +1131,11 @@ sub displayRegoFlowProducts {
         hidden_ref=> $hidden_ref,
         Lang => $Data->{'lang'},
         client=>$client,
-		amountCheck => $totalamountchk,
+	amountCheck => $totalamountchk,
         NoFormFields =>$noFormFields,
-		AssociationName => $maName,
-		payMethod => $rego_ref->{'payMethod'},
-		productTerms => $product_terms || '',
+	AssociationName => $maName,
+	payMethod => $rego_ref->{'payMethod'},
+	productTerms => $product_terms || '',
     );
 	
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';

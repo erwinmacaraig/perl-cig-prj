@@ -75,7 +75,8 @@
             [% FOREACH rego IN rowdata %]
                 <tr class="task-list">
                     <td><span class="fa fa-user"></span>[% rego.strNationalNum %]</td>
-                    <td>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</td>
+                    <!-- <td>[% rego.strLocalFirstname %] [% rego.strLocalSurname %]</td> -->
+                    <td>[% rego.name %]</td>
                     <td data-order = "[% rego.dtDOB %]" style = "white-space: nowrap;">[% DateFormat.format(rego.dtDOB,'MEDIUM') %]</td>
                     <td>[% rego.types %]</td>
                     <td><span style = "[% IF rego.subtypes.length > 110 %]font-size:10px;[% END %]">[% rego.subtypes%]</span></td>

@@ -548,14 +548,14 @@ sub display_documents {
 		$clientValues{'clubID'} = $self->ID;
 		$clientValues{'currentLevel'} = $Defs::LEVEL_CLUB; 
 		my $clmx = setClient(\%clientValues);
-
+        
         my %documentData = (
             target => $self->{'Data'}->{'target'},
             documents => \@required_docs_listing,
-			optionaldocs => \@optional_docs_listing,
+	    optionaldocs => \@optional_docs_listing,
             Lang => $self->{'Data'}->{'lang'},           
-			client => $clmx,
-			clubID => $clubID,
+	    client => $clmx,
+	    clubID => $clubID,
             
         );
 		
@@ -880,6 +880,7 @@ sub loadObjectValues    {
     my %values = ();
     if($object) {
         for my $field (qw(
+            strStatus
             strLocalName
             strLocalShortName
             intLocalLanguage

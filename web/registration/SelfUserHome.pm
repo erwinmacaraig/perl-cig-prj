@@ -21,6 +21,9 @@ use Utils;
 use L10n::DateFormat;
 use L10n::CurrencyFormat;
 use Data::Dumper;
+use Countries;
+use CGI  qw(param);
+use PersonUtils;
 
 sub getSelfRegoMatrixOptions    {
 
@@ -71,11 +74,19 @@ sub showHome {
 	my $documents = '';
 	my $registrationHist = '';
 	my $transactions = '';
+	my $memberdetail = '';
+	my $activeTab = param('act_acc') || 0;
+	my $activeAccordion = param('act_acc') || 0;
+	my $tempAccordion = 0;
 	#
     my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	foreach my $person (@{$people}){
 		$count++;
+		if(!$activeAccordion && !$tempAccordion){
+                    $tempAccordion = $person->{'intPersonID'};
+		}
 		$documents = getUploadedSelfRegoDocuments($Data,$person->{'intPersonID'});
+		$memberdetail = getMemberDetail($Data, $person->{'intPersonID'});
 		$registrationHist = getSelfRegoHistoryRegistrations($Data, $previousRegos->{$person->{'intPersonID'}});
 		$transactions = getSelfRegoTransactionHistory($Data, $previousRegos->{$person->{'intPersonID'}});
 		$accordion .= runTemplate($Data, {
@@ -85,16 +96,21 @@ sub showHome {
 			Documents => $documents,
 			History => $registrationHist,
 			Transactions => $transactions,
-            selfRegoMatrixOptions => $selfRegoMatrixOptions,
+			PersonDetails => $memberdetail,
+                        selfRegoMatrixOptions => $selfRegoMatrixOptions,
+                        count => $person->{'intPersonID'},
+                        activeAccordion =>  $activeAccordion || $tempAccordion,
+                        activeTab => $activeTab,
+                        
 		},
 		'selfrego/accordion.templ',		
 		 );
 	}
-	
+    my $name = formatPersonName($Data, $user->name(), $user->familyname(), '');
     my $resultHTML = runTemplate(
         $Data,
         {
-            Name => $user->fullname(),
+            Name => $name,
             PreviousRegistrations => $previousRegos,
             People => $people,
             Found => $found,
@@ -107,8 +123,52 @@ sub showHome {
         },
         'selfrego/home.templ',
     );    
-
     return $resultHTML;
+}
+
+sub getMemberDetail {
+    my ($Data,$personID) = @_;
+    my $persondetails = '';
+       
+    my $personObj = new PersonObj(db => $Data->{'db'}, ID => $personID, cache => $Data->{'cache'});
+    $personObj->load(); 
+        
+    my $languages = PersonLanguages::getPersonLanguages($Data, 1, 0);
+    my $selectedLanguage;
+    for my $l ( @{$languages} ) {
+        if($l->{intLanguageID} == $personObj->getValue('intLocalLanguage')){
+             $selectedLanguage = $l->{'language'};
+            last
+        }
+    }
+    
+    my $isocountries  = getISOCountriesHash();
+    my %TemplateData = (
+        LastName => $personObj->getValue('strLocalSurname')|| '',
+        FirstName => $personObj->getValue('strLocalFirstname') || '',
+        LanguageOfName => $selectedLanguage || '',
+        DOB => $personObj->getValue('dtDOB') || '',
+        Gender => $Defs::PersonGenderInfo{$personObj->getValue('intGender')} || '',
+        Nationality => $isocountries->{$personObj->getValue('strISONationality')} || '',
+        CountryOfBirth => $isocountries->{$personObj->getValue('strISOCountryOfBirth')} || '',
+        RegionOfBirth => $personObj->getValue('strRegionOfBirth') || '',
+        Address1 => $personObj->getValue('strAddress1') || '',
+        Address2 => $personObj->getValue('strAddress2') || '',
+        City => $personObj->getValue('strSuburb') || '',
+        State => $personObj->getValue('strState') || '',
+        PostalCode => $personObj->getValue('strPostalCode') || '',
+        ContactISOCountry => $isocountries->{$personObj->getValue('strISOCountry')} || '',
+        ContactPhone => $personObj->getValue('strPhoneHome') || '',        
+        Email => $personObj->getValue('strEmail') || '',
+        EditDetailsLink => "$Data->{'target'}?client=$Data->{'client'}&amp;a=SPE_&amp;pID=$personID&amp;dtype=" . $personObj->getValue('strPersonType'),
+    );
+    $persondetails = runTemplate(
+                        $Data,
+                        \%TemplateData,
+                        'selfrego/selfregopersondetails.templ',
+                     );
+    return $persondetails;
+    
 }
 
 sub getUploadedSelfRegoDocuments {
@@ -224,10 +284,10 @@ sub getSelfRegoTransactionHistory{
 }
 sub getPreviousRegos {
     my (
-		$Data,
+        $Data,
         $userID,
     ) = @_;
-
+    my $formattedName;
     my $st = qq[
         SELECT
             A.intMinor,
@@ -286,11 +346,13 @@ sub getPreviousRegos {
     my %regos = ();
     my %found = ();
     my @people = ();
+    my %renewLinks = ();
     my $allowTransferShown=0;
     while(my $dref = $q->fetchrow_hashref())    {
         my $pID = $dref->{'intPersonID'} || next;
         if(!exists $regos{$pID})    {
             $allowTransferShown=0;
+            $formattedName = formatPersonName($Data,$dref->{'strLocalFirstname'},$dref->{'strLocalSurname'},'');
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
                 strLocalSurname => $dref->{'strLocalSurname'} || '',
@@ -299,7 +361,19 @@ sub getPreviousRegos {
                 intMinor => $dref->{'intMinor'},
                 intPersonID => $pID,
                 NationalNum => $dref->{'strNationalNum'},
+                formattedName => $formattedName,
+               
             };
+        } 
+        if(!exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}){
+            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}} = {
+                regoID => $dref->{'intPersonRegistrationID'},
+                enableRenewButton => 1,
+                nature => $dref->{'strRegistrationNature'},
+            };
+        }        
+        else{
+            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}{'enableRenewButton'} = 0;
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';
         $found{$type} = 1;
@@ -307,7 +381,7 @@ sub getPreviousRegos {
         $dref->{'strPersonLevelName'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
         $dref->{'strSportType'} = $Defs::sportType{$dref->{'strSport'}} || '';
         $dref->{'renewlink'} = '';
-		$dref->{'transferlink'} = '';
+        $dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
@@ -317,7 +391,7 @@ sub getPreviousRegos {
             and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
             $dref->{'allowTransfer'} =1;
             $allowTransferShown=1;
-			$dref->{'transferlink'} = "?a=TRANSFER_INIT&amp;pID=$pID&amp;rtargetid=$dref->{'intPersonRegistrationID'}";
+            $dref->{'transferlink'} = "?a=TRANSFER_INIT&amp;pID=$pID&amp;rtargetid=$dref->{'intPersonRegistrationID'}";
         }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE) 
@@ -336,9 +410,17 @@ sub getPreviousRegos {
             }
         }
 
-        push @{$regos{$pID}}, $dref;
+        push @{$regos{$pID}}, $dref; 
     }
-    
+   
+    #do some processing with regards to displaying renewal button    
+    foreach my $person (@people){
+        foreach my $r (@{$regos{$person->{'intPersonID'}}}){
+            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} == $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
+                    $r->{'renewlink'} = '';
+            }
+        }
+    }
     return (
         \%regos,
         \@people,
@@ -346,4 +428,4 @@ sub getPreviousRegos {
     );
 }
 1;
-1;
+

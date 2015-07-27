@@ -55,14 +55,13 @@ sub handleTransactions	{
 		#queryBlkTXNviaInvoice($action, $Data, $intTableID) if  ($action =~ /_step2/ && param('d_strInvoiceNumber')); 
 		
 		 if($action =~ /_step2/){
-			$heading = 'This is just a test run';	
 			my $value = param('d_strInvoiceNumber') ;
 			$value =~ s/^\s+//;
 			if(length($value) > 0 || $value ne ''){
 				$resultHTML = $value;
 			}
 			else { 
-				$resultHTML = 'Belat';
+				$resultHTML = '';
 			}
 			
  		 }
@@ -73,30 +72,33 @@ sub handleTransactions	{
 
   if ($action =~ /_TXN_LIST/) {
         $entityID = getLastEntityID($Data->{'clientValues'});		
-		my $cl = setClient($Data->{'clientValues'});
-        my %cv = getClient($cl);
-		if ($Data->{'clientValues'}{'clubID'} > 0)   {
+	my $cl = setClient($Data->{'clientValues'});
+        my %cv = getClient($cl);  
+        my $ignoreUnpaidFlag = 1; # if set show only paid and on-hold transactions
+	if ($Data->{'clientValues'}{'clubID'} > 0)   {
             $cv{'clubID'} = $entityID;
-            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;
-       }
+            $cv{'currentLevel'} = $Defs::LEVEL_CLUB;            
+        }
        elsif ($Data->{'clientValues'}{'regionID'} > 0)    {
             $cv{'regionID'} = $entityID;
-            $cv{'currentLevel'} = $Defs::LEVEL_REGION;
-       }
+            $cv{'currentLevel'} = $Defs::LEVEL_REGION;            
+        }
+        elsif($Data->{'clientValues'}{'personID'} > 0){
+            my $ignoreUnpaidFlag = 0;
+        }
        else {
             $cv{'entityID'} = $entityID; ## As its getLastEntityID
             $cv{'currentLevel'} = $Defs::LEVEL_NATIONAL;
         }
- 		my $clm = setClient(\%cv);
-		my $resultHTML_ = '';
-		($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID);
-    		$heading = $Data->{'lang'}->txt('List Transactions');
-		$resultHTML_ .= qq[<br />
-			<div>
-				<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> ] . $lang->txt('Go to your dashboard') . qq[ </a>
-				<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">]. $lang->txt('Return to Invoices') . qq[ </a>
-				
-			</div>
+ 	my $clm = setClient(\%cv);
+	my $resultHTML_ = '';
+	($resultHTML_,$heading) = TransLog::handleTransLogs('list', $Data, $entityID, $intTableID,$ignoreUnpaidFlag);
+	$heading = $Data->{'lang'}->txt('List Transactions');
+	$resultHTML_ .= qq[<br />
+            <div>
+		<a href="$Data->{target}?client=$clm&amp;a=WF_" class="btn-main"> ] . $lang->txt('Go to your dashboard') . qq[ </a>
+		<a href="$Data->{target}?client=$clm&amp;a=TXN_PAY_INV_QUERY_INFO" class="btn-main pull-right">]. $lang->txt('Return to Invoices') . qq[ </a>
+            </div>
 		];
 			
 		$resultHTML .= $resultHTML_;

@@ -27,6 +27,7 @@ require Exporter;
     updateTaskNotes
     updateTaskScreen
     getInitialTaskAssignee
+    redirectTemplate
 );
 
 use strict;
@@ -67,6 +68,8 @@ use InstanceOf;
 
 use PersonLanguages;
 use GatewayProcess;
+
+
 sub checkRulePaymentFlagActions {
 
     my(
@@ -143,7 +146,7 @@ sub checkRulePaymentFlagActions {
         if ($dref->{'intRemoveTaskOnPayment'} == 1) {
             my $stUPD = qq[
                 UPDATE tblWFTask
-                SET strTaskStatus = 'DELETED'
+                SET strTaskStatus = 'DELETED', intPaymentGatewayResponded = 1
                 WHERE 
                     intRealmID = ?
                     AND intWFTaskID = ?
@@ -152,7 +155,18 @@ sub checkRulePaymentFlagActions {
             $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
             $countTaskSkipped++;
         }
-        GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
+        else    {
+            my $stUPD = qq[
+                UPDATE tblWFTask
+                SET intPaymentGatewayResponded = 1
+                WHERE 
+                    intRealmID = ?
+                    AND intWFTaskID = ?
+            ];
+            my $qUPD= $Data->{'db'}->prepare($stUPD);
+            $qUPD->execute($Data->{'Realm'}, $dref->{'intWFTaskID'});
+        }
+        #GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
@@ -666,7 +680,7 @@ sub listTasks {
 			AgeLevel => $dref->{strAgeLevel},
 			RuleFor=> $dref->{strWFRuleFor},
 			RegistrationNature => $dref->{strRegistrationNature},
-			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel}) || $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
+			RegistrationNatureLabel => $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$registrationNatureLabel})|| $Data->{'lang'}->txt($Defs::workTaskTypeLabel{$ruleForType}),
 			DocumentName => $dref->{strDocumentName},
             Name=>$name,
 			LocalEntityName=> $dref->{EntityLocalName},
@@ -695,6 +709,9 @@ sub listTasks {
             InternationalLoanDescription => ($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}) ? '('.$Data->{'lang'}->txt("International Player Loan").')' : "",
 		);
         #print STDERR Dumper \%single_row;
+        if($dref->{strRegistrationNature} eq 'NEW' and $dref->{'intPersonLevelChanged'} and $dref->{'strPersonLevel'} ne $dref->{'strPreviousPersonLevel'} ){
+            $single_row{'RegistrationNatureLabel'} = 'Player Registration <br />(Level Change)';
+        }
    
         if(!($Defs::workTaskTypeLabel{$ruleForType} ~~ @taskType)){
             push @taskType, $Defs::workTaskTypeLabel{$ruleForType};
@@ -1194,10 +1211,11 @@ sub addWorkFlowTasks {
 		$workTaskType .=  qq[ ($Defs::workTaskTypeLabel{'INTERNATIONAL_LOAN_PLAYER'}) ];
 		$notificationType = $Defs::NOTIFICATION_INTERNATIONALPLAYERLOAN_SENT
             }
+            #'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'}            
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
-                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'Person' =>  formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'Club' => $task->{'strLocalName'},
                 'Venue' => $task->{'strLocalName'},
@@ -1373,10 +1391,12 @@ sub approveTask {
     else {
         my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
         my $cc = getCCRecipient($Data, $task);
+        formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
+        # 'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
         my %notificationData = (
             'Reason' => $task->{'holdNotes'},
             'WorkTaskType' => $workTaskType,
-            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'Person' =>  formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
             'Venue' => $task->{'strLocalName'},
@@ -1539,7 +1559,7 @@ sub checkForOutstandingTasks {
             my %notificationData = (
                 'Reason' => '',
                 'WorkTaskType' => $workTaskType,
-                'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+                'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
                 'PersonRegisterTo' => $task->{'registerToEntity'},
                 'Club' => $task->{'strLocalName'},
                 'Venue' => $task->{'strLocalName'},
@@ -2188,7 +2208,7 @@ sub resolveTask {
     my %notificationData = (
         'Reason' => $nr->{'strNotes'},
         'WorkTaskType' => $workTaskType,
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),,
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
         'Venue' => $task->{'strLocalName'},
@@ -2339,7 +2359,7 @@ sub rejectTask {
         my %notificationData = (
             'Reason' => $task->{'rejectNotes'},
             'WorkTaskType' => $workTaskType,
-            'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+            'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''),
             'PersonRegisterTo' => $task->{'registerToEntity'},
             'Club' => $task->{'strLocalName'},
             'Venue' => $task->{'strLocalName'},
@@ -2353,6 +2373,7 @@ sub rejectTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
+            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
@@ -2528,7 +2549,7 @@ sub viewTask {
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
-
+    
     $st = qq[
         SELECT
             t.intWFTaskID,
@@ -3229,6 +3250,7 @@ sub populateDocumentViewData {
             AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             AND tblRegistrationItem.intEntityLevel = ?
     ];
+     
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
     if ($dref->{'intOriginLevel'} && $dref->{'intOriginLevel'} > 0)   {
@@ -3252,6 +3274,7 @@ sub populateDocumentViewData {
         $internationalLoan,
         @levels
     );
+    
     while(my $adref = $sth->fetchrow_hashref()){
         next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
         next if exists $validdocs{$adref->{'intDocumentTypeID'}};
@@ -3285,8 +3308,8 @@ sub populateDocumentViewData {
 
     my %TemplateData = ();
 
-	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
-
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'}) || $Data->{'UserID'};
+      
     $dref->{'currentAge'} ||= 0;
     my $st = qq[
         SELECT
@@ -3376,8 +3399,7 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-
-	 
+    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
@@ -3389,7 +3411,7 @@ sub populateDocumentViewData {
 	my @RelatedDocuments = ();
 	my $rowCount = 0;
     my %DocoSeen = ();
-
+    
     my %DocumentAction = (
         'target' => 'main.cgi',
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -3484,7 +3506,7 @@ sub populateDocumentViewData {
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){
-                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;                
             }
             else {
                 $displayReplace = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
@@ -3499,7 +3521,7 @@ sub populateDocumentViewData {
                 $displayReplace = 1;
             }
         }
-
+        
         if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
@@ -4301,9 +4323,6 @@ sub updateTaskScreen {
         'CurrentViewLevel' => $currentViewLevel
     );
 
-    #open (my $FH,">test.txt");
-    #print $FH  Dumper($TaskType, $task->{'strPersonType'}, $task, $task->{'strTaskStatus'}, $raID->{'strLocalName'});
-    #print $FH "Message: \n " . $action;
 	$body = runTemplate(
         $Data,
         \%TemplateData,
@@ -4387,11 +4406,11 @@ sub holdTask {
 
     my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
     my $cc = getCCRecipient($Data, $task);
-
+    # 'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'}
     my %notificationData = (
         'Reason' => $task->{'holdNotes'},
         'WorkTaskType' => $workTaskType,
-        'Person' => $task->{'strLocalFirstname'} . ' ' . $task->{'strLocalSurname'},
+        'Person' => formatPersonName($Data, $task->{'strLocalFirstname'}, $task->{'strLocalSurname'}, ''), 
         'PersonRegisterTo' => $task->{'registerToEntity'},
         'Club' => $task->{'strLocalName'},
         'Venue' => $task->{'strLocalName'},
@@ -4550,6 +4569,7 @@ sub deleteRegoTransactions {
             AND intPersonRegistrationID = ?
             AND intRealmID = ?
             AND intStatus = 0
+            AND intSentToGateway = 0
     ];
 
     my $q = $Data->{'db'}->prepare($st) or query_error($st);

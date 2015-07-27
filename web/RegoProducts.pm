@@ -121,7 +121,7 @@ sub getRegoProducts {
         UnPaidItems => \@unpaid_items,
         HideTotal => $hideTotal,
         client => $cl,
-		URLBaseFormatter => $Defs::base_url,
+	URLBaseFormatter => $Defs::base_url,
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
@@ -521,6 +521,7 @@ sub cleanRegoTransactions	{
 	$st.= qq[
             AND intID = ? 
             AND intStatus=0 
+            AND intSentToGateway = 0
     ];
     my $q= $db->prepare($st);
     $q->execute($regoID, $intID);
@@ -548,6 +549,7 @@ sub insertRegoTransaction {
             AND intID = ? 
             AND intStatus=0 
             AND intProductID=? 
+            AND intSentToGateway = 0
     ];
     my $q_txnclean= $db->prepare($stTxnsClean);
     #Get products selected
@@ -570,13 +572,42 @@ sub insertRegoTransaction {
     while(my $pref=$qryPaid->fetchrow_hashref())  {
         $Paid{$pref->{'intProductID'}} = 1;
     }
-        
+ 
+    my $stAlready= qq[
+        SELECT 
+            intProductID,
+            intTransactionID
+        FROM
+            tblTransactions
+        WHERE
+            intPersonRegistrationID = ? 
+            AND intID = ? 
+            AND intStatus<> 1
+            AND intSentToGateway = 1
+            AND (
+                intPaymentGatewayResponded = 0
+                OR (
+                    intPaymentGatewayResponded= 1 AND intStatus=3
+                )
+            )
+    ];
+    my $qryAlready= $db->prepare($stAlready);
+    $qryAlready->execute($regoID, $intID);
+    my %AlreadyTXN = ();
+    my %AlreadyProduct = ();
+    while(my $aref=$qryAlready->fetchrow_hashref())  {
+        $AlreadyTXN{$aref->{'intTransactionID'}} = 1;
+        $AlreadyProduct{$aref->{'intProductID'}} = 1;
+        push @already_in_cart_items, $aref->{'intTransactionID'};
+    }
+               
     for my $k (%{$params})  {
       if($k=~/prod_/) {
         if($params->{$k}==1)  {
           my $prod=$k;
           $prod=~s/[^\d]//g;
           next if exists $Paid{$prod};
+          next if exists $AlreadyProduct{$prod};
           push @productsselected, $prod;
         }
       }
@@ -584,6 +615,7 @@ sub insertRegoTransaction {
         if($params->{$k}>=1)  {
           my $txn=$k;
           $txn=~s/[^\d]//g;
+          next if exists $AlreadyTXN{$txn};
           push @already_in_cart_items, $txn;
         }
       }

@@ -159,25 +159,26 @@ strItemType
 	        $Data->{'RealmSubType'}, 
 	        $ruleFor,
 	        $originLevel,
-		    $regNature,
-		    $regNature2,
+		$regNature,
+		$regNature2,
 	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
 	        $entityLevel,
-		    $Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
-		    $Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
-		    $Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
-		    $Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
-		    $Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
 	        $itemType, 
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'Nationality'} || '',
 	        $Rego_ref->{'currentAge'} || 0,
 	        $Rego_ref->{'currentAge'} || 0,
-            $Rego_ref->{'InternationalTransfer'} || 0,
-            $Rego_ref->{'InternationalLoan'} || 0,
-		    $itc
-		) or query_error($st); 
-	
+                $Rego_ref->{'InternationalTransfer'} || 0,
+                $Rego_ref->{'InternationalLoan'} || 0,
+		$itc
+    ) or query_error($st); 
+
+    	
     my @values = (); 
     push @values, $Data->{'Realm'};  
     push @values,$Data->{'RealmSubType'}; 
@@ -237,6 +238,7 @@ strItemType
             $Item{'TransactionID'} = $dref->{'intTransactionID'} || 0;
             
         }
+       
         push @Items, \%Item;
     }
     return \@Items;

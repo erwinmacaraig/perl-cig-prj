@@ -1,6 +1,6 @@
 [% USE Dumper %]
 <h3 class="panel-header"><b>[% Lang.txt('Summary') %]</b></h3>
-	<div class="panel-body">
+	<div class="panel-body summary-page">
 		<div class="document-upload summary">
 			<div class="col-md-6">
 				<div class="read-only personal-information">
@@ -19,7 +19,7 @@
 					    	<li><span class="details-left">[% Lang.txt("Country of Birth") %]:</span> <span class="detail-value">[% IF person.Country %] [% person.Country %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Region") %]:</span> <span class="detail-value">[% IF person.Region %] [% person.Region %] [% ELSE %] - [% END %]</span></li>
 					    </ul>
-					    <a href="[% editlink %]&amp;rfp=cd" class="pull-right">[% Lang.txt('Edit') %]</a>
+					    <a href="[% editlink %]&amp;rfp=cd" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
 				    </div>
 				</div>
 			</div>
@@ -37,7 +37,7 @@
 					    	<li><span class="details-left">[% Lang.txt("Phone Number") %]:</span> <span class="detail-value">[% IF person.Phone %] [% person.Phone %] [% ELSE %] - [% END %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Email Address") %]:</span> <span class="detail-value">[% IF person.Email %] [% person.Email %] [% ELSE %] - [% END %]</span></li>
 					    </ul>
-					    <a href="[% editlink %]&amp;rfp=cond" class="pull-right">[% Lang.txt('Edit') %]</a>
+					    <a href="[% editlink %]&amp;rfp=cond" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
 				    </div>
 				</div>
 			</div>
@@ -56,7 +56,7 @@
 					    		<li><span class="details-left">[% Lang.txt("Certifications") %]:</span> <span class="detail-value">[% certifications %]</span></li>							
 					    	[% END %]
 					    </ul>
-					    <a href="[% editlink %]&amp;rfp=r" class="pull-right">[% Lang.txt('Edit') %]</a>
+					    <a href="[% editlink %]&amp;rfp=r" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
 				     </div>
 				</div>
 			</div>
@@ -70,7 +70,7 @@
 					    	<li><span class="details-left">[% Lang.txt("Total") %]:</span> <span class="detail-value">[% CurrencyFormat.format(payment.totalPaymentDue) %]</span></li>
 					    	<li><span class="details-left">[% Lang.txt("Payment Method") %]:</span> <span class="detail-value">[% Lang.txt(payment.paymentMethodText) %]</span></li>
 					    </ul>
-					    <a href="[% editlink %]&amp;rfp=p" class="pull-right">[% Lang.txt('Edit') %]</a>
+					    <a href="[% editlink %]&amp;rfp=p" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
 				     </div>
 				</div>
 			</div>
@@ -78,7 +78,6 @@
     	[% END %]
 
 		[% IF registration.documents.size %]
-			<div class="clearfix" style="clear:both;">&nbsp;</div>
 			<div class="col-md-6">
 		<div class="read-only">
 			 <h4>[% Lang.txt('Documents') %]</h4>
@@ -90,7 +89,7 @@
 
 					[% END %]
 			    </ul>
-                <a href="[% editlink %]&amp;rfp=d" class="pull-right">[% Lang.txt('Edit') %]</a>
+                <a href="[% editlink %]&amp;rfp=d" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
 		     </div>
 		</div>
 			</div>
