@@ -15,6 +15,7 @@ use SelfUserLogin;
 use TTTemplate;
 use SelfUserSession;
 use SystemConfig;
+use Localisation;
 
 main();
 
@@ -23,13 +24,16 @@ sub main {
     my %Data = ();
     my $db   = connectDB();
     $Data{'db'} = $db;
-    my $lang = Lang->get_handle() || die "Can't get a language handle!";
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
+
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
+    initLocalisation(\%Data);
+
     $Data{'target'} = 'login.cgi';
     $Data{'cache'}  = new MCache();
 
-    $Data{'Realm'} = 1;
-    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $email = param('email') || '';
     my $password = param('pw') || '';
     my $srp = param('srp') || '';

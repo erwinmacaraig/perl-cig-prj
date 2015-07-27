@@ -8,5 +8,6 @@ CREATE TABLE IF NOT EXISTS `tblCertificationTypes` (
   `intActive` TINYINT NOT NULL DEFAULT 1,
   intActiveOrder  TINYINT NOT NULL DEFAULT 0,
   `intDisplayOrder` smallint(6) DEFAULT '0',
+    strGroupSport varchar(30) default '',
   PRIMARY KEY (`intCertificationTypeID`)
 ) DEFAULT CHARSET=utf8;

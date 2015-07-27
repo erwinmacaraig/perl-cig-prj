@@ -580,6 +580,19 @@ sub display_documents {
     my $venue_documents = '';
     my $content = '';
 
+    my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
+    my %cv = getClient($cl);
+    $cv{'venueID'} = $facilityID;
+    $cv{'currentLevel'} = $Defs::LEVEL_VENUE;
+    my $clm = setClient(\%cv);
+    my %documentData = (
+            target => $self->{'Data'}->{'target'},
+            documents => [],
+            optionaldocs => [],
+            Lang => $self->{'Data'}->{'lang'},
+            client => $clm,
+            venueID => $facilityID,
+        );
     if($facilityID) {
         $venue_documents = getRegistrationItems(
             $self->{'Data'},
@@ -594,43 +607,43 @@ sub display_documents {
             $Defs::DOC_FOR_VENUES,
         );
 
-        if(! scalar(@{$venue_documents})) {
-            $self->incrementCurrentProcessIndex();
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-        }
-		if(!$self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'}){
-			$self->incrementCurrentProcessIndex();
-            $self->incrementCurrentProcessIndex();
-            return ('',2);
-		}
-        my @required_docs_listing = ();
-        my @optional_docs_listing = ();
+        #if(! scalar(@{$venue_documents})) {
+            #$self->incrementCurrentProcessIndex();
+            #$self->incrementCurrentProcessIndex();
+            #return ('',2);
+        #}
+	#if(!$self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'}){
+            #$self->incrementCurrentProcessIndex();
+            #$self->incrementCurrentProcessIndex();
+            #return ('',2);
+	#}
 	
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents, 0);
-        foreach my $rdc (@{$diff}){
-            if($rdc->{'Required'}){
-                push @required_docs_listing, $rdc;
+	if($self->{'Data'}->{'SystemConfig'}{'hasVenueDocuments'} and scalar(@{$venue_documents})){
+            my @required_docs_listing = ();
+            my @optional_docs_listing = ();
+            
+            my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $facilityID,  $venue_documents, 0);
+            foreach my $rdc (@{$diff}){
+                if($rdc->{'Required'}){
+                    push @required_docs_listing, $rdc;
+                }
+                else {
+                    push @optional_docs_listing, $rdc;
+                }
             }
-            else {
-                push @optional_docs_listing, $rdc;
-            }
-		}
+            $documentData{'documents'} = \@required_docs_listing;
+            $documentData{'optionaldocs'} = \@optional_docs_listing;
+            
+        }
 
-        my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
-        my %cv = getClient($cl);
-        $cv{'venueID'} = $facilityID;
-        $cv{'currentLevel'} = $Defs::LEVEL_VENUE;
-        my $clm = setClient(\%cv);
-
-        my %documentData = (
-            target => $self->{'Data'}->{'target'},
-            documents => \@required_docs_listing,
-            optionaldocs => \@optional_docs_listing,
-            Lang => $self->{'Data'}->{'lang'},
-            client => $clm,
-            venueID => $facilityID,
-        );
+        #my $cl = setClient($self->{'Data'}->{'clientValues'}) || '';
+        #my %cv = getClient($cl);
+        #$cv{'venueID'} = $facilityID;
+        #$cv{'currentLevel'} = $Defs::LEVEL_VENUE;
+        #my $clm = setClient(\%cv);
+        #documents => \@required_docs_listing,
+        #optionaldocs => \@optional_docs_listing,
+        
  
         $content = runTemplate($self->{'Data'}, \%documentData, 'entity/required_docs.templ') || '';  
     }

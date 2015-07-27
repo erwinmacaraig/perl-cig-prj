@@ -133,7 +133,7 @@ sub listPendingRegistrations    {
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
         my $name = formatPersonName($Data, $dref->{'strLatinFirstname'}, $dref->{'strLatinSurname'}, $dref->{'intGender'});
         my $local_latin_name = $localname;
-        $local_latin_name .= qq[ ($name)] if ($name and $name ne ' ');
+        $local_latin_name .= qq[ ($name)] if (($name and $name ne ', ') and $name ne ' ' );
 
         my $entitylocalname = $dref->{'ApprovalLocalName'};
         my $taskTo= $entitylocalname;

@@ -26,6 +26,7 @@ use Payments;
 use Data::Dumper;
 
 use GridDisplay;
+use PersonUtils;
 
 sub handlePayInvoice {
 	my($action, $Data, $clubID)=@_;
@@ -552,7 +553,8 @@ sub queryInvoiceByOtherInfo {
 		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
 		$selectPay = '' if ($dref->{'GatewayLocked'});
 		$cv{'personID'} = $dref->{'intPersonID'};
-        my $clm=setClient(\%cv);	
+                my $clm=setClient(\%cv);
+                my $name = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '');
 		push @rowdata, {
 			id => $dref->{'intTransactionID'},
 			SelectLink => qq[$Data->{'target'}?client=$clm&amp;a=P_TXN_EDIT&personID=$dref->{'intPersonID'}&amp;tID=$dref->{intTransactionID}&amp;id=0],
@@ -560,7 +562,7 @@ sub queryInvoiceByOtherInfo {
 			invoiceNum => $dref->{'strInvoiceNumber'},
 			invoiceDate =>  $Data->{'l10n'}{'date'}->TZformat($dref->{'invoiceDate'},'MEDIUM','SHORT'), 
 			item => $dref->{'strName'},
-			person => $dref->{'strLocalFirstname'} . ' ' . $dref->{'strLocalSurname'},
+			person => $name,
 			quantity => $dref->{'intQty'},
 			amount => $Data->{'l10n'}{'currency'}->format($dref->{'TotalAmount'}),
 			status => $dref->{'GatewayLocked'} ? $Data->{'lang'}->txt("Locked") : $Defs::TransactionStatus{$dref->{'intStatus'}},			

@@ -151,6 +151,14 @@ sub _getConfiguration {
 					dbfield=>'TL.strTXN',
 				}
 			],
+			strOnlinePayReference => [
+                                'Payment Reference Number',
+                                {
+                                    displaytype => 'text',
+                                    fieldtype   => 'text',
+                                    dbfield     => 'TL.strOnlinePayReference'
+                                }
+                        ],
 			intLogID => [
 				'Payment Log ID',
 				{
@@ -271,8 +279,9 @@ sub _getConfiguration {
 			strReceiptRef
 			intPaymentType
 			strTXN
+			strOnlinePayReference
 			intLogID
-            intTransLogStatusID
+                        intTransLogStatusID
 			TLComments
 			intAmount
 			dtTransaction
@@ -333,6 +342,7 @@ sub SQLBuilder  {
 				CONCAT(M.strLocalSurname, ", ", M.strLocalFirstname) as PaymentFor, 
 				TL.intAmount, 
 				TL.strTXN, 
+				TL.strOnlinePayReference,
 				TL.strReceiptRef,
 				TL.intPaymentType, 
 				T.intProductID, 
@@ -368,7 +378,7 @@ sub SQLBuilder  {
                         #    TL.intEntityPaymentID IN (0, $self->{'EntityID'}) 
                         #    OR TL.intEntityPaymentID IS NULL
                         #) 
-    return ($sql,'');
+        return ($sql,'');
   }
 }
 

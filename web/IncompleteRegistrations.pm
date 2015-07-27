@@ -102,7 +102,7 @@ sub listIncompleteRegistrations    {
         my $localname = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, $dref->{'intGender'});
         my $name = formatPersonName($Data, $dref->{'strLatinFirstname'}, $dref->{'strLatinSurname'}, $dref->{'intGender'});
         my $local_latin_name = $localname;
-        $local_latin_name .= qq[ ($name)] if ($name and $name ne ' ');
+        $local_latin_name .= qq[ ($name)] if (($name and $name ne ', ') and $name ne ' ');
 
         my $delete = qq[
             <a href = "$Data->{'target'}?client=$client&amp;a=INCOMPLPR_D&amp;irID=$dref->{'id'}" class = "btn btn-inside-panels" onclick = "return confirm('].$lang->txt('Are you sure you want to delete this registration?').qq[');">].$lang->txt('Delete').qq[</a>
