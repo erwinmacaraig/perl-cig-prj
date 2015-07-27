@@ -1031,7 +1031,7 @@ sub GenerateTree {
         zoneID => ['entity', $Defs::LEVEL_ZONE, 'E_HOME', ''],
         clubID => ['club', $Defs::LEVEL_CLUB, 'C_HOME', ''],
         personID => ['person', $Defs::LEVEL_PERSON, 'P_HOME', ''],
-    );
+    );    
     for my $level (qw(
         interID
         intregID
@@ -1048,6 +1048,7 @@ sub GenerateTree {
             $id 
                 and $id != $Defs::INVALID_ID
         ) {
+            my $name;
             my %tempClientRef = %{$clientValues_ref};
             my $instancetype = $instancetypes{$level}[0] || next;
             my $levelType = $instancetypes{$level}[1] || next;
@@ -1057,7 +1058,10 @@ sub GenerateTree {
             $tempClientRef{'currentLevel'} = $levelType;
             my $client=setClient(\%tempClientRef);
             my $url = "$Data->{'target'}?client=$client&amp;a=$action";
-            my $name = $obj->name();
+            $name = $obj->name();
+            if($level eq 'personID' and $instancetype eq 'person' and $levelType eq $Defs::LEVEL_PERSON){
+                $name = PersonUtils::formatPersonName($Data, $obj->firstname(),$obj->surname(),'');                
+            }                       
             $objects{$levelType} = $obj;
             next if $levelType > $clientValues_ref->{'authLevel'};
             push @tree, {
@@ -1070,10 +1074,11 @@ sub GenerateTree {
                 ma_email => $Data->{'SystemConfig'}{'ma_email'},
                 help_desk_email => $Data->{'SystemConfig'}{'help_desk_email'},
                 help_desk_phone_number => $Data->{'SystemConfig'}{'help_desk_phone_number'},
-            };
+            };            
         }
     }
-
+    
+    
     return (
         \@tree,
         \%objects,

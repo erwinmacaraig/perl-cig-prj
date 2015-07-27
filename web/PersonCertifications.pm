@@ -26,6 +26,7 @@ sub cleanPersonCertifications   {
     my $st = qq[
         SELECT 
             MAX(CT.intActiveOrder) as maxOrder, 
+            CT.strGroupSport,
             CT.strCertificationType
         FROM 
             tblPersonCertifications as PC 
@@ -35,7 +36,8 @@ sub cleanPersonCertifications   {
             AND PC.intRealmID = ?
             AND PC.strStatus = 'ACTIVE'
         GROUP BY        
-            CT.strCertificationType
+            CT.strCertificationType,
+            CT.strGroupSport
     ];
     my $qry = $Data->{'db'}->prepare($st); 
     $qry->execute(
@@ -52,6 +54,7 @@ sub cleanPersonCertifications   {
             PC.strStatus = 'INACTIVE'
         WHERE
             CT.strCertificationType = ?
+            AND CT.strGroupSport= ?
             AND PC.intPersonID = ?
             AND CT.intActiveOrder < ?
             AND CT.intActiveOrder > 0
@@ -62,6 +65,7 @@ sub cleanPersonCertifications   {
     while(my $dref = $qry->fetchrow_hashref()){
         $qryUpd->execute(
             $dref->{'strCertificationType'},
+            $dref->{'strGroupSport'},
             $personID,
             $dref->{'maxOrder'},
             $Data->{'Realm'}
@@ -185,6 +189,7 @@ sub handleCertificates {
                 order       => \@certificationTypesOrder,
                 firstoption => [ '', $Data->{'lang'}->txt('Select Certification') ],
                 translateLookupValues => 1,
+                    compulsory => 1,
             },
             dtValidFrom => {
                 label       => 'Date Valid From',
@@ -209,6 +214,7 @@ sub handleCertificates {
                    options     => \%Defs::person_certification_status,
                    firstoption => [ '', $Data->{'lang'}->txt('Status') ],           
                    translateLookupValues => 1,
+                    compulsory => 1,
               },
               strDescription => {
       	           label => 'Description',

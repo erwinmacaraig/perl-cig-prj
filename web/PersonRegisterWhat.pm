@@ -432,7 +432,7 @@ sub optionsPersonRegisterWhat {
 
             if((defined $Defs::entitySportType{$entityAllowed->{'strDiscipline'}}) and $entityAllowed->{'strDiscipline'} ne 'ALL') {
                 #include in WHERE the specific sport from tblEntity to narrow down search
-                $MATRIXwhere .= " AND $lookingForField = '$entityAllowed->{'strDiscipline'}'";
+                $MATRIXwhere .= " AND $lookingForField IN ('', '$entityAllowed->{'strDiscipline'}') ";
             }
 
             $st = qq[

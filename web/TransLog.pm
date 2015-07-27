@@ -22,6 +22,7 @@ use DeQuote;
 use FormHelpers;
 use AuditLog;
 use GridDisplay;
+use PersonUtils;
 
 require Products;
 use Payments;
@@ -33,9 +34,12 @@ my $entityNameURL    = 'P_TXNLog';
 
 
 sub handleTransLogs {
-  my($action, $Data, $entityID, $personID) = @_;
+  my($action, $Data, $entityID, $personID, $ignoreUnpaidFlag) = @_;
   my $q=new CGI;
   $Data->{'params'} = $q->Vars();
+  $ignoreUnpaidFlag ||= 1;
+  $ignoreUnpaidFlag = 0 if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
+ 
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
 
@@ -75,8 +79,8 @@ sub handleTransLogs {
 	  $action='list';
   }
   if ($action=~/list/) {
-	  setupStandardList($Data);
-	  ($body, $header) = listTransactions($Data, $db, $entityID, $personID, $clientValues_ref, $action, $resultMessage);
+	setupStandardList($Data);
+        ($body, $header) = listTransactions($Data, $db, $entityID, $personID, $clientValues_ref, $action, $resultMessage, $ignoreUnpaidFlag);
   }
   if ($action=~/payLIST/) {
 	  ($body, $header) = listTransLog($Data, $entityID, $personID);
@@ -535,6 +539,7 @@ sub getTransList {
 	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
 		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
 	}
+	
 	#	
 	$displayonly ||= 0;
     my $hidePayment=1;
@@ -569,23 +574,27 @@ sub getTransList {
   ];
 
     $prodSellLevel = '' if $Data->{'SystemConfig'}{'IgnoreMinSellLevelForTransList'};
-
+   
+    
+    
     my $locale = $Data->{'lang'}->getLocale();
 	my $statement = qq[
     SELECT 
       t.intTransactionID, 
       tl.strOnlinePayReference,
-        tl.strReceiptRef,
-	IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
+      tl.strReceiptRef,
+      IF(t.intSentToGateway=1 and t.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       t.intStatus, 
       t.curAmount, 
       t.intTransLogID, 
       t.intID, 
-	  i.strInvoiceNumber,
-	  t.dtPaid,
-      intQty, 
-	  CONCAT(Person.strLocalFirstname, ' ', Person.strLocalSurname) as strPerson,
-	  PR.strPersonType,
+      i.strInvoiceNumber,
+      t.dtPaid,
+      intQty,
+      Person.strLocalFirstname,
+      Person.strLocalSurname,
+      CONCAT(Person.strLocalFirstname, ' ', Person.strLocalSurname) as strPerson,
+      PR.strPersonType,
       t.dtStart AS dtStart_RAW, 
       DATE_FORMAT(t.dtStart, '%d/%m/%Y') AS dtStart, 
       t.dtEnd as dtEnd_RAW, 
@@ -598,10 +607,10 @@ sub getTransList {
     FROM 
       tblTransactions as t
       INNER JOIN tblProducts as P ON (P.intProductID = t.intProductID)
-	  LEFT JOIN tblPerson as Person ON t.intID = Person.intPersonID
-	  LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
+      LEFT JOIN tblPerson as Person ON t.intID = Person.intPersonID
+      LEFT JOIN tblInvoice as i ON t.intInvoiceID = i.intInvoiceID
       LEFT JOIN tblTransLog as tl ON (t.intTransLogID = tl.intLogID)
-        LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
+      LEFT JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (
             PR.intPersonRegistrationID = t.intPersonRegistrationID
         )
         LEFT JOIN tblLocalTranslations AS LT_P ON (
@@ -613,18 +622,20 @@ sub getTransList {
     WHERE
       t.intRealmID = $Data->{Realm}
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
-			AND P.intProductType<>2
+	AND P.intProductType<>2
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
-		$TXNEntityID		
-      $whereClause
-        $prodSellLevel
+	$TXNEntityID		
+      $whereClause      
+      $prodSellLevel  
 	  GROUP BY 
 		  t.intTransactionID
 		$orderBy
   ];
-	
+    
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
+    
+   
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     my $client = setClient($Data->{clientValues});
@@ -650,14 +661,14 @@ sub getTransList {
         field => 'intTransactionID', 
         width => 20
     },
-	{
-		name => $Data->{'lang'}->txt('Person'),
-		field => 'strPerson',
-	},
-	{
-		name => $Data->{'lang'}->txt('Type'),
-		field => 'PersonType',
-	},
+    {
+	name => $Data->{'lang'}->txt('Person'),
+	field => 'strPerson',
+    },
+    {
+	name => $Data->{'lang'}->txt('Type'),
+	field => 'PersonType',
+    },
     {
         name => $lang->txt('Status'), 
         field => 'StatusTextLang', 
@@ -727,11 +738,11 @@ sub getTransList {
                $row->{StatusText} = $lang->txt($Defs::TransLogStatus{$row->{'intStatus'}}) || 'a';
                $row->{StatusTextLang} = $lang->txt($Defs::TransLogStatus{$row->{'intStatus'}}) || 'n';
             }
-		if ($row->{'GatewayLocked'})	{
-			$row->{'StatusText'} = $Data->{'lang'}->txt("Locked");
-			$row->{'StatusTextLang'} = $Data->{'lang'}->txt("Locked");
-		}
-            $row_data->{$header->{field}} = $row->{$header->{field}}; 
+            if ($row->{'GatewayLocked'})	{
+		$row->{'StatusText'} = $Data->{'lang'}->txt("Locked");
+		$row->{'StatusTextLang'} = $Data->{'lang'}->txt("Locked");
+            }
+            $row_data->{$header->{field}} = $row->{$header->{field}}; ####################
             $row_data->{'dtPaid_RAW'} = $row->{'dtPaid'}; 
             $row_data->{'dtPaid'} = $Data->{'l10n'}{'date'}->TZformat($row->{'dtPaid'},'MEDIUM','SHORT'); 
         }
@@ -776,6 +787,7 @@ sub getTransList {
             $row_data->{'strInvoiceNumber'} = $row->{'strInvoiceNumber'};
             $row_data->{'strOnlinePayReference'} = $row->{'strOnlinePayReference'} || $row->{'intTransLogID'} || '';
             $row_data->{'curAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($row->{'curAmount'});
+            $row_data->{'strPerson'} = formatPersonName($Data, $row->{'strLocalFirstname'}, $row->{'strLocalSurname'}, '');
             push @rowdata, $row_data if $row_data;
             $i++;
     }
@@ -899,9 +911,9 @@ sub generateTXNListLink {
 #}
 
 sub listTransactions {
-    my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage) = @_;
+    my ($Data, $db, $entityID, $personID, $tempClientValues_ref, $action, $resultMessage, $ignoreUnpaidFlag) = @_;
     my ($body, $paidLink, $unpaidLink, $cancelledLink, $query) = ('', '', '', '', '');
-	my $lang = $Data->{'lang'};
+    my $lang = $Data->{'lang'};
     my $txnStatus = $Data->{'ViewTXNStatus'} || $Defs::TXN_UNPAID;
     my ($link, $mode, $TableID, $paymentID, $client, $dtStart_paid, $dtEnd_paid) = generateTXNListLink('', $Data, $tempClientValues_ref);
     my ($safeTableID, $safePaymentID) = ($TableID, $paymentID);
@@ -914,17 +926,20 @@ sub listTransactions {
     my $whereClause = '';
     $whereClause .= qq[ AND t.intID=$personID and t.intTableType=$Defs::LEVEL_PERSON] if ($personID and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
     $whereClause .= qq[ AND t.intID=$entityID and t.intTableType=$Defs::LEVEL_CLUB] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID != -1);
-
-	$whereClause .= qq[ AND t.intTableType=$Defs::LEVEL_PERSON] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID == -1);
+    $whereClause .= qq[ AND t.intTableType=$Defs::LEVEL_PERSON] if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB && $personID == -1);
 
     $whereClause .= qq[ AND t1.intTLogID= $safePaymentID ] if $paymentID;
 
     my $authID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
    # $whereClause .= qq[ AND intTXNEntityID IN (0, $entityID, $authID)] if $entityID;
     $whereClause .= qq[ AND P.intProductType NOT IN ($Defs::PROD_TYPE_MINFEE) ] if $txnStatus != $Defs::TXN_PAID;
+    
+    if($ignoreUnpaidFlag){ 
+        #show only Paid and Onhold Transaction 
+        $whereClause .= qq[ AND (t.intStatus IN (1,3) AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}) ];
+    }
 
-
-	($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
+    ($tempBody, $transCount) = getTransList($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref,0,0,0);
 
 	my $addLink = qq[<a href="$Data->{'target'}?client=$client&amp;a=P_TXN_ADD" class = "btn-main">].$Data->{'lang'}->txt('Add Transaction').qq[</a>];
     $addLink = '' if $Data->{'ReadOnlyLogin'};
