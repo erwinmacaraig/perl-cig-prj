@@ -1863,7 +1863,7 @@ this is to nudge the "back to" button into position*/
 
 .docViewerEntityInfo p {
 	margin:15px 15px 10px 15px;
-	padding-top:15px;
+	padding-top: 0px;
 }
 
 table.facility-field-summary tr td { 
