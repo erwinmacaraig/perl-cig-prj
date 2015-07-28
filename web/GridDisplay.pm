@@ -340,6 +340,7 @@ sub showGrid {
 	my $groupby                  = $params{'groupby'}                  || '';
 	my $coloredTopClass          = $params{'coloredTop'}               || 'yes';
 	my $groupby_collection_name  = $params{'groupby_collection_name'}  || 'items';
+	my $grid_title_display       = $params{'gridtitle'}                || '';
 	#
 	my $sortColumn				 = $params{'sortColumn'} || [];
 	my $instanceDestroy			 = $params{'instanceDestroy'} || 'false';
@@ -453,7 +454,10 @@ sub showGrid {
 
     my $coloredtop = $coloredTopClass eq 'yes' ? 'tableboxheader' : '';
     my $initialCols = $headerInfo->{'initialColumns'} || '1';
+    my $gridtitle = $grid_title_display ? qq[ <div class="pageHeading">$grid_title_display</div> ] : '';
+
 	return qq[
+        $gridtitle
 		<table id = "$gridID" initial-cols="$initialCols" class = "res-table table $coloredtop zebra" style = "$width">
 			<thead>
 				<tr class = " res-headers ">$headers</tr>

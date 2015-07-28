@@ -68,6 +68,9 @@ use InstanceOf;
 
 use PersonLanguages;
 use GatewayProcess;
+
+use PersonRegistrationStatusChange;
+
 sub checkRulePaymentFlagActions {
 
     my(
@@ -1686,6 +1689,7 @@ sub checkForOutstandingTasks {
 
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
 
+                my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
 
                         #LEFT JOIN tblNationalPeriod as NP ON (PR.intNationalPeriodID = NP.intNationalPeriodID)
@@ -1753,6 +1757,9 @@ sub checkForOutstandingTasks {
                     PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
+                if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $Defs::PERSONREGO_STATUS_ACTIVE);
+                }
            ##############################################################################################################
         }
        	}
@@ -2547,7 +2554,7 @@ sub viewTask {
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
 
     my $st;
-
+    
     $st = qq[
         SELECT
             t.intWFTaskID,
@@ -3248,6 +3255,7 @@ sub populateDocumentViewData {
             AND (tblRegistrationItem.intItemForInternationalLoan = 0 OR tblRegistrationItem.intItemForInternationalLoan = ?)
             AND tblRegistrationItem.intEntityLevel = ?
     ];
+     
     my @levels = ();
     push @levels, $dref->{'intEntityLevel'};
     if ($dref->{'intOriginLevel'} && $dref->{'intOriginLevel'} > 0)   {
@@ -3271,6 +3279,7 @@ sub populateDocumentViewData {
         $internationalLoan,
         @levels
     );
+    
     while(my $adref = $sth->fetchrow_hashref()){
         next if (defined $dref->{'intPersonRegistrationID'} and $adref->{'strApprovalStatus'} eq 'REJECTED' and $adref->{'strActionPending'} ne 'REGO'); ## If its a personRego ID lets only get Approved/Pending docos
         next if exists $validdocs{$adref->{'intDocumentTypeID'}};
@@ -3304,8 +3313,8 @@ sub populateDocumentViewData {
 
     my %TemplateData = ();
 
-	my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
-
+    my $entityID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'}) || $Data->{'UserID'};
+      
     $dref->{'currentAge'} ||= 0;
     my $st = qq[
         SELECT
@@ -3395,8 +3404,7 @@ sub populateDocumentViewData {
             AND wt.intRealmID = ?
         ORDER BY dt.strDocumentName, d.intDocumentID DESC
     ];
-
-	 
+    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
     $q->execute(
         $dref->{'intWFTaskID'},
@@ -3408,7 +3416,7 @@ sub populateDocumentViewData {
 	my @RelatedDocuments = ();
 	my $rowCount = 0;
     my %DocoSeen = ();
-
+    
     my %DocumentAction = (
         'target' => 'main.cgi',
         'WFTaskID' => $dref->{intWFTaskID} || 0,
@@ -3503,7 +3511,7 @@ sub populateDocumentViewData {
 
         if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
             if(!$tdref->{'intDocumentID'}){
-                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
+                $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;                
             }
             else {
                 $displayReplace = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
@@ -3518,7 +3526,7 @@ sub populateDocumentViewData {
                 $displayReplace = 1;
             }
         }
-
+        
         if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
@@ -4880,6 +4888,51 @@ sub getInitialTaskAssignee {
     ) = @_;
 
     if($entityID){
+        my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+        my $st = qq[
+            SELECT
+                r.intWFRuleID,
+                r.intRealmID,
+                r.intSubRealmID,
+                r.intApprovalEntityLevel,
+                r.strTaskType,
+                r.strWFRuleFor,
+                r.intDocumentTypeID,
+                r.strTaskStatus,
+                r.intProblemResolutionEntityLevel,
+                0 as intPersonID,
+                0 as intPersonRegistrationID,
+                e.intEntityID as RegoEntity,
+                0 as DocumentID
+            FROM tblEntity as e
+            INNER JOIN tblWFRule AS r ON (
+                e.intRealmID = r.intRealmID
+                AND e.intSubRealmID = r.intSubRealmID
+                AND r.strPersonType = ''
+                AND r.intEntityLevel = e.intEntityLevel
+            )
+            WHERE e.intEntityID= ?
+                AND r.strWFRuleFor = 'ENTITY'
+                AND r.intRealmID = ?
+                AND r.intSubRealmID IN (0, ?)
+                AND r.intOriginLevel = ?
+                AND r.strRegistrationNature = ?
+            ORDER BY
+                r.intApprovalEntityLevel
+            LIMIT 1
+		];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $entityID,
+            $Data->{'Realm'},
+            $Data->{'RealmSubType'},
+            $originLevel,
+            'NEW'
+        );
+
+  	    $q->execute($entityID, $Data->{'Realm'}, , $originLevel, 'NEW');
+        my $dref = $q->fetchrow_hashref();
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
     }
     elsif($personID and $registrationID){
         my $st = qq[
@@ -4894,15 +4947,31 @@ sub getInitialTaskAssignee {
                 AND tr.strRegistrationNature = tp.strRegistrationNature
                 AND tr.intOriginLevel = tp.intOriginLevel
             )
+            INNER JOIN tblPerson p
+            ON (
+                p.intPersonID = tp.intPersonID
+            )
+            INNER JOIN tblEntity te
+            ON (
+                te.intEntityID = tp.intEntityID
+            )
             WHERE
                 tp.intPersonRegistrationID = ?
+                AND tr.intEntityLevel = te.intEntityLevel
+                AND tr.intRealmID = ?
                 AND tr.strTaskStatus = 'ACTIVE'
+                AND (tr.strISOCountry_IN IS NULL or tr.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+                AND (tr.strISOCountry_NOTIN IS NULL or tr.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
             ORDER BY
                 tr.intApprovalEntityLevel
             LIMIT 1
         ];
+
         my $q = $Data->{'db'}->prepare($st);
-        $q->execute($registrationID);
+        $q->execute(
+            $registrationID,
+            $Data->{'Realm'}
+        );
 
         my $dref = $q->fetchrow_hashref();
         return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
