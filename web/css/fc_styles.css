@@ -754,11 +754,12 @@ table tr.new-task {
 .read-only, .fieldSectionGroupWrapper-DisplayOnly {
 	position: relative;
 	margin-bottom: 20px
+;
 }
 
 .read-only h4, .fieldSectionGroupWrapper-DisplayOnly h3.panel-header {
 	display: inline-block;
-	background: #e3e3e3;
+	background: #EDEDED;
 	color: #000;
 	padding: 5px;
 	position: absolute;
@@ -766,6 +767,7 @@ table tr.new-task {
 	left: 15px;
 	font-size: 16px;
 	border-radius: 4px;
+	/* text-transform: uppercase; */
 }
 
 .read-only ul {
@@ -1095,7 +1097,7 @@ h2.section-header {
 }
 .detail-value {
 	font-weight: bold;
-	width: 48%;
+	width: 65%;
 	float:  right;
 	-webkit-font-smoothing: antialiased;
 }
@@ -1503,7 +1505,7 @@ header nav ul li a {
 }
 #flowFormID .col-md-6 {
 	position: relative;
-	width: 50%;
+	width: 100%;
 }
 
 #flowFormID {
