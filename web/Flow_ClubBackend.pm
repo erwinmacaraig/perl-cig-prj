@@ -728,10 +728,17 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
 
 	$self->addCarryField('payMethod',$payMethod);
 
+    my $initialTaskAssigneeLevel = WorkFlow::getInitialTaskAssignee(
+        $self->{'Data'},
+        0,
+        0,
+        $clubObj->ID()
+    );
+ 
  my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
     );
 	
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
@@ -739,7 +746,7 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
 
