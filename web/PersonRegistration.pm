@@ -32,6 +32,7 @@ use Reg_common;
 use PersonCertifications;
 use PersonEntity;
 use PersonUtils;
+use PersonRegistrationStatusChange;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -129,6 +130,8 @@ sub rolloverExistingPersonRegistrations {
     );
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $oldStatus = $rego->{'strStatus'};
+
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
@@ -137,6 +140,7 @@ sub rolloverExistingPersonRegistrations {
         $Month++;
         $thisRego->{'dtTo'} = "$Year-$Month-$Day";
         
+        addPersonRegistrationStatusChangeLog($Data, $rego->{'intPersonRegistrationID'}, $oldStatus, $Defs::PERSONREGO_STATUS_ROLLED_OVER);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }

@@ -45,6 +45,7 @@ use Date::Calc;
 use AssocTime;
 use PlayerPassport;
 
+use PersonRegistrationStatusChange;
 
 sub handlePersonRequest {
     my ($action, $Data) = @_;
@@ -1733,6 +1734,38 @@ sub finaliseTransfer {
         last if $rows;
     }
     
+
+    ####add change status log
+    my $stc = qq[
+        SELECT
+            intPersonRegistrationID,
+            strStatus
+        FROM
+            tblPersonRegistration_$Data->{'Realm'}
+        WHERE
+            intEntityID = ?
+            AND strPersonType = ?
+            AND strSport = ?
+            AND intPersonID = ?
+            AND strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
+    ];
+
+    $query = $db->prepare($stc) or query_error($stc);
+    $query->execute(
+       $personRequest->{'intRequestToEntityID'},
+       $personRequest->{'strPersonType'},
+       $personRequest->{'strSport'},
+       $personRequest->{'intPersonID'}
+    ) or query_error($stc);
+
+    while (my $spref = $query->fetchrow_hashref()) {
+        addPersonRegistrationStatusChangeLog($Data, $spref->{'intPersonRegistrationID'}, $spref->{'strStatus'}, $Defs::PERSONREGO_STATUS_TRANSFERRED);
+    }
+ 
+    ###### end add status change log
+
+
+
     my $st = qq[
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -1761,6 +1794,7 @@ sub finaliseTransfer {
        $personRequest->{'strSport'},
        $personRequest->{'intPersonID'}
     ) or query_error($st);
+
 
     $st = qq[
         UPDATE
@@ -2389,6 +2423,16 @@ sub activatePlayerLoan {
             AND NP.intDontUseForLoans = 0
     ];
 
+    my $stu = qq[
+        SELECT
+            PR.intPersonRegistrationID,
+            PR.strStatus
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} PR
+        WHERE
+            PR.intPersonRequestID = ?
+    ];
+
     foreach my $req (@{$requestIDs})  {
         my $st = $bst . qq[ AND NP.strSport = PR.strSport];
         my $query = $db->prepare($st) or query_error($st);
@@ -2398,8 +2442,35 @@ sub activatePlayerLoan {
             $query = $db->prepare($st) or query_error($st);
             $query->execute($req) or query_error($st);
         }
+
+        $query = $db->prepare($stu) or query_error($stu);
+        $query->execute($req) or query_error($stu);
+
+        my $sturef = $query->fetchrow_hashref();
+        addPersonRegistrationStatusChangeLog($Data, $sturef->{'intPersonRegistrationID'}, 'PENDING', $sturef->{'strStatus'});
+
     }
     
+    my %prevStatus = ();
+    my $pstu = qq[
+        SELECT
+            PR.intPersonRegistrationID,
+            PR.strStatus
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
+        WHERE
+            PRQ.intPersonRequestID = ($idset)
+    ];
+
+    my $qprevs = $db->prepare($pstu) or query_error($pstu);
+    $qprevs->execute() or query_error($pstu);
+
+    while(my $psturef = $qprevs->fetchrow_hashref()) {
+        $prevStatus{$psturef->{'intPersonRegistrationID'}} = $psturef->{'strStatus'};
+    }
+
     #update records for lending club
     my $lst = qq [
         UPDATE
@@ -2416,10 +2487,31 @@ sub activatePlayerLoan {
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'ROLLED_OVER')
     ];
 
+
     my $query = $db->prepare($lst) or query_error($lst);
     $query->execute() or query_error($lst);
 
+    my $cstu = qq[
+        SELECT
+            PR.intPersonRegistrationID,
+            PR.strStatus
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
+        WHERE
+            PRQ.intPersonRequestID = ?
+    ];
 
+    foreach my $reqsid (@{$requestIDs})  {
+        my $qcur = $db->prepare($cstu) or query_error($cstu);
+        $qcur->execute($reqsid) or query_error($cstu);
+
+        my $cturef = $qcur->fetchrow_hashref();
+        addPersonRegistrationStatusChangeLog($Data, $cturef->{'intPersonRegistrationID'}, $prevStatus{$cturef->{'intPersonRegistrationID'}}, $cturef->{'strStatus'});
+
+    }
+ 
 
     for my $personID (@{$personIDs}) {
         savePlayerPassport($Data, $personID);
@@ -2435,6 +2527,27 @@ sub deactivatePlayerLoan {
     my $idset = join(', ', @{$requestIDs});
     my $peopleIds= join(', ', @{$personIDs});
     return if (! $idset or ! $peopleIds);
+
+    my %prevStatus = ();
+    my $pstu = qq[
+        SELECT
+            PR.intPersonRegistrationID,
+            PR.strStatus
+        FROM
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PRQ  ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
+        WHERE
+            PRQ.intPersonRequestID = ($idset)
+    ];
+
+    my $qprevs = $db->prepare($pstu) or query_error($pstu);
+    $qprevs->execute() or query_error($pstu);
+
+    while(my $psturef = $qprevs->fetchrow_hashref()) {
+        addPersonRegistrationStatusChangeLog($Data, $psturef->{'intPersonRegistrationID'}, $psturef->{'strStatus'}, $Defs::PERSONREGO_STATUS_PASSIVE);
+    }
+
     my $bst = qq [
         UPDATE
             tblPersonRegistration_$Data->{'Realm'}
@@ -2450,6 +2563,7 @@ sub deactivatePlayerLoan {
     ];
     my $query = $db->prepare($bst) or query_error($bst);
     $query->execute() or query_error($bst);
+
 
     my $st = qq[
         UPDATE
