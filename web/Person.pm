@@ -262,6 +262,8 @@ sub personRegistrationsHistory   {
         Date => $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtLastUpdated'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
         Date_RAW => $rego->{'dtApproved'} || $rego->{'dtLastUpdated'} || $rego->{'dtAdded'} || '',
         SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
+        ValidFrom => $Data->{'l10n'}{'date'}->TZformat($rego->{'npdtFrom'},'MEDIUM','NONE') || '',
+        ValidTo => $Data->{'l10n'}{'date'}->TZformat($rego->{'npdtTo'},'MEDIUM','NONE') || '',
       };
     }
 
@@ -317,6 +319,14 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Status'),
             field => 'Status',
+        },
+        {
+            name => $Data->{'lang'}->txt('Valid From'),
+            field => 'ValidFrom',
+        },
+        {
+            name => $Data->{'lang'}->txt('Valid To'),
+            field => 'ValidTo',
         },
         {
             name  => $Data->{'lang'}->txt('Date'),
