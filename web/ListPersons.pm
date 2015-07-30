@@ -98,7 +98,7 @@ sub listPersons {
             ) 
         WHERE 
             P.strStatus <> 'DELETED' 
-            AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR (PR.intOnLoan = 1 AND PR.dtTo > NOW()))
+            AND PR.strStatus = 'ACTIVE' OR (PR.strStatus IN ('PASSIVE','ACTIVE') AND PR.intOnLoan = 1 AND PR.dtTo > NOW())           
             AND P.intRealmID = $realm_id
         ORDER BY 
             strLocalSurname, 
@@ -106,6 +106,7 @@ sub listPersons {
             P.intPersonID
     ];
             #AND PR.strStatus <> 'INPROGRESS'
+           
 
     my $query = $Data->{'db'}->prepare($statement);
     $query->execute(
