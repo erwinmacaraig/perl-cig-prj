@@ -794,8 +794,8 @@ sub insertRegoTransaction {
         my $regoFormID = $Data->{'RegoFormID'} || 0;
         my $st = qq[
           INSERT INTO tblTransLog
-          (dtTLCreated, dtLog, intAmount, intRealmID, intStatus, intPaymentType, intRegoFormID)
-          VALUES (NOW(), NOW(), 0, ?, 1, 0, ?)
+          (dtLog, intAmount, intRealmID, intStatus, intPaymentType, intRegoFormID)
+          VALUES (NOW(), 0, ?, 1, 0, ?)
         ];
         my $qry=$Data->{'db'}->prepare($st);
         $qry->execute( $Data->{'Realm'}, $regoFormID );
