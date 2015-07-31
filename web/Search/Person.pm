@@ -833,7 +833,7 @@ sub getPersonAccess {
     $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
 
     #exclude persons that are already in the CLUB initiating the transfer
-    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+    #$self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
     my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
     my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
     my @persons = ();
