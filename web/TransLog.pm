@@ -536,9 +536,24 @@ sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
-	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
-		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
-	}
+	#if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
+	#	$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
+	#}
+	my $intTXNEntityID = getEntityID($Data->{'clientValues'});
+	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){                       
+            $TXNEntityID .= qq[ AND t.intTXNEntityID = $intTXNEntityID ];                   
+        }
+        elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
+            my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
+            my $st = $Data->{'db'}->prepare($subquery);
+            my @clubs = ();
+            push @clubs,$intTXNEntityID;
+            $st->execute();
+            while(my $dref = $st->fetchrow_hashref()){
+                push @clubs, $dref->{'intChildEntityID'};
+            }
+            $TXNEntityID .= qq[ AND t.intTXNEntityID IN ('', ] . join(',',@clubs) . q[)];
+        }
 	
 	#	
 	$displayonly ||= 0;
@@ -624,12 +639,12 @@ sub getTransList {
         AND (t.intPersonRegistrationID =0 or t.intStatus= 1 or PR.strStatus NOT IN ('INPROGRESS'))
 	AND P.intProductType<>2
         AND (t.intStatus<>1 or (t.intStatus=1 AND intPaymentByLevel <= $Data->{'clientValues'}{'authLevel'}))
-	$TXNEntityID		
-      $whereClause      
-      $prodSellLevel  
-	  GROUP BY 
-		  t.intTransactionID
-		$orderBy
+        $TXNEntityID
+        $whereClause      
+        $prodSellLevel  
+    GROUP BY 
+    t.intTransactionID
+    $orderBy
   ];
     
 	    #$prodSellLevel
@@ -638,6 +653,7 @@ sub getTransList {
    
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
+    
     my $client = setClient($Data->{clientValues});
     my $lang = $Data->{'lang'};
     my @headers = (
