@@ -220,6 +220,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 );
             }
             elsif ( $type eq 'date' ) {
+                my $adddatecsvalidation = $f->{'adddatecsvalidation'} || '';
                 $row_class = 'form-select';
                 $val = '' if $val eq '00/00/00';
                 $val = '' if $val eq '00/00/0000';
@@ -231,7 +232,7 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                 if ( $datetype eq 'dropdown' ) {
                     $field_html =
                       $self->_date_selection_dropdown( $fieldname, $val, $f,
-                        $disabled, $onChange, $maxyear, $minyear );
+                        $disabled, $onChange, $maxyear, $minyear, $adddatecsvalidation);
                 }
                 else {
                     $field_html =
@@ -260,6 +261,8 @@ qq[<input class="nb" type="checkbox" name="d_$fieldname" value="1" id="l_$fieldn
                   $f->{'compulsoryIfVisible'};
                 $clientside_validation{$fieldname}{'validateData'} =
                   $f->{'validateData'};
+                $clientside_validation{$fieldname}{'adddatecsvalidation'} =
+                  $f->{'adddatecsvalidation'};
             }
             $label = qq[$label] if $label;
         }
@@ -737,7 +740,12 @@ sub _validate {
             my $deltaDays = -1;
 
             if($val and $num1) {
-                $deltaDays = Date::Calc::Delta_Days($year_before, $month_before, $day_before, $year_ahead, $month_ahead, $day_ahead);
+                my $validLoanStart = Date::Calc::check_date( $year_before, $month_before, $day_before );
+                my $validLoanEnd = Date::Calc::check_date( $year_ahead, $month_ahead, $day_ahead );
+
+                if($validLoanStart and $validLoanEnd) {
+                    $deltaDays = Date::Calc::Delta_Days($year_before, $month_before, $day_before, $year_ahead, $month_ahead, $day_ahead);
+                }
             }
             else {
                 return;
@@ -933,7 +941,7 @@ sub _time_selection_box {
 
 sub _date_selection_dropdown {
     my $self = shift;
-    my ( $fieldname, $val, $f, $otherinfo, $onChange, $maxyear, $minyear ) = @_;
+    my ( $fieldname, $val, $f, $otherinfo, $onChange, $maxyear, $minyear, $addcsvalidation) = @_;
     my ( $onBlur, $onMouseOut );
     if ($onChange) {
         ( $onBlur = $onChange ) =~
@@ -1012,7 +1020,14 @@ qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0
     $field_html .= $daysfield;
     $field_html .= $monthsfield;
     $field_html .= $yearsfield;
-    $field_html = qq[ <div class = "dateselection-group">$field_html</div> ];
+
+    my $datecsvalidation = '';
+    if($addcsvalidation) {
+        my $hidden_validator_name = 'd_' . $fieldname . '_dummyvalidator';
+        $datecsvalidation = qq[ <input class="dummyvalidation" type="hidden" name="$hidden_validator_name" />];
+    }
+
+    $field_html = qq[ <div class = "dateselection-group">$field_html </div> $datecsvalidation];
     return $field_html;
 }
 
@@ -1144,6 +1159,8 @@ sub generate_clientside_validation {
 
     my %valinfo = ();
     my $remote_updates = '';
+
+    my $dummy_validator = '';
     for my $k ( keys %{$validation} ) {
         if ( $validation->{$k}{'compulsory'} ) {
             $valinfo{'rules'}{ $field_prefix . $k }{'required'} = 'true';
@@ -1153,6 +1170,11 @@ sub generate_clientside_validation {
         if ( $validation->{$k}{'compulsoryIfVisible'} ) {
             $valinfo{'rules'}{ $field_prefix . $k }{'required'} = qq[JAVASCRIPTfunction(element){if(jQuery('#].$validation->{$k}{'compulsoryIfVisible'}.qq[').is(SINGLEQUOTE:visibleSINGLEQUOTE)){return true;} return false;}JAVASCRIPT];
             $valinfo{'messages'}{ $field_prefix . $k }{'required'} =
+              $self->txt("Field required");
+        }
+        if ( $validation->{$k}{'adddatecsvalidation'} and $validation->{$k}{'compulsory'}) {
+            $valinfo{'rules'}{ $field_prefix . $k . '_dummyvalidator'}{'required'} = 'true';
+            $valinfo{'messages'}{ $field_prefix . $k . '_dummyvalidator' }{'required'} =
               $self->txt("Field required");
         }
         if ( $validation->{$k}{'validate'} ) {
@@ -1216,6 +1238,39 @@ sub generate_clientside_validation {
                     $valinfo{'messages'}{ 'd_' . $k }{'remote'} =
                       $self->txt("Number is invalid", $num1, $num2 );
                 }
+                elsif ($t eq 'DATE') {
+                    my $fdtday = 'l_' . $k . '_day';
+                    my $fdtmon = 'l_' . $k . '_mon';
+                    my $fdtyear = 'l_' . $k . '_year';
+
+                    my $targetfield = $field_prefix . $k;
+                    my $targetdummyfield = $field_prefix . $k . '_dummyvalidator';
+
+                    $dummy_validator .= qq [
+                        jQuery('#$fdtday, #$fdtmon, #$fdtyear').on('change', function(){
+                            var targetfield = '$targetfield';
+                            var targetdummyfield = '$targetdummyfield';
+
+                            var date = jQuery('#$fdtyear').val() + '-' + jQuery('#$fdtmon').val() + '-' + jQuery('#$fdtday').val();
+                            jQuery('input[name="' + targetdummyfield + '"]').val(date);
+                        });
+                    ];
+
+                    $valinfo{'rules'}{ $field_prefix . $k . '_dummyvalidator'}{'validDate'} = 'true';
+                    $valinfo{'messages'}{ $field_prefix . $k . '_dummyvalidator' }{'validDate'} = $self->txt("Date is invalid");
+
+                }
+                elsif ($t eq 'DATEMORETHAN') {
+                    #num1 is the target date dummy field that we want dateTo to be compared with
+                    my $targetdummyfield = $field_prefix . $num1 . '_dummyvalidator';
+
+                    my $dFrom = $self->{'Fields'}{'fields'}{$k}{'label'};
+                    my $dTo = $self->{'Fields'}{'fields'}{$num1}{'label'};
+
+                    $valinfo{'rules'}{ $field_prefix . $k . '_dummyvalidator'}{'dateMoreThan'} = $targetdummyfield;
+                    $valinfo{'messages'}{ $field_prefix . $k . '_dummyvalidator' }{'dateMoreThan'} =
+                        $self->txt("[_1] is not more than [_2]", $dTo, $dFrom);
+                }
             }
         }
     }
@@ -1265,7 +1320,11 @@ sub generate_clientside_validation {
                 if(jQuery(element).is(":visible"))  {
                     error.insertAfter(element);
                 }
+                else if(jQuery(element).hasClass("dummyvalidation")) {
+                    error.insertAfter(element);
+                }
                 else    {
+                    jQuery(element).next(':visible');
                     error.insertAfter(jQuery(element).next(':visible')); 
                 }
             },
@@ -1275,9 +1334,53 @@ sub generate_clientside_validation {
         <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
         <script type="text/javascript">
         jQuery().ready(function() {
+                jQuery.validator.addMethod(
+                    "validDate",
+                    function(value, element) {
+                        if(!value) {
+                            return false;
+                        }
+
+                        var date = jQuery(element).val().split('-');
+                        var d = date\[2\];
+                        var m = date\[1\];
+                        var y = date\[0\];
+
+                        date = new Date(y, m-1, d);
+                        if(date.getFullYear() == y && date.getMonth() + 1 == m && date.getDate() == d) {
+                            return true;
+                        }
+
+                        return false;
+                    },
+                    ""
+                );
+
+                jQuery.validator.addMethod(
+                    "dateMoreThan",
+                    function(dateTo, element, dateFromElement) {
+                        var dateFrom = jQuery('input[name="' + dateFromElement + '"]').val();
+
+                        if(!dateTo || !dateFrom) {
+                            return false;
+                        }
+
+                        if(new Date(dateTo) > new Date(dateFrom)) {
+                            return true;
+                        }
+
+                        return false;
+                    },
+                    ""
+                );
+
+
+
                 // validate the comment form when it is submitted
                 jQuery("#$formname$form_suffix").validate($val_rules);
                 $remote_updates
+
+                $dummy_validator
             });
         </script>
         ];
