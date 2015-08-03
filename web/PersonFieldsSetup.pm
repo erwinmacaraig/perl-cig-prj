@@ -279,6 +279,7 @@ sub personFieldsSetup {
                     sectionname => 'core',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],
+                    adddatecsvalidation => 1,
 
                     #noedit      => 1,
                 },
@@ -590,6 +591,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
                     compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    adddatecsvalidation => 1,
                 },
                 dtInternationalLoanToDate => {
                 	label => $FieldLabels->{'dtInternationalLoanToDate'},
@@ -603,6 +605,7 @@ sub personFieldsSetup {
                     displayFunctionParams=> ['MEDIUM'],
                     compulsory => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
                     active => ($values->{'itc'} and $values->{'preqtype'} eq $Defs::PERSON_REQUEST_LOAN) ? 1 : 0,
+                    adddatecsvalidation => 1,
                 },
                 strInternationalLoanTMSRef => {
                 	label => $FieldLabels->{'strInternationalLoanTMSRef'},
