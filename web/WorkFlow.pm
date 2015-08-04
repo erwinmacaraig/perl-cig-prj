@@ -115,7 +115,7 @@ sub checkRulePaymentFlagActions {
                     SET 
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
-                        dtFrom = NOW(),
+                        dtFrom = IF(strRegistrationNature IN ('TRANSFER','DOMESTIC_LOAN','INTERNATIONAL_LOAN'),dtFrom, NOW()),
                         strStatus = 'ACTIVE', 
                         intWasActivatedByPayment = 1
                     WHERE 
