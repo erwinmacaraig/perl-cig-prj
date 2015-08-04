@@ -1264,8 +1264,8 @@ sub generate_clientside_validation {
                     #num1 is the target date dummy field that we want dateTo to be compared with
                     my $targetdummyfield = $field_prefix . $num1 . '_dummyvalidator';
 
-                    my $dFrom = $self->{'Fields'}{'fields'}{$k}{'label'};
-                    my $dTo = $self->{'Fields'}{'fields'}{$num1}{'label'};
+                    my $dTo = $self->{'Fields'}{'fields'}{$k}{'label'};
+                    my $dFrom = $self->{'Fields'}{'fields'}{$num1}{'label'};
 
                     $valinfo{'rules'}{ $field_prefix . $k . '_dummyvalidator'}{'dateMoreThan'} = $targetdummyfield;
                     $valinfo{'messages'}{ $field_prefix . $k . '_dummyvalidator' }{'dateMoreThan'} =
