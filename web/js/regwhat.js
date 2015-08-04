@@ -28,6 +28,15 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&itc=' + jQuery('#itc').val();
     qstring = qstring + '&preqtype=' + jQuery('#preqtype').val();
 
+    if(jQuery('#replacedflow-btn-continue').length>0) {
+        jQuery('#replacedflow-btn-continue').hide();
+    }
+    else {
+        jQuery('#flow-btn-continue').hide();
+    }
+
+
+    console.log(optionType);
     if(currentoption != '' && currentoption === optionType && optiontrigger === currentoption) {
         //do nothing to avoid duplicate call
     }
