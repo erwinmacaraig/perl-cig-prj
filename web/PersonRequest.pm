@@ -2461,7 +2461,7 @@ sub activatePlayerLoan {
         INNER JOIN
             tblPersonRequest PRQ  ON (PRQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID and PRQ.intPersonID = PR.intPersonID)
         WHERE
-            PRQ.intPersonRequestID = ($idset)
+            PRQ.intPersonRequestID IN ($idset)
     ];
 
     my $qprevs = $db->prepare($pstu) or query_error($pstu);
