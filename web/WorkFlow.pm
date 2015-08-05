@@ -2872,7 +2872,8 @@ sub populateRegoViewData {
     my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_&amp;dtype=$dref->{'strPersonType'}";
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
     my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
-    my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    #my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    my $LocalName = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, ''), 
     my $PersonType = $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '';
 
     my $certifications = getPersonCertifications(
