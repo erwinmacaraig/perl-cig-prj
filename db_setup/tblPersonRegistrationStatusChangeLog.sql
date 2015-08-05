@@ -7,6 +7,7 @@ CREATE TABLE `tblPersonRegistrationStatusChangeLog` (
     `intUserID` INT NOT NULL COMMENT 'User who initiated the status change',
     `strOldStatus` VARCHAR(30) NOT NULL COMMENT 'Old status',
     `strNewStatus` VARCHAR(30) NOT NULL COMMENT 'New status',
-    PRIMARY KEY (`intPersonRegistrationStatusChangeLogID`)
+    PRIMARY KEY (`intPersonRegistrationStatusChangeLogID`),
+    INDEX key_PersonRego (intPersonRegistrationID)
 ) DEFAULT CHARACTER SET = utf8;
 
