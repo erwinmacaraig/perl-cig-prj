@@ -169,7 +169,6 @@ sub checkRulePaymentFlagActions {
         }
         #GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
-    print STDERR Dumper "COUNT TASK SKIPPED " . $countTaskSkipped;
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
     $ruleFor = 'ENTITY' if (! $personID and ! $personRegistrationID);
