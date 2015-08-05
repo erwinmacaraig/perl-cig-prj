@@ -951,7 +951,7 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
     $PersonRef{'strPersonType'} = $rego_ref->{'strPersonType'} || '';
     $PersonRef{'strAgeLevel'} = $rego_ref->{'strAgeLevel'} || '';
     my $personRegoNature = 'NEW';
-    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data, $personID);
 
     if ($pref->{'strStatus'} ne $Defs::PERSON_STATUS_INPROGRESS){
         $personRegoNature = 'RENEWAL';
@@ -1148,7 +1148,7 @@ sub displayRegoFlowProductsBulk {
     my $lang=$Data->{'lang'};
 
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);
+    my $pref = Person::loadPersonDetails($Data, $personID);
     $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
     my $CheckProducts = getRegistrationItems(
         $Data,
@@ -1406,7 +1406,7 @@ sub bulkRegoCreate  {
             $ProductRules{$product->{'ID'}} = $product;
         }
 
-        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $pref = Person::loadPersonDetails($Data, $pID) if ($pID);
         my $ageLevelOptions = checkRegoAgeRestrictions(
             $Data,
             $pID,
@@ -1525,7 +1525,7 @@ sub bulkRegoSubmit {
     my @IDs= split /\|/, $rolloverIDs;
 
     for my $pID (@IDs)   {
-        my $pref = Person::loadPersonDetails($Data->{'db'}, $pID) if ($pID);
+        my $pref = Person::loadPersonDetails($Data, $pID) if ($pID);
         my $regoID=param('regoID_'.$pID);
         next if (! $regoID);
         #cleanTasks(

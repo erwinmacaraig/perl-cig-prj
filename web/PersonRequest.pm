@@ -1124,7 +1124,7 @@ sub viewRequest {
         }
     }
 
-    my $personDetails = Person::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personDetails = Person::loadPersonDetails($Data, $request->{'intPersonID'});
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
