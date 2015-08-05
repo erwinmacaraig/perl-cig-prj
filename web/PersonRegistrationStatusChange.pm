@@ -123,7 +123,7 @@ sub getPersonRegistrationStatusChangeLog {
 }
 
 sub addPersonRegistrationStatusChangeLog {
-    my ($Data, $personRegistrationID, $oldStatus, $newStatus) = @_;
+    my ($Data, $personRegistrationID, $oldStatus, $newStatus, $trigger) = @_;
 
     #return if (($oldStatus eq $newStatus) or $Defs::personRegoStatus{$newStatus} == '');
     return if ($oldStatus eq $newStatus);
@@ -149,10 +149,12 @@ sub addPersonRegistrationStatusChangeLog {
         )
     ];
 
+    $trigger ||= $Data->{'clientValues'}{'authLevel'};
+
   	my $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $personRegistrationID,
-        $Data->{'clientValues'}{'authLevel'} || 0,
+        $trigger || 0,
         $Data->{'clientValues'}{'authLevel'} == 1 ? $Data->{'User'}{'UserID'} || 0 : $Data->{'clientValues'}{'userID'} || 0,
         $oldStatus,
         $newStatus
