@@ -169,12 +169,16 @@ sub checkRulePaymentFlagActions {
         }
         #GatewayProcess::markGatewayAsResponded($Data, $dref->{'intWFTaskID'});
     }
+    print STDERR Dumper "COUNT TASK SKIPPED " . $countTaskSkipped;
     my $ruleFor = 'PERSON';
     $ruleFor = 'REGO' if ($personRegistrationID);
     $ruleFor = 'ENTITY' if (! $personID and ! $personRegistrationID);
     if ($countTaskSkipped)    {
         my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
     }
+
+    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE,-1)
+        if $personRegistrationID;
 
 }
 sub cleanTasks  {
