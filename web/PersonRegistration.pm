@@ -32,6 +32,7 @@ use Reg_common;
 use PersonCertifications;
 use PersonEntity;
 use PersonUtils;
+use PersonRegistrationStatusChange;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -129,6 +130,8 @@ sub rolloverExistingPersonRegistrations {
     );
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $oldStatus = $rego->{'strStatus'};
+
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
@@ -137,6 +140,7 @@ sub rolloverExistingPersonRegistrations {
         $Month++;
         $thisRego->{'dtTo'} = "$Year-$Month-$Day";
         
+        addPersonRegistrationStatusChangeLog($Data, $rego->{'intPersonRegistrationID'}, $oldStatus, $Defs::PERSONREGO_STATUS_ROLLED_OVER);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
@@ -197,6 +201,29 @@ sub checkNewRegoOK  {
     ## I assume the above is handled via checkLimits?
 #Not OK.. Transfer needed
 
+    my $playerInEntity = 0;
+    if ($rego_ref->{'personType'} eq $Defs::PERSON_TYPE_PLAYER) {
+        ## Do they have a ACTIVE or PASSIVE record in current Entity as ANY level
+        %Reg=();
+        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+        %Reg = (
+            sport=> $rego_ref->{'sport'} || '',
+            personType=> $rego_ref->{'personType'} || '',
+            entityID => $rego_ref->{'entityID'},
+            personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+            statusIN => \@statusIN,
+        );
+            #ageLevel=> $rego_ref->{'ageLevel'} || '',
+        $count=0;
+        $regs='';
+        ($count, $regs) = getRegistrationData(
+            $Data,
+            $personID,
+            \%Reg
+        );
+        $playerInEntity = 1 if ($count);
+    }
+     
     ## Now check within this ENTITY
     %Reg=();
     %Reg = (
@@ -217,7 +244,8 @@ sub checkNewRegoOK  {
     $ok=1;
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} != $rego_ref->{'entityID'};
-        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE);
+        $ok = 0 if (! $playerInEntity and $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
     }
     return $ok;
 }
