@@ -131,7 +131,7 @@ sub checkRulePaymentFlagActions {
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($personID, $entityID, $personRegistrationID);
 
-                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE)
+                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, -1)
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
