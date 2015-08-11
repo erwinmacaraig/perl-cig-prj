@@ -1,0 +1,32 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 reg-complete-summary-left-bar">
+            [% PersonSummaryPanel %]
+        </div>
+        <div class="col-md-9  result-message">
+            <h3 class="panel-header"><b>[% Lang.txt("Thank you") %]</b></h3>
+            <div class="panel-body">
+                <div class="reg-complete-wrapper">
+                    [% IF payLaterFlag %]
+                        <p>[% Lang.txt("An invoice for this transaction has been created.  You can find all your transactions under the 'Transactions' tab.") %]</p> 
+                    [% ELSIF !payNowMsg && !payLaterFlag %]
+                        <p>[% Lang.txt("The product you are trying to add is already in your transaction list.  You can find all your transactions under the 'Transactions' tab.") %]</p>
+                    [% ELSE %]
+                         <p>[% Lang.txt("Please refer to the 'Transactions' tab to review all of your transactions.") %]</p>
+                    [% END %]
+                </div>
+            </div>
+                    [% IF payNowFlag and payNowStatus == 1 %]
+                       [% payNowMsg %] 
+                    [% END %]
+                    [% IF payNowFlag and payNowStatus == 3 %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.') %]</div>
+                    [% END %]                    
+            <div class="button-row">
+                <ul class="row-btn-complete">
+                    <a href="[% url %]/registration/" class="btn-main">[% Lang.txt("Return to your Dashboard") %]</a>                    
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
