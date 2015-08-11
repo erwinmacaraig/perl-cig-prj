@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions getSelectedProducts);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions getSelectedProducts);
 
 use strict;
 use lib "..","../..";
@@ -836,7 +836,21 @@ sub insertRegoTransaction {
 }
 
 sub getSelectedProducts {
-
+    my ($Data, $selectedProducts) = @_;
+    my %products = ();
+    my $products_list = join (',',@{$selectedProducts});
+    
+    my $st = qq[
+        SELECT strName, strDisplayName, strGroup FROM tblProducts as P WHERE P.intProductID IN ($products_list) AND P.intInactive=0
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+   $query->execute();
+    while(my $dref = $query->fetchrow_hashref()){
+        push @{$products{'prods'}}, $dref;
+    }
+    
+     my $content = runTemplate($Data, \%products, 'selfrego/choosenproducts.templ');
+     return $content;
 }
 
 1;
