@@ -1,25 +1,39 @@
 <div class = "selfreg-details col-md-12">
     <div class="selfreg-txnlist">
-         [% SET lastInv = 0 %]
-                [% FOREACH row IN txn %]
+        [% SET lastInv = 0 %]
+       
+                [% FOREACH row IN txn %]    
                     [% IF lastInv != row.InvoiceNumber %]
+                       
                         [% IF lastInv != 0 %]
                             </div>
+                            
                         [% END %]
                         [% SET lastInv = row.InvoiceNumber %]
                         <div class = "txnrow">
                             <div class = "row">
                                 <div class ="col-md-3 pull-left">[% Lang.txt('Invoice Number') %]: <b> [% row.TransactionNumber %] </b></div>
                                 <div class="col-md-3 pull-right"> <b>[% row.TXNStatus %]</b>[% IF row.PaymentType %] - [% row.PaymentType %][% END %] 
-                            </div>
-                        </div>                
+                            </div>                            
+                        </div>                        
                     [% END %]
+                   
                     <div class = "row">
                         <div class = "col-md-1">&nbsp;</div>
                         <div class = "col-md-9">[% row.Qty %] x [% row.ProductType %] : [% row.ProductName %]</div>
                         <div class = "col-md-2">[% CurrencyFormat.format(row.Amount) %]</div>
-                    </div>
+                    </div>  
+                   
                 [% END %] 
                 </div>
+                
+                <div class="">
+                    <a href="?a=ADD_PROD&srp=&pID=[% row.personID %]&dtype=&rID=[% row.regoID %]&rfp=r&_ss=r&es=1" class="btn-inside-panels">Add Transaction To This Registration</a>
+                   
+                </div>
+                
     </div>
-</div>
+</div> 
+<br />
+
+
