@@ -1,0 +1,18 @@
+<h3 class="panel-header">[% Lang.txt('Additional Products Transaction') %]</h3>
+<div class="panel-body">
+    <table class="listTable products-table table">
+        <thead>
+            <tr>
+                <th class="col-3">[% Lang.txt('Name') %]</th>
+            </tr>
+        </thead>
+        <tbody>
+        [% FOREACH p IN prods %]
+            <tr class ="product-row">
+                <td class="col-3"><label for="[% p.strName %]">[% p.strDisplayName %] ([% p.strName %])</label></td>
+            </tr>
+        [% END %]
+        </tbody>
+    </table>
+</div>
+
