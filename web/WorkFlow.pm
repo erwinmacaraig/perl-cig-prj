@@ -130,6 +130,8 @@ sub checkRulePaymentFlagActions {
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($personID, $entityID, $personRegistrationID);
+
+                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, -1)
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
@@ -176,8 +178,6 @@ sub checkRulePaymentFlagActions {
         my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
     }
 
-    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE,-1)
-        if $personRegistrationID;
 
 }
 sub cleanTasks  {
