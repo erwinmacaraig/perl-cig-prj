@@ -232,7 +232,8 @@ sub getSelfRegoTransactionHistory{
 	my $txns = '';
 	my %transactions = ();
 	my $sth; 
-
+	
+        my @arr = ();
 		foreach my $regoDetail (@{$previousRegos}){
 			my $query = qq[ SELECT
             T.intQty,
@@ -256,29 +257,37 @@ sub getSelfRegoTransactionHistory{
 			$sth = $Data->{'db'}->prepare($query);
 			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
 			while(my $dref = $sth->fetchrow_hashref()){
-				push @{$transactions{'txn'}},{
-					TransactionNumber => $dref->{'intTransactionID'},
-					InvoiceNumber => $dref->{'strInvoiceNumber'},
-           			PaymentLogID=> $dref->{'intTransLogID'},
-                    ProductName=> $dref->{'ProductName'},
-                    ProductType=> $dref->{'ProductType'},
-                    Amount=> $dref->{'curAmount'},
-                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
-                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
-                    Qty=> $dref->{'intQty'},				
-				}
+                               push @{$transactions{'txn'}},{
+                                    TransactionNumber => $dref->{'intTransactionID'},
+                                    InvoiceNumber => $dref->{'strInvoiceNumber'},
+                                    PaymentLogID=> $dref->{'intTransLogID'},
+                                    ProductName=> $dref->{'ProductName'},
+                                    ProductType=> $dref->{'ProductType'},
+                                    Amount=> $dref->{'curAmount'},
+                                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
+                                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
+                                    Qty=> $dref->{'intQty'},
+                                    regoID => $regoDetail->{'intPersonRegistrationID'},
+                                    personID => $regoDetail->{'intPersonID'},
+				};			
 			}
+			$txns .= runTemplate(
+                                $Data,
+                                 \%transactions,
+                                'selfrego/selfregotxnbody.templ'                        
+                        );
+                        %transactions = ();
 
 		}
 	
 	
 
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
-	$txns = runTemplate(
-				$Data,
-				\%transactions,
-				'selfrego/selfregotxnbody.templ'			
-			);
+	#$txns = runTemplate(
+        #                        $Data,
+        #                        \%transactions,
+        #                        'selfrego/selfregotxnbody.templ'                        
+        #                );
 	return $txns;
 	
 }
