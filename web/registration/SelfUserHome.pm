@@ -271,23 +271,21 @@ sub getSelfRegoTransactionHistory{
                                     personID => $regoDetail->{'intPersonID'},
 				};			
 			}
-			$txns .= runTemplate(
-                                $Data,
-                                 \%transactions,
-                                'selfrego/selfregotxnbody.templ'                        
-                        );
-                        %transactions = ();
+			#$txns .= runTemplate(
+                        #        $Data,
+                        #         \%transactions,
+                        #        'selfrego/selfregotxnbody.templ'                        
+                        #);
+                        #%transactions = ();
 
 		}
-	
-	
 
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
-	#$txns = runTemplate(
-        #                        $Data,
-        #                        \%transactions,
-        #                        'selfrego/selfregotxnbody.templ'                        
-        #                );
+	$txns = runTemplate(
+                                $Data,
+                                \%transactions,
+                                'selfrego/selfregotxnbody.templ'                        
+                        );
 	return $txns;
 	
 }
@@ -392,6 +390,7 @@ sub getPreviousRegos {
         $dref->{'renewlink'} = '';
         $dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
+        $dref->{'allowAddTransaction'} = 0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
             ! $allowTransferShown
@@ -418,7 +417,10 @@ sub getPreviousRegos {
                 }
             }
         }
-
+        if($Data->{'SystemConfig'}{'selfRego_allow_addTransaction'}){       
+            $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
+            $dref->{'allowAddTransaction'} = 1;
+        }
         push @{$regos{$pID}}, $dref; 
     }
    
