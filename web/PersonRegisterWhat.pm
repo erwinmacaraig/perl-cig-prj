@@ -35,11 +35,12 @@ sub displayPersonRegisterWhat   {
         $bulk,
         $regoID,
         $entitySelection,
+        $displaydetailsonly
     ) = @_;
     #$transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
-
+    $displaydetailsonly ||= 0;
     my $defaultType = param('dtype') || '';
     my $defaultSport = param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
@@ -74,6 +75,7 @@ sub displayPersonRegisterWhat   {
         AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
         itc => $itc,
         preqtype => $preqtype,
+        displaydetailsonly => $displaydetailsonly
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
