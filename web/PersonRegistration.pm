@@ -254,7 +254,7 @@ sub checkRenewalRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
     my $pref= undef;
-    $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+    $pref = Person::loadPersonDetails($Data, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
 
