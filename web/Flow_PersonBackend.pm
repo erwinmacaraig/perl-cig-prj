@@ -885,7 +885,14 @@ sub process_registration {
             $self->addCarryField('pType',$personType);
         }
     }
-
+    ## checks for existing renewal/transfer FC-948
+    if(hasPendingTransferRegistration($self->{'Data'},$personID,$sport,[])){
+         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, there is an active pending transfer request for this person. ");
+    }
+    if(hasPendingRegistration($self->{'Data'},$personID,$sport,[])){
+         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("Registration failed, there is an active pending registration for this person. ");
+    }
+    #
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
