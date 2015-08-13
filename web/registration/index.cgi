@@ -138,7 +138,7 @@ sub main {
     }
     elsif($action =~ /ADD_PROD/){
         my $extraprod = handleSelfUserExtraProductFlow($action, \%Data, undef);
-        $resultHTML .= $extraprod;
+        $resultHTML .= $extraprod;       
     }
    else {
         # Display login page

@@ -42,17 +42,15 @@ sub setProcessOrder {
     my $self = shift;
   
     my $dtype = param('dtype') || '';
-    my $typename = $Defs::personType{$dtype} || '';
-    my $regname = $typename
-        ? $typename .' Registration'
-        : 'Registration';
+    my $typename = 'Add Products/Licenses'; 
+       
     $self->{'ProcessOrder'} = [       
        
         {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => 'Registration',
-            'title'  => "Registration Type",
+            'title'  => $typename . " - Registration Type",
         },
         {
             'action' => 'ru',
@@ -63,7 +61,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => 'License',
-            'title'  => "Confirm License",
+            'title'  => $typename . " - Confirm License",
         },
         {
             'action' => 'pu',
@@ -73,13 +71,13 @@ sub setProcessOrder {
             'action' => 'summ',
             'function' => 'display_summary',
             'label'  => 'Summary',
-            'title'  => "Summary",
+            'title'  => $typename . " - Summary",
         },
        {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Complete',
-            'title'  => "Submitted",
+            'title'  => $typename . " - Submitted",
             'NoGoingBack' => 1,
             'NoDisplayInNav' => 1,
         },
@@ -444,7 +442,8 @@ sub display_summary {
     my $originLevel = $Defs::LEVEL_PERSON;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
-    
+    my $initialTaskAssigneeLevel;
+    my %Config;
     my $selectedProducts = '';
     
     my @additionalProds = split ':', $self->{'RunParams'}{'prodIds'};
@@ -481,18 +480,7 @@ print STDERR "SUMM$regoID\n";
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
         $hiddenFields->{'cA'} = "SELFREGOFLOW";
         $hiddenFields->{'selfRego'} = "1";
-        ($content, $gatewayConfig)= displayRegoFlowSummary(
-            $self->{'Data'}, 
-            $regoID, 
-            $client, 
-            $originLevel, 
-            $rego_ref, 
-            $entityID, 
-            $personID, 
-            $hiddenFields,
-            $self->stringifyURLCarryField(),
-        );
-        
+               
         $selectedProducts = getSelectedProducts($self->{'Data'}, \@additionalProds);
         
         
@@ -505,27 +493,37 @@ print STDERR "SUMM$regoID\n";
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
-
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
-        $self->{'Data'},
-        $personID,
-        $regoID,
-        0
+    $initialTaskAssigneeLevel = getInitialTaskAssignee(
+            $self->{'Data'},
+            $personID,
+            $regoID,
+            0
     );
-
-    my %Config = (
+    %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
         ContinueButtonText => $self->{'Lang'}->txt('Submit to [_1]' , $initialTaskAssigneeLevel),
     );
     $gatewayConfig->{'Target'} = "$Defs::base_url/".$gatewayConfig->{'Target'};
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
-        ## Change Target etc
+       ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
             ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
+    }
+    my $displayContinueBtn = 0;
+     if(!$selectedProducts){
+        $selectedProducts = qq[
+        <div class="alert existingReg">
+            <div>
+                <span class="fa fa-info"></span>
+                <p>] . $self->{'Lang'}->txt("No additional product(s) chosen, please click  ") . qq[ <strong> ] . $self->{'Lang'}->txt("Back") . qq [</strong>] . $self->{'Lang'}->txt(" link to go back to the product/license listing") . qq[.</p>
+            </div>
+        </div>
+        ];
+        $displayContinueBtn = 1;
     }
 
     my %PageData = (
@@ -538,8 +536,13 @@ print STDERR "SUMM$regoID\n";
         HiddenFields => $Config{'HiddenFields'},
         Target => $Config{'Target'},
         ContinueButtonText => $Config{'ContinueButtonText'},
+        NoContinueButton => $displayContinueBtn,
     );    
     my $registrationNature = $self->{'RunParams'}{'d_nature'} || '';
+    
+   
+    
+   
     my $pagedata = $self->display(\%PageData);
 
     return ($pagedata,0);
