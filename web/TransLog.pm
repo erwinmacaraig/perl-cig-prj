@@ -54,10 +54,7 @@ sub handleTransLogs {
 #########################################
   if ($action=~/step2/) {	
 	  if ($cc_submit)	{
-		  ($step1Success, $resultMessage) = (1,'');		
-		   
-		  
-		  
+		  ($step1Success, $resultMessage) = (1,'');			  
 	  }
 	  else	{
 		  ($step1Success, $resultMessage) = validateStep1($Data,$db,$clientValues_ref);
