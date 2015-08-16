@@ -27,7 +27,7 @@ sub process {
             return $self->getUnique($raw);
             #return $self->getUnique();
         }
-        case 'transfer' {
+        case ['transfer', 'int_transfer_out'] {
             return $self->getTransfer($raw);
         }
         case 'access' {
@@ -157,6 +157,7 @@ sub getTransfer {
     my ($self) = shift;
     my ($raw) = @_;
 
+    my $searchType = $self->getSearchType();
     my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
     my $filters = $self->setupFilters($subNodes);
 
@@ -253,6 +254,7 @@ sub getTransfer {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PR.intPersonRegistrationID,
                 PR.intPersonID,
                 PR.dtFrom,
@@ -326,6 +328,8 @@ sub getTransfer {
         my @sportsFilter;
 
         while(my $dref = $q->fetchrow_hashref()) {
+            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
@@ -345,7 +349,7 @@ sub getTransfer {
                     id => $result->{'intPersonID'} || next,
                     name => $name,
                     sport => $Defs::sportType{$personSport},
-                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
+                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=$searchType&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
                     otherdetails => {
                         dob => $result->{'dtDOB'},
                         dtadded => $result->{'dtadded'},
@@ -516,6 +520,7 @@ sub getPlayerLoan {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PR.intPersonRegistrationID,
                 PR.intPersonID,
                 PR.dtFrom,
@@ -589,6 +594,8 @@ sub getPlayerLoan {
         my @sportsFilter;
 
         while(my $dref = $q->fetchrow_hashref()) {
+            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
@@ -868,6 +875,7 @@ sub getPersonAccess {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PRQinprogress.intPersonRequestID as existingInProgressRequestID,
                 PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
                 PRQactive.intPersonRequestID as existingPersonRegistrationID,
@@ -926,6 +934,8 @@ sub getPersonAccess {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
+            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+
             $count++;
             my $name = formatPersonName($self->getData(), $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '') || '';
             my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
