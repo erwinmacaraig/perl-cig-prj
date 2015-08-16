@@ -1238,7 +1238,7 @@ print STDERR "SUMM$regoID\n";
         return ('',2);
     }
 
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+    my ($initialTaskAssigneeLevel, $assigneeRef) = getInitialTaskAssignee(
         $self->{'Data'},
         $personID,
         $regoID,
