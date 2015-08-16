@@ -97,6 +97,18 @@
                             [% END %]
                             </div>
                         </td>
+                    [% ELSIF task.TaskType == 'INT_TRANSFER_OUT' %]
+                        <td style="word-wrap: break-word;width: 280px;">
+                            <span style="float: left" class="fa fa-user"></span>
+                            <div style="float: left; word-wrap: break-word;width: 80%;">
+                            [% task.personRequestLabel %]<br/>
+                            [% IF task.TaskStatus == 'ACCEPTED' %]
+                                [% Lang.txt('of') %] [% task.Name %] [% Lang.txt('from') %] [% task.requestTo %] 
+                            [% ELSIF task.TaskStatus == 'PENDING' %]
+                                [% Lang.txt('of') %] [% task.Name %] [% Lang.txt('from') %] [% task.requestTo %] 
+                            [% END %]
+                            </div>
+                        </td>
                     [% ELSIF task.TaskType == 'LOAN' %]
                         <td style="word-wrap: break-word;width: 280px;">
                             <span style="float: left" class="fa fa-user"></span>
@@ -192,7 +204,7 @@
                             <td class="just-view-text"><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View') %]</a></td>
                         [% END %]
 
-                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' or task.TaskType == 'LOAN' %]
+                    [% ELSIF task.TaskType == 'TRANSFER' or task.TaskType == 'ACCESS' or task.TaskType == 'LOAN' or task.TaskType == 'INT_TRANSFER_OUT' %]
 
                         [% IF task.currentClubView == 1 %]
                             <td><a href="[% task.viewURL %]" class="btn-inside-panels">[% Lang.txt('View and Approve') %]</a></td>
