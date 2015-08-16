@@ -369,6 +369,38 @@ $(document).ready(function(){
         }
     });   
 
+
+    $("div#int_transfer_type_option a").click(function(e){
+        e.preventDefault();
+
+        var selected = jQuery(this).prop("id");
+        console.log(selected);
+        $("input[name=transfer_type][value=" + selected.toUpperCase() + "]").prop("checked", true);
+
+        switch(selected){
+            case "int_transfer_out":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#int_transfer_type_option a#int_transfer_return").removeClass("active");
+
+                    $("input[name=request_type]").val('int_transfer_out');
+                }
+
+                break;
+            case "int_transfer_return":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#int_transfer_type_option a#int_transfer_out").removeClass("active");
+
+                    $("input[name=request_type]").val('int_transfer_return');
+                }
+              break;
+        }
+
+    });
+
+
+
 });
 /*
 $(window).scroll(function() {
