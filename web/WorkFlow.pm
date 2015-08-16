@@ -809,6 +809,7 @@ sub listTasks {
 
     }
 
+
     my @sortedTaskList = sort { $b->{'taskTimeStamp'} <=> $a->{'taskTimeStamp'}} @TaskList;
 	my $msg = '';
 	if ($rowCount == 0) {
@@ -1329,7 +1330,7 @@ sub approveTask {
   	    auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	    ###
         setDocumentStatus($Data, $WFTaskID, 'APPROVED');
-	    if ($q->errstr) {
+        if ($q->errstr) {
 	    	return $q->errstr . '<br>' . $st
 	    }
 
@@ -1391,6 +1392,10 @@ sub approveTask {
     }
     elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
         PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+    }
+    elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT) {
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::finaliseInternationalTransferOut($Data, $personRequestID);
     }
     else {
         my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
@@ -3887,6 +3892,28 @@ sub viewSummaryPage {
 
                 $title = $Data->{'lang'}->txt($header . " - Approval");
             }
+            elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT){
+                $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
+                $templateFile = 'workflow/summary/inttransfer.templ';
+                my $header = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PLAYER"}; 
+
+                $title = $Data->{'lang'}->txt($header . " - Approval");
+
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                #$TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+            }
             else {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New [_1] Registration', $Data->{'lang'}->txt($Defs::personType{$task->{'strPersonType'}})) . " - " . $Data->{'lang'}->txt('Approval');
@@ -4961,8 +4988,8 @@ sub getInitialTaskAssignee {
                 AND tr.intEntityLevel = te.intEntityLevel
                 AND tr.intRealmID = ?
                 AND tr.strTaskStatus = 'ACTIVE'
-                AND (tr.strISOCountry_IN IS NULL or tr.strISOCountry_IN = '' OR r.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
-                AND (tr.strISOCountry_NOTIN IS NULL or tr.strISOCountry_NOTIN = '' OR r.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
+                AND (tr.strISOCountry_IN IS NULL or tr.strISOCountry_IN = '' OR tr.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+                AND (tr.strISOCountry_NOTIN IS NULL or tr.strISOCountry_NOTIN = '' OR tr.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
             ORDER BY
                 tr.intApprovalEntityLevel
             LIMIT 1
@@ -4975,7 +5002,7 @@ sub getInitialTaskAssignee {
         );
 
         my $dref = $q->fetchrow_hashref();
-        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
+        return ($Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100}, $dref);
     }
 }
 
