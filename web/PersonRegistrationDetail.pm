@@ -19,15 +19,22 @@ use HTMLForm;
 use FormHelpers;
 use GridDisplay;
 use RecordTypeFilter;
+use PersonRegistrationStatusChange;
+
+use FlashMessage;
 
 sub personRegistrationDetail   {
 
     my ($action, $Data, $entityID, $personRegistrationID) = @_;
 
+    my $flashMessage = getFlashMessage($Data, 'PRS_UPDATE');
+
     my $RegistrationDetail = PersonRegistration::getRegistrationDetail($Data, $personRegistrationID);
     $RegistrationDetail = pop $RegistrationDetail;
 
     my $option = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 'edit' : 'display';
+
+    my $currentRegStatus = $RegistrationDetail->{'strStatus'};
     
     my $client=setClient($Data->{'clientValues'}) || '';
     
@@ -128,10 +135,10 @@ sub personRegistrationDetail   {
             WHERE intPersonRegistrationID=$personRegistrationID LIMIT 1],
             addSQL => qq[],
 
-            afteraddFunction => ,
+            #afteraddFunction => ,
             afteraddParams => [$option, $Data, $Data->{'db'}],
-            afterupdateFunction => ,
-            afterupdateParams => [$option, $Data, $Data->{'db'}],
+            afterupdateFunction => \&postPersonRegistrationUpdate,
+            afterupdateParams => [$Data, $Data->{'db'}, $personRegistrationID, $currentRegStatus],
             LocaleMakeText => $Data->{'lang'},
         },
         carryfields =>  {
@@ -145,10 +152,11 @@ sub personRegistrationDetail   {
     #$personRegistrationID
     my $resultHTML = '';
     ($resultHTML, undef) = handleHTMLForm(\%FieldDefinitions, undef, $option, '', $Data->{'db'});
-
+    
     my $workTasks = personRegistrationWorkTasks($Data, $personRegistrationID);
+    my $regoStatusChangeLog = getPersonRegistrationStatusChangeLog($Data, $personRegistrationID);
 
-    return $resultHTML . $workTasks;
+    return $flashMessage . $resultHTML . $workTasks . $regoStatusChangeLog;
 
     #print STDERR Dumper $RegistrationDetail;
 
@@ -168,6 +176,23 @@ sub personRegistrationDetail   {
     $Data->{'cache'}->delete('swm',"VenueObj-$entityID") if $Data->{'cache'};
   
   }
+
+sub postPersonRegistrationUpdate  {
+    my($id,$params,$Data,$client,$personRegistrationID, $currentStatus)=@_;
+
+    my $cgi              = new CGI;
+    my %params           = $cgi->Vars();
+
+    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $currentStatus, $params->{'d_strStatus'});
+
+    my %flashMessage;
+    $flashMessage{'flash'}{'type'} = 'success';
+    $flashMessage{'flash'}{'message'} = $Data->{'lang'}->txt('Record updated successfully');
+    setFlashMessage($Data, 'PRS_UPDATE', \%flashMessage);
+
+    $Data->{'RedirectTo'} = "$Defs::base_url/" . $Data->{'target'} . "?client=$Data->{'client'}&a=P_REGO&prID=$personRegistrationID";
+}
+
 sub personRegistrationWorkTasks {
 
     my ($Data, $personRegistrationID) = @_;
@@ -366,6 +391,7 @@ sub personRegistrationWorkTasks {
         gridid  => 'grid',
         width   => '100%',
         filters => $filterfields,
+        gridtitle => $Data->{'lang'}->txt('Work Task Log'),
     );
 
     my $resultHTML = qq[

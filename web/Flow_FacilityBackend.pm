@@ -829,6 +829,13 @@ sub display_summary {
 
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityObj->ID());
 
+    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+        $self->{'Data'},
+        0,
+        0,
+        $facilityObj->ID()
+    );
+ 
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -838,7 +845,7 @@ sub display_summary {
         Title => '',
         TextTop => $content,
         TextBottom => '',
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to [_1]', $initialTaskAssigneeLevel),
     );
     my $pagedata = $self->display(\%PageData);
 
