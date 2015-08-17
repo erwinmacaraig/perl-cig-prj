@@ -52,7 +52,7 @@ sub checkRegoAgeRestrictions {
             $personAge = $regs->[0]{'currentAge'};
         }
     } else {
-        $personDetails = Person::loadPersonDetails($Data->{'db'}, $personID);
+        $personDetails = Person::loadPersonDetails($Data, $personID);
         #print STDERR Dumper $personDetails;
         $personAge = $personDetails->{'currentAge'} or undef;
     }

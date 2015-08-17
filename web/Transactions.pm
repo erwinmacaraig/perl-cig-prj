@@ -210,6 +210,7 @@ sub displayTransaction	{
 		SELECT 
       P.strName, 
       T.* , 
+      TL.intPaymentType,
 	IF(T.intSentToGateway=1 and T.intPaymentGatewayResponded = 0, 1, 0) as GatewayLocked,
       DATE_FORMAT(T.dtTransaction ,"%d/%m/%Y") AS dtTransaction, 
       DATE_FORMAT(T.dtStart ,"%d/%m/%Y") AS dtStart, 
@@ -219,6 +220,7 @@ sub displayTransaction	{
 			COUNT(tChildren.intTransactionID) as NumChildren,
 			SUM(tChildren.curAmount) as AmountAlreadyPaid
 		FROM tblTransactions as T INNER JOIN tblProducts as P ON (P.intProductID = T.intProductID)
+		LEFT JOIN tblTransLog as TL ON T.intTransLogID = TL.intLogID 
 		LEFT JOIN tblTransactions as tParent ON (tParent.intTransactionID= T.intParentTXNID)
 		LEFT JOIN tblProducts as PParent ON (PParent.intProductID = tParent.intProductID)
 		LEFT JOIN tblTransactions as tChildren ON (tChildren.intParentTXNID = T.intTransactionID and tChildren.intStatus=1 and tChildren.intProductID=T.intProductID)
@@ -314,8 +316,10 @@ sub displayTransaction	{
     }
 
     my $showPR = $pr_count ? 1 : 0;
-
-	my $readonly = ($Data->{'SystemConfig'}{'TXNStatusChange_MinLevel'} > $Data->{'clientValues'}{'authLevel'} or $dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD) ? 1 : 0;
+        
+	my $readonly = ($Data->{'SystemConfig'}{'TXNStatusChange_MinLevel'} > $Data->{'clientValues'}{'authLevel'} or $dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD or ( exists $Defs::onlinePaymentTypes{$dref->{'intPaymentType'}} and $dref->{intStatus} == $Defs::TXN_PAID)) ? 1 : 0;
+	
+	
 	#my $amount_readonly = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? 0: 1;
 	my $amount_readonly = ! $dref->{intStatus} ? 0: 1;
 	$amount_readonly = 1 if ! $id;

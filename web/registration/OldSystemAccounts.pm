@@ -141,21 +141,16 @@ sub getPersonUserAccount    {
 
 sub numAdultLinks {
     my ($Data, $userID) = @_;
-    my $st = qq[
-        SELECT
-            COUNT(*)
-        FROM 
-            tblSelfUserAuth
-        WHERE
-            intSelfUserID = ?
-            AND intMinor = 0
-    ];
+    #my $st = qq[ SELECT COUNT(*) FROM tblSelfUserAuth WHERE intSelfUserID = ? AND intMinor = 0 ];
+    my $st = qq[SELECT COUNT(*) from tblSelfUserAuth INNER JOIN tblPersonRegistration_$Data->{'Realm'} on tblSelfUserAuth.intEntityID = tblPersonRegistration_$Data->{'Realm'}.intPersonID where tblSelfUserAuth.intSelfUserID = ? and tblPersonRegistration_$Data->{'Realm'}.strStatus NOT IN ('','REJECTED') AND tblSelfUserAuth.intMinor = 0];
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(
         $userID,
     );
     my ($count) = $q->fetchrow_array();
     $q->finish();
+    
+    
     return $count || 0;
 }
 
