@@ -480,7 +480,18 @@ print STDERR "SUMM$regoID\n";
         $hiddenFields->{'__cf'} = $self->{'RunParams'}{'__cf'};
         $hiddenFields->{'cA'} = "SELFREGOFLOW";
         $hiddenFields->{'selfRego'} = "1";
-               
+        my $tempcontent = '';
+        ($tempcontent, $gatewayConfig)= displayRegoFlowSummary(
+            $self->{'Data'}, 
+            $regoID, 
+            $client, 
+            $originLevel, 
+            $rego_ref, 
+            $entityID, 
+            $personID, 
+            $hiddenFields,
+            $self->stringifyURLCarryField(),
+        );       
         $selectedProducts = getSelectedProducts($self->{'Data'}, \@additionalProds);
         
         

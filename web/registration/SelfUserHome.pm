@@ -244,15 +244,17 @@ sub getSelfRegoTransactionHistory{
             T.intStatus,
             T.intTransactionID,
             TL.intPaymentType,
-			I.strInvoiceNumber
+            I.strInvoiceNumber
         FROM
             tblTransactions as T
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
-			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (T.intPersonRegistrationID = PR.intPersonRegistrationID AND T.intRealmID = PR.intRealmID) 
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
            
              T.intTableType = $Defs::LEVEL_PERSON
+             AND PR.strStatus NOT IN ('', 'INPROGRESS')
             AND T.intPersonRegistrationID = ?];			
 			$sth = $Data->{'db'}->prepare($query);
 			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
@@ -269,6 +271,7 @@ sub getSelfRegoTransactionHistory{
                                     Qty=> $dref->{'intQty'},
                                     regoID => $regoDetail->{'intPersonRegistrationID'},
                                     personID => $regoDetail->{'intPersonID'},
+                                    
 				};			
 			}
 			#$txns .= runTemplate(

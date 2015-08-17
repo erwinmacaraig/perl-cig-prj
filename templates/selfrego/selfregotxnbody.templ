@@ -11,7 +11,7 @@
                         [% SET lastInv = row.InvoiceNumber %]
                         <div class = "txnrow">
                             <div class = "row">
-                                <div class ="col-md-3 pull-left">[% Lang.txt('Invoice Number') %]: <b> [% row.TransactionNumber %] </b></div>
+                                <div class ="col-md-3 pull-left">[% Lang.txt('Invoice Number') %]: <b> [% row.InvoiceNumber %] </b></div>
                                 <div class="col-md-3 pull-right"> <b>[% row.TXNStatus %]</b>[% IF row.PaymentType %] - [% row.PaymentType %][% END %] 
                             </div>                            
                         </div>                        
