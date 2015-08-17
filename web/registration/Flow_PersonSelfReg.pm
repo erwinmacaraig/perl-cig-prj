@@ -578,6 +578,20 @@ sub process_registration {
     if(!doesSelfUserHaveAccess($self->{'Data'}, $personID, $self->{'UserID'})) {
         return ('Invalid User',0);
     }
+
+    #initial validation for required fields
+    if(
+        ((!$personType or !$ageLevel or !$registrationNature) and !$existingReg and !$changeExistingReg)
+        or
+        ((!$personType or !$ageLevel or !$registrationNature) and $changeExistingReg)
+    ) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("This type of registration is not available");
+
+        $self->decrementCurrentProcessIndex();
+        return ('',2);
+    }
+
+
     #if(!doesUserHaveEntityAccess($self->{'Data'}, $entityID,'WRITE')) {
         #return ('Invalid User Entity',0);
     #}
