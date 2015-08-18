@@ -1024,7 +1024,7 @@ qq[ <span $onMouseOut> <script language="JavaScript1.2">var changed_$fieldname=0
     my $datecsvalidation = '';
     if($addcsvalidation) {
         my $hidden_validator_name = 'd_' . $fieldname . '_dummyvalidator';
-        $datecsvalidation = qq[ <input class="dummyvalidation" type="hidden" name="$hidden_validator_name" />];
+        $datecsvalidation = qq[ <input class="dummyvalidation" type="hidden" value="$val" name="$hidden_validator_name" />];
     }
 
     $field_html = qq[ <div class = "dateselection-group">$field_html </div> $datecsvalidation];
