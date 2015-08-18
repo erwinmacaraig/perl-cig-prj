@@ -43,13 +43,13 @@
 				[% IF p.TransactionID and !p.Status %]
 					[% IF p.DefaultProduct or p.Mandatory %]
 						<!-- <input type="hidden" name="txn_[% p.TransactionID %]" value="1">[% Lang.txt('Yes') %] -->
-						<input type="hidden" name="prod_[% p.ProductID %]" value="1">[% Lang.txt('Yes') %]
+						<input type="hidden" name="prod_[% p.ProductID %]" value="1" />[% Lang.txt('Yes') %]
 					[% ELSE %]
 					<!-- <input type="checkbox" CHECKED onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]');" name="txn_[% p.TransactionID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">(already in cart) --> 
 					<input type="checkbox" CHECKED onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]', '[% URLBaseFormatter %]');" name="prod_[% p.ProductID %]" value="1" class="nc" id = "up_prod_[% p.ProductID %]">(already in cart)
 					[% END %]
 				[% ELSIF p.DefaultProduct or p.Mandatory %]
-					<input type="hidden" name="prod_[% p.ProductID %]" value="1">Yes
+					<input type="hidden" name="prod_[% p.ProductID %]" value="1" />Yes
 					
 				[% ELSE %]
 					<input type="checkbox" name="prod_[% p.ProductID %]" onclick="updateRegoProductsTotal('up_prod_[% p.ProductID %]','cost_prod_[% p.ProductID %]','TotalAmountUnformatted','[% client %]', '[% URLBaseFormatter %]');" value="1" class="nc" id = "up_prod_[% p.ProductID %]">
@@ -70,23 +70,23 @@
 				[% END %]
 		[% ELSE %]
 				[% IF p.TransactionID and !p.Status %]
-					1 <input type="hidden" name="txnQTY_[% p.TransactionID %]" value="1">
+					1 <input type="hidden" name="txnQTY_[% p.TransactionID %]" value="1" />
 				[% ELSE %]
-					1 <input type="hidden" name="prodQTY_[% p.ProductID %]" value="1">
+					1 <input type="hidden" name="prodQTY_[% p.ProductID %]" value="1" />
 				[% END %]
 		[% END %]
 	[% ELSE %]
 				[% IF p.TransactionID and !p.Status %]
-			<input type="hidden" name="txnQTY_[% p.TransactionID %]" value="1">
+			<input type="hidden" name="txnQTY_[% p.TransactionID %]" value="1" />
 				[% ELSE %]
-			<input type="hidden" name="prodQTY_[% p.ProductID %]" value="1">
+			<input type="hidden" name="prodQTY_[% p.ProductID %]" value="1" />
 				[% END %]
 	[% END %]
 				</td>
 				<td class="col-3"><label for = "up_prod_[% p.ProductID %]">[% p.Name %]</label></td>
 	[% IF !HideCost %]
 				<td class="col-4">[% CurrencyFormat.format(p.Amount) %]
-				<input type="hidden" id="cost_prod_[% p.ProductID %]" value="[% p.Amount %]">
+				<input type="hidden" id="cost_prod_[% p.ProductID %]" value="[% p.Amount %]" />
 				
 				</td>
 	[% END %]
@@ -101,12 +101,13 @@
 	[% END %]
 	[% loopcount = loopcount + 1 %]
 		[% END %]
+		<input type="hidden" id="TotalAmountUnformatted" value="[% totalAmountUnpaid %]" />
     [% UNLESS HideTotal %]
 		<tr class="product-row ">
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
 			<td>&nbsp;</td>
-			<td class="totalFont"> <input type="hidden" id="TotalAmountUnformatted" value="[% totalAmountUnpaid %]" />[% Lang.txt('Total') %]:</td>
+			<td class="totalFont"> [% Lang.txt('Total') %]:</td>
 			<td><span style="display:block" id="totalAmountUnpaidInFlow">[% CurrencyFormat.format(totalAmountUnpaid) %]</span></td>
 
 		</tr>

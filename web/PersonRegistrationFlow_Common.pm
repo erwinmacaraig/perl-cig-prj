@@ -1188,8 +1188,8 @@ sub displayRegoFlowProductsBulk {
         Lang => $Data->{'lang'},
         NoFormFields =>1,
         client=>$client,
-		amountCheck => $totalamountchk,
-		payMethod => $rego_ref->{'payMethod'},
+	amountCheck => $totalamountchk,
+	payMethod => $rego_ref->{'payMethod'},
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
