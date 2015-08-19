@@ -207,25 +207,46 @@ $(document).ready(function(){
         $("input[name=transfer_type][value=" + selected.toUpperCase() + "]").prop("checked", true);
 
         switch(selected){
-            case "international":
+            case "int_transfer_in":
                 if(!$(this).hasClass("active")){
                     $(this).addClass("active");
                     $("div#transfer_type_option a#domestic").removeClass("active");
+                    $("div#transfer_type_option a#int_transfer_return").removeClass("active");
 
-                    $("div#itc_selection").slideToggle("fast");
-                    $("div#peoplelookup_form").slideToggle("fast");
-                    $("div#transfer_search_result").slideToggle("fast");
+                    $("div#itc_selection").show("slide", {direction: "down"}, "fast");
+                    $("div#peoplelookup_form").hide("slide", {direction: "down"}, "fast");
+                    $("div#transfer_search_result").hide("fast");
+
+                    $("input[name=request_type]").val('int_transfer_in');
                 }
 
                 break;
+            case "int_transfer_return":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+                    $("div#transfer_type_option a#domestic").removeClass("active");
+                    $("div#transfer_type_option a#int_transfer_in").removeClass("active");
+
+                    $("div#itc_selection").hide("slide", {direction: "down"}, "fast");
+                    $("div#peoplelookup_form").show("slide", {direction: "down"}, "fast");
+                    $("div#transfer_search_result").hide("fast");
+
+                    $("input[name=request_type]").val('int_transfer_return');
+                }
+
+                break;
+
             case "domestic":
                 if(!$(this).hasClass("active")){
                     $(this).addClass("active");
-                    $("div#transfer_type_option a#international").removeClass("active");
+                    $("div#transfer_type_option a#int_transfer_in").removeClass("active");
+                    $("div#transfer_type_option a#int_transfer_return").removeClass("active");
 
-                    $("div#itc_selection").slideToggle("fast");
-                    $("div#peoplelookup_form").slideToggle("fast");
-                    $("div#transfer_search_result").slideToggle("fast");
+                    $("div#itc_selection").hide("slide", {direction: "down"}, "fast");
+                    $("div#peoplelookup_form").show("slide", {direction: "down"}, "fast");
+                    $("div#transfer_search_result").hide("fast");
+
+                    $("input[name=request_type]").val('transfer');
                 }
               break;
         }
