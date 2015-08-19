@@ -39,6 +39,9 @@ sub process {
         case 'default' {
             return $self->getPersonRegistration($raw);
         }
+        case 'int_transfer_return' {
+            return $self->getIntTransferReturn($raw);
+        }
         else {
             return $self->getUnique($raw);
             #return unique for now
@@ -976,5 +979,119 @@ sub getPersonAccess {
     }
 
 }
+
+
+sub getIntTransferReturn {
+
+    my ($self) = shift;
+    my ($raw) = @_;
+
+    my $searchType = $self->getSearchType();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
+    my $filters = $self->setupFilters($subNodes);
+
+    my $realmID = $self->getData()->{'Realm'};
+    $self->getSphinx()->ResetFilters();
+    $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
+
+    #exclude persons that are already in the CLUB initiating the transfer
+#    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
+    my @persons = ();
+
+    if($results and $results->{'total'})  {
+        for my $r (@{$results->{'matches'}})  {
+            push @persons, $r->{'doc'};
+        }
+    }
+
+    my @memarray = ();
+    if(@persons)  {
+        my $person_list = join(',',@persons);
+        my %personRegMapping = ();
+
+        my $pst = qq [
+            SELECT
+                it.intPersonID,
+                it.intOldEntityID,
+                it.intPersonRequestID,
+                it.strSport,
+                it.strPersonType,
+                it.strPersonOutLevel,
+                tp.strLocalFirstname,
+                tp.strLocalSurname,
+                tp.strNationalNum,
+                tp.dtDOB,
+                pr.intPersonRegistrationID
+            FROM
+                tblIntTransfer it
+            INNER JOIN
+                tblPersonRegistration_$realmID pr ON (pr.intPersonID = it.intPersonID AND pr.intPersonRequestID = it.intPersonRequestID)
+            INNER JOIN
+                tblPerson tp ON (tp.intPersonID = it.intPersonID)
+            WHERE
+                it.intPersonID IN ($person_list)
+                AND it.intTransferReturn = 0
+                AND pr.strStatus != ?
+            ORDER BY
+                it.intPersonID
+        ];
+
+        my $precheck = $self->getData->{'db'}->prepare($pst);
+        $precheck->execute(
+            $Defs::PERSONREGO_STATUS_INPROGRESS
+        );
+
+        my $count = 0;
+        my $target = $self->getData()->{'target'};
+        my $client = $self->getData()->{'client'};
+
+        my %validRecords = ();
+        my @sportsFilter;
+
+        while(my $pdref = $precheck->fetchrow_hashref()) {
+            next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
+
+            push @sportsFilter, $Defs::sportType{$pdref->{'strSport'}} if !(grep /$Defs::sportType{$pdref->{'strSport'}}/, @sportsFilter);
+            my $name = formatPersonName($self->getData(), $pdref->{'strLocalFirstname'}, $pdref->{'strLocalSurname'}, '') || '';
+            my $acceptedRequestLink = ($pdref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$pdref->{'existingAcceptedRequestID'}" : '';
+            push @memarray, {
+                id => $pdref->{'intPersonID'} || next,
+                name => $name,
+                sport => $Defs::sportType{$pdref->{'strSport'}},
+                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=$searchType&amp;search_keyword=$pdref->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$pdref->{'intPersonRegistrationID'}",
+                otherdetails => {
+                    dob => $pdref->{'dtDOB'},
+                    dtadded => $pdref->{'dtadded'},
+                    ma_id => $pdref->{'strNationalNum'} || '',
+                    org => $pdref->{'EntityName'} || '',
+                },
+            };
+
+            $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = "ACTIVE";
+            $count++;
+        }
+
+        return if(!$count); #no existing record in tblIntTranfer, or has been transferred return already
+
+        if($raw){
+            return \@memarray;
+        }
+        else {
+
+            my %filters = (
+                sports => \@sportsFilter,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
+
+            return $count;
+        }
+
+    }
+
+}
+
 
 1;
