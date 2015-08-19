@@ -614,6 +614,9 @@ sub optionsPersonRegisterWhat {
         if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_OUT'];
         }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_RETURN'];
+        }
         #if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
         #    $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
         #}
