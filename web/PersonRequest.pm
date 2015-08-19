@@ -235,6 +235,9 @@ sub listPeople {
         }
         case ["int_transfer_return"] {
             #needs new logic for searching against tblIntTransfer
+            $searchType = "int_transfer_return";
+            $resultTemplate = "personrequest/transfer/itr_search_result.templ";
+            $searchTemplate = "personrequest/transfer/search_form.templ";
         }
         else {
 
@@ -337,7 +340,9 @@ sub listPersonRecord {
         ];
         #$limit = qq[ LIMIT 1 ];
     }
-    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT) {
+    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER
+            or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT
+            or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN) {
         $joinCondition = qq [ AND PR.strPersonType = 'PLAYER' ];
         $joinCondition .= qq [ AND PR.intPersonRegistrationID = $targetPRID ] if $targetPRID;
         $groupBy = qq [ GROUP BY PR.strSport, PR.intEntityID ];
@@ -396,7 +401,7 @@ sub listPersonRecord {
                 PR.intEntityID != ?
                 AND PR.intPersonID = P.intPersonID
                 AND PR.intRealmID = P.intRealmID
-                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE','PENDING','INT_TRANSFER_OUT')
                 $joinCondition
                 )
         LEFT JOIN tblPersonRequest as eRQ
@@ -574,7 +579,9 @@ sub listPersonRecord {
             'personrequest/access/personregistration_summary.templ',
         );
     }
-    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT) {
+    elsif($requestType eq $Defs::PERSON_REQUEST_TRANSFER
+            or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT
+            or $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN) {
         $resultHTML = ' ';
         my $templateFile = $requestType eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT ? "int_search_form.templ" : "search_form.templ";
         my %TemplateData;
@@ -920,6 +927,7 @@ sub displayCompletedRequest {
     $title = $Data->{'lang'}->txt("Request Access (Add Role) - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
     $title = $Data->{'lang'}->txt("Player Loan - Submitted to Current Club") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
     $title = $Data->{'lang'}->txt("International Transfer Out") if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+    $title = $Data->{'lang'}->txt("International Transfer Return") if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
 
     my %reqFilters = (
         'requestIDs' => \@prids
@@ -938,6 +946,7 @@ sub displayCompletedRequest {
     for my $request (@{$personRequests}) {
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " Request for") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " notification for") if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+        $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " notification for") if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " for") if $rtype eq $Defs::PERSON_REQUEST_LOAN;
         $found = 1;
@@ -980,6 +989,7 @@ sub displayCompletedRequest {
     $TemplateData{'requesttype'} = "Request Access" if $rtype eq $Defs::PERSON_REQUEST_ACCESS;
     $TemplateData{'requesttype'} = "Player Loan" if $rtype eq $Defs::PERSON_REQUEST_LOAN;
     $TemplateData{'requesttype'} = "International Transfer Out" if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+    $TemplateData{'requesttype'} = "International Transfer Return" if $rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
 
     $TemplateData{'PersonSummaryPanel'} = personSummaryPanel($Data, $personID) || 'PSP';
 
@@ -1166,6 +1176,17 @@ sub viewRequest {
 
             $requestType = $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
         }
+        case ["$Defs::PERSON_REQUEST_INT_TRANSFER_RETURN"] {
+            if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                $templateFile = "personrequest/transfer/int_holding_club_view.templ";
+            }
+            else {
+                $templateFile = "personrequest/transfer/int_current_club_view.templ";
+            }
+
+            $requestType = $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
+        }
+
 
 
         else {
@@ -1284,6 +1305,10 @@ sub viewRequest {
             case "$Defs::PERSON_REQUEST_INT_TRANSFER_OUT" {
                 #$action = "PREGF_TU";
                 $action = "PITO_";
+            }
+            case "$Defs::PERSON_REQUEST_INT_TRANSFER_RETURN" {
+                #$action = "PREGF_TU";
+                $action = "PITR_";
             }
             case "$Defs::PERSON_REQUEST_ACCESS" {
                 my %tempClientValues = %{ $Data->{'clientValues'} };
@@ -1446,6 +1471,7 @@ sub setRequestResponse {
         if($response eq "ACCEPTED"){
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
             $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+            $templateFile = "personrequest/transfer/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
             $templateFile = "personrequest/loan/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_accepted.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
             $notifDetails .= $Data->{'lang'}->txt("You will be notified once the transfer is effective and approved by ") . $maName if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -1453,12 +1479,14 @@ sub setRequestResponse {
         elsif($response eq "DENIED"){
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
             $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+            $templateFile = "personrequest/transfer/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
             $templateFile = "personrequest/loan/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_denied.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;
         }
         elsif($response eq "CANCELLED") {
             $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_TRANSFER;
             $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
+            $templateFile = "personrequest/transfer/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN;
             $templateFile = "personrequest/loan/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_LOAN;
             $templateFile = "personrequest/access/request_cancelled.templ" if $request->{'strRequestType'} eq $Defs::PERSON_REQUEST_ACCESS;       
         }
@@ -2890,8 +2918,55 @@ sub addIntTransferOutRecord {
         '',
         ''
     );
+}
 
+sub finaliseInternationalTransferReturn  {
+    my ($Data, $personRequestID) = @_;
 
+    #retrieve intExistingPersonRegistrationID
+
+    my %reqFilters = (
+        'requestID' => $personRequestID
+    );
+
+    my $personRequestRef = getRequests($Data, \%reqFilters);
+    $personRequestRef = $personRequestRef->[0];
+
+    updateIntTransferOutRecord($Data, $personRequestRef);
+
+}
+
+sub updateIntTransferOutRecord {
+    my ($Data, $personRequestObj) = @_;
+
+    #retrieve intPersonRequestID using intExistingPersonRegistrationID to determine tblIntTransfer entry
+
+    my $st = qq[
+        UPDATE
+            tblPersonRegistration_$Data->{'Realm'} PR
+        INNER JOIN
+            tblPersonRequest PQ ON (PQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID AND PQ.intPersonID = PR.intPersonID)
+        INNER JOIN
+            tblIntTransfer IT ON (IT.intPersonRequestID = PQ.intPersonRequestID AND IT.intPersonID = PQ.intPersonID)
+        SET
+            PR.strPreTransferredStatus = PR.strStatus,
+            PR.strStatus = ?,
+            IT.dtTransferReturn = NOW(),
+            IT.intTransferReturn = 1,
+            IT.strPersonReturnLevel = ?
+        WHERE
+            PR.intPersonRegistrationID = ?
+            AND PQ.strRequestResponse = 'ACCEPTED'
+            AND PQ.strRequestStatus = 'COMPLETED'
+    ];
+
+    my $db = $Data->{'db'};
+    my $q = $db->prepare($st) or query_error($st);
+    $q->execute(
+        $Defs::PERSONREGO_STATUS_INT_TRANSFERRED_RETURN,
+        $personRequestObj->{'strNewPersonLevel'},
+        $personRequestObj->{'intExistingPersonRegistrationID'}
+    ) or query_error($st);
 }
 
 1;
