@@ -1,6 +1,6 @@
 #!/usr/bin/perl -w
 
-use lib '.','..';
+use lib '.','..',"user","../user","../../user";
 use Defs;
 use CGI qw(:cgi escape unescape);
 
@@ -13,7 +13,9 @@ use MD5;
 use Data::Dumper;
 use Documents;
 use JSON;
+use AuditLog;
 use SystemConfig;
+use UserObj;
 use strict;
 
 my $client = param('client') || param('clm') || 0;
@@ -35,7 +37,11 @@ $Data{'db'}=$db;
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
      my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-	$Data{'lang'} = $lang;
+    $Data{'lang'} = $lang;    
+    my $user = new UserObj(db => $db, id => $Data{'clientValues'}{'userID'});    
+    $Data{'UserName'} = $user->FullName();
+    
+    
 if($uploaded_filename ne ''){  
     my $filefield = 'file';  
     my $permission = 1; 
@@ -53,10 +59,19 @@ if($uploaded_filename ne ''){
 	my $fileID = UploadFiles::processUploadFile(\%Data,\@files, $Data{'clientValues'}{'currentLevel'}, $personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   
 
 	if($notFromFlow){
-		(!$isForEntity) ? pendingDocumentActions(\%Data,$personID,$regoID,$fileID) : pendingEntityDocumentActions(\%Data,$personID,$fileID);
+		#(!$isForEntity) ? pendingDocumentActions(\%Data,$personID,$regoID,$fileID) : pendingEntityDocumentActions(\%Data,$personID,$fileID);
+		if(!$isForEntity){
+                    pendingDocumentActions(\%Data,$personID,$regoID,$fileID);
+		}
+		else{
+                    pendingEntityDocumentActions(\%Data,$personID,$fileID);
+                    auditLog($personID, \%Data, 'Add Document', 'Entity');
+		}
 	}
 
 	#pendingDocumentActions(\%Data,$personID,$regoID,$fileID)if($notFromFlow && !$isForEntity);
+	
+	
 	
 	$other_person_info{'f'} = $fileID;  
     if($fromURL)    {
