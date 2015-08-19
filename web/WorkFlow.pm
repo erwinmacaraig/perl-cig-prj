@@ -1397,6 +1397,10 @@ sub approveTask {
         PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
         PersonRequest::finaliseInternationalTransferOut($Data, $personRequestID);
     }
+    elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN) {
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::finaliseInternationalTransferReturn($Data, $personRequestID);
+    }
     else {
         my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
         my $cc = getCCRecipient($Data, $task);
@@ -3914,6 +3918,29 @@ sub viewSummaryPage {
                 $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
                 #$TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
             }
+            elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN){
+                $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
+                $templateFile = 'workflow/summary/inttransfer.templ';
+                my $header = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PLAYER"}; 
+
+                $title = $Data->{'lang'}->txt($header . " - Approval");
+
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                #$TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+            }
+
             else {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New [_1] Registration', $Data->{'lang'}->txt($Defs::personType{$task->{'strPersonType'}})) . " - " . $Data->{'lang'}->txt('Approval');
@@ -4181,6 +4208,14 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
+            if($TaskType eq 'INT_TRANSFER_RETURN_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the International Transfer Return process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            if($TaskType eq 'INT_TRANSFER_RETURN_OUT') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the International Transfer Out process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
@@ -4262,6 +4297,14 @@ sub updateTaskScreen {
             }
 			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
 				$message = $Data->{'lang'}->txt("You have rejected the player loan of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
+			elsif($TaskType eq 'INT_TRANSFER_OUT_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the International Transfer Out of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
+			elsif($TaskType eq 'INT_TRANSFER_RETURN_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the International Transfer Return of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
 				$status = $Data->{'lang'}->txt("Rejected");
 			}
             elsif($TaskType eq 'NEW_PLAYER') {
