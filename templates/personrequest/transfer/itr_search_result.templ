@@ -1,0 +1,118 @@
+[% USE Dumper %]
+<div id="transfer_search_result" class="tasklist-content dashboard-tasklist ">
+	<table id="transferSearchResult" cellpadding="5" style="width: 100%">
+		<thead>
+			<tr class="box-header">
+				<th style="width: 18%">[% Lang.txt('Member ID') %]</th>
+				<th>[% Lang.txt('Name') %]</th>
+				<th>[% Lang.txt('Sport') %]</th>
+				<th>[% Lang.txt('Date of Birth') %]</th>
+				<th>&nbsp;</th>
+			</tr>
+			<tr>
+				<td>
+                    <input style="padding: 5px" class="search-mid" type="text" placeholder="[% Lang.txt('Search MA ID') %]"/>
+		        </td>
+				<td>
+                    <input style="padding: 5px" class="search-name" type="text" placeholder="[% Lang.txt('Search Name') %]"/>
+		        </td>
+				<td>
+					<select class="filter-sport">
+                        <option value="">-- [% Lang.txt('All') %] --</option>
+                        [% FOREACH sport IN Filters.sports %]
+                        <option value="[% sport %]">[% sport %]</option>
+                        [% END %]
+			        </select>
+		        </td>
+				<td>
+					<select class="sort-dob">
+			          <option value="">-- [% Lang.txt('Sort') %] --</option>
+			          <option value="desc">[% Lang.txt('Youngest') %]</option>
+			          <option value="asc">[% Lang.txt('Oldest') %]</option>
+			        </select>
+				</td>
+				<td></td>
+			</tr>
+			<tr style="display: none" class="box-header">
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+				<th></th>
+			</tr>
+		</thead>
+		<tbody>
+		    [% FOREACH rego IN RegoList %]
+                <tr class="task-list">
+                    <td>[% rego.otherdetails.ma_id %]</td>
+                    <td><span class="fa fa-user"></span>[% rego.name %]</td>
+                    <td>[% rego.sport %]</td>
+                    <td data-order = "[% rego.otherdetails.dob %]">[% DateFormat.format(rego.otherdetails.dob,'MEDIUM') %]</td>
+                    <td>
+                    [% IF rego.inProgressRequestExists %]
+                        [% Lang.txt('Request Transfer sent to Club') %]
+                    [% ELSIF rego.submittedPersonRegistrationExists %]
+                        [% Lang.txt('Request Transfer for approval') %]
+                    [% ELSIF rego.acceptedRequestLink %]
+                        <a href="[% rego.acceptedRequestLink %]" class="btn-inside-panels">[% Lang.txt('View Request') %]</a>
+                    [% ELSE %]
+                        <a href="[% rego.link %]" class="btn-inside-panels">[% Lang.txt('Select') %]</a>
+                    [% END %]
+                    </td>
+                </tr>
+		    [% END %]
+		</tbody>
+	</table>
+</div>
+
+
+<script src = "//cdn.datatables.net/1.10.4/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        var table = jQuery("#transferSearchResult").DataTable({"language":{"sInfo":"[% Lang.txt('Showing _START_ to _END_ of _TOTAL_ entries') %]","sZeroRecords":"[% Lang.txt('No matching records found') %]","sLengthMenu":"[% Lang.txt('Show _MENU_ entries') %]","oPaginate":{"sPrevious":"[% Lang.txt('Previous') %]","sFirst":"[% Lang.txt('First') %]","sNext":"[% Lang.txt('Next') %]","sLast":"[% Lang.txt('Last') %]"},"search":"[% Lang.txt('Filter') %]","infoFiltered":" - [% Lang.txt('filtered from _MAX_ records') %]","infoEmpty":"[% Lang.txt('No entries to show') %]"},"dom":"ilftpr"});
+    
+        jQuery("input.search-mid").on('keyup change', function(){
+            table
+                .column(0)
+                .search(this.value)
+                .draw();
+        });
+
+
+        jQuery("input.search-name").on('keyup change', function(){
+            table
+                .column(1)
+                .search(this.value)
+                .draw();
+        });
+
+        var role = jQuery("select.filter-sport");
+        var rolecol = table.column(2);
+
+        var dob = jQuery("select.sort-dob");
+        var dobcol = table.column(3);
+
+        jQuery(dob).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+
+            dobcol
+                .order(val)
+                .draw();               
+
+        });
+
+
+        jQuery(role).on('change', function(){
+            var index = jQuery(this).find(":selected").index();
+            var val = jQuery.fn.dataTable.util.escapeRegex(jQuery(this).val());
+            rolecol
+                .search( val ? '^'+val+'$' : '', true, false )
+                .draw();               
+
+        });
+
+    });
+</script>
+
+
