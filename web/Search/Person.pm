@@ -1013,17 +1013,13 @@ sub getIntTransferReturn {
 
         my $pst = qq [
             SELECT
-                it.intPersonID,
-                it.intOldEntityID,
-                it.intPersonRequestID,
-                it.strSport,
-                it.strPersonType,
-                it.strPersonOutLevel,
+                it.*,
                 tp.strLocalFirstname,
                 tp.strLocalSurname,
                 tp.strNationalNum,
                 tp.dtDOB,
-                pr.intPersonRegistrationID
+                pr.intPersonRegistrationID,
+                pr.strStatus
             FROM
                 tblIntTransfer it
             INNER JOIN
@@ -1033,15 +1029,14 @@ sub getIntTransferReturn {
             WHERE
                 it.intPersonID IN ($person_list)
                 AND it.intTransferReturn = 0
-                AND pr.strStatus != ?
+                AND pr.strRegistrationNature IN ('INT_TRANSFER_OUT')
+                AND pr.strStatus IN ('ACTIVE')
             ORDER BY
                 it.intPersonID
         ];
 
         my $precheck = $self->getData->{'db'}->prepare($pst);
-        $precheck->execute(
-            $Defs::PERSONREGO_STATUS_INPROGRESS
-        );
+        $precheck->execute();
 
         my $count = 0;
         my $target = $self->getData()->{'target'};
