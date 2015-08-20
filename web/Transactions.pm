@@ -317,7 +317,7 @@ sub displayTransaction	{
 
     my $showPR = $pr_count ? 1 : 0;
         
-	my $readonly = ($Data->{'SystemConfig'}{'TXNStatusChange_MinLevel'} > $Data->{'clientValues'}{'authLevel'} or $dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD or ( exists $Defs::onlinePaymentTypes{$dref->{'intPaymentType'}} and $dref->{intStatus} == $Defs::TXN_PAID)) ? 1 : 0;
+	my $readonly = ($Data->{'SystemConfig'}{'TXNStatusChange_MinLevel'} > $Data->{'clientValues'}{'authLevel'} or $dref->{intStatus} == $Defs::TXN_UNPAID or $dref->{intStatus} == $Defs::TXN_HOLD or ( exists $Defs::paymentTypes{$dref->{'intPaymentType'}} and $dref->{intStatus} == $Defs::TXN_PAID)) ? 1 : 0;
 	
 	
 	#my $amount_readonly = $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_ASSOC ? 0: 1;
