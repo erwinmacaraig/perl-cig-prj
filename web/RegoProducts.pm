@@ -122,6 +122,7 @@ sub getRegoProducts {
         HideTotal => $hideTotal,
         client => $cl,
 	URLBaseFormatter => $Defs::base_url,
+	hideBulkRenewalProducts => $Data->{'SystemConfig'}{'HideMandatoryBulkRenewalProducts'},
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
