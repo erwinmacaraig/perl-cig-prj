@@ -1171,7 +1171,7 @@ sub displayRegoFlowProductsBulk {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1,1);
      }
     else    {
         return '';

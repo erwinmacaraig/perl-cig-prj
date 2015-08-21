@@ -41,11 +41,11 @@
         [% IF p.Mandatory %]
             [% totalAmountUnpaid = totalAmountUnpaid + p.Amount %]
         [% END %]
-        [% IF (p.TransactionID and !p.Status) &&  hideBulkRenewalProducts %]
+        [% IF (p.TransactionID and !p.Status) &&  hideBulkRenewalProducts && forBulkRenewalsFlag %]
             [% IF p.DefaultProduct or p.Mandatory  %]
                 <input type="hidden" name="prod_[% p.ProductID %]" value="1">
             [% END %]
-        [% ELSIF (p.DefaultProduct or p.Mandatory) && hideBulkRenewalProducts %]            
+        [% ELSIF (p.DefaultProduct or p.Mandatory) && hideBulkRenewalProducts && forBulkRenewalsFlag%]            
                 <input type="hidden" name="prod_[% p.ProductID %]" value="1">           
         [% ELSE %]                        
                         <tr class ="product-row">

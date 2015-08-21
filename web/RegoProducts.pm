@@ -29,9 +29,11 @@ sub getRegoProducts {
         $multipersonType,
         $regItemRules_ref,
         $returnItems,
-        $hideTotal
+        $hideTotal,
+        $BulkRenewalsMandatoryProducts
     ) = @_;
 
+    $BulkRenewalsMandatoryProducts ||= 0;
     $returnItems ||= 0;
     $hideTotal ||= 0;
     my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
@@ -123,6 +125,7 @@ sub getRegoProducts {
         client => $cl,
 	URLBaseFormatter => $Defs::base_url,
 	hideBulkRenewalProducts => $Data->{'SystemConfig'}{'HideMandatoryBulkRenewalProducts'},
+        forBulkRenewalsFlag => $BulkRenewalsMandatoryProducts
     );
     my $pagedata = '';
     $pagedata = runTemplate($Data, \%PageData, 'registration/products.templ');
