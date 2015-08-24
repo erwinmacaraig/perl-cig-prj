@@ -161,7 +161,7 @@ sub optionsPersonRegisterWhat {
     $bulk ||= 0;
 
     my $pref= undef;
-    $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+    $pref = loadPersonDetails($Data, $personID) if ($personID);
 
     #$registrationNature ||= '';
     #$registrationNature = '' if (! defined $registrationNature or $registrationNature eq 'null');

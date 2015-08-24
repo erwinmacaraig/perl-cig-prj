@@ -1124,7 +1124,7 @@ sub viewRequest {
         }
     }
 
-    my $personDetails = Person::loadPersonDetails($Data->{'db'}, $request->{'intPersonID'});
+    my $personDetails = Person::loadPersonDetails($Data, $request->{'intPersonID'});
     my $personCurrAgeLevel = Person::calculateAgeLevel($Data, $personDetails->{'currentAge'});
     my $originLevel = $Data->{'clientValues'}{'authLevel'};
 
@@ -2295,6 +2295,7 @@ sub loanRequiredFields {
                     validate    => 'DATE',
                 	compulsory => 1,  
                     sectionname => 'loanfields',
+                    adddatecsvalidation => 1,
    		    	},
    		    	dtLoanEndDate => {
    		    		label => $Data->{'lang'}->txt('Loan End Date'),
@@ -2302,9 +2303,10 @@ sub loanRequiredFields {
    		    		size => '20',
 					name => 'dtLoanEndDate',
                     datetype    => 'dropdown',
-                    validate    => 'DATE,DATEMORETHAN:',
+                    validate    => 'DATE,DATEMORETHAN:dtLoanStartDate', #pass element for client side validation
                 	compulsory => 1,  
                     sectionname => 'loanfields',
+                    adddatecsvalidation => 1,
    		    	},
    		    	strTMSReference => {
    		    		label => $Data->{'lang'}->txt('TMS Reference'),

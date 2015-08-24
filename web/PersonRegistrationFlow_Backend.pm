@@ -69,7 +69,7 @@ sub handleRegistrationFlowBackend   {
 	
     my $pref= undef;
     if ($personID && $personID>0)  {
-        $pref = loadPersonDetails($Data->{'db'}, $personID);       
+        $pref = loadPersonDetails($Data, $personID);       
     }
 
     if($regoID) {

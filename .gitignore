@@ -19,4 +19,5 @@ nytprof.out
 *.o
 *.bs
 web/myadmin/
+web/registration/test.txt
 

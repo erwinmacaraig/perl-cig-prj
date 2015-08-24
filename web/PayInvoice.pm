@@ -89,7 +89,9 @@ sub handlePayInvoice {
 		$query->execute();
 		my @intIDs = ();
 		while(my $dref = $query->fetchrow_hashref()){
+                    if(! grep /$dref->{'intID'}/,@intIDs){
 			push @intIDs,$dref->{'intID'};
+                    }
 		}		
 		my $receiptLink = "printreceipt.cgi?client=$client&ids=$intTransLogID&pID=" . join(",",@intIDs);
 		
