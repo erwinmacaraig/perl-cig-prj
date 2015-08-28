@@ -3452,15 +3452,43 @@ sub populateDocumentViewData {
 		$fileID = $tdref->{'intFileID'};
 		if(!$tdref->{'strApprovalStatus'}){     
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
-
-				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
-#or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
-					$documentStatusCount{'MISSING'}++;
-					$status = $Data->{'lang'}->txt('MISSING');
-				}
-				else {
-					$status = $Data->{'lang'}->txt('Optional. Not Provided.');
-				}
+                                switch($dref->{strWFRuleFor}) {
+                                    case 'REGO' {
+                                        if($tdref->{'Required'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }
+                                    }
+                                    case 'ENTITY' {
+                                         if($tdref->{'EntityRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }  
+                                    }
+                                    case 'PERSON' {
+                                        if($tdref->{'personRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }                                        
+                                    }                                
+                                }
+                                #if($tdref->{'Required'} or $tdref->{'personRequired'}){				
+                                #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
+				#	$documentStatusCount{'MISSING'}++;
+				#	$status = $Data->{'lang'}->txt('MISSING');
+				#}
+				#else {
+				#	$status = $Data->{'lang'}->txt('Optional. Not Provided.');
+				#}
 			}
 			else{
 				#$status = 'APPROVED';

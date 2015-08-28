@@ -111,16 +111,16 @@ sub main {
             $paytry = 0;
         }
     }
-    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    $Data{'lang'} = $lang;
+    #my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    #$Data{'lang'} = $lang;
     my $db = allowedTo( \%Data );
 
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     getDBConfig( \%Data );
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
-    #my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    #$Data{'lang'} = $lang;
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'} = $lang;
     initLocalisation(\%Data);
     updateSystemConfigTranslation(\%Data);
 
