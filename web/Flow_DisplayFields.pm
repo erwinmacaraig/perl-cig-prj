@@ -1365,7 +1365,27 @@ sub generate_clientside_validation {
                             return false;
                         }
 
-                        if(new Date(dateTo) > new Date(dateFrom)) {
+                        var dtF = dateFrom.split('-');
+                        var ddtF = dtF\[2\];
+                        var mdtF = dtF\[1\];
+                        var ydtF = dtF\[0\];
+
+                        ddtF = (ddtF.length == 2) ? ddtF : "0" + ddtF;
+                        mdtF = (mdtF.length == 2) ? mdtF : "0" + mdtF;
+
+                        var dtT = dateTo.split('-');
+                        var ddtT = dtT\[2\];
+                        var mdtT = dtT\[1\];
+                        var ydtT = dtT\[0\];
+
+                        ddtT = (ddtT.length == 2) ? ddtT : "0" + ddtT;
+                        mdtT = (mdtT.length == 2) ? mdtT : "0" + mdtT;
+
+
+                        dtF = ydtF + "-" + mdtF + "-" + ddtF;
+                        dtT = ydtT + "-" + mdtT + "-" + ddtT;
+
+                        if(new Date(dtT) > new Date(dtF)) {
                             return true;
                         }
 
