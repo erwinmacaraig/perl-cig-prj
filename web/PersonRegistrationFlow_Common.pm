@@ -198,6 +198,10 @@ sub displayRegoFlowSummary {
             or $rego_ref->{'registrationNature'} eq 'TRANSFER'
             or $rego_ref->{'strRegistrationNature'} eq 'DOMESTIC_LOAN'
             or $rego_ref->{'registrationNature'} eq 'DOMESTIC_LOAN'
+            or $rego_ref->{'strRegistrationNature'} eq 'INT_TRANSFER_OUT'
+            or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_OUT'
+            or $rego_ref->{'strRegistrationNature'} eq 'INT_TRANSFER_RETURN'
+            or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_RETURN'
     ) {
         $ok=1;
     }
@@ -432,7 +436,12 @@ sub displayRegoFlowComplete {
 
     my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL'
+        or $rego_ref->{'registrationNature'} eq 'RENEWAL'
+        or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER'
+        or $rego_ref->{'registrationNature'} eq 'TRANSFER'
+        or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_OUT'
+        or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_RETURN') {
         $ok=1;
     }
     else    {
@@ -606,6 +615,12 @@ sub displayRegoFlowComplete {
         
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
+        }
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT) {
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/out_complete.templ') || '';
+        }
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN) {
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/return_complete.templ') || '';
         }
         else {
             #my $template = 'registration/complete.templ';
@@ -1328,6 +1343,8 @@ sub add_rego_record{
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL'
         and $rego_ref->{'registrationNature'} ne 'TRANSFER'
+        and $rego_ref->{'registrationNature'} ne 'INT_TRANSFER_OUT'
+        and $rego_ref->{'registrationNature'} ne 'INT_TRANSFER_RETURN'
         and $rego_ref->{'registrationNature'} ne 'DOMESTIC_LOAN') {
         print STDERR "ABOUT TO CHECK TYP LIMITS FOR : " . $rego_ref->{'sport'} . "|" . $rego_ref->{'personType'} . "|" . $rego_ref->{'personLevel'} . "|" . $rego_ref->{'entityID'} ."\n\n";
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 

@@ -1,4 +1,4 @@
-package Flow_TransferBackend;
+package Flow_IntTransferOutBackend;
 
 use strict;
 use lib '.', '..', '../..', "../dashboard", "../user";
@@ -46,13 +46,13 @@ sub setProcessOrder {
             'function' => 'display_old_club',
             'fieldset'  => 'contactdetails',
             'label'  => $lang->txt('Old Club'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Old Club Details'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Current Club Details'),
         },
         {
             'action' => 'cd',
             'function' => 'display_core_details',
             'label'  => $lang->txt('Personal Details'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Personal Details'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Check/Update Personal Details'),
             'fieldset'  => 'core',
             #'noRevisit' => 1,
         },
@@ -66,7 +66,7 @@ sub setProcessOrder {
             'function' => 'display_contact_details',
             'fieldset'  => 'contactdetails',
             'label'  => $lang->txt('Contact Details'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Contact Details'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Check/Update Contact Details'),
         },
         {
             'action' => 'condu',
@@ -77,7 +77,7 @@ sub setProcessOrder {
             'action' => 'r',
             'function' => 'display_registration',
             'label'  => $lang->txt('Registration'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Confirm Transfer Registration'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Confirm Transfer Registration'),
         },
         {
             'action' => 'ru',
@@ -87,7 +87,7 @@ sub setProcessOrder {
             'action' => 'd',
             'function' => 'display_documents',
             'label'  => $lang->txt('Documents'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Check/Update Documents'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Check/Update Documents'),
         },
         {
             'action' => 'du',
@@ -97,7 +97,7 @@ sub setProcessOrder {
             'action' => 'p',
             'function' => 'display_products',
             'label'  => $lang->txt('Payments'),
-            'title'  => $lang->txt('Transfer') .' - ' . $lang->txt('Confirm Transfer Fee'),
+            'title'  => $lang->txt('International Transfer Out') .' - ' . $lang->txt('Confirm Fee'),
         },
         {
             'action' => 'pu',
@@ -113,7 +113,7 @@ sub setProcessOrder {
             'action' => 'c',
             'function' => 'display_complete',
             'label'  => 'Submit',
-            'title'  => 'Transfer - Submitted',
+            'title'  => 'International Transfer Out - Submitted',
             'title'  => $lang->txt('Transfer') . ' - ' . $lang->txt('Submitted'),
             'NoNav' => 1,
             'NoDisplayInNav' => 1,
@@ -136,8 +136,8 @@ sub setupValues    {
 
     my $request = getRequests($self->{'Data'}, \%regFilter);
     $request = $request->[0];
-    $self->{'RunParams'}{'nat'} = 'TRANSFER';
-    $self->{'RunParams'}{'dnat'} = 'TRANSFER';
+    #$self->{'RunParams'}{'nat'} = 'TRANSFER';
+    #$self->{'RunParams'}{'dnat'} = 'TRANSFER';
     $self->{'RunParams'}{'dsport'} = $request->{'strSport'};
     $self->addCarryField('dtype', $request->{'strPersonType'});
     $self->addCarryField('dsport', $request->{'strSport'});
@@ -603,7 +603,6 @@ sub process_registration {
     my $self = shift;
 
     #add rego record with types etc.
-
     my $personID = $self->ID();
     if(!doesUserHaveAccess($self->{'Data'}, $personID,'WRITE')) {
         return ('Invalid User',0);
@@ -694,9 +693,11 @@ sub process_registration {
         or
         ((!$personType or !$ageLevel or !$registrationNature) and $changeExistingReg)
     ) {
+
         push @{$self->{'RunDetails'}{'Errors'}}, $lang->txt("This type of registration is not available");
 
-        $self->decrementCurrentProcessIndex();
+        $self->setCurrentProcessIndex('r');
+        #$self->decrementCurrentProcessIndex();
         return ('',2);
     }
 
@@ -817,7 +818,7 @@ sub process_registration {
 
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
-        $self->decrementCurrentProcessIndex();
+        #$self->decrementCurrentProcessIndex();
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
@@ -1229,7 +1230,7 @@ sub display_summary {
     #}
     my $payMethod = '';
     if($regoID) {
-        $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
+       $personObj = new PersonObj(db => $self->{'db'}, ID => $personID, cache => $self->{'Data'}{'cache'});
         $personObj->load();
         my $nationality = $personObj->getValue('strISONationality') || ''; 
         $rego_ref->{'Nationality'} = $nationality;
@@ -1271,6 +1272,7 @@ sub display_summary {
         my $lang = $self->{'Data'}{'lang'};
         push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Lang'}->txt("Invalid Registration ID");
     }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -1284,21 +1286,17 @@ sub display_summary {
         0
     );
 
-    print STDERR Dumper "ASSIGNEE " . $initialTaskAssigneeLevel;
-    print STDERR Dumper "COUNT " . scalar(%{$assigneeRef});
-    print STDERR Dumper $assigneeRef;
-
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to '. $initialTaskAssigneeLevel),
+        ContinueButtonText => scalar(%{$assigneeRef}) ? $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel) : $self->{'Lang'}->txt('Mark as Transferred Out'),
     );
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
         ## Change Target etc
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment'),
         );
     }
     my %PageData = (
@@ -1330,6 +1328,7 @@ sub display_complete {
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
+
 
     my $rego_ref = {};
     my $content = '';
@@ -1391,6 +1390,35 @@ sub display_complete {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+
+    my $st = qq[
+        SELECT
+            T.intWFTaskID
+        FROM
+            tblWFTask as T
+            INNER JOIN tblWFRule as R ON (R.intWFRuleID = T.intWFRuleID)
+        WHERE
+            T.strTaskStatus = 'ACTIVE'
+            AND T.intPersonID = ?
+            AND T.intPersonRegistrationID = ?
+        ORDER BY intWFTaskID DESC LIMIT 1
+    ];
+
+    my $q = $self->{'Data'}->{'db'}->prepare($st);
+    $q->execute($personID, $regoID);
+    my $dref = $q->fetchrow_hashref();
+
+    my $personRequestID = $self->{'RunParams'}{'prid'} || '';
+
+    if(!$dref->{'intWFTaskID'}) {
+        my %task = (
+            'intPersonRequestID' => $personRequestID
+        ); 
+
+        PersonRequest::setRequestStatus($self->{'Data'}, \%task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::finaliseInternationalTransferOut($self->{'Data'}, $personRequestID);
+    }
+
     my %PageData = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
@@ -1399,7 +1427,7 @@ sub display_complete {
         #FlowSummaryTemplate => 'registration/person_flow_summary.templ',
         processStatus => 1,
         Content => '',
-        Title => $self->{'Data'}{'lang'}->txt('Transfer Submitted to MA'),
+        Title => $self->{'Data'}{'lang'}->txt("International Transfer Out [_1]", $dref->{'intWFTaskID'} ? 'submitted' : 'has been auto-approved'),
         TextTop => $content,
         TextBottom => '',
         NoContinueButton => 1,

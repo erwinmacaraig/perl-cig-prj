@@ -613,6 +613,12 @@ sub optionsPersonRegisterWhat {
         if ($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'DOMESTIC_LOAN'];
         }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_OUT'];
+        }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_RETURN'];
+        }
         #if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
         #    $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
         #}
@@ -830,8 +836,6 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
-#print STDERR $st;
-#print STDERR Dumper($values_ref);
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
@@ -846,7 +850,7 @@ sub getPersonLevelFromMatrix {
             defined $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
-            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+            and ($pref->{'currentAge'} and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'})
         );
 
         #if the player is under 16, "AMATEUR_U_C" should not be available (specific to MA - sys config entry)
@@ -854,7 +858,7 @@ sub getPersonLevelFromMatrix {
             defined $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_AMATEUR_UNDER_CONTRACT
-            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
+            and ($pref->{'currentAge'} and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'})
         );
 
         if($dref->{'strPersonLevel'}){
