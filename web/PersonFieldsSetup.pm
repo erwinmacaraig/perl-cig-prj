@@ -599,7 +599,7 @@ sub personFieldsSetup {
                 	type        => 'date',
                     datetype    => 'dropdown',
                     format      => 'dd/mm/yyyy',
-                    validate    => 'DATE,DATEMORETHAN:' . $dtLoanFromDate,
+                    validate    => 'DATE,DATEMORETHAN:' . 'dtInternationalLoanFromDate',
                     sectionname => 'loan',
                     displayFunction => sub {$Data->{'l10n'}{'date'}->format(@_)},
                     displayFunctionParams=> ['MEDIUM'],

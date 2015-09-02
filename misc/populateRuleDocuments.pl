@@ -21,15 +21,19 @@ sub main	{
     my @itemIDs;
 
 
-    my $personType = $ARGV[0] || '';
-    my $registrationNature = $ARGV[1] || '';
+    my %args = @ARGV;
+
+    my $personType = $args{'--persontype'} || '';
+    my $originLevel = $args{'--originlevel'} || '';
+    my $registrationNature = $args{'--registrationnature'} || '';
 
     print "Invalid parameter.\n" if !$personType or !$Defs::personType{$personType};
     return if !$personType or !$Defs::personType{$personType};
 
     my $regNatureCond = qq [ AND strRegistrationNature = '$registrationNature' ] if $registrationNature;
+    my $originLevelCond = qq [ AND intOriginLevel = '$originLevel' ] if $originLevel;
     my $sti = qq [
-        SELECT distinct intID from tblRegistrationItem where strPersonType = '$personType' $regNatureCond and strItemType = 'DOCUMENT'
+        SELECT distinct intID from tblRegistrationItem where strPersonType = '$personType' $regNatureCond $originLevelCond and strItemType = 'DOCUMENT'
     ];
 
     my $q = $db->prepare($sti);
@@ -40,7 +44,7 @@ sub main	{
     }
 
     my $st = qq[
-        SELECT intWFRuleID from tblWFRule where strPersonType = '$personType' $regNatureCond
+        SELECT intWFRuleID from tblWFRule where strPersonType = '$personType' $regNatureCond $originLevelCond
     ];
 
     $q = $db->prepare($st);
