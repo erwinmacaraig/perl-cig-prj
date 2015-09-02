@@ -2,8 +2,8 @@ package RegoProducts;
 require Exporter;
 @ISA =  qw(Exporter);
 
-@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
-@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions);
+@EXPORT = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions getSelectedProducts);
+@EXPORT_OK = qw(getRegoProducts checkAllowedProductCount checkMandatoryProducts insertRegoTransaction cleanRegoTransactions getSelectedProducts);
 
 use strict;
 use lib "..","../..";
@@ -840,7 +840,25 @@ sub insertRegoTransaction {
 }
 
 sub getSelectedProducts {
-
+    my ($Data, $selectedProducts) = @_;
+    my %products = ();
+    my $products_list = join (',',@{$selectedProducts});
+    my $total = 0;
+    my $st = qq[
+        SELECT strName, strDisplayName, strGroup, curDefaultAmount FROM tblProducts as P WHERE P.intProductID IN ($products_list) AND P.intInactive=0
+    ];
+    my $query = $Data->{'db'}->prepare($st);
+   $query->execute();
+    while(my $dref = $query->fetchrow_hashref()){
+        next if($dref->{'curDefaultAmount'} eq '0.00');
+        $dref->{'curDefaultAmount'} = $Data->{'l10n'}{'currency'}->format($dref->{'curDefaultAmount'});
+        push @{$products{'prods'}}, $dref;
+        $total += $dref->{'curDefaultAmount'};
+    }    
+     $products{'total'} = $Data->{'l10n'}{'currency'}->format($total);
+     my $content = runTemplate($Data, \%products, 'selfrego/choosenproducts.templ');
+     return $content if($total);
+     return 0;
 }
 
 1;

@@ -232,7 +232,8 @@ sub getSelfRegoTransactionHistory{
 	my $txns = '';
 	my %transactions = ();
 	my $sth; 
-
+	
+        my @arr = ();
 		foreach my $regoDetail (@{$previousRegos}){
 			my $query = qq[ SELECT
             T.intQty,
@@ -243,42 +244,51 @@ sub getSelfRegoTransactionHistory{
             T.intStatus,
             T.intTransactionID,
             TL.intPaymentType,
-			I.strInvoiceNumber
+            I.strInvoiceNumber
         FROM
             tblTransactions as T
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
-			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (T.intPersonRegistrationID = PR.intPersonRegistrationID AND T.intRealmID = PR.intRealmID) 
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
            
              T.intTableType = $Defs::LEVEL_PERSON
+             AND PR.strStatus NOT IN ('', 'INPROGRESS')
             AND T.intPersonRegistrationID = ?];			
 			$sth = $Data->{'db'}->prepare($query);
 			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
 			while(my $dref = $sth->fetchrow_hashref()){
-				push @{$transactions{'txn'}},{
-					TransactionNumber => $dref->{'intTransactionID'},
-					InvoiceNumber => $dref->{'strInvoiceNumber'},
-           			PaymentLogID=> $dref->{'intTransLogID'},
-                    ProductName=> $dref->{'ProductName'},
-                    ProductType=> $dref->{'ProductType'},
-                    Amount=> $dref->{'curAmount'},
-                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
-                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
-                    Qty=> $dref->{'intQty'},				
-				}
+                               push @{$transactions{'txn'}},{
+                                    TransactionNumber => $dref->{'intTransactionID'},
+                                    InvoiceNumber => $dref->{'strInvoiceNumber'},
+                                    PaymentLogID=> $dref->{'intTransLogID'},
+                                    ProductName=> $dref->{'ProductName'},
+                                    ProductType=> $dref->{'ProductType'},
+                                    Amount=> $dref->{'curAmount'},
+                                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
+                                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
+                                    Qty=> $dref->{'intQty'},
+                                    regoID => $regoDetail->{'intPersonRegistrationID'},
+                                    personID => $regoDetail->{'intPersonID'},
+                                    
+				};			
 			}
+			#$txns .= runTemplate(
+                        #        $Data,
+                        #         \%transactions,
+                        #        'selfrego/selfregotxnbody.templ'                        
+                        #);
+                        #%transactions = ();
 
 		}
-	
-	
 
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	$txns = runTemplate(
-				$Data,
-				\%transactions,
-				'selfrego/selfregotxnbody.templ'			
-			);
+                                $Data,
+                                \%transactions,
+                                'selfrego/selfregotxnbody.templ'                        
+                        );
 	return $txns;
 	
 }
@@ -383,6 +393,7 @@ sub getPreviousRegos {
         $dref->{'renewlink'} = '';
         $dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
+        $dref->{'allowAddTransaction'} = 0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
             ! $allowTransferShown
@@ -409,7 +420,10 @@ sub getPreviousRegos {
                 }
             }
         }
-
+        if($Data->{'SystemConfig'}{'selfRego_allow_addTransaction_'. $dref->{'strPersonType'}}){       
+            $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
+            $dref->{'allowAddTransaction'} = 1;
+        }
         push @{$regos{$pID}}, $dref; 
     }
    
