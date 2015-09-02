@@ -420,7 +420,7 @@ sub getPreviousRegos {
                 }
             }
         }
-        if($Data->{'SystemConfig'}{'selfRego_allow_addTransaction'}){       
+        if($Data->{'SystemConfig'}{'selfRego_allow_addTransaction_'. $dref->{'strPersonType'}}){       
             $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
             $dref->{'allowAddTransaction'} = 1;
         }
