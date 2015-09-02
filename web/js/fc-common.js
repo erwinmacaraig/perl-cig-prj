@@ -415,12 +415,47 @@ $(document).ready(function(){
 
                     $("input[name=request_type]").val('int_transfer_return');
                 }
-              break;
+                break;
         }
 
     });
 
 
+    $("div#loan_type_option a").click(function(e){
+        e.preventDefault();
+
+        var selected = jQuery(this).prop("id");
+        console.log(selected);
+        $("input[name=transfer_type][value=" + selected.toUpperCase() + "]").prop("checked", true);
+
+        switch(selected){
+            case "int_loan":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+
+                    $("div#loan_type_option a#domestic_loan").removeClass("active");
+
+                    $("div#itc_selection").slideToggle("fast");
+                    $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
+
+
+                }
+
+                break;
+            case "domestic_loan":
+                if(!$(this).hasClass("active")){
+                    $(this).addClass("active");
+
+                    $("div#loan_type_option a#int_loan").removeClass("active");
+                    $("div#itc_selection").slideToggle("fast");
+                    $("div#peoplelookup_form").slideToggle("fast");
+                    $("div#transfer_search_result").slideToggle("fast");
+                }
+                break;
+        }
+
+    });
 
 });
 /*
