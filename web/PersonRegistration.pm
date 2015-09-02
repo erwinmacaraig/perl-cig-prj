@@ -320,6 +320,7 @@ sub checkRenewalRegoOK  {
         statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
         nationalPeriodID=>$nationalPeriodID,
+        LoaningEntityOpenLoan => 0,
     );
     my ($countAlready, undef) = getRegistrationData(
         $Data,
@@ -674,6 +675,10 @@ sub getRegistrationData	{
     if(exists $regFilters_ref->{'originLevel'})  {
         push @values, $regFilters_ref->{'originLevel'};
         $where .= " AND pr.intOriginLevel = ? ";
+    }
+    if(exists $regFilters_ref->{'LoaningEntityOpenLoan'})  {
+        push @values, $regFilters_ref->{'LoaningEntityOpenLoan'};
+        $where .= " AND (existprq.intOpenLoan IS NULL OR existprq.intOpenLoan = 0) ";
     }
 
     my $st= qq[
