@@ -732,7 +732,7 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
+                AND (PR.strStatus IN ('TRANSFERRED', 'ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
