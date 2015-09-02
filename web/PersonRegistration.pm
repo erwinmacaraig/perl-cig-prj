@@ -309,7 +309,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
     my @statusNOTIN = ();
-    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED);
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE);
 
     %Reg=();
     %Reg = (
