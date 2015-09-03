@@ -409,7 +409,7 @@ sub getPreviousRegos {
             and $dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_REGISTERED
         )   {
             my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $dref->{'strSport'}, $dref->{'strPersonType'}, 'RENEWAL');
-            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1) {
+            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1 or ($dref->{'intNationalPeriodID'} == $nationalPeriodID and $dref->{'existOpenLoan'} == 0 and $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE)) {
                 $dref->{'existOpenLoan'} ||= 0;
                 $dref->{'intOpenLoan'} ||= 0;
                 if (
