@@ -99,6 +99,12 @@
             jQuery("div#showSendRequest").modal();
         });
 
+        jQuery("#personRequestNotes").submit(function(e){
+            if(jQuery(this).valid()) {
+                jQuery(this).find("input[name='submitb']").attr('disabled', true);
+            }
+        });
+
         // validate the comment form when it is submitted
         jQuery("#personRequestNotes").validate({
             rules: {
