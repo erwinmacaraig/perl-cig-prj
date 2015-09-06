@@ -331,7 +331,7 @@ sub getTransfer {
         my @sportsFilter;
 
         while(my $dref = $q->fetchrow_hashref()) {
-            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+            next if $dref->{'intIsInternationalTransfer'} == 1; #club must not be able to request from holding club of international transfer out/return
 
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
