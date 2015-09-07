@@ -885,7 +885,7 @@ sub _entityList {
     my $st = '';
     my $q = undef;
     my $systemConfig = getSystemConfig($Data);
-    my $acceptSelfRegoFilter = qq [ AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
+    my $acceptSelfRegoFilter = qq [ AND E.intIsInternationalTransfer<>1 AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
 
     if($currentEntityID)    {
         $st = qq[
@@ -902,7 +902,6 @@ sub _entityList {
                 AND intParentID = ?
                 AND intChildLevel = ?
                 AND E.strStatus = 'ACTIVE'
-                AND E.intIsInternationalTransfer <> 1
             ORDER BY
                 E.strLocalName
             )
@@ -918,7 +917,6 @@ sub _entityList {
                 AND intEntityID = ?
                 AND intEntityLevel = ?
                 AND E.strStatus = 'ACTIVE'
-                AND E.intIsInternationalTransfer <> 1
             ORDER BY
                 E.strLocalName
             )
