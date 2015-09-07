@@ -504,7 +504,7 @@ print STDERR "SUMM$regoID\n";
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
-    $initialTaskAssigneeLevel = getInitialTaskAssignee(
+    ($initialTaskAssigneeLevel, undef) = getInitialTaskAssignee(
             $self->{'Data'},
             $personID,
             $regoID,
