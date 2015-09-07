@@ -902,6 +902,7 @@ sub _entityList {
                 AND intParentID = ?
                 AND intChildLevel = ?
                 AND E.strStatus = 'ACTIVE'
+                AND E.intIsInternationalTransfer <> 1
             ORDER BY
                 E.strLocalName
             )
@@ -917,6 +918,7 @@ sub _entityList {
                 AND intEntityID = ?
                 AND intEntityLevel = ?
                 AND E.strStatus = 'ACTIVE'
+                AND E.intIsInternationalTransfer <> 1
             ORDER BY
                 E.strLocalName
             )
