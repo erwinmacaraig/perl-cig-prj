@@ -825,7 +825,7 @@ sub person_details {
 
     $personID = 0 if $option eq 'add';
     my $hideWebCamTab = $Data->{SystemConfig}{hide_webcam_tab} ? qq[&hwct=1] : '';
-    my $field = loadPersonDetails( $Data->{'db'}, $personID ) || ();
+    my $field = loadPersonDetails( $Data, $personID ) || ();
 
 
     if ( $prefillData and ref $prefillData ) {
@@ -1686,9 +1686,9 @@ $person_photo
 }
 
 sub loadPersonDetails {
-    my ( $db, $id) = @_;
+    my ( $Data, $id) = @_;
     return {} if !$id;
-
+    my $db = $Data->{'db'};
     my $statement = qq[
 	SELECT
 		tblPerson.*,
@@ -1722,6 +1722,7 @@ sub loadPersonDetails {
         }
         else {
             ( $field->{dtDOB_year}, $field->{dtDOB_month}, $field->{dtDOB_day} ) = $field->{dtDOB_RAW} =~ /(\d\d\d\d)-(\d\d)-(\d\d)/;
+            $field->{'currentAge'} = PersonUtils::personAge($Data, $field->{'dtDOB_RAW'});
         }
     }
 

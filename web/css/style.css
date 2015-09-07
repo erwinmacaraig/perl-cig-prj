@@ -4572,6 +4572,7 @@ div#content div.member-home-page div.task-actions {
 #docViewerPanel {
     float: right;
     width: 300px;
+    z-index: 10;
 }
 
 #docViewerFileBlock {

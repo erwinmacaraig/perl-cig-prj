@@ -887,9 +887,9 @@ sub getTXNDetails	{
 
 	
 	#$dref->{'InvoiceNum'} = TXNtoInvoiceNum($dref->{intTransactionID}); 
-	#$dref->{'InvoiceNum'} = $dref->{'strInvoiceNumber'};
+	$dref->{'InvoiceNum'} = $dref->{'strInvoiceNumber'};
 
-	$dref->{'InvoiceNum'} = TXNtoTXNNumber($dref->{intTransactionID});# new
+	#$dref->{'InvoiceNum'} = TXNtoTXNNumber($dref->{intTransactionID});# new
 
 	$dref->{ProductName} = qq[$dref->{ProductGroup} - $dref->{ProductName}] if ($dref->{ProductGroup});
 	if ($dref->{intTableType} == 1)       {

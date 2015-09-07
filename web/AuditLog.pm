@@ -125,7 +125,7 @@ sub auditLog  {
   $log->log(
     id => $id || 0,
     username => $Data->{'UserName'} || '',
-	userID => $Data->{'clientValues'}{'userID'} || 0,
+    userID => $Data->{'clientValues'}{'userID'} || 0,
     type => $type,
     section => $section,
     login_entity_type => $Data->{'clientValues'}{'authLevel'} || 0,
