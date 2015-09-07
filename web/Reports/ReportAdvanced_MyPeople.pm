@@ -38,6 +38,7 @@ sub _getConfiguration {
             Products         => 1,
             RecordTypes      => 1,
             NationalPeriods  => 1,
+            CertTypes => 1,
         },
     );
     my $hideSeasons = $CommonVals->{'Seasons'}{'Hide'} || 0;
@@ -1679,6 +1680,60 @@ sub _getConfiguration {
 "LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID =intEntityPaymentID)"
                 }
               ],
+              intCertificationTypeID => [
+                $lang->txt('Certification Type'),
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => $CommonVals->{'CertTypes'},
+                    allowsort       => 1,
+                    optiongroup     => 'certtypes',
+                    allowgrouping   => 1
+                }
+            ],
+            dtValidFrom => [
+                $lang->txt('Valid From'),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'datetime',
+                    allowsort   => 1,
+                    datetimeformat => ['MEDIUM',''],
+                    optiongroup => 'certtypes',
+                    dbfield     => 'PC.dtValidFrom'
+                }
+              ],
+             dtValidUntil=> [
+                $lang->txt('Valid Until'),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'datetime',
+                    allowsort   => 1,
+                    datetimeformat => ['MEDIUM',''],
+                    optiongroup => 'certtypes',
+                    dbfield     => 'PC.dtValidUntil'
+                }
+              ],
+            PCstrStatus=> [
+                $lang->txt('Status'),
+                {
+                    dbfield         => 'PC.strStatus',
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::person_certification_status,
+                    translate       => 1,
+                    optiongroup     => 'certtypes',
+                    allowgrouping   => 1
+                }
+            ],
+            PCDesc=> [
+                $lang->txt('Description'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'certtypes',
+                    dbfield     => 'PC.strDescription'
+                }
+              ],
 
           },
 #strP1Salutation
@@ -1831,6 +1886,11 @@ sub _getConfiguration {
               EntityPaymentID
               strMemberRecordTypeList
               dtMemberRecordIn
+                intCertificationTypeID
+                dtValidFrom
+                dtValidUntil
+                PCstrStatus
+                PCDesc
               )
           ],
           Config => {
@@ -1855,6 +1915,14 @@ sub _getConfiguration {
             otherfields     => [ $lang->txt('Other Fields'),     {} ],
             affiliations    => [ $lang->txt('Affiliations'),     {} ],
             records         => [ $lang->txt('Member Records'),   {} ],
+            certtypes=> [
+                $lang->txt('Certification Types'),
+                {
+                    from =>
+"LEFT JOIN tblPersonCertifications as PC ON (PC.intPersonID = tblPerson.intPersonID)"
+                }
+            ],
+
             transactions => [
                 $txt_Transactions,
                 {
@@ -1902,7 +1970,7 @@ sub SQLBuilder {
     }
 
     $sql = qq[
-        SELECT ###SELECT###
+        SELECT DISTINCT ###SELECT###
         FROM
             $from_levels
             $current_from

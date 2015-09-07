@@ -115,7 +115,7 @@ sub checkRulePaymentFlagActions {
                     SET 
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
-                        dtFrom = NOW(),
+                        dtFrom = IF(strRegistrationNature IN ('TRANSFER','DOMESTIC_LOAN','INTERNATIONAL_LOAN'),dtFrom, NOW()),
                         strStatus = 'ACTIVE', 
                         intWasActivatedByPayment = 1
                     WHERE 
@@ -3443,15 +3443,43 @@ sub populateDocumentViewData {
 		$fileID = $tdref->{'intFileID'};
 		if(!$tdref->{'strApprovalStatus'}){     
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
-
-				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
-#or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
-					$documentStatusCount{'MISSING'}++;
-					$status = $Data->{'lang'}->txt('MISSING');
-				}
-				else {
-					$status = $Data->{'lang'}->txt('Optional. Not Provided.');
-				}
+                                switch($dref->{strWFRuleFor}) {
+                                    case 'REGO' {
+                                        if($tdref->{'Required'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }
+                                    }
+                                    case 'ENTITY' {
+                                         if($tdref->{'EntityRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }  
+                                    }
+                                    case 'PERSON' {
+                                        if($tdref->{'personRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }                                        
+                                    }                                
+                                }
+                                #if($tdref->{'Required'} or $tdref->{'personRequired'}){				
+                                #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
+				#	$documentStatusCount{'MISSING'}++;
+				#	$status = $Data->{'lang'}->txt('MISSING');
+				#}
+				#else {
+				#	$status = $Data->{'lang'}->txt('Optional. Not Provided.');
+				#}
 			}
 			else{
 				#$status = 'APPROVED';
@@ -4494,7 +4522,9 @@ sub holdTask {
         }
 
         #resetRelatedTasks($Data, $WFTaskID, 'PENDING');
-
+        #######################
+        auditLog($WFTaskID, $Data, 'Updated Work Task to On-Hold', 'WFTask');
+        #######################
         return 1;
     }
 
@@ -4559,6 +4589,7 @@ sub addMissingDocument {
     else {
         ($body, $title) = EntityDocuments::handle_entity_documents("C_DOCS_frm", $Data, $memberID, $documentTypeID, undef);
     }
+    auditLog($registrationID,$Data,'Add Missing Club Document','WFTask');    
 
     return ($body, $title);
 }

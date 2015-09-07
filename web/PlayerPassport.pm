@@ -73,7 +73,7 @@ sub savePlayerPassport{
 	#get all Possible Registration candidate to be placed in tblPlayerPassport 
 	# FROM these records choose the ones in which PersonAge >= 10 
 
-    my $pref = Person::loadPersonDetails($Data->{'db'}, $personID);  #Get DOB
+    my $pref = Person::loadPersonDetails($Data, $personID);  #Get DOB
     my $yearBorn = $pref->{'dtDOB_year'};     
     
      
