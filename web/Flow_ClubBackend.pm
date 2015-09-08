@@ -339,6 +339,7 @@ sub validate_role_details {
 	
     ($clubData, $self->{'RunDetails'}{'Errors'}) = $self->gatherFields($memperm);
 
+
     my $id = $self->ID() || 0;
     if(!doesUserHaveEntityAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -347,6 +348,12 @@ sub validate_role_details {
     if(!$id){
         push @{$self->{'RunDetails'}{'Errors'}}, 'Invalid club.';
     }
+
+    my $holdingClub = $self->getHoldingClub();
+    if($clubData->{'intIsInternationalTransfer'} and $holdingClub->{'exist'} > 0) {
+        push @{$self->{'RunDetails'}{'Errors'}}, $self->{'Data'}{'lang'}->txt('Holding club already exists');
+    }
+
     if($self->{'RunDetails'}{'Errors'} and scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         #There are errors - reset where we are to go back to the form again
         $self->decrementCurrentProcessIndex();
@@ -728,10 +735,17 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
 
 	$self->addCarryField('payMethod',$payMethod);
 
+    my ($initialTaskAssigneeLevel, $assigneeRef) = WorkFlow::getInitialTaskAssignee(
+        $self->{'Data'},
+        0,
+        0,
+        $clubObj->ID()
+    );
+ 
  my %Config = (
         HiddenFields => $self->stringifyCarryField(),
         Target => $self->{'Data'}{'target'},
-        ContinueButtonText => $self->{'Lang'}->txt('Submit to Member Association'),
+        ContinueButtonText => $self->{'Lang'}->txt('Submit to ' . $initialTaskAssigneeLevel),
     );
 	
     if ($gatewayConfig->{'amountDue'} and $payMethod eq 'now')    {
@@ -739,7 +753,7 @@ my $displayPayment = ($amountDue and $payMethod) ? 1 : 0;
         %Config = (
             HiddenFields => $gatewayConfig->{'HiddenFields'},
             Target => $gatewayConfig->{'Target'},
-            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to Member Association'),
+            ContinueButtonText => $self->{'Lang'}->txt('Proceed to Payment and Submit to [_1]', $initialTaskAssigneeLevel),
         );
     }
 
@@ -912,6 +926,7 @@ sub loadObjectValues    {
             strBankAccountNumber
             intNotifications
             intAcceptSelfRego
+            intIsInternationalTransfer
         )) {
             $values{$field} = $object->getValue($field);
         }
@@ -970,6 +985,30 @@ sub getEntityTXN    {
     }
 print STDERR "getEntityTXM $count $amount\n";
     return ($count, $amount, \%tlogIDs);
+}
+
+sub getHoldingClub {
+    my $self = shift;
+
+    my $st = qq[
+        SELECT
+            COUNT(*) AS exist
+        FROM tblEntity
+        WHERE
+            intIsInternationalTransfer = 1
+            AND intRealmID = ?
+            AND strStatus = ?
+    ];
+
+    my $q = $self->{'db'}->prepare($st);
+    $q->execute(
+        $self->{'Data'}{'Realm'},
+        $Defs::ENTITY_STATUS_ACTIVE
+    );
+
+    my $dref = $q->fetchrow_hashref();
+
+    return $dref;
 }
 
 1;

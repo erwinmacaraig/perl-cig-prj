@@ -69,6 +69,7 @@ use InstanceOf;
 use PersonLanguages;
 use GatewayProcess;
 
+use PersonRegistrationStatusChange;
 
 sub checkRulePaymentFlagActions {
 
@@ -114,7 +115,7 @@ sub checkRulePaymentFlagActions {
                     SET 
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
-                        dtFrom = NOW(),
+                        dtFrom = IF(strRegistrationNature IN ('TRANSFER','DOMESTIC_LOAN','INTERNATIONAL_LOAN'),dtFrom, NOW()),
                         strStatus = 'ACTIVE', 
                         intWasActivatedByPayment = 1
                     WHERE 
@@ -129,6 +130,8 @@ sub checkRulePaymentFlagActions {
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
                 $qUPD->execute($personID, $entityID, $personRegistrationID);
+
+                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, -1)
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
@@ -174,6 +177,7 @@ sub checkRulePaymentFlagActions {
     if ($countTaskSkipped)    {
         my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, 0);
     }
+
 
 }
 sub cleanTasks  {
@@ -805,6 +809,7 @@ sub listTasks {
 
     }
 
+
     my @sortedTaskList = sort { $b->{'taskTimeStamp'} <=> $a->{'taskTimeStamp'}} @TaskList;
 	my $msg = '';
 	if ($rowCount == 0) {
@@ -1325,7 +1330,7 @@ sub approveTask {
   	    auditLog($WFTaskID, $Data, 'Updated Work Task', 'WFTask');
   	    ###
         setDocumentStatus($Data, $WFTaskID, 'APPROVED');
-	    if ($q->errstr) {
+        if ($q->errstr) {
 	    	return $q->errstr . '<br>' . $st
 	    }
 
@@ -1387,6 +1392,14 @@ sub approveTask {
     }
     elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_NEW) {
         PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+    }
+    elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT) {
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::finaliseInternationalTransferOut($Data, $personRequestID);
+    }
+    elsif($personRequestID and $registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN) {
+        PersonRequest::setRequestStatus($Data, $task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
+        PersonRequest::finaliseInternationalTransferReturn($Data, $personRequestID);
     }
     else {
         my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
@@ -1688,6 +1701,7 @@ sub checkForOutstandingTasks {
 
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
 
+                my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
 
                         #LEFT JOIN tblNationalPeriod as NP ON (PR.intNationalPeriodID = NP.intNationalPeriodID)
@@ -1755,6 +1769,9 @@ sub checkForOutstandingTasks {
                     PersonRequest::setPlayerLoanValidDate($Data, 0, $personID, $personRegistrationID);
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
+                if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $Defs::PERSONREGO_STATUS_ACTIVE);
+                }
            ##############################################################################################################
         }
        	}
@@ -2867,7 +2884,8 @@ sub populateRegoViewData {
     my $PersonEditLink = "$Data->{'target'}?client=$tempClient&amp;a=PE_&amp;dtype=$dref->{'strPersonType'}";
     my $readonly = !( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 );
     my $minorProtectionOptions = getMinorProtectionOptions($Data, $dref->{'InternationalTransfer'});
-    my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    #my $LocalName = "$dref->{'strLocalFirstname'} $dref->{'strLocalMiddleName'} $dref->{'strLocalSurname'}" || '';
+    my $LocalName = formatPersonName($Data, $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, ''), 
     my $PersonType = $Data->{'lang'}->txt($Defs::personType{$dref->{'strPersonType'} || 0}) || '';
 
     my $certifications = getPersonCertifications(
@@ -3434,15 +3452,43 @@ sub populateDocumentViewData {
 		$fileID = $tdref->{'intFileID'};
 		if(!$tdref->{'strApprovalStatus'}){     
 			if(!grep /$tdref->{'doctypeid'}/,@validdocsforallrego){  
-
-				if($tdref->{'Required'} or $tdref->{'personRequired'}){				
-#or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
-					$documentStatusCount{'MISSING'}++;
-					$status = $Data->{'lang'}->txt('MISSING');
-				}
-				else {
-					$status = $Data->{'lang'}->txt('Optional. Not Provided.');
-				}
+                                switch($dref->{strWFRuleFor}) {
+                                    case 'REGO' {
+                                        if($tdref->{'Required'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }
+                                    }
+                                    case 'ENTITY' {
+                                         if($tdref->{'EntityRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }  
+                                    }
+                                    case 'PERSON' {
+                                        if($tdref->{'personRequired'}){
+                                            $documentStatusCount{'MISSING'}++;
+                                            $status = $Data->{'lang'}->txt('MISSING');
+                                        }
+                                        else {
+                                            $status = $Data->{'lang'}->txt('Optional. Not Provided.');
+                                        }                                        
+                                    }                                
+                                }
+                                #if($tdref->{'Required'} or $tdref->{'personRequired'}){				
+                                #or $tref->{'PersonRequired'} or $tref->{'EntityRequired'}
+				#	$documentStatusCount{'MISSING'}++;
+				#	$status = $Data->{'lang'}->txt('MISSING');
+				#}
+				#else {
+				#	$status = $Data->{'lang'}->txt('Optional. Not Provided.');
+				#}
 			}
 			else{
 				#$status = 'APPROVED';
@@ -3878,6 +3924,51 @@ sub viewSummaryPage {
 
                 $title = $Data->{'lang'}->txt($header . " - Approval");
             }
+            elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT){
+                $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
+                $templateFile = 'workflow/summary/inttransfer.templ';
+                my $header = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PLAYER"}; 
+
+                $title = $Data->{'lang'}->txt($header . " - Approval");
+
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                #$TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+            }
+            elsif($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN){
+                $TemplateData{'PersonRegistrationDetails'}{'currentClub'} = $task->{'strLocalName'};
+                $templateFile = 'workflow/summary/inttransfer.templ';
+                my $header = $Defs::workTaskTypeLabel{$task->{'strRegistrationNature'} . "_PLAYER"}; 
+
+                $title = $Data->{'lang'}->txt($header . " - Approval");
+
+                my %regFilter = (
+                    'requestID' => $task->{'intPersonRequestID'},
+                );
+
+                my $request = getRequests($Data, \%regFilter);
+                $request = $request->[0];
+
+                $TemplateData{'TransferDetails'}{'personType'} = $Defs::personType{$task->{'strPersonType'}};
+                $TemplateData{'TransferDetails'}{'TransferTo'} = $request->{'requestFrom'};
+                $TemplateData{'TransferDetails'}{'TransferFrom'} = $request->{'requestTo'};
+                $TemplateData{'TransferDetails'}{'DateFrom'} = $task->{'NPdtFrom'};
+                $TemplateData{'TransferDetails'}{'DateTo'} = $task->{'NPdtTo'};
+                $TemplateData{'TransferDetails'}{'Summary'} = $request->{'strRequestNotes'};
+                #$TemplateData{'TransferDetails'}{'Fee'} = $PaymentsData->{'TXNs'}[0]{'Amount'};
+            }
+
             else {
                 $templateFile = 'workflow/summary/personregistration.templ';
                 $title = $Data->{'lang'}->txt('New [_1] Registration', $Data->{'lang'}->txt($Defs::personType{$task->{'strPersonType'}})) . " - " . $Data->{'lang'}->txt('Approval');
@@ -4145,6 +4236,14 @@ sub updateTaskScreen {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Loan process.");
                 $status = $Data->{'lang'}->txt("Pending");
             }
+            if($TaskType eq 'INT_TRANSFER_RETURN_PLAYER') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the International Transfer Return process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
+            if($TaskType eq 'INT_TRANSFER_RETURN_OUT') {
+                $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the International Transfer Out process.");
+                $status = $Data->{'lang'}->txt("Pending");
+            }
             elsif($TaskType eq 'NEW_PLAYER') {
                 $message = $Data->{'lang'}->txt("You have put this task on-hold, once the submitting Club resolves the issue, you would be able to verify and continue with the Player Registration process.");
                 $status = $Data->{'lang'}->txt("Pending");
@@ -4226,6 +4325,14 @@ sub updateTaskScreen {
             }
 			elsif($TaskType eq 'DOMESTIC_LOAN_PLAYER'){
 				$message = $Data->{'lang'}->txt("You have rejected the player loan of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
+			elsif($TaskType eq 'INT_TRANSFER_OUT_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the International Transfer Out of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
+				$status = $Data->{'lang'}->txt("Rejected");
+			}
+			elsif($TaskType eq 'INT_TRANSFER_RETURN_PLAYER'){
+				$message = $Data->{'lang'}->txt("You have rejected the International Transfer Return of [_1] [_2]",$task->{'strLocalFirstname'}, $task->{'strLocalSurname'});
 				$status = $Data->{'lang'}->txt("Rejected");
 			}
             elsif($TaskType eq 'NEW_PLAYER') {
@@ -4485,7 +4592,9 @@ sub holdTask {
         }
 
         #resetRelatedTasks($Data, $WFTaskID, 'PENDING');
-
+        #######################
+        auditLog($WFTaskID, $Data, 'Updated Work Task to On-Hold', 'WFTask');
+        #######################
         return 1;
     }
 
@@ -4550,6 +4659,7 @@ sub addMissingDocument {
     else {
         ($body, $title) = EntityDocuments::handle_entity_documents("C_DOCS_frm", $Data, $memberID, $documentTypeID, undef);
     }
+    auditLog($registrationID,$Data,'Add Missing Club Document','WFTask');    
 
     return ($body, $title);
 }
@@ -4880,6 +4990,51 @@ sub getInitialTaskAssignee {
     ) = @_;
 
     if($entityID){
+        my $originLevel = $Data->{'clientValues'}{'authLevel'} || 0;
+        my $st = qq[
+            SELECT
+                r.intWFRuleID,
+                r.intRealmID,
+                r.intSubRealmID,
+                r.intApprovalEntityLevel,
+                r.strTaskType,
+                r.strWFRuleFor,
+                r.intDocumentTypeID,
+                r.strTaskStatus,
+                r.intProblemResolutionEntityLevel,
+                0 as intPersonID,
+                0 as intPersonRegistrationID,
+                e.intEntityID as RegoEntity,
+                0 as DocumentID
+            FROM tblEntity as e
+            INNER JOIN tblWFRule AS r ON (
+                e.intRealmID = r.intRealmID
+                AND e.intSubRealmID = r.intSubRealmID
+                AND r.strPersonType = ''
+                AND r.intEntityLevel = e.intEntityLevel
+            )
+            WHERE e.intEntityID= ?
+                AND r.strWFRuleFor = 'ENTITY'
+                AND r.intRealmID = ?
+                AND r.intSubRealmID IN (0, ?)
+                AND r.intOriginLevel = ?
+                AND r.strRegistrationNature = ?
+            ORDER BY
+                r.intApprovalEntityLevel
+            LIMIT 1
+		];
+        my $q = $Data->{'db'}->prepare($st);
+        $q->execute(
+            $entityID,
+            $Data->{'Realm'},
+            $Data->{'RealmSubType'},
+            $originLevel,
+            'NEW'
+        );
+
+  	    $q->execute($entityID, $Data->{'Realm'}, , $originLevel, 'NEW');
+        my $dref = $q->fetchrow_hashref();
+        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
     }
     elsif($personID and $registrationID){
         my $st = qq[
@@ -4894,18 +5049,34 @@ sub getInitialTaskAssignee {
                 AND tr.strRegistrationNature = tp.strRegistrationNature
                 AND tr.intOriginLevel = tp.intOriginLevel
             )
+            INNER JOIN tblPerson p
+            ON (
+                p.intPersonID = tp.intPersonID
+            )
+            INNER JOIN tblEntity te
+            ON (
+                te.intEntityID = tp.intEntityID
+            )
             WHERE
                 tp.intPersonRegistrationID = ?
+                AND tr.intEntityLevel = te.intEntityLevel
+                AND tr.intRealmID = ?
                 AND tr.strTaskStatus = 'ACTIVE'
+                AND (tr.strISOCountry_IN IS NULL or tr.strISOCountry_IN = '' OR tr.strISOCountry_IN LIKE CONCAT('%|',p.strISONationality ,'|%'))
+                AND (tr.strISOCountry_NOTIN IS NULL or tr.strISOCountry_NOTIN = '' OR tr.strISOCountry_NOTIN NOT LIKE CONCAT('%|',p.strISONationality ,'|%'))
             ORDER BY
                 tr.intApprovalEntityLevel
             LIMIT 1
         ];
+
         my $q = $Data->{'db'}->prepare($st);
-        $q->execute($registrationID);
+        $q->execute(
+            $registrationID,
+            $Data->{'Realm'}
+        );
 
         my $dref = $q->fetchrow_hashref();
-        return $Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100};
+        return ($Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100}, $dref);
     }
 }
 

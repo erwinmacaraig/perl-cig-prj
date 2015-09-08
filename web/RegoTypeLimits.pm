@@ -111,7 +111,11 @@ sub checkRegoTypeLimits    {
         WHERE
             PR.intPersonID = ?
             AND PR.intPersonRegistrationID <> ?
-            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
+            AND (
+                (PR.intOnLoan = 1 AND PR.strStatus IN ('ACTIVE'))
+                OR 
+                (PR.intOnLoan = 0 AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED', 'PASSIVE'))
+            )
     ];
             #AND strPersonType = ?
     my $stPR = qq[
@@ -123,7 +127,11 @@ sub checkRegoTypeLimits    {
         WHERE
             PR.intPersonID = ?
             AND PR.intPersonRegistrationID <> ?
-            AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED')
+            AND (
+                (PR.intOnLoan = 1 AND PR.strStatus IN ('ACTIVE'))
+                OR 
+                (PR.intOnLoan = 0 AND PR.strStatus IN ('ACTIVE', 'PENDING', 'SUSPENDED', 'PASSIVE'))
+            )
     ];
             #AND strPersonType = ?
     my @values =();

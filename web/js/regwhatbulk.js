@@ -13,6 +13,8 @@ function update_options(optionType, dtype)   {
     qstring = qstring + '&eID=' + jQuery('#selected_entityID').val();
     qstring = qstring + '&pID=' + jQuery('#pID').val();
 
+    jQuery('#flow-btn-continue').hide();
+
     if(optionType == 'complete')    {
       jQuery('#flow-btn-continue').show();
     }

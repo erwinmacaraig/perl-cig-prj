@@ -491,6 +491,7 @@ sub getFieldsList	{
         intFacilityTypeID
         strBankAccountNumber
         intAcceptSelfRego
+        intIsInternationalTransfer
         ));
 
     return \@clubFields if $fieldtype eq 'Club';

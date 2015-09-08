@@ -471,7 +471,7 @@ sub showLink {
         return $url if ($Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL);     
         my %Reg=();
         $Reg{'entityID'} = getLastEntityID($Data->{'clientValues'});
-        my $field = Person::loadPersonDetails($Data->{'db'},$personID); 
+        my $field = Person::loadPersonDetails($Data,$personID); 
         if(($field->{'strStatus'} eq $Defs::PERSON_STATUS_REGISTERED || $field->{'strStatus'} eq $Defs::PERSON_STATUS_PENDING || $field->{'strStatus'} eq $Defs::PERSON_STATUS_DUPLICATE) && PersonRegistration::isPersonRegistered($Data,$personID,\%Reg)){
             return  $url; 
         } 

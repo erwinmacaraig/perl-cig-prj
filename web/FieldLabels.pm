@@ -218,6 +218,7 @@ sub getFieldLabels	{
             intFacilityTypeID => 'Venue Type',
             strBankAccountNumber => 'Bank Account Details',
             intAcceptSelfRego => 'Accept Self Registration',
+            intIsInternationalTransfer => 'Holding Club (International Transfer)',
             );
 	}
 

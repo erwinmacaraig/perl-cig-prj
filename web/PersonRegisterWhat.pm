@@ -35,11 +35,12 @@ sub displayPersonRegisterWhat   {
         $bulk,
         $regoID,
         $entitySelection,
+        $displaydetailsonly
     ) = @_;
     #$transfer ||=0;
     $bulk ||= 0;
     $entitySelection ||= 0;
-
+    $displaydetailsonly ||= 0;
     my $defaultType = param('dtype') || '';
     my $defaultSport = param('dsport') || '';
     my $defaultEntityRole= param('dentityrole') || '';
@@ -74,6 +75,7 @@ sub displayPersonRegisterWhat   {
         AllowMAComment => $systemConfig->{'personRegoAllowMAComment'},
         itc => $itc,
         preqtype => $preqtype,
+        displaydetailsonly => $displaydetailsonly
     );
     if($entitySelection)    {
         $templateData{'entityID'} = 0;
@@ -161,7 +163,7 @@ sub optionsPersonRegisterWhat {
     $bulk ||= 0;
 
     my $pref= undef;
-    $pref = loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+    $pref = loadPersonDetails($Data, $personID) if ($personID);
 
     #$registrationNature ||= '';
     #$registrationNature = '' if (! defined $registrationNature or $registrationNature eq 'null');
@@ -611,6 +613,12 @@ sub optionsPersonRegisterWhat {
         if ($registrationNature eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN and $lookingForField eq 'strRegistrationNature')   {
             $NATUREwhere= qq[AND strRegistrationNature = 'DOMESTIC_LOAN'];
         }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_OUT'];
+        }
+        if ($registrationNature eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN and $lookingForField eq 'strRegistrationNature')   {
+            $NATUREwhere= qq[AND strRegistrationNature = 'INT_TRANSFER_RETURN'];
+        }
         #if ($registrationNature eq $Defs::REGISTRATION_NATURE_INTERNATIONAL_LOAN and $lookingForField eq 'strRegistrationNature')   {
         #    $NATUREwhere= qq[AND strRegistrationNature = 'INTERNATIONAL_LOAN'];
         #}
@@ -828,8 +836,6 @@ sub getPersonLevelFromMatrix {
             $where
         GROUP BY strPersonLevel
     ];
-#print STDERR $st;
-#print STDERR Dumper($values_ref);
 
     my $query = $Data->{'db'}->prepare($st);
     $query->execute(@{$values_ref});
@@ -844,7 +850,7 @@ sub getPersonLevelFromMatrix {
             defined $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_PROFESSIONAL
-            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'}
+            and ($pref->{'currentAge'} and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_PROFESSIONAL'})
         );
 
         #if the player is under 16, "AMATEUR_U_C" should not be available (specific to MA - sys config entry)
@@ -852,7 +858,7 @@ sub getPersonLevelFromMatrix {
             defined $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
             and $personType eq $Defs::PERSON_TYPE_PLAYER
             and $dref->{'strPersonLevel'} eq $Defs::PERSON_LEVEL_AMATEUR_UNDER_CONTRACT
-            and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'}
+            and ($pref->{'currentAge'} and $pref->{'currentAge'} < $systemConfig->{'age_breakpoint_PLAYER_AMATEUR_U_C'})
         );
 
         if($dref->{'strPersonLevel'}){
@@ -879,7 +885,7 @@ sub _entityList {
     my $st = '';
     my $q = undef;
     my $systemConfig = getSystemConfig($Data);
-    my $acceptSelfRegoFilter = qq [ AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
+    my $acceptSelfRegoFilter = qq [ AND E.intIsInternationalTransfer<>1 AND intAcceptSelfRego = 1 ] if ($originLevel == 1 and $systemConfig->{'allow_SelfRego'});
 
     if($currentEntityID)    {
         $st = qq[

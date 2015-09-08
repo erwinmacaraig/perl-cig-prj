@@ -64,6 +64,27 @@ sub getCommonValues {
 		}
 		$optvalues{'DefCodes'} = \%Codes;
 	}
+	if($options->{'CertTypes'})	{
+		my %CertTypes=();
+		my $statement=qq[
+			SELECT intCertificationTypeID, strCertificationType, strCertificationName
+			FROM tblCertificationTypes
+			WHERE intRealmID = ?
+		];
+		my $query = $db->prepare($statement);
+		$query->execute($Data->{'Realm'});
+		while (my $dref = $query->fetchrow_hashref() ) {
+            my $name = '';
+            if ($dref->{'strCertificationType'})    {
+                $name .= $Defs::personType{$dref->{'strCertificationType'}} . qq[-];
+            }
+            $name .= $dref->{strCertificationName};
+			$CertTypes{$dref->{'intCertificationTypeID'}}=$name;
+		}
+		$optvalues{'CertTypes'} = \%CertTypes;
+	}
+
+
 	if($options->{'LegalTypes'})	{
 		my %LegalTypes=();
 		my $statement=qq[

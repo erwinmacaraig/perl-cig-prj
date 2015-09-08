@@ -762,10 +762,29 @@ sub getClubMenuData {
         };
     }
 
+
     if ($SystemConfig->{'allowPersonRequest'}) {
+        my $request_action = '';
+	    my $authLevel = $Data->{'clientValues'}{'authLevel'};
+	    my $currentLevel = $Data->{'clientValues'}{'currentLevel'};
+	    my $holdingClubID = getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+        my $holdingClubObj = getInstanceOf($Data, 'club', $holdingClubID);
+
+        #FC-1599 - if initiator == MA and navigated down to IntTransfer holding Club,
+        #then display different search screen
+        if($authLevel == $Defs::LEVEL_NATIONAL
+            and $currentLevel == $Defs::LEVEL_CLUB
+            and $holdingClubObj->getValue('intIsInternationalTransfer') == 1
+        ) {
+            $request_action = 'PRA_IT';
+        }
+        else {
+            $request_action = 'PRA_T';
+        }
+
         $menuoptions{'requesttransfer'} = {
             name => $lang->txt('Request or start a transfer'),
-            url => $baseurl."a=PRA_T",
+            url => $baseurl."a=$request_action",
             #url => $baseurl."a=INITSRCH_P&type=transfer&amp;origin=" . $Data->{'clientValues'}{'authLevel'},
         };
     }

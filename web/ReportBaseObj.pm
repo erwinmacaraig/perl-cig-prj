@@ -10,6 +10,7 @@ use TTTemplate;
 use Utils;
 use Time::HiRes qw(gettimeofday tv_interval);
 use Reports::ReportEmail;
+use Encode qw(from_to);
 
 sub new {
 
@@ -221,6 +222,10 @@ sub deliverReport {
 sub downloadReport {
     my $self = shift;
     my ($reportoutput) = @_;
+
+    #FC-1381 - needed to prefix BOM char in the file content and encode from UTF8 to UTF16LE
+    $reportoutput = "\xef\xbb\xbf" . $reportoutput;
+    from_to($reportoutput, "utf8", "utf16le");
 
     my $contenttype = 'application/download';
     #my $size = length($reportoutput);

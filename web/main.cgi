@@ -111,16 +111,16 @@ sub main {
             $paytry = 0;
         }
     }
-    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    $Data{'lang'} = $lang;
+    #my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    #$Data{'lang'} = $lang;
     my $db = allowedTo( \%Data );
 
     ( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
     getDBConfig( \%Data );
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
     $Data{'LocalConfig'}  = getLocalConfig( \%Data );
-    #my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    #$Data{'lang'} = $lang;
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'} = $lang;
     initLocalisation(\%Data);
     updateSystemConfigTranslation(\%Data);
 
@@ -326,6 +326,15 @@ use TransferFlow;
 use LoanFlow;
         ( $resultHTML, $pageHeading ) = handleLoanFlow($action, \%Data);
     }
+    elsif ( $action =~ /^PITO_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleIntTransferOutFlow($action, \%Data);
+    }
+    elsif ( $action =~ /^PITR_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleIntTransferReturnFlow($action, \%Data);
+    }
+
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});

@@ -242,10 +242,17 @@ sub personRegistrationsHistory   {
     my @rowdata = ();
     my $results = 0;
     my $client           = setClient( $Data->{'clientValues'} ) || '';
+    my $validToDate;
+    my $validFromDate;
+   
     foreach my $rego (@{$Reg_ref})  {
       $results=1;
         my $name = $rego->{'strLocalName'};
         $name .= " ($rego->{'strLatinName'})" if $rego->{'strLatinName'};
+        $validFromDate = ($rego->{'dtFrom'} and $rego->{'dtFrom'} ne '0000-00-00') ? $Data->{'l10n'}{'date'}->TZformat($rego->{'dtFrom'},'MEDIUM','NONE') : $Data->{'l10n'}{'date'}->TZformat($rego->{'npdtFrom'},'MEDIUM','NONE');
+        
+        $validToDate = ($rego->{'dtTo'} and $rego->{'dtTo'} ne '0000-00-00') ? $Data->{'l10n'}{'date'}->TZformat($rego->{'dtTo'},'MEDIUM','NONE') : $Data->{'l10n'}{'date'}->TZformat($rego->{'npdtTo'},'MEDIUM','NONE');
+        
       push @rowdata, {
         id => $rego->{'intPersonRegistrationID'} || 0,
         EntityLocalName=> $name,
@@ -262,6 +269,8 @@ sub personRegistrationsHistory   {
         Date => $Data->{'l10n'}{'date'}->TZformat($rego->{'dtApproved'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtLastUpdated'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($rego->{'dtAdded'},'MEDIUM','SHORT') || '',
         Date_RAW => $rego->{'dtApproved'} || $rego->{'dtLastUpdated'} || $rego->{'dtAdded'} || '',
         SelectLink => "$Data->{'target'}?client=$client&amp;a=P_REGO&amp;prID=$rego->{'intPersonRegistrationID'}",
+        ValidFrom => $validFromDate || '',
+        ValidTo => $validToDate || '',
       };
     }
 
@@ -317,6 +326,14 @@ sub personRegistrationsHistory   {
         {
             name  => $Data->{'lang'}->txt('Status'),
             field => 'Status',
+        },
+        {
+            name => $Data->{'lang'}->txt('Valid From'),
+            field => 'ValidFrom',
+        },
+        {
+            name => $Data->{'lang'}->txt('Valid To'),
+            field => 'ValidTo',
         },
         {
             name  => $Data->{'lang'}->txt('Date'),
@@ -808,7 +825,7 @@ sub person_details {
 
     $personID = 0 if $option eq 'add';
     my $hideWebCamTab = $Data->{SystemConfig}{hide_webcam_tab} ? qq[&hwct=1] : '';
-    my $field = loadPersonDetails( $Data->{'db'}, $personID ) || ();
+    my $field = loadPersonDetails( $Data, $personID ) || ();
 
 
     if ( $prefillData and ref $prefillData ) {
@@ -1669,9 +1686,9 @@ $person_photo
 }
 
 sub loadPersonDetails {
-    my ( $db, $id) = @_;
+    my ( $Data, $id) = @_;
     return {} if !$id;
-
+    my $db = $Data->{'db'};
     my $statement = qq[
 	SELECT
 		tblPerson.*,
@@ -1705,6 +1722,7 @@ sub loadPersonDetails {
         }
         else {
             ( $field->{dtDOB_year}, $field->{dtDOB_month}, $field->{dtDOB_day} ) = $field->{dtDOB_RAW} =~ /(\d\d\d\d)-(\d\d)-(\d\d)/;
+            $field->{'currentAge'} = PersonUtils::personAge($Data, $field->{'dtDOB_RAW'});
         }
     }
 

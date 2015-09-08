@@ -1441,13 +1441,13 @@ sub display_summary {
         return ('',2);
     }
 
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+    my ($initialTaskAssigneeLevel, $assigneeRef) = getInitialTaskAssignee(
         $self->{'Data'},
         $personID,
         $regoID,
         0
     );
-   
+
     #if ($payMethod ne 'now')    {
     #    $gateways = '';
     #}

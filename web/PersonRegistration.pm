@@ -34,6 +34,7 @@ use Reg_common;
 use PersonCertifications;
 use PersonEntity;
 use PersonUtils;
+use PersonRegistrationStatusChange;
 
 sub cleanPlayerPersonRegistrations  {
 
@@ -131,6 +132,8 @@ sub rolloverExistingPersonRegistrations {
     );
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
+        my $oldStatus = $rego->{'strStatus'};
+
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
         $thisRego->{'strStatus'} = $Defs::PERSONREGO_STATUS_ROLLED_OVER;
@@ -139,6 +142,7 @@ sub rolloverExistingPersonRegistrations {
         $Month++;
         $thisRego->{'dtTo'} = "$Year-$Month-$Day";
         
+        addPersonRegistrationStatusChangeLog($Data, $rego->{'intPersonRegistrationID'}, $oldStatus, $Defs::PERSONREGO_STATUS_ROLLED_OVER);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
     }
 }
@@ -199,6 +203,29 @@ sub checkNewRegoOK  {
     ## I assume the above is handled via checkLimits?
 #Not OK.. Transfer needed
 
+    my $playerInEntity = 0;
+    if ($rego_ref->{'personType'} eq $Defs::PERSON_TYPE_PLAYER) {
+        ## Do they have a ACTIVE or PASSIVE record in current Entity as ANY level
+        %Reg=();
+        my @statusIN = ($Defs::PERSONREGO_STATUS_ACTIVE, $Defs::PERSONREGO_STATUS_PASSIVE);
+        %Reg = (
+            sport=> $rego_ref->{'sport'} || '',
+            personType=> $rego_ref->{'personType'} || '',
+            entityID => $rego_ref->{'entityID'},
+            personEntityRole=> $rego_ref->{'personEntityRole'} || '',
+            statusIN => \@statusIN,
+        );
+            #ageLevel=> $rego_ref->{'ageLevel'} || '',
+        $count=0;
+        $regs='';
+        ($count, $regs) = getRegistrationData(
+            $Data,
+            $personID,
+            \%Reg
+        );
+        $playerInEntity = 1 if ($count);
+    }
+     
     ## Now check within this ENTITY
     %Reg=();
     %Reg = (
@@ -219,7 +246,8 @@ sub checkNewRegoOK  {
     $ok=1;
     foreach my $reg (@{$regs})  {
         next if $reg->{'intEntityID'} != $rego_ref->{'entityID'};
-        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        $ok = 0 if ($reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PENDING or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE);
+        $ok = 0 if (! $playerInEntity and $reg->{'strStatus'} eq $Defs::PERSONREGO_STATUS_TRANSFERRED);
     }
     return $ok;
 }
@@ -228,7 +256,7 @@ sub checkRenewalRegoOK  {
 
     my ($Data, $personID, $rego_ref) = @_;
     my $pref= undef;
-    $pref = Person::loadPersonDetails($Data->{'db'}, $personID) if ($personID);
+    $pref = Person::loadPersonDetails($Data, $personID) if ($personID);
     return 0 if (defined $pref and ($pref->{'strStatus'} eq $Defs::PERSON_STATUS_SUSPENDED));
     my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $rego_ref->{'sport'}, $rego_ref->{'personType'}, 'RENEWAL');
 
@@ -283,7 +311,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
     my @statusNOTIN = ();
-    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED);
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE);
 
     %Reg=();
     %Reg = (
@@ -294,6 +322,7 @@ sub checkRenewalRegoOK  {
         statusNOTIN => \@statusNOTIN,
         entityID=> $rego_ref->{'entityID'} || 0,
         nationalPeriodID=>$nationalPeriodID,
+        LoaningEntityOpenLoan => 0,
     );
     my ($countAlready, undef) = getRegistrationData(
         $Data,
@@ -648,6 +677,10 @@ sub getRegistrationData	{
     if(exists $regFilters_ref->{'originLevel'})  {
         push @values, $regFilters_ref->{'originLevel'};
         $where .= " AND pr.intOriginLevel = ? ";
+    }
+    if(exists $regFilters_ref->{'LoaningEntityOpenLoan'})  {
+        push @values, $regFilters_ref->{'LoaningEntityOpenLoan'};
+        $where .= " AND (existprq.intOpenLoan IS NULL OR existprq.intOpenLoan = ?) ";
     }
 
     my $st= qq[

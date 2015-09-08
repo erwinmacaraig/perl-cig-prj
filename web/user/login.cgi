@@ -24,14 +24,16 @@ sub main {
     my %Data = ();
     my $db   = connectDB();
     $Data{'db'} = $db;
-    my $lang = Lang->get_handle() || die "Can't get a language handle!";
+    $Data{'Realm'} = 1;
+    $Data{'SystemConfig'} = getSystemConfig( \%Data );
+
+    #my $lang = Lang->get_handle() || die "Can't get a language handle!";
+    my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
     my $target = 'authlist.cgi';
     $Data{'target'} = $target;
     $Data{'cache'}  = new MCache();
 
-    $Data{'Realm'} = 1;
-    $Data{'SystemConfig'} = getSystemConfig( \%Data );
     my $email = param('email') || '';
     my $password = param('pw') || '';
 
