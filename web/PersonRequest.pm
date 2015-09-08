@@ -266,7 +266,7 @@ sub listPeople {
         ->setKeyword($searchKeyword)
         ->setSphinx($sphinx)
         ->setGridTemplate($resultTemplate);
-
+     
     my $resultGrid = $personSearchObj->process();
 
     if(!$resultGrid){

@@ -329,10 +329,11 @@ sub getTransfer {
 
         my %validRecords = ();
         my @sportsFilter;
-
-        while(my $dref = $q->fetchrow_hashref()) {
+       
+        while(my $dref = $q->fetchrow_hashref()) {            
+            next if(PersonRegistration::hasPendingRegistration($self->getData(), $dref->{'intPersonID'}, $dref->{'strSport'}, [] ));
             next if $dref->{'intIsInternationalTransfer'} == 1; #club must not be able to request from holding club of international transfer out/return
-
+       
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;

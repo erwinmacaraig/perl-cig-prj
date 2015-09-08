@@ -15,6 +15,8 @@ require Exporter;
     checkIsSuspended
     getRegistrationDetail
     cleanPlayerPersonRegistrations
+    hasPendingRegistration
+    hasPendingTransferRegistration
 );
 use strict;
 use lib "..",".";
@@ -1207,5 +1209,75 @@ sub getRegistrationDetail {
     }
     return (\@RegistrationDetail);
 }
+#
+sub hasPendingRegistration {
+    my ($Data, $personID, $sport, $existingRegos) = @_;
+    if(scalar @{$existingRegos}){
+        my $count = 0;
+        my %renewalCtrlForRego = ();
+        foreach my $rego (@{$existingRegos}){
+            #check for sport        
+            if(!exists $renewalCtrlForRego{$rego->{'strSport'}.$rego->{'strPersonType'}}){
+                $renewalCtrlForRego{$rego->{'strSport'}.$rego->{'strPersonType'}} = {
+                    regoID => $rego->{'intPersonRegistrationID'},
+                    enableButton => ($rego->{'strStatus'} eq 'ACTIVE' && $rego->{'strRegistrationNature'} eq 'NEW') ? 1 : 0 ,   
+                    index => $count,
+                    status => $rego->{'strStatus'},  
+                };
+            }
+            else{
+                # check if the last sport has a pending or active status
+                if($renewalCtrlForRego{$rego->{'strSport'}.$rego->{'strPersonType'}}{'enableButton'} && $rego->{'strRegistrationNature'} eq 'RENEWAL'){ #last sport seen has active status
+                    $existingRegos->[$renewalCtrlForRego{$rego->{'strSport'}.$rego->{'strPersonType'}}{'index'}]->{'renew_link'} = '';   
+                    $existingRegos->[$renewalCtrlForRego{$rego->{'strSport'}.$rego->{'strPersonType'}}{'index'}]->{'changelevel_link'} = ''; 
+                }
+                else {
+                    $existingRegos->[$count]->{'renew_link'} = ''; # 
+                    $existingRegos->[$count]->{'changelevel_link'} = '';
+                }                
+            }            
+            $count++;            
+        }
+        
+    }
+    
+    if($personID){
+        my $query = qq[SELECT intPersonRegistrationID FROM tblPersonRegistration_$Data->{'Realm'} WHERE intPersonID = ? AND strSport = ? AND strRegistrationNature = 'RENEWAL' AND strStatus = 'PENDING' AND strPersonType = 'PLAYER'];        
+        my $st = $Data->{'db'}->prepare($query);
+        $st->execute($personID,$sport);
+        my $dref = $st->fetchrow_hashref();
+        return $dref->{'intPersonRegistrationID'};
+        
+    }
+   
+    return 1;  
+    
+}
 
+sub hasPendingTransferRegistration {
+    my ($Data, $personID, $sport, $existingRegos) = @_;
+    my $count = 0;
+    if(scalar @{$existingRegos}){
+        foreach my $rego (@{$existingRegos}){
+            my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest WHERE intPersonID = ? AND strRequestType = 'TRANSFER' AND intExistingPersonRegistrationID = ? AND strSport = ? AND strRequestStatus = 'INPROGRESS' AND strPersonType = 'PLAYER'];
+            my $st = $Data->{'db'}->prepare($query);
+            $st->execute($personID,$rego->{'intPersonRegistrationID'},$rego->{'strSport'});
+            my $dref = $st->fetchrow_hashref();
+            if($dref->{'intPersonRequestID'}){
+                $existingRegos->[$count]->{'changelevel_link'} = '';
+                $existingRegos->[$count]->{'renew_link'} = '';
+            }
+            $count++;
+        }
+    }
+    if($personID){
+        my $query = qq[SELECT intPersonRequestID FROM tblPersonRequest WHERE intPersonID = ? AND strRequestType = 'TRANSFER' AND strSport = ? AND strRequestStatus = 'INPROGRESS' AND strPersonType = 'PLAYER'];
+         my $st = $Data->{'db'}->prepare($query);
+         $st->execute($personID,$sport);
+         my $dref = $st->fetchrow_hashref();
+         return $dref->{'intPersonRequestID'};
+    }
+    return 1;
+}
+#
 1;
