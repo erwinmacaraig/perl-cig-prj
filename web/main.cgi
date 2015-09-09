@@ -326,6 +326,15 @@ use TransferFlow;
 use LoanFlow;
         ( $resultHTML, $pageHeading ) = handleLoanFlow($action, \%Data);
     }
+    elsif ( $action =~ /^PITO_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleIntTransferOutFlow($action, \%Data);
+    }
+    elsif ( $action =~ /^PITR_/ ) {
+use TransferFlow;
+        ( $resultHTML, $pageHeading ) = handleIntTransferReturnFlow($action, \%Data);
+    }
+
     elsif ( $action =~ /^PENDPR_/ ) {
         my $prID = safe_param( 'prID', 'number' );
         my $entityID = getID($Data{'clientValues'},$Data{'clientValues'}{'currentLevel'});

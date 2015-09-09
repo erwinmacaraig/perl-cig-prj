@@ -31,6 +31,12 @@ sub setNotificationType {
 		case "$Defs::PERSON_REQUEST_SELF_TRANSFER" {
             $self->SUPER::setNotificationType('NOTIFICATION_REQUESTSELFTRANSFER_' . $action);
 		}
+        case "$Defs::PERSON_REQUEST_INT_TRANSFER_OUT" {
+            $self->SUPER::setNotificationType('NOTIFICATION_REQUESTINTTRANSFEROUT_' . $action);
+        }
+        case "$Defs::PERSON_REQUEST_INT_TRANSFER_RETURN" {
+            $self->SUPER::setNotificationType('NOTIFICATION_REQUESTINTTRANSFERRETURN_' . $action);
+        }
         else {
         }
     }

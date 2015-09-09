@@ -1,0 +1,25 @@
+[% IF prods.size %]
+<h3 class="panel-header">[% Lang.txt('Additional Products Transaction') %]</h3>
+<div class="panel-body">
+    <table class="listTable products-table table">
+        <thead>
+            <tr>
+                <th class="col-3">[% Lang.txt('Name') %]</th>
+                <th class="col-4">[% Lang.txt('Cost') %]</th>
+            </tr>
+        </thead>
+        <tbody>
+        [% FOREACH p IN prods %]
+            <tr>
+                <td class="col-3"><label for="[% p.strName %]">[% p.strDisplayName %] ([% p.strName %])</label></td>
+                <td class="col-4"><label for="[% p.strName %]price">[% p.curDefaultAmount %]</label></td>
+            </tr>
+        [% END %]
+        <tr>
+            <td align="right">[% Lang.txt('Total') %]:</td>
+            <td class="col-4"> [% total %]</td>  
+        </tr>
+        </tbody>
+    </table>
+</div>
+[% END %]

@@ -1277,12 +1277,16 @@ sub display_summary {
         return ('',2);
     }
 
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+    my ($initialTaskAssigneeLevel, $assigneeRef) = getInitialTaskAssignee(
         $self->{'Data'},
         $personID,
         $regoID,
         0
     );
+
+    print STDERR Dumper "ASSIGNEE " . $initialTaskAssigneeLevel;
+    print STDERR Dumper "COUNT " . scalar(%{$assigneeRef});
+    print STDERR Dumper $assigneeRef;
 
     my %Config = (
         HiddenFields => $self->stringifyCarryField(),

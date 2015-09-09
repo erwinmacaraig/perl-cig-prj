@@ -32,7 +32,7 @@ use ForgottenPassword;
 use Data::Dumper;
 use SelfRegoPersonEdit;
 use PersonUtils;
-
+use SelfUserExtraProductFlow;
 main();
 
 sub main {
@@ -136,7 +136,11 @@ sub main {
     elsif ($action =~ /TRANSFER_/) {
         ($resultHTML, $pageHeading) = handleSelfUserTransfer(\%Data, $user, $action);
     }
-    else {
+    elsif($action =~ /ADD_PROD/){
+        my $extraprod = handleSelfUserExtraProductFlow($action, \%Data, undef);
+        $resultHTML .= $extraprod;       
+    }
+   else {
         # Display login page
         $resultHTML = runTemplate(
             \%Data,

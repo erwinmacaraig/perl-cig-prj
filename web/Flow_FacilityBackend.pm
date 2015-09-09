@@ -829,7 +829,7 @@ sub display_summary {
 
     my $entitySummaryPanel = entitySummaryPanel($self->{'Data'}, $facilityObj->ID());
 
-    my $initialTaskAssigneeLevel = getInitialTaskAssignee(
+    my ($initialTaskAssigneeLevel, $assigneeRef) = getInitialTaskAssignee(
         $self->{'Data'},
         0,
         0,

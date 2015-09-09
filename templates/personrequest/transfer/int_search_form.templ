@@ -1,0 +1,300 @@
+[% USE Dumper %]
+
+    [% IF transferTypeOption != '' %]
+    <!--
+    <span class="label">Transfer type:</span></td><td><span class="formw">[% transferTypeOption %]</span>
+
+    <br/>
+    <br/>
+    <div id="international" style="display: none;">
+        <span>Do You have the Player/'s ITC?</span><span>[% withITC %][% noITC %]</span>
+    </div>
+    -->
+
+    [% END %]
+
+    <br/>
+    <!--<div class="row">-->
+        <div class="col-md-9">
+            <h3 class="panel-header">[% Lang.txt('Transfer Details') %]</h3>
+            <div class="panel-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <span class="notice-error">*[% Lang.txt('Required fields') %]</span>
+                    </div>
+                    <br /><br />
+                    <div class="col-md-12">
+                        <div style="mfloat: left; width: 100%; padding: 0px 8%;">
+                            <div style="width: 100%; float: left; padding: 0px 0px;">
+                                <div class="col-md-5 txtright"><span class="notice-error">*</span> [% Lang.txt('Transfer type') %]:</div>
+                                <div class="col-md-6">
+                                    <div id="int_transfer_type_option" class="toggle-type">
+                                        <a href="#" title="International Transfer Out" id="int_transfer_out" autocomplete="off" class="active">[% Lang.txt('Transfer Out') %]</a>
+                                        <a href="#" title="International Transfer Return" id="int_transfer_return" autocomplete="off" class="">[% Lang.txt('Transfer Return') %]</a>
+                                    </div>
+                                </div> 
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="peoplelookup_form" class="col-md-12">
+                        <form id="personRequestForm" action="main.cgi" method="POST">
+                            
+                            <div style="margin-top: 20px; float: left; width: 100%; padding: 10px 8%;">
+                                <div style="background: #ccc; width: 100%; float: left; padding: 20px 0px;">
+                                    <div class="col-md-5 txtright">[% Lang.txt('Enter name or Member ID') %]:</div>
+                                    <div class="col-md-6">
+
+                                    <input type="text" name="search_keyword" value="[% search_keyword %]">
+                                        <div class="col-md-8 txtleft" style="padding: 5px 0px 0px 0px;"><p id="errorMsg"></p></div>
+                                        <div class="col-md-4 txtright" style="padding: 5px 0px 0px 0px;">
+                                            <input class="btn-inside-panels" type="submit" name="submitb" value="[% Lang.txt('Search') %]">   
+                                            <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+                                            <input type="hidden" value="[% request_type %]" name="request_type">
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                            <center>
+                                <ul class="list-unstyled inline">
+                                    <li class="lblPeoplelookup">
+                                    </li>
+                                    <li class="btnPeoplelookupSearch">
+                                        <!--<button class="btn btn-sm btn-primary" type="submit">Search people</button>-->
+                                        <!--
+                                        <input class="btn-inside-panels" type="submit" name="submitb" value="Search">   
+                                        <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+                                        <input type="hidden" value="[% request_type %]" name="request_type">
+                                        -->
+                                    </li>
+                                </ul>
+                            </center>
+                        </form>
+                    </div>
+                </div>
+                <br/>
+                <div class="row">
+                    <div id="init_error" class="col-md-12" style="display: none">
+                        <div class="alert alert-warning" role="alert">
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>Please select from the Registration(s) below.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        [% IF groupResult %]
+                            <form id="personInitRequest" name="thisisatest" action="main.cgi" method="POST">
+                                <div>
+                                    [% IF groupResult.size > 1 %]
+                                    <div class="alert">
+                                        <div>
+                                        <span class="fa fa-exclamation"></span>
+                                        <p>[% Lang.txt('This person has more than one registration. Please select ones apply to this transfer.') %]
+                                        </p>
+                                    </div>
+                                    </div>
+                                    [% END %]
+
+                                    [% FOREACH result IN groupResult %] 
+                                    	
+                                        <div class="read-only">
+                                            <h4>[% result.key %]</h4>
+                                            <div class="read-only-text">
+
+                                            [% FOREACH sportOption IN result.value %]
+                                                
+                                                <input id="option_[% sportOption.id %]" name="regoselected[[% sportOption.personID %]][[% sportOption.id %]]" type="checkbox"/>
+                                                <label for="option_[% sportOption.id %]">[% Lang.txt(sportOption.sportLabel) %]</label>
+                                                <br/>
+
+                                            [% END %]
+                                            
+                                            </div>
+                                        </div>		
+                                    
+                                    <br/>
+                                    [% END %]
+                                </div>
+
+                                <input type="hidden" value="[% action_request %]" name="a">
+                                <input type="hidden" value="[% client %]" name="client">
+                                <input type="hidden" value="[% request_type %]" name="request_type">
+                                <input type="hidden" value="[% transfer_type %]" name="transfer_type">
+                                <!--<input type="submit" name="submitb" class="btn btn-sm btn-primary" value="Send Request">   -->
+                            </form>
+                        [% END %]
+                    </div>
+                </div>
+            </div>
+            <br />
+            [% IF searchResultGrid %]
+                [% IF searchResultGrid.count %]
+                    [% searchResultGrid.data %]
+                [% ELSE %]
+                    <div>
+                        <div class="alert alert-warning" role="alert">
+                            <div>
+                                <span class="fa fa-exclamation"></span>
+                                <p>[% Lang.txt('No result found for keyword') %] '[% search_keyword %]'.</p>
+                            </div>
+                        </div>
+                    </div>
+                [% END %]
+            [% END %]
+
+
+            <div class = "button-row pull-right">
+            [% IF action_request %]
+            <a class="btn-main sendtransfer-request" data-target="#showSendRequest" data-actiontype="SENDREQUEST" href = "">
+                [% Lang.txt('Send Request') %]
+            </a>
+            [% END %]
+            </div>
+
+        </div>
+
+        <div class="col-md-3">
+            <h3 class="panel-header">[% Lang.txt('Transfer Summary') %]</h3>
+            <div class="panel-body transfer-summary">
+                <div class="row">
+                    <div class="col-md-12">
+                        <p>
+                            <label>[% Lang.txt('Member ID') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.memberID %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('Last Name') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.lastName %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('First Name') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.firstName %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('Transfer to club') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.transferToClub %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('Current club(s)') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% selectedForTransferDetails.currentClub %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('Current registration(s)') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% Lang.txt(selectedForTransferDetails.currentRegistrations) %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                        <p>
+                            <label>[% Lang.txt('Current sport(s)') %]:</label><br />
+                            <label><b>
+                                [% IF(selectedForTransferDetails) %][% Lang.txt(selectedForTransferDetails.currentSports) %][% ELSE %]&#8211;[% END %]
+                            </b></label>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+<div class="modal fade" id="showSendRequest" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" style="z-index:9999;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
+        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Transfer Notes') %]</h4>
+      </div>
+      
+      <form id="personRequestNotes" action="main.cgi" method="POST">
+          <div class="modal-body">
+            <label>[% Lang.txt('Please enter request notes') %]</label>
+            <textarea name="request_notes"></textarea>
+          </div>
+
+          <div id="hiddenfields" style="display: none">
+          </div>
+
+          <div class="modal-footer">
+            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+            <input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
+          </div>
+      </form>
+      
+    </div>
+  </div>
+</div>
+
+    <!--</div>-->
+
+<!--
+    <br /><br />
+    <div id="domestic">
+        <form action="main.cgi" method="POST">
+            <table>
+            <tbody><tr><td><span class="label">Person Lookup:</span></td><td><span class="formw"><input type="text" name="search_keyword" value=""></span></td></tr>
+            <tbody><tr><td><span class="label"></span></td><td><span class="label">Enter Name or Member ID</span></td></tr>
+            </tbody></table>
+            <input type="submit" name="submitb" value="[% Lang.txt('Search') %]">   
+            <input type="hidden" value="[% action %]" name="a"> <input type="hidden" value="[% client %]" name="client">
+            <input type="hidden" value="[% request_type %]" name="request_type">
+        </form>
+    </div>
+    [% script %]
+    -->
+
+
+
+<script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
+<script type="text/javascript">
+    jQuery().ready(function() {
+        
+
+        //$("form#personInitRequest").submit(function(e){
+        //    if($(this).find("input[type=checkbox]:checked").length == 0){
+        //        e.preventDefault();
+        //        $("div#init_error").slideDown();
+        //    }
+        //});
+
+    
+        jQuery("a.sendtransfer-request").click(function(e){
+            e.preventDefault();
+
+            if(jQuery("form#personInitRequest").find("input[type=checkbox]:checked").length == 0){
+                jQuery("div#init_error").slideDown();
+            } else {
+                if(jQuery.trim(jQuery("form#personRequestNotes div#hiddenfields").html()) == "") {
+                    jQuery("form#personRequestNotes div#hiddenfields").append(jQuery("form#personInitRequest input").clone());
+                }
+                jQuery("div#showSendRequest").modal();
+            }
+        });
+        // validate the comment form when it is submitted
+        jQuery("#personRequestNotes").validate({
+            rules: {
+                request_notes: {
+                    required: true
+                }
+            },
+            messages: {
+                request_notes: "[% Lang.txt('Please add notes') %]"
+            }
+        });
+    });
+</script>
+
