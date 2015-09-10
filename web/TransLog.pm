@@ -533,14 +533,14 @@ sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 	#
 	my $TXNEntityID = '';
-	#if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
-	#	$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
-	#}
+	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
+		$TXNEntityID = qq[ AND t.intTXNEntityID = ] . getLastEntityID($Data->{'clientValues'});
+	}
 	my $intTXNEntityID = getEntityID($Data->{'clientValues'});
 	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){                       
             $TXNEntityID .= qq[ AND t.intTXNEntityID = $intTXNEntityID ];                   
-        }
-        elsif($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
+    }
+    elsif(1==2 and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
             my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
             my $st = $Data->{'db'}->prepare($subquery);
             my @clubs = ();
