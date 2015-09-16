@@ -50,9 +50,9 @@
                     <td data-order = "[% rego.otherdetails.dob %]">[% DateFormat.format(rego.otherdetails.dob,'MEDIUM') %]</td>
                     <td>
                     [% IF rego.inProgressRequestExists %]
-                        [% Lang.txt('Request Transfer sent to Club') %]
+                        [% Lang.txt('Request sent') %]
                     [% ELSIF rego.submittedPersonRegistrationExists %]
-                        [% Lang.txt('Request Transfer for approval') %]
+                        [% Lang.txt('Request is subject for approval') %]
                     [% ELSIF rego.acceptedRequestLink %]
                         <a href="[% rego.acceptedRequestLink %]" class="btn-inside-panels">[% Lang.txt('View Request') %]</a>
                     [% ELSE %]
