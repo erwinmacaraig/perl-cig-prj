@@ -1,0 +1,1 @@
+ALTER TABLE tblProducts ADD COLUMN intOldProductID INT DEFAULT 0;
