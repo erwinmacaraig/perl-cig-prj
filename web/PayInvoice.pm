@@ -552,7 +552,7 @@ sub queryInvoiceByOtherInfo {
 	my $isPaid = 0;
 	while(my $dref = $sth->fetchrow_hashref()){		
 		$results = 1;				
-		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" />];	
+		my $selectPay = qq[<input type="checkbox" name="act_$dref->{'intTransactionID'}" class="paytxn_chk" value="$dref->{'TotalAmount'}" id="$dref->{'intTransactionID'}" />];	
 		$selectPay = '' if ($dref->{'GatewayLocked'});
 		$cv{'personID'} = $dref->{'intPersonID'};
                 my $clm=setClient(\%cv);
@@ -586,7 +586,7 @@ sub displayResults {
 	  name => 'Pay',
 	  field => 'selectpay',
 	  width => 20,
-      type => 'HTML',
+          type => 'HTML',
       defaultShow => 1,
     },
 	{
@@ -632,6 +632,7 @@ sub displayResults {
    		 rowdata => $rowdata,   	    
    	     gridid => 'grid',
   	     width => '99%',
+  	     instanceDestroy=>'true',
     );
 
 	### payment settings ###
@@ -663,7 +664,7 @@ sub displayResults {
     $Year+=1900;
     $Month++;
     my $currentDate="$Day/$Month/$Year";
-	#$gateway_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
+	$gateway_body = '' if ! $Data->{'SystemConfig'}{'AllowTXNs_CCs'};
 	for my $i (qw(intAmount strBank strBSB strAccountNum strAccountName strResponseCode strResponseText strReceiptRef strComments intPartialPayment))	{
 		  $Data->{params}{$i}='' if !defined $Data->{params}{$i};
 	}
@@ -690,7 +691,9 @@ sub displayResults {
      if($paymentType==0){ $paymentType='';}
    
 	#
-	$gateway_body .= qq[<input type="hidden" id="id_total" value="0" />];
+	$gateway_body .= qq[<input type="hidden" id="id_total" value="0" />
+	
+	];
 	if ($allowMP and $isManualPaymentAllowedAtThisLevel){
 	$gateway_body .= qq[<div  style="display:none;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
