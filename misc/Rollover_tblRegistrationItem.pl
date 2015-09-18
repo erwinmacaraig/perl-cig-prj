@@ -16,6 +16,8 @@ sub main    {
 
     rolloverRegoItems($db);
 
+
+
 }
 
 sub rolloverRegoItems {
@@ -23,19 +25,21 @@ sub rolloverRegoItems {
 
     my $realmID=2016;
     my $maxOldProductID = 175;
+#SELECT COUNT(R.intItemID) FROM tblRegistrationItem as R INNER JOIN tblProducts as P ON (P.intProductID=R.intID) WHERE strItemType ='PRODUCT' AND intID<175 and R.intRealmID=1;
 
     my ($activeProducts_ref, $activePeriods_ref, $newProductIDs_ref) = setupFINHashes();
 
     my $st = qq[
         SELECT
-            *
+            R.*
         FROM
-            tblRegistrationItem
+            tblRegistrationItem as R
+            INNER JOIN tblProducts as P ON (P.intProductID = R.intID)
         WHERE
-            strItemType = 'PRODUCT'
-            AND intID < $maxOldProductID
-            AND intRealmID=1
-            AND strRuleFor = 'REGO'
+            R.strItemType = 'PRODUCT'
+            AND R.intID <= $maxOldProductID
+            AND R.intRealmID=1
+            AND R.strRuleFor = 'REGO'
     ];
 
     my $stDEL = qq[
@@ -67,7 +71,7 @@ sub rolloverRegoItems {
             intRequired, 
             strPersonEntityRole, 
             strISOCountry_IN, 
-            strISOCountry_NOTIN  
+            strISOCountry_NOTIN,
             intFilterFromAge, 
             intFilterToAge, 
             intItemNeededITC, 
@@ -134,7 +138,7 @@ sub rolloverRegoItems {
                 }
             }
             if ($dref->{'strItemActiveFilterPaidProducts'} =~ /\|/) {
-                my @products= split /\&/, $dref->{'strItemActiveFilterPaidProducts'};
+                my @products= split /\|/, $dref->{'strItemActiveFilterPaidProducts'};
                 foreach my $ExistingProductID (@products)    {
                     $activeProducts.= "|" if ($activeProducts);
                     $activeProducts .= $newProductIDs_ref->{$ExistingProductID};
@@ -143,7 +147,6 @@ sub rolloverRegoItems {
         }
 
         $qryINS->execute(
-            $dref->{'intSubRealmID'},
             $dref->{'intOriginLevel'},
             $dref->{'strRuleFor'},
             $dref->{'strEntityType'},
