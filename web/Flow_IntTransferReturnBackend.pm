@@ -1418,7 +1418,7 @@ sub display_complete {
         ); 
 
         PersonRequest::setRequestStatus($self->{'Data'}, \%task, $Defs::PERSON_REQUEST_STATUS_COMPLETED);
-        PersonRequest::finaliseInternationalTransferOut($self->{'Data'}, $personRequestID);
+        PersonRequest::finaliseInternationalTransferReturn($self->{'Data'}, $personRequestID);
     }
 
     my %PageData = (
