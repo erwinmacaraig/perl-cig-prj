@@ -2957,6 +2957,7 @@ sub updateIntTransferOutRecord {
             PR.intPersonRegistrationID = ?
             AND PQ.strRequestResponse = 'ACCEPTED'
             AND PQ.strRequestStatus = 'COMPLETED'
+            AND IT.intTransferReturn = 0
     ];
 
     my $db = $Data->{'db'};
