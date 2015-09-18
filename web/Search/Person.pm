@@ -1007,6 +1007,9 @@ sub getIntTransferReturn {
         }
     }
 
+    my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
+    $clubID = 0 if $clubID == $Defs::INVALID_ID;
+
     my @memarray = ();
     if(@persons)  {
         my $person_list = join(',',@persons);
@@ -1019,19 +1022,51 @@ sub getIntTransferReturn {
                 tp.strLocalSurname,
                 tp.strNationalNum,
                 tp.dtDOB,
-                pr.intPersonRegistrationID,
-                pr.strStatus
+                PR.intPersonRegistrationID,
+                PR.strStatus,
+                PRQinprogress.intPersonRequestID as existingInProgressRequestID,
+                PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
+                PRQactive.intPersonRequestID as existingPersonRegistrationID,
+                ePR.intPersonRegistrationID as existingPendingRegistrationID
             FROM
                 tblIntTransfer it
             INNER JOIN
-                tblPersonRegistration_$realmID pr ON (pr.intPersonID = it.intPersonID AND pr.intPersonRequestID = it.intPersonRequestID)
+                tblPersonRegistration_$realmID PR ON (PR.intPersonID = it.intPersonID AND PR.intPersonRequestID = it.intPersonRequestID)
             INNER JOIN
                 tblPerson tp ON (tp.intPersonID = it.intPersonID)
+            LEFT JOIN tblPersonRequest AS PRQinprogress ON (
+                PRQinprogress.strRequestType = "INT_TRANSFER_RETURN"
+                AND PRQinprogress.intPersonID = tp.intPersonID
+                AND PRQinprogress.strSport =  PR.strSport
+                AND PRQinprogress.strPersonType = PR.strPersonType
+                AND PRQinprogress.strRequestStatus NOT IN ("PENDING", "COMPLETED", "DENIED", "REJECTED", "CANCELLED")
+            )
+            LEFT JOIN tblPersonRequest AS PRQaccepted ON (
+                PRQaccepted.strRequestType = "INT_TRANSFER_RETURN"
+                AND PRQaccepted.intPersonID = tp.intPersonID
+                AND PRQaccepted.strSport =  PR.strSport
+                AND PRQaccepted.strPersonType = PR.strPersonType
+                AND PRQaccepted.strRequestStatus = "PENDING" AND PRQaccepted.strRequestResponse = "ACCEPTED"
+                AND PRQaccepted.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRegistration_$realmID ePR
+            ON (
+                ePR.intEntityID = "$clubID"
+                AND ePR.intPersonID = tp.intPersonID
+                AND ePR.intRealmID = tp.intRealmID
+                AND ePR.strStatus IN ('PENDING')
+                AND ePR.strSport = PR.strSport
+                AND ePR.strPersonType = PR.strPersonType
+            )
+            LEFT JOIN tblPersonRequest as PRQactive
+            ON  (
+                PRQactive.intPersonRequestID = PR.intPersonRequestID
+                )
             WHERE
                 it.intPersonID IN ($person_list)
                 AND it.intTransferReturn = 0
-                AND pr.strRegistrationNature IN ('INT_TRANSFER_OUT')
-                AND pr.strStatus IN ('ACTIVE')
+                AND PR.strRegistrationNature IN ('INT_TRANSFER_OUT')
+                AND PR.strStatus IN ('ACTIVE')
             ORDER BY
                 it.intPersonID
         ];
@@ -1063,6 +1098,9 @@ sub getIntTransferReturn {
                     ma_id => $pdref->{'strNationalNum'} || '',
                     org => $pdref->{'EntityName'} || '',
                 },
+                inProgressRequestExists => $pdref->{'existingInProgressRequestID'},
+                acceptedRequestLink => $acceptedRequestLink,
+                submittedPersonRegistrationExists => $pdref->{'existingPendingRegistrationID'},
             };
 
             $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = "ACTIVE";
