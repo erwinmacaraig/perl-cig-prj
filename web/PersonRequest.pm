@@ -2946,7 +2946,7 @@ sub updateIntTransferOutRecord {
         INNER JOIN
             tblPersonRequest PQ ON (PQ.intExistingPersonRegistrationID = PR.intPersonRegistrationID AND PQ.intPersonID = PR.intPersonID)
         INNER JOIN
-            tblIntTransfer IT ON (IT.intPersonRequestID = PQ.intPersonRequestID AND IT.intPersonID = PQ.intPersonID)
+            tblIntTransfer IT ON (IT.intPersonID = PQ.intPersonID AND IT.strSport = PQ.strSport AND IT.strPersonType = PQ.strPersonType AND IT.strPersonOutLevel = PQ.strPersonLevel)
         SET
             PR.strPreTransferredStatus = PR.strStatus,
             PR.strStatus = ?,
@@ -2957,6 +2957,7 @@ sub updateIntTransferOutRecord {
             PR.intPersonRegistrationID = ?
             AND PQ.strRequestResponse = 'ACCEPTED'
             AND PQ.strRequestStatus = 'COMPLETED'
+            AND IT.intTransferReturn = 0
     ];
 
     my $db = $Data->{'db'};
