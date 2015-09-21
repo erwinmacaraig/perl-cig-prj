@@ -86,7 +86,7 @@ sub send {
 		$outputparams{'text'} = $params{'TextMessage'};
 	}
 	if($params{'HTMLMessage'})	{
-		$outputparams{'html'} = $params{'HTMLMessage'};
+ 		$outputparams{'html'} = $params{'HTMLMessage'};
 	}
 	if($params{'ReplyToAddress'})	{
 		$outputparams{'replyto'} = $params{'ReplyToAddress'};
@@ -143,6 +143,9 @@ sub send {
     for my $k (keys %outputparams) {
         $content .= qq[------------------------------400f182a9360\r\nContent-Disposition: form-data; name="$k"\r\nContent-Type: text/html\r\n\r\n$outputparams{$k}\r\n];
     }
+    $content .= qq[------------------------------400f182a9360\r\n];
+    $content .= qq[------------------------------400f182a9360------------------------------\r\n];
+
     my $url = 'https://sendgrid.com/api/mail.send.json';
     my $ua = LWP::UserAgent->new();
     #my $req = POST $url, \%outputparams;
@@ -150,6 +153,7 @@ sub send {
     $req->content_type("multipart/form-data; boundary=----------------------------400f182a9360");
     $req->content($content);
     $req->content_length(length($content));
+
     my $res= $ua->request($req);
 	my $retvalue = $res->content() || '';
 	my $retvalues = from_json($retvalue);
