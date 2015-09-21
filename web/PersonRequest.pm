@@ -942,6 +942,7 @@ sub displayCompletedRequest {
     my @rowdata;
     my %personDetails;
     my $itemRequestType;
+    my $requestToMA =  '';
 
     for my $request (@{$personRequests}) {
         $itemRequestType = $Data->{'lang'}->txt($Defs::personRequest{$request->{'strRequestType'}} . " Request for") if $rtype eq $Defs::PERSON_REQUEST_TRANSFER;
@@ -960,13 +961,18 @@ sub displayCompletedRequest {
 
         $error = 1 if($entityID != $request->{'intRequestFromEntityID'});
 
+        if($rtype eq $Defs::PERSON_REQUEST_INT_TRANSFER_RETURN) {
+            my $maObj =  getInstanceOf($Data, 'national');
+            $requestToMA = $maObj->name();
+        }
+
         push @rowdata, {
             id => $request->{'intPersonRequestID'} || 0,
             personID => $request->{'intPersonID'} || 0,
             sport => $Defs::sportType{$request->{'strSport'}},
             personType => $Defs::personType{$request->{'strPersonType'}},
             requestFrom => $request->{'requestFrom'} || '',
-            requestTo => $request->{'requestTo'} || '',
+            requestTo => $requestToMA || $request->{'requestTo'} || '',
             requestType => $itemRequestType,
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
             #SelectLink => $selectLink,
@@ -1134,6 +1140,7 @@ sub viewRequest {
 
     my $templateFile = undef;
     my $error = undef;
+    my $requestToMA =  '';
 
     switch($request->{'strRequestType'}) {
         case ["$Defs::PERSON_REQUEST_TRANSFER"] {
@@ -1177,7 +1184,11 @@ sub viewRequest {
             $requestType = $Defs::PERSON_REQUEST_INT_TRANSFER_OUT;
         }
         case ["$Defs::PERSON_REQUEST_INT_TRANSFER_RETURN"] {
+            print STDERR Dumper $request;
             if($request->{'intPersonRequestID'} and $request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED) {
+                my $maObj = getInstanceOf($Data, 'national');
+                $requestToMA = $maObj->name();
+
                 $templateFile = "personrequest/transfer/int_holding_club_view.templ";
             }
             else {
@@ -1217,7 +1228,7 @@ sub viewRequest {
 
         'requestFromTo' => $request->{'requestFromTo'} || '',
 
-        'requestTo' => $request->{'requestTo'} || '',
+        'requestTo' => $requestToMA || $request->{'requestTo'} || '',
         'requestToDiscipline' => $lang->txt($Defs::entitySportType{$request->{'requestToDiscipline'}}) || '',
         'requestToISOCountry' => $isocountries->{$request->{'requestToISOCountry'}} || '',
         'requestToAddress' => $request->{'requestToAddress'} || '',
