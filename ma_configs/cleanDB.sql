@@ -20,6 +20,8 @@ DELETE FROM tblTransLog_Counts;
 DELETE FROM tblOldSystemAccounts;
 
 DELETE FROM tblWFTask;
+DELETE FROM tblWFTaskNotes;
+DELETE FROM tblWFTaskPreReq;
 DELETE FROM tblAuditLog;
 
 DELETE FROM tblUploadedFiles;
