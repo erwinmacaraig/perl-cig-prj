@@ -611,12 +611,17 @@ sub displayRegoFlowComplete {
             originLevel => $originLevel,
             originClient => $originClient,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
+            ConfirmationHeader => $Data->{'lang'}->txt("Registration has been submitted for approval"),
         );
         
+
+        print STDERR Dumper %PageData;
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT) {
+            $PageData{'ConfirmationHeader'} = $Data->{'lang'}->txt("Player has been marked as Transferred Out");
+
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/out_complete.templ') || '';
         }
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN) {
