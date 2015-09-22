@@ -734,7 +734,7 @@ sub _validate {
                   if !Mail::RFC822::Address::valid($_);
             }
         }
-        elsif( $t eq 'DATEMORETHAN') {
+        elsif( $t eq 'SS_DATEMORETHAN') {
             my($year_before,$month_before,$day_before) = $num1 =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
             my($year_ahead,$month_ahead,$day_ahead) = $val =~/(\d\d\d\d)-(\d{1,2})-(\d{1,2})/;
             my $deltaDays = -1;
@@ -1260,7 +1260,7 @@ sub generate_clientside_validation {
                     $valinfo{'messages'}{ $field_prefix . $k . '_dummyvalidator' }{'validDate'} = $self->txt("Date is invalid");
 
                 }
-                elsif ($t eq 'DATEMORETHAN') {
+                elsif ($t eq 'CS_DATEMORETHAN') {
                     #num1 is the target date dummy field that we want dateTo to be compared with
                     my $targetdummyfield = $field_prefix . $num1 . '_dummyvalidator';
 
