@@ -2951,6 +2951,7 @@ sub updateIntTransferOutRecord {
             PR.strPreTransferredStatus = PR.strStatus,
             PR.strStatus = ?,
             IT.dtTransferReturn = NOW(),
+            PR.dtTo = NOW(),
             IT.intTransferReturn = 1,
             IT.strPersonReturnLevel = ?
         WHERE
