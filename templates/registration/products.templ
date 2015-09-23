@@ -113,9 +113,10 @@
         [% END %]
         [% loopcount = loopcount + 1 %]
                 [% END %]
-                <input type="hidden" id="TotalAmountUnformatted" value="[% totalAmountUnpaid %]" />
+                <!--<input type="hidden" id="TotalAmountUnformatted" value="[% totalAmountUnpaid %]" />-->
 
         [% END %]
+                <input type="hidden" id="TotalAmountUnformatted" value="[% totalAmountUnpaid %]" />
         [% UNLESS HideTotal %]
                 <tr class="product-row ">
                         <td>&nbsp;</td>

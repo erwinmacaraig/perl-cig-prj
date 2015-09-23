@@ -59,7 +59,7 @@ sub savePlayerPassport{
             AND PR.dtFrom IS NOT NULL
         HAVING
             PRToCalc > When10
-            ORDER BY PR.dtFrom, orderdtTo
+            ORDER BY PR.dtFrom, orderdtTo, PR.dtAdded
     ];	
     #ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom
 
