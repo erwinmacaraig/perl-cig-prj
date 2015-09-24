@@ -110,13 +110,29 @@ sub checkRulePaymentFlagActions {
     while (my $dref = $q->fetchrow_hashref())   {
         if ($dref->{'intAutoActivateOnPayment'} == 1)   {
             if ($personRegistrationID)  {
+                my $stNP = qq[
+                    SELECT 
+                        IF((NP.intCurrentNew=1 or NP.intCurrentRenewal=1 or NP.intCurrentTransfer=1 or NP.dtFrom>NOW() or (NP.dtFrom<NOW() and NP.dtTo>NOW())), 1, 0) as ActiveStatus
+                    FROM 
+                        tblPersonRegistration_$Data->{'Realm'} as PR
+                        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+                    WHERE
+                        PR.intPersonID = ?
+                        AND PR.intEntityID = ?
+                        AND PR.intPersonRegistrationID = ?
+                ];
+                my $qNP= $Data->{'db'}->prepare($stNP);
+                $qNP->execute($personID, $entityID, $personRegistrationID);
+                my $activeNP = $qNP->fetchrow_array() || 0;
+                my $newStatus = $activeNP ? $Defs::PERSONREGO_STATUS_ACTIVE : $Defs::PERSONREGO_STATUS_PASSIVE;
+
                 my $stUPD = qq[
                     UPDATE tblPersonRegistration_$Data->{'Realm'}
                     SET 
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
                         dtFrom = IF(strRegistrationNature IN ('TRANSFER','DOMESTIC_LOAN','INTERNATIONAL_LOAN'),dtFrom, NOW()),
-                        strStatus = 'ACTIVE', 
+                        strStatus = ?,
                         intWasActivatedByPayment = 1
                     WHERE 
                         intPersonID = ?
@@ -129,9 +145,9 @@ sub checkRulePaymentFlagActions {
                         AND intPaymentRequired=0
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
-                $qUPD->execute($personID, $entityID, $personRegistrationID);
+                $qUPD->execute($newStatus, $personID, $entityID, $personRegistrationID);
 
-                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, -1)
+                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $newStatus, -1)
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
