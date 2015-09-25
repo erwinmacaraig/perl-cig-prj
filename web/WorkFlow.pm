@@ -2360,6 +2360,8 @@ sub rejectTask {
   	###
 
     if($task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER
+        or $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT
+        or $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN
         or $task->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN) {
         #check for pending tasks?
 
