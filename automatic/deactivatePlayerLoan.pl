@@ -26,7 +26,7 @@ use strict;
         FROM
             tblPersonRequest prq
         INNER JOIN
-            tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonRequestID = prq.intPersonRequestID)
+            tblPersonRegistration_$Data{'Realm'} pr ON (pr.intPersonID = prq.intPersonID AND pr.intPersonRequestID = prq.intPersonRequestID)
         WHERE
             pr.strStatus IN ('ACTIVE', 'ROLLED_OVER')
             AND prq.strRequestType = 'LOAN'
