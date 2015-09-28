@@ -1199,6 +1199,11 @@ sub displayRegoFlowProductsBulk {
         return '';
     }
 
+    my $maObj = getInstanceOf($Data, 'national');
+    my $maName = $maObj
+        ? $maObj->name()
+        : '';
+
      my %PageData = (
         nextaction=>"PREGFB_PU",
         target => $Data->{'target'},
@@ -1210,6 +1215,7 @@ sub displayRegoFlowProductsBulk {
         Lang => $Data->{'lang'},
         NoFormFields =>1,
         client=>$client,
+	AssociationName => $maName,
 	amountCheck => $totalamountchk,
 	payMethod => $rego_ref->{'payMethod'},
     );
