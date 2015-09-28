@@ -364,6 +364,17 @@ sub printReport    {
   <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<script>
+var _prum = [['id', '5608cbd0abe53dde140437a7'],
+             ['mark', 'firstbyte', (new Date()).getTime()]];
+(function() {
+    var s = document.getElementsByTagName('script')[0]
+      , p = document.createElement('script');
+    p.async = 'async';
+    p.src = '//rum-static.pingdom.net/prum.min.js';
+    s.parentNode.insertBefore(p, s);
+})();
+</script>
       <title>$title</title>
             <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
     </head>
@@ -393,6 +404,17 @@ sub printBasePage {
       <title>$title</title>
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
             <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.21/jquery-ui.min.js"></script>
+<script>
+var _prum = [['id', '5608cbd0abe53dde140437a7'],
+             ['mark', 'firstbyte', (new Date()).getTime()]];
+(function() {
+    var s = document.getElementsByTagName('script')[0]
+      , p = document.createElement('script');
+    p.async = 'async';
+    p.src = '//rum-static.pingdom.net/prum.min.js';
+    s.parentNode.insertBefore(p, s);
+})();
+</script>
             <link rel="stylesheet" type="text/css" href="js/jquery-ui/css/theme/jquery-ui-1.8.22.custom.css">
             <script type="text/javascript" src="$Defs::base_url/js/jquery.ui.touch-punch.min.js"></script>
       <link rel="stylesheet" type="text/css" href="$Defs::base_url/css/style.css">
