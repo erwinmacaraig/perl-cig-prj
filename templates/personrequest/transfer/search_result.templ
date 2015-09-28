@@ -6,8 +6,8 @@
 				<th style="width: 18%">[% Lang.txt('Member ID') %]</th>
 				<th>[% Lang.txt('Name') %]</th>
 				<th>[% Lang.txt('Organisation') %]</th>
-				<th>[% Lang.txt('Sport') %]</th>
-				<th>[% Lang.txt('Date of Birth') %]</th>
+				<th class="res-invisible">[% Lang.txt('Sport') %]</th>
+				<th class="res-invisible">[% Lang.txt('Date of Birth') %]</th>
 				<th>&nbsp;</th>
 			</tr>
 			<tr>
@@ -20,7 +20,7 @@
 				<td>
                     <input style="padding: 5px" class="search-org" type="text" placeholder="[% Lang.txt('Search Organisation') %]"/>
 		        </td>
-				<td>
+				<td class="res-invisible">
 					<select class="filter-sport">
                         <option value="">-- [% Lang.txt('All') %] --</option>
                         [% FOREACH sport IN Filters.sports %]
@@ -28,7 +28,7 @@
                         [% END %]
 			        </select>
 		        </td>
-				<td>
+				<td class="res-invisible">
 					<select class="sort-dob">
 			          <option value="">-- [% Lang.txt('Sort') %] --</option>
 			          <option value="desc">[% Lang.txt('Youngest') %]</option>
@@ -41,8 +41,8 @@
 				<th></th>
 				<th></th>
 				<th></th>
-				<th></th>
-				<th></th>
+				<th class="res-invisible"></th>
+				<th class="res-invisible"></th>
 				<th></th>
 			</tr>
 		</thead>
@@ -52,8 +52,8 @@
                     <td>[% rego.otherdetails.ma_id %]</td>
                     <td><span class="fa fa-user"></span>[% rego.name %]</td>
                     <td>[% rego.otherdetails.org %]</td>
-                    <td>[% rego.sport %]</td>
-                    <td data-order = "[% rego.otherdetails.dob %]">[% DateFormat.format(rego.otherdetails.dob,'MEDIUM') %]</td>
+                    <td class="res-invisible">[% rego.sport %]</td>
+                    <td class="res-invisible" data-order = "[% rego.otherdetails.dob %]">[% DateFormat.format(rego.otherdetails.dob,'MEDIUM') %]</td>
                     <td>
                     [% IF rego.inProgressRequestExists %]
                         [% Lang.txt('Request Transfer sent to Club') %]
