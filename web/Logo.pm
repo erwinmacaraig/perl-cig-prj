@@ -22,6 +22,13 @@ use UploadFiles;
 use FormHelpers;
 
 
+
+#functions
+
+#getLogo
+#showLogo
+#updateLogo - from documentId
+
 sub showLogo	{
 	my(
 		$Data, 

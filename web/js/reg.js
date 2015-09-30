@@ -16,9 +16,13 @@ function dialogform(url, title, width, height,data) {
 	if(data) {d.html(unescape(data));}
 }
 
-function docViewer(id, params) {
+function docViewer(id, params, script) {
     jQuery('#docViewerOverlay').remove();
-    var url = 'viewer.cgi?' + params + '&f=' + id;
+    filename = 'viewer.cgi';
+    if(script) { 
+        filename = script;
+    }
+    var url = filename + '?' + params + '&f=' + id;
     window.scrollTo(0,0);
     var d = jQuery('<div id = "docViewerOverlay"><iframe id="docViewerPage" src = "' + url +'" scrolling="yes"></iframe>');
 	jQuery('body').append(d);
