@@ -2427,7 +2427,7 @@ header .navbar-brand {
 }
 @media (min-width: 480px) and (max-width: 768px) {
   header .logo-area ul { float: right; margin-top: 10px }
-  header .logo-area ul li { margin: 0px 15px 10px 0px; float: none;text-align: center}
+  header .logo-area ul li { margin: 0px 15px 0px 0px; float: none;text-align: center}
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
   .navbar-collapse { border-top: none; box-shadow: none; }
@@ -2472,7 +2472,7 @@ header .navbar-brand {
   #worktasks_filter { text-align: right; }
   /*.summaryPanel { display: none; }*/
   div.dataTables_filter label { color: #000; }
-  div.row span.formw { width: 80%; }
+  div.row span.formw { width: 75%; }
 /*  #searchResult { width: 722px!important; }*/
   div.dashboard-tasklist table th { font-size: 12px; }
   div.dashboard-tasklist table td { font-size: 12px; }
