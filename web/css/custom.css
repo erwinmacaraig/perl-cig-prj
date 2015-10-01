@@ -639,7 +639,7 @@ th {
   color: #fff;
   }
   .logo-area{
-    display: none;
+    /* display: none; */
   }
   #ROallfields-wrapper, #ROreportselect-wrapper  {
     width:100%;
