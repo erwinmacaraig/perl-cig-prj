@@ -461,6 +461,10 @@ select {
     line-height:auto;
 }
 
+.chosen-container {
+	max-width: 100%;
+}
+
 .toggle a {
 	background: #d8d8d8;
 	border: 1px solid #cccccc;
