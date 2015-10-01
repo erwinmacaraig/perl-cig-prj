@@ -2484,6 +2484,10 @@ header .navbar-brand {
     	float: none !important;
     /* clear: both; */
 	}
+
+	.table {
+    	display: block !important;
+	}
    
    /*#grid_wrapper #grid th:nth-child(3) { display: none; } 
    #grid_wrapper #grid td:nth-child(3) { display: none; } 
