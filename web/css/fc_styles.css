@@ -2373,6 +2373,11 @@ header .navbar-brand {
 .product-row td:nth-child(2), .product-row td:nth-child(3) {
   display: none;
 }
+
+.product-row td.col-4 {
+  min-width: 65px;
+}
+
 .products-table .product-row:last-child {
     background: rgb(214, 214, 214);
 }
