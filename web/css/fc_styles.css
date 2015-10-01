@@ -2005,6 +2005,7 @@ a.HTdisabled, a.HTdisabled:hover {
 .document-upload.summary .club-details .details-left {
 	width: 60%;
 	float:left;
+	word-wrap: break-word;
 }
 
 .document-upload.summary .club-contact-details .details-left {
@@ -2015,6 +2016,7 @@ a.HTdisabled, a.HTdisabled:hover {
 .document-upload.summary .organization-details .details-left {
 	width: 70%;
 	float:left;
+	word-wrap: break-word;
 }
 
 .toppadding {
