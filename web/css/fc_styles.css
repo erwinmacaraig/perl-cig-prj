@@ -1865,14 +1865,23 @@ i.documents-rejected {
 
 #ffg_venue td {
 	font-size: 12px;
+	display: table-cell !important;
 }
+
+#ffg_venue th {
+	font-size: 12px;
+	display: table-cell !important;
+}
+
 #ffg_venue td input[type="text"] {
 	width: 100%;
 	padding: 5px 0px;
+	outline:  none;
 }
 #ffg_venue td select {
 	width: 100%;
 	border: 1px solid #cccccc;
+	outline:  none;
 }
 
 /*a class called upon a condition on the complete screen - 
@@ -2390,6 +2399,10 @@ header .navbar-brand {
 		width: 100% !important;
 	}
 	form#flowFormID #fsg-core label {
+		margin-top: 6px;
+		text-align: left !important
+	}
+	.control-label.txtright  {
 		margin-top: 6px;
 		text-align: left !important
 	}
