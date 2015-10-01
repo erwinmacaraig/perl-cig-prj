@@ -2446,6 +2446,10 @@ header .navbar-brand {
     font-size: 12px;
   }
 
+	.table {
+		display: block !important;
+	}
+
   .progressFlow .col-md-2{ width: 100%; }
   h2.main-heading { font-size: 30px; margin-top: 0px; }
   #worktasks_length { display: none; }
