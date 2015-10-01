@@ -34,7 +34,7 @@ pre.prettyprint {
          url('fonts/noto-sans/notosans-bold-webfont.svg#noto_sansbold') format('svg');
     font-weight: normal;
     font-style: normal;
-s}
+}
 
 @font-face {
     font-family: 'noto_sansbold_italic';
@@ -372,6 +372,10 @@ strong {
     padding: 5px;
     width: 71%;*/
 }
+.step {
+    min-width: 150px !important;
+}
+
 div.showrecoptions form#personDocAdd, div.showrecoptions form#entityDocAdd {
 	position: relative;
 }
@@ -912,6 +916,8 @@ table tr.new-task {
     background-color: #33a7f2;
 }
 div.dataTables_filter label { color: #000; }
+
+.responsiveTablesDropDown button{margin: 6px 5px !important;}
 /*----Temporary Styles-----*/
 
 
@@ -1909,8 +1915,9 @@ form#flowFormID h3.panel-header {
 form#flowFormID #fsg-core label {
 	margin-top: 6px;
 }
-form#flowFormID #fsg-main label {
+form#flowFormID #fsg-main label.txtright {
 	margin-top: 6px;
+	text-align: left;
 }
 form#flowFormID #fsgw-other label {
 	margin-top: 6px;
@@ -2059,11 +2066,6 @@ header nav.navbar-default .container ul li a.focus {
 	width: 50%;
 }
 
-#grid_wrapper  {
-	max-width: 100%;
-    overflow: scroll;
-    clear: both;
-}
 
 #grid_wrapper #grid {
 	width: 100% !important;
@@ -2378,11 +2380,24 @@ header .navbar-brand {
 	#flowFormID .col-md-6{
 		width: 100% !important;
 	}
+	form#flowFormID #fsg-main label.txtright {
+		margin-top: 6px;
+		text-align: left;
+	}
 }
 
 @media (max-width: 992px){
 	.result-message { padding: 0; }
 }
+
+@media (min-width: 800px){
+	#grid_wrapper  {
+		max-width: 100%;
+	    overflow: scroll;
+	    clear: both;
+	}
+}
+
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }
 }
@@ -2440,7 +2455,7 @@ header .navbar-brand {
   .navbar-default .navbar-nav .open .dropdown-menu > li > a {
     color:#000; 
   }
-  .responsiveTablesDropDown button{margin: 6px!important;}
+  .responsiveTablesDropDown button{margin: 0px 5px !important;}
 
   
   .fa-user, .fa-clock-o { display: none; }
