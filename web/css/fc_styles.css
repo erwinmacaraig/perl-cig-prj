@@ -2292,6 +2292,10 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-insid
 	font-size:13px;
 }
 
+.transaction_container .res-wrapper table > thead > tr > th:first-child, .transaction_container .res-wrapper table > tbody > tr > td:first-child{
+	display: table-cell;
+}
+
 .subtext {
 	margin-top:10px;
 	margin-bottom:10px;
