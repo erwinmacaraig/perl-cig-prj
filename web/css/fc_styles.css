@@ -2385,9 +2385,9 @@ header .navbar-brand {
 	#flowFormID .col-md-6{
 		width: 100% !important;
 	}
-	form#flowFormID #fsg-main label.txtright {
+	form#flowFormID #fsg-core label {
 		margin-top: 6px;
-		text-align: left;
+		text-align: left !important
 	}
 }
 
