@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS tmpEntity;
 CREATE TABLE tmpEntity (
     intID INT NOT NULL AUTO_INCREMENT,
     strFileType varchar(30) default '',
+    strParentCode varchar(45) default '',
     strEntityCode varchar(30) default '',
     strNationalNum varchar(30) default '',
     strStatus varchar(30) default '',

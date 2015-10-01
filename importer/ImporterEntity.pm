@@ -81,11 +81,40 @@ sub insertEntityRecord {
     ];
     my $qryINS= $db->prepare($stINS) or query_error($stINS);
 
+    my $stELINS = qq[
+        INSERT INTO tblEntityLinks (
+            intParentEntityID,
+            intChildEntityID,
+            intPrimary,
+            intImportID
+        )
+        VALUES (
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $qryELINS= $db->prepare($stELINS) or query_error($stELINS);
+ 
     my $st = qq[
         SELECT * FROM tmpEntity WHERE strFileType= ?
     ];
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute($type);
+    
+    my $stMRAs = qq[
+        SELECT strImportEntityCode, intEntityID
+        FROM tblEntity
+        WHERE intEntityLevel > 3
+    ];
+    my $qryMRAs = $db->prepare($stMRAs) or query_error($stMRAs);
+    $qryMRAs->execute();
+    my %ParentIDs=();
+    while (my $dref = $qryMRAs->fetchrow_hashref())  {
+        $ParentIDs{$dref->{'strImportEntityCode'}} = $dref->{'intEntityID'};
+    }
+
     while (my $dref= $qry->fetchrow_hashref())    {
         my $status = $dref->{'strStatus'};
         my $localLang = 0; ## NEEDS LINKING TO tmpPerson.strLocalLanguage
@@ -93,6 +122,7 @@ sub insertEntityRecord {
         my $otherIdentifierType = 0;
         
         my $entityLevel = 3;
+        my $parentEntityID = $ParentIDs{$dref->{'strEntityParentCode'}} || 0;
         
         if ($maCode eq 'HKG')   {
             ## Config here for HKG
@@ -129,6 +159,12 @@ sub insertEntityRecord {
             $dref->{'dtIdentifierTo'}
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
+        $qryELINS->execute(
+            $parentEntityID,
+            $ID, 
+            1, 
+            $dref->{'intID'}
+        );
     }
 }
 
@@ -189,6 +225,7 @@ while (<INFILE>)	{
 	    $parts{'OTHERIDENTIFIERCOUNTRY'} = $fields[17] || ''; 
 	    $parts{'OTHERIDENTIFIER_dtFROM'} = $fields[18] || '0000-00-00'; 
 	    $parts{'OTHERIDENTIFIER_dtTO'} = $fields[19] || '0000-00-00'; 
+	    $parts{'PARENTCODE'} = $fields[20] || ''; 
         
     }
 	if ($countOnly)	{
@@ -218,9 +255,11 @@ while (<INFILE>)	{
             strIdentifierType,
             strIdentifierCountryIssued,
             dtIdentifierFrom,
-            dtIdentifierTo
+            dtIdentifierTo,
+            strParentCode
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -264,7 +303,8 @@ while (<INFILE>)	{
 	    $parts{'OTHERIDENTIFIERTYPE'},
 	    $parts{'OTHERIDENTIFIERCOUNTRY'},
 	    $parts{'OTHERIDENTIFIER_dtFROM'},
-	    $parts{'OTHERIDENTIFIER_dtTO'}
+	    $parts{'OTHERIDENTIFIER_dtTO'},
+	    $parts{'PARENTCODE'}
     ) or print "ERROR";
 }
 $count --;
