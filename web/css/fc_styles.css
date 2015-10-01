@@ -2537,8 +2537,11 @@ header .navbar-brand {
   div.dashboard-tasklist table th { font-size: 10px; }
   div.dashboard-tasklist table td { font-size: 10px; }
 
-
-  header .logo-area { /* display:none; */ }
+	.pageHeading + .logout-wrap {
+	    margin-top: 50px;
+	}
+	
+  header .logo-area { display:none; }
   header .logo-area ul li { margin: 0px 15px 0px 0px; }
   .row { margin-bottom: -18px; }
   #spmain-navbar-collapse {overflow-y: hidden; margin-bottom: 10px;}
@@ -2557,7 +2560,7 @@ header .navbar-brand {
   td { font-size: 12px; }
   #worktasks tr td a.btn-inside-panels { font-size: 11px; }
   #worktasks #toggleGd_intTaskType a { font-size: 12px; }
-  .utilities { /* display: none; */ }
+  .utilities { display: none; }
   /*.logo-area { display: none; }*/
   .dataTables_info, .dataTables_length, .order-override { display: none; }
 	div#worktasks_filter {
