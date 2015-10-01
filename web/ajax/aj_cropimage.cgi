@@ -71,7 +71,7 @@ sub main	{
           );
         }
         if(!$error) {
-          #putFileToS3($filekey,$tempfilename);
+          putFileToS3($filekey,$tempfilename);
         }
         unlink $tempfilename;
       }

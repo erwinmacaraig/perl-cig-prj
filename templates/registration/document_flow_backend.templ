@@ -1,6 +1,6 @@
 
-<link rel="stylesheet" type="text/css" href="js/cropper/cropper.css">
-<script type="text/javascript" src="js/cropper/cropper.js"></script>
+<link rel="stylesheet" type="text/css" href="js/cropper/cropper.min.css">
+<script type="text/javascript" src="js/cropper/cropper.min.js"></script>
 
 
 <div class="document-upload">
@@ -70,7 +70,12 @@
 							[% END %]		
 						</form>
                         [% IF doc.ImageCrop %]
-                        <a href=#" class = "btn btn-primary crop-btn" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                        <div class = "crop-data-row" id = "crop-data-row-[% doc.ID %]">
+                            <a href=#" class = "btn btn-primary crop-btn crop-text-initial-[% doc.ID %]" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                            <p class = "crop-text-complete-[% doc.ID %] crop-text-complete">[% Lang.txt('Cropping Complete') %]</p>
+                            <div class="crop-preview-raw[% doc.ID %] preview-sm preview-raw"></div>
+                            <div class="crop-preview-[% doc.ID %] preview-sm"></div>
+                        </div>
                         [% END %]
 						<script>
 							var doc;
@@ -91,6 +96,9 @@
 										doc = response;		
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
+                                        jQuery('#crop-data-row-' + fObject.docTypeID).show();
+                                        jQuery('#crop-text-initial-' + fObject.docTypeID).show();
+                                        jQuery('#crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);								
 									});								
 									this.on("removedfile", function(file, response){
@@ -196,7 +204,12 @@
 							[% END %]
 						</form>
                         [% IF doc.ImageCrop %]
-                        <a href=#" class = "btn btn-primary crop-btn" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                        <div class = "crop-data-row" id = "crop-data-row-[% doc.ID %]">
+                            <a href=#" class = "btn btn-primary crop-btn crop-text-initial-[% doc.ID %]" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                            <p class = "crop-text-complete-[% doc.ID %]">[% Lang.txt('Cropping Complete') %]</p>
+                            <div class="crop-preview-raw[% doc.ID %] preview-sm preview-raw"></div>
+                            <div class="crop-preview-[% doc.ID %] preview-sm"></div>
+                        </div>
                         [% END %]
 						<script>
 							var doc;
@@ -214,6 +227,9 @@
 										doc = response;	
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
+                                        jQuery('#crop-data-row-' + fObject.docTypeID).show();
+                                        jQuery('#crop-text-initial-' + fObject.docTypeID).show();
+                                        jQuery('#crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);	
 									});								
 									this.on("removedfile", function(file, response){
@@ -261,13 +277,15 @@
       </div>
       <div class="modal-body">
         <div class = "modal-body-content">
-            <div class="btn-group">
-              <button title="[% Lang.txt('Rotate Left') %]"  id = "cropper-rotate-left" class="btn btn-primary" type="button">
-                  <span class="fa fa-rotate-left"></span>
-              </button>
-              <button title="[% Lang.txt('Rotate Right') %]" id = "cropper-rotate-right" class="btn btn-primary" type="button">
-                  <span class="fa fa-rotate-right"></span>
-              </button>
+            <div id = "cropper-buttons">
+                <div class="btn-group">
+                  <button title="[% Lang.txt('Rotate Left') %]"  id = "cropper-rotate-left" class="btn btn-primary" type="button">
+                      <span class="fa fa-rotate-left"></span>
+                  </button>
+                  <button title="[% Lang.txt('Rotate Right') %]" id = "cropper-rotate-right" class="btn btn-primary" type="button">
+                      <span class="fa fa-rotate-right"></span>
+                  </button>
+                </div>
             </div>
             <div id="cropper-image">
               <img id = "crop-image">
@@ -278,22 +296,44 @@
   </div>
 </div>
 <style>
-#cropper-image {
+#cropper-image, #cropper-buttons {
     margin-left:auto;
     margin-right:auto;
+}
+#cropper-buttons {
+    width:200px;
+}
+.preview-raw {
+    display:none;
+}
+.preview-sm {
+    width:80px;
+    height:120px;
+    overflow:hidden;
+    float:right;
+    border:1px solid #acacac;
+}
+.crop-data-row {
+    padding:10px;
+    display:none;
+}
+.crop-text-complete {
+    display:none;
 }
 
 </style>
 
 <script>
   jQuery().ready(function(){
-    var fileID =[% doc.intFileID %];
     var cropBoxData;
     var canvasData;
     jQuery('.crop-btn').on('click', function () {
         doctype = jQuery(this).attr('data-doctype');
-        url = 'viewfile.cgi?client=[% client %]&amp;f=' + jQuery('#fileId_' + doctype).val();
+        fileId = jQuery('#fileId_' + doctype).val();
+        url = 'viewfile.cgi?client=[% client %]&amp;f=' + fileId;
         jQuery('#crop-image').attr('src',url);
+        jQuery('#crop-image').attr('data-doctype',doctype);
+        jQuery('#crop-image').attr('data-fileId',fileId);
         jQuery('#cropper-modal').modal();
     });
 
@@ -318,22 +358,29 @@
       cropBoxData = \$image.cropper('getCropBoxData');
       canvasData = \$image.cropper('getCanvasData');
       d = \$image.cropper('getData');
+      fileID = jQuery('#crop-image').attr('data-fileId');
+      docType = jQuery('#crop-image').attr('data-doctype');
       jQuery.ajax({
           method: "POST",
           url:"[% BaseURL %]/ajax/aj_cropimage.cgi",
           data:'x=' + d.x + '&y=' + d.y + '&width=' + d.width + '&height=' + d.height + '&rotate=' + d.rotate + '&scaleX=' + d.scaleX + '&scaleY=' + d.scaleY + "&f=" + fileID + "&client=[% client %]"
       }).done(function()    {
-        var \$image = jQuery('#cropper-image > img');
-        \$image.cropper('destroy');
       });
-      $(this).removeData('bs.modal');
+      jQuery('.crop-preview-' + docType).html((jQuery('.crop-preview-raw' + docType).html()));
+      jQuery('.crop-text-initial-' + docType).hide();
+      jQuery('.crop-text-complete-' + docType).show();
+      jQuery('#crop-image').cropper('destroy');
+    
+      jQuery(this).removeData('bs.modal');
     });
 
     function loadCropper()   {
       var \$image = jQuery('#crop-image');
+      doctype = jQuery('#crop-image').attr('data-doctype');
       size = Math.max(\$image.width(),\$image.height());
       if(size) {
         jQuery('#cropper-image').css('width',size);
+        jQuery('#cropper-buttons').css('width',size);
         jQuery('#cropper-image').css('height',size);
       }
 
@@ -341,6 +388,7 @@
       \$image.cropper({
           aspectRatio: 3/4,
           strict: true,
+          preview: ".crop-preview-raw" + doctype,
           responsive: true,
           zoomable: false,
           autoCropArea: 0.5,

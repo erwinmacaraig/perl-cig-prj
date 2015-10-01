@@ -5,7 +5,6 @@ CREATE TABLE tblLogo (
     strPath VARCHAR(50) NOT NULL,
     strFilename VARCHAR(50) NOT NULL,
     strExtension CHAR(4),
-    intBytes INT DEFAULT 1,
 
 PRIMARY KEY (intEntityTypeID,intEntityID)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
