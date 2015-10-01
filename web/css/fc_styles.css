@@ -2910,6 +2910,8 @@ header .navbar-brand {
 
 #selfreg-myselfoptions h3 { margin-left: 20px;}
 
+.selfRegSubHead {margin-left: 14px}
+
 .navbar-default .navbar-toggle {
     border:none;
 }
