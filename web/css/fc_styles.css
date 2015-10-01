@@ -2596,6 +2596,7 @@ header .navbar-brand {
   .additional-person{
   	margin-right: 0!important;
   }
+  #selfreg-myselfoptions h3 { margin-left: 35px !important;}
   #content .container .row .tasklist-content {
     padding-left: 0;
     padding-right: 0;
@@ -2906,6 +2907,9 @@ header .navbar-brand {
 }
 
 #selfreg-myselfoptions { display:none; }
+
+#selfreg-myselfoptions h3 { margin-left: 20px;}
+
 .navbar-default .navbar-toggle {
     border:none;
 }
