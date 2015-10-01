@@ -1501,6 +1501,8 @@ header nav ul li a {
 	font-family: 'noto_sansregular', arial;
 }
 
+
+
 #errorMsg label {
 	font-weight: bold;
 	float:right;
@@ -2056,8 +2058,15 @@ header nav.navbar-default .container ul li a.focus {
 .col-md-6 #transfer_type_option a {
 	width: 50%;
 }
+
+#grid_wrapper  {
+	max-width: 100%;
+    overflow: scroll;
+    clear: both;
+}
+
 #grid_wrapper #grid {
-	width: 100%!important;
+	width: 100% !important;
 }
 
 #flowFormID .form-group .col-md-6 .toggle-type {
