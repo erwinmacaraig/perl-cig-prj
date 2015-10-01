@@ -1,6 +1,6 @@
 
 <link rel="stylesheet" type="text/css" href="js/cropper/cropper.css">
-<script type="text/javascript" src="js/cropper/cropper.min.js"></script>
+<script type="text/javascript" src="js/cropper/cropper.js"></script>
 
 
 <div class="document-upload">
@@ -45,6 +45,7 @@
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
+							<input type="hidden" id ="fileId_[% doc.ID %]" value="[% doc.intFileID %]" />
                             <div class = "fallback">
 							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
                                 [% IF doc.strOrigFilename != '' %]
@@ -68,84 +69,9 @@
 							<input type="hidden" name="[% h.key %]" value="[% h.value %]" />							
 							[% END %]		
 						</form>
-[% IF doc.ImageCrop %]
-<button data-toggle="modal" data-target="#cropper-modal" class="btn btn-primary" type="button">Crop</button>
-<div class="modal fade" id="cropper-modal">
-  <div class="modal-dialog modal-lg" style="z-index:9999;">
-    <div class="modal-content">
-        <div class="modal-header">
-                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">[% Lang.txt('Save and Close') %]</button>
-                <h4 id="bootstrap-modal-label" class="modal-title">[% Lang.txt('Crop the image') %]</h4>
-      </div>
-      <div class="modal-body">
-<div class="btn-group">
-          <button title="[% Lang.txt('Rotate Left') %]"  id = "cropper-rotate-left" class="btn btn-primary" type="button">
-              <span class="fa fa-rotate-left"></span>
-          </button>
-          <button title="[% Lang.txt('Rotate Right') %]" id = "cropper-rotate-right" class="btn btn-primary" type="button">
-              <span class="fa fa-rotate-right"></span>
-          </button>
-        </div>
-        <div id="cropper-image">
-          <img src="viewfile.cgi?client=[% client %]&amp;f=[% doc.intFileID %]" alt="">
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-<style>
-.cropper-image {
-  width: 100%;
-}
-
-.cropper-image > img {
-  max-width: 100%;
-}
-
-</style>
-
-<script>
-  (function () {
-    var \$image = jQuery('#cropper-image > img');
-    var fileID =[% doc.intFileID %];
-    var cropBoxData;
-    var canvasData;
-    jQuery('#cropper-rotate-right').on('click', function () {
-        jQuery('#cropper-image > img').cropper('rotate',90);
-    });
-    jQuery('#cropper-rotate-left').on('click', function () {
-        jQuery('#cropper-image > img').cropper('rotate',-90);
-        jQuery('#cropper-image > img').cropper('scale',0.5);
-v = jQuery('#cropper-image > img').cropper('getImageData');
-    });
-
-    jQuery('#cropper-modal').on('shown.bs.modal', function () {
-      \$image.cropper({
-        aspectRatio: 1,
-        strict: false,
-        responsive: true,
-        autoCropArea: 0.5,
-        built: function () {
-          // Strict mode: set crop box data first
-          \$image.cropper('setCropBoxData', cropBoxData);
-          \$image.cropper('setCanvasData', canvasData);
-        }
-      });
-    }).on('hidden.bs.modal', function () {
-      cropBoxData = \$image.cropper('getCropBoxData');
-      canvasData = \$image.cropper('getCanvasData');
-      d = \$image.cropper('getData');
-      jQuery.ajax({
-          method: "POST",
-          url:"[% BaseURL %]/ajax/aj_cropimage.cgi",
-          data:'x=' + d.x + '&y=' + d.y + '&width=' + d.width + '&height=' + d.height + '&rotate=' + d.rotate + '&scaleX=' + d.scaleX + '&scaleY=' + d.scaleY + "&f=" + fileID + "&client=[% client %]"
-      }).done(function()    {
-        \$image.cropper('destroy');
-      });
-    });
-  })();
-</script>
-[% END %]
+                        [% IF doc.ImageCrop %]
+                        <a href=#" class = "btn btn-primary crop-btn" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                        [% END %]
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
@@ -161,8 +87,10 @@ v = jQuery('#cropper-image > img').cropper('getImageData');
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
 								init: function(){
-									this.on("success", function(file, response){										
+									this.on("success", function(file, response) {
 										doc = response;		
+										var fObject = JSON.parse(doc);
+                                        jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
 										console.log(doc);								
 									});								
 									this.on("removedfile", function(file, response){
@@ -242,6 +170,7 @@ v = jQuery('#cropper-image > img').cropper('getImageData');
 							<input type="hidden" name="rID" value="[% regoID %]" />
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
+							<input type="hidden" id ="fileId_[% doc.ID %]" value="[% doc.intFileID %]" />
                             <div class = "fallback">
 							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
                                 [% IF doc.strOrigFilename != '' %]
@@ -266,6 +195,9 @@ v = jQuery('#cropper-image > img').cropper('getImageData');
 							
 							[% END %]
 						</form>
+                        [% IF doc.ImageCrop %]
+                        <a href=#" class = "btn btn-primary crop-btn" data-doctype = "[% doc.ID %]">[% Lang.txt('Crop') %]</a>
+                        [% END %]
 						<script>
 							var doc;
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
@@ -278,8 +210,10 @@ v = jQuery('#cropper-image > img').cropper('getImageData');
 								addRemoveLinks: true,							
                                 maxFilesize: 25,
 								init: function(){
-									this.on("success", function(file, response){										
+									this.on("success", function(file, response) {
 										doc = response;	
+										var fObject = JSON.parse(doc);
+                                        jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
 										console.log(doc);	
 									});								
 									this.on("removedfile", function(file, response){
@@ -317,3 +251,109 @@ v = jQuery('#cropper-image > img').cropper('getImageData');
 [% END %]
 
 </div>
+
+<div class="modal fade" id="cropper-modal">
+  <div class="modal-dialog modal-lg" style="z-index:9999;">
+    <div class="modal-content">
+        <div class="modal-header">
+                <button aria-hidden="true" data-dismiss="modal" class="close" type="button">[% Lang.txt('Save and Close') %]</button>
+                <h4 id="bootstrap-modal-label" class="modal-title">[% Lang.txt('Crop the image') %]</h4>
+      </div>
+      <div class="modal-body">
+        <div class = "modal-body-content">
+            <div class="btn-group">
+              <button title="[% Lang.txt('Rotate Left') %]"  id = "cropper-rotate-left" class="btn btn-primary" type="button">
+                  <span class="fa fa-rotate-left"></span>
+              </button>
+              <button title="[% Lang.txt('Rotate Right') %]" id = "cropper-rotate-right" class="btn btn-primary" type="button">
+                  <span class="fa fa-rotate-right"></span>
+              </button>
+            </div>
+            <div id="cropper-image">
+              <img id = "crop-image">
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+#cropper-image {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+</style>
+
+<script>
+  jQuery().ready(function(){
+    var fileID =[% doc.intFileID %];
+    var cropBoxData;
+    var canvasData;
+    jQuery('.crop-btn').on('click', function () {
+        doctype = jQuery(this).attr('data-doctype');
+        url = 'viewfile.cgi?client=[% client %]&amp;f=' + jQuery('#fileId_' + doctype).val();
+        jQuery('#crop-image').attr('src',url);
+        jQuery('#cropper-modal').modal();
+    });
+
+    jQuery('#cropper-rotate-right').on('click', function () {
+        jQuery('#cropper-image > img').cropper('rotate',90);
+    });
+    jQuery('#cropper-rotate-left').on('click', function () {
+        jQuery('#cropper-image > img').cropper('rotate',-90);
+    });
+
+    jQuery('#cropper-modal').on('shown.bs.modal', function () {
+      if(jQuery('#crop-image').complete) {
+        loadCropper();
+      }
+      else  {
+        jQuery('#crop-image').on('load',function() {
+          loadCropper();
+        });
+      }
+    }).on('hidden.bs.modal', function () {
+      var \$image = jQuery('#cropper-image > img');
+      cropBoxData = \$image.cropper('getCropBoxData');
+      canvasData = \$image.cropper('getCanvasData');
+      d = \$image.cropper('getData');
+      jQuery.ajax({
+          method: "POST",
+          url:"[% BaseURL %]/ajax/aj_cropimage.cgi",
+          data:'x=' + d.x + '&y=' + d.y + '&width=' + d.width + '&height=' + d.height + '&rotate=' + d.rotate + '&scaleX=' + d.scaleX + '&scaleY=' + d.scaleY + "&f=" + fileID + "&client=[% client %]"
+      }).done(function()    {
+        var \$image = jQuery('#cropper-image > img');
+        \$image.cropper('destroy');
+      });
+      $(this).removeData('bs.modal');
+    });
+
+    function loadCropper()   {
+      var \$image = jQuery('#crop-image');
+      size = Math.max(\$image.width(),\$image.height());
+      if(size) {
+        jQuery('#cropper-image').css('width',size);
+        jQuery('#cropper-image').css('height',size);
+      }
+
+      \$image.cropper('destroy');
+      \$image.cropper({
+          aspectRatio: 3/4,
+          strict: true,
+          responsive: true,
+          zoomable: false,
+          autoCropArea: 0.5,
+          minCropBoxWidth: 150,
+          minCropBoxHeight: 200,
+          built: function () {
+            // Strict mode: set crop box data first
+            \$image.cropper('setCropBoxData', cropBoxData);
+            \$image.cropper('setCanvasData', canvasData);
+          }
+      });
+      return 1;
+    }
+  });
+</script>
+
