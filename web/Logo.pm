@@ -1,21 +1,80 @@
 package Logo;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(convertToLogo);
-@EXPORT_OK = qw(convertToLogo);
+@EXPORT = qw(convertToLogo getLogo getLogoData);
+@EXPORT_OK = qw(convertToLogo getLogo getLogoData);
 
 use strict;
 use lib "..",".";
 use Defs;
+use Reg_common;
 use Utils;
 
 use S3Upload;
 
 #functions
 
-#getLogo
-#showLogo
-#convertToLogo - from documentId
+sub getLogo {
+    my (
+        $Data,
+        $entityTypeID,
+        $entityID,
+        $logoData,
+    ) = @_;
+
+    if(!$logoData)  {
+        $logoData = getLogoData(
+            $Data,
+            $entityTypeID,
+            $entityID,
+        );
+    }
+    if(
+        $logoData
+        and $logoData->{'strPath'}
+        and $logoData->{'strExtension'}
+        and $logoData->{'strFilename'}
+    )   {
+        my $clientValues = $Data->{'clientValues'};
+        $clientValues->{'currentLevel'} = $entityTypeID;
+        setClientValue($clientValues,$entityTypeID, $entityID);
+        my $newclient = setClient($clientValues);
+        my $url = "$Defs::base_url/photologo.cgi?client=$newclient";
+        return $url;
+    }
+    return '';
+}
+
+sub getLogoData {
+    my (
+        $Data,
+        $entityTypeID,
+        $entityID,
+    ) = @_;
+    return undef if !$entityTypeID;
+    return undef if !$entityID;
+    my $st = qq[
+        SELECT
+            strPath,
+            strFilename,
+            strExtension
+        FROM
+            tblLogo
+        WHERE
+            intEntityTypeID = ?
+            AND intEntityID = ?
+    ];
+
+    my $db = $Data->{'db'};
+    my $query = $db->prepare($st);
+    $query->execute(
+        $entityTypeID,
+        $entityID,
+    );
+    my $dref =$query->fetchrow_hashref();
+    $query->finish();
+    return $dref || undef;
+}
 
 sub convertToLogo {
     my (

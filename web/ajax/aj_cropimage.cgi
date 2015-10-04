@@ -11,6 +11,7 @@ use Reg_common;
 use Utils;
 use JSON;
 use Lang;
+use MCache;
 use SystemConfig;
 use Image::Magick;
 use S3Upload;
@@ -30,22 +31,21 @@ sub main	{
     my $box_x = param('x') || 0;
     my $box_y = param('y') || 0;
 
-    my $db=connectDB();
-
     my %Data=();
-    $Data{'db'} = $db;
+    my $target='aj_cropimage.cgi';
+    $Data{'target'}=$target;
+    $Data{'cache'}  = new MCache();
+    my %clientValues = getClient($client);
+    $Data{'clientValues'} = \%clientValues;
+    my $lang = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+    $Data{'lang'}=$lang;
 
+    my $db = allowedTo( \%Data );
+    $Data{'db'} = $db;
     ($Data{'Realm'}, $Data{'RealmSubType'}) = getRealm(\%Data);
     $Data{'Realm'} ||= 1;
 
-    my $target='aj_cropimage.cgi';
-    $Data{'target'}=$target;
-    my %clientValues = getClient($client);
-    $Data{'clientValues'} = \%clientValues;
-
     $Data{'SystemConfig'} = getSystemConfig( \%Data );
-    my $lang = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
-    $Data{'lang'}=$lang;
 
     my $options = undef;
     my $error = '';
