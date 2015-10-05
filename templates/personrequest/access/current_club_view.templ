@@ -13,7 +13,7 @@
                         [% IF personStatus == 'PENDING' %]
 						    <p>[% Lang.txt('The add role process cannot continue until re-approved by [_1]',MA) %]</p>
                         [% ELSE %]
-						    <p>[% Lang.txt('By approving you are giving access to all of the details of [_1] [_2] to [_3]', personFirstname, requestFrom) %]</p>
+						    <p>[% Lang.txt('By approving you are giving access to all of the details of [_1] [_2] to [_3]', personFirstname, personSurname, requestFrom) %]</p>
                         [% END %]
 					</div>
 				</div>
