@@ -1669,7 +1669,7 @@ sub _getConfiguration {
               ],
               EntityPaymentID => [
                 $SystemConfig->{'AllowTXNrpts'}
-                ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment for]
+                ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment From]
                 : '',
                 {
                     displaytype => 'text',
