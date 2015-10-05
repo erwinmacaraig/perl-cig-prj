@@ -525,7 +525,7 @@ sub clubFieldsSetup {
                 intIsInternationalTransfer
             )],
             sections => [
-                [ 'main',        $Data->{'lang'}->txt('Organisation Details'),'','',$values->{'footer-roledetails'} ],
+                [ 'main',        $Data->{'lang'}->txt('Organisation'),'','',$values->{'footer-roledetails'} ],
             ],
         },
     };
