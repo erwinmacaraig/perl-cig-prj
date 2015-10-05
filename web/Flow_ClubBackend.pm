@@ -70,7 +70,7 @@ sub setProcessOrder {
         {
             'action' => 'role',
             'function' => 'display_role_details',
-            'label'  => $lang->txt('Organisation Details'),
+            'label'  => $lang->txt('Organisation'),
             'fieldset' => 'roledetails',
             'title'  => $lang->txt('Club') . ' - ' . $lang->txt('Enter Organisation Information'),
         },
