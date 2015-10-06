@@ -346,7 +346,7 @@ sub SQLBuilder  {
 
     my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
     $sql = qq[
-        SELECT DISTINCT
+        SELECT 
 				T.intTransactionID, 
 				T.intStatus, 
 				T.curAmount, 

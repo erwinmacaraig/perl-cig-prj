@@ -1970,7 +1970,7 @@ sub SQLBuilder {
     }
 
     $sql = qq[
-        SELECT DISTINCT ###SELECT###
+        SELECT ###SELECT###
         FROM
             $from_levels
             $current_from

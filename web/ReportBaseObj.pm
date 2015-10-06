@@ -341,7 +341,15 @@ my $output_array = undef;
 		while($index <= $numrows)	{
 			my $row = $output_array->[$index];
 			if($self->{'RunParams'}{'Distinct'} or $self->{'RunParams'}{'Summarise'})	{
-				my $rowdatahash = join("\0",(map {defined $_ ? $_ : ''} values %{$row})); #key for row
+				my $rowdatahash = '';
+                {
+                    my @t = ();
+                    for my $k (sort keys %{$row})  {
+                        push @t, $row->{$k};
+                    }
+                    $rowdatahash = join("~",@t);
+                }
+				#my $rowdatahash = join("~",(map {defined $_ ? $_ : ''} values %{$row})); #key for row
 				$self->{'RunParams'}{'SummaryCount'}{'Rows'}{$rowdatahash}++;
 				$self->{'RunParams'}{'SummaryCount'}{'All'}++;
 				my $gv = $row->{$groupfield};
