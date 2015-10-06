@@ -1695,7 +1695,7 @@ sub _getConfiguration {
               ],
               EntityPaymentID => [
                 $SystemConfig->{'AllowTXNrpts'}
-                ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment for]
+                ? qq[$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment From]
                 : '',
                 {
                     displaytype => 'text',
@@ -1952,7 +1952,7 @@ sub _getConfiguration {
                 $lang->txt('Transactions'),
                 {
                     from =>
-"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intTableType =1 $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
+"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND tblPerson.intPersonID=TX.intID AND TX.intPersonRegistrationID = PR.intPersonRegistrationID AND TX.intTableType =1 $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
                 }
             ],
           },
