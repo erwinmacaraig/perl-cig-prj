@@ -35,10 +35,10 @@ sub getLogo {
         and $logoData->{'strExtension'}
         and $logoData->{'strFilename'}
     )   {
-        my $clientValues = $Data->{'clientValues'};
-        $clientValues->{'currentLevel'} = $entityTypeID;
-        setClientValue($clientValues,$entityTypeID, $entityID);
-        my $newclient = setClient($clientValues);
+        my %clientValues = %{$Data->{'clientValues'}};
+        $clientValues{'currentLevel'} = $entityTypeID;
+        setClientValue(\%clientValues,$entityTypeID, $entityID);
+        my $newclient = setClient(\%clientValues);
         my $url = "$Defs::base_url/photologo.cgi?client=$newclient";
         return $url;
     }

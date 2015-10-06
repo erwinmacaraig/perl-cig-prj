@@ -68,9 +68,11 @@ sub main	{
               $box_y,
               $scaleX,
               $scaleY,
+              $fileID,
           );
         }
         if(!$error) {
+          updateSize(\%Data, $fileID, (stat($tempfilename))[7]);
           putFileToS3($filekey,$tempfilename);
         }
         unlink $tempfilename;
@@ -122,6 +124,7 @@ sub crop_photo	{
     $box_y,
     $scaleX,
     $scaleY,
+    $fileID,
   ) = @_;
 
 	my $error='';
@@ -140,6 +143,29 @@ sub crop_photo	{
 	}
   return $error || '';
 }
+
+sub updateSize  {
+    my ($Data, $fileID, $size) = @_;
+
+    my $st = qq[
+        UPDATE 
+            tblUploadedFiles
+        SET 
+            intBytes = ?
+        WHERE
+            intFileID = ?
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $size ||= 0;
+    $q->execute(
+        $size,
+        $fileID,
+    );
+    $q->finish();
+
+    return 1;
+}
+
 
 sub getFileInfo {
     my ($Data, $fileID) = @_;

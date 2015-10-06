@@ -97,8 +97,8 @@
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
-                                        jQuery('#crop-text-initial-' + fObject.docTypeID).show();
-                                        jQuery('#crop-text-complete-' + fObject.docTypeID).hide();
+                                        jQuery('.crop-text-initial-' + fObject.docTypeID).show();
+                                        jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);								
 									});								
 									this.on("removedfile", function(file, response){
@@ -107,9 +107,10 @@
 											type: 'POST',
 											url: '[% url %]/deleteregofile.cgi',
 											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
-										}).done(
-
-										);
+										}).done(function()    {
+                                        });
+                                        jQuery('#crop-data-row-' + fObject.docTypeID).hide();
+                                        jQuery('.crop-preview-' + docType).html('');
 									});
 									this.on("canceled", function(file, response){
 										jQuery(".dropzone.dz-started").removeClass('dz-started')
@@ -228,8 +229,8 @@
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
-                                        jQuery('#crop-text-initial-' + fObject.docTypeID).show();
-                                        jQuery('#crop-text-complete-' + fObject.docTypeID).hide();
+                                        jQuery('.crop-text-initial-' + fObject.docTypeID).show();
+                                        jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);	
 									});								
 									this.on("removedfile", function(file, response){
@@ -238,10 +239,10 @@
 											type: 'POST',
 											url: '[% url %]/deleteregofile.cgi',
 											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
-										}).done(
-											
-										);
-
+										}).done(function()    {
+                                        });
+                                        jQuery('#crop-data-row-' + fObject.docTypeID).hide();
+                                        jQuery('.crop-preview-' + docType).html('');
 									});
 								}
 							}
@@ -268,6 +269,7 @@
 
 </div>
 
+<div class = "person-crop">
 <div class="modal fade" id="cropper-modal">
   <div class="modal-dialog modal-lg" style="z-index:9999;">
     <div class="modal-content">
@@ -294,6 +296,7 @@
       </div>
     </div>
   </div>
+</div>
 </div>
 <style>
 #cropper-image, #cropper-buttons {
@@ -325,8 +328,6 @@
 
 <script>
   jQuery().ready(function(){
-    var cropBoxData;
-    var canvasData;
     jQuery('.crop-btn').on('click', function () {
         doctype = jQuery(this).attr('data-doctype');
         fileId = jQuery('#fileId_' + doctype).val();
@@ -355,8 +356,6 @@
       }
     }).on('hidden.bs.modal', function () {
       var \$image = jQuery('#cropper-image > img');
-      cropBoxData = \$image.cropper('getCropBoxData');
-      canvasData = \$image.cropper('getCanvasData');
       d = \$image.cropper('getData');
       fileID = jQuery('#crop-image').attr('data-fileId');
       docType = jQuery('#crop-image').attr('data-doctype');
@@ -396,12 +395,12 @@
           minCropBoxHeight: 200,
           built: function () {
             // Strict mode: set crop box data first
-            \$image.cropper('setCropBoxData', cropBoxData);
-            \$image.cropper('setCanvasData', canvasData);
+            //\$image.cropper('setCropBoxData', cropBoxData);
+            //\$image.cropper('setCanvasData', canvasData);
           }
       });
+      jQuery('.cropper-view-box').after('<div class = "cropper-overlay cropper-move"></div>');
       return 1;
     }
   });
 </script>
-
