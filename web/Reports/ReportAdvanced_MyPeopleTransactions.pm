@@ -259,12 +259,27 @@ sub _getConfiguration {
 					dbfield=>'intExportAssocBankFileID'
 				}
 			],
-			EntityPaymentID=> [
-				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}],
+			EntityID=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment From],
 				{
 					displaytype=>'text', 
 					fieldtype=>'text', 
 					dbfield=>'PaymentEntity.strLocalName', 
+				}
+			],
+			EntityPaymentID=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Payment From],
+				{
+					displaytype=>'text', 
+					fieldtype=>'text', 
+					dbfield=>'PaymentEntity.strLocalName', 
+				}
+			],
+            PREntityName=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB}],
+				{
+					displaytype=>'text', 
+					fieldtype=>'text', 
 				}
 			],
 		},
@@ -289,6 +304,7 @@ sub _getConfiguration {
 			intStatus
 			TXNNotes
 			EntityPaymentID
+            PREntityName
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
@@ -330,7 +346,7 @@ sub SQLBuilder  {
 
     my $PRtablename = "tblPersonRegistration_" . $Data->{'Realm'};
     $sql = qq[
-        SELECT DISTINCT
+        SELECT 
 				T.intTransactionID, 
 				T.intStatus, 
 				T.curAmount, 
@@ -351,6 +367,7 @@ sub SQLBuilder  {
 				T.strNotes as TXNNotes,  
 				TL.strComments as TLComments,  
 				PaymentEntity.strLocalName AS EntityPaymentID,
+				PREntity.strLocalName AS PREntityName,
 				P.strName
 			FROM tblTransactions as T
                 LEFT JOIN $PRtablename as PR ON (
@@ -362,6 +379,7 @@ sub SQLBuilder  {
                     M.intPersonID = T.intID 
                     AND T.intTableType = $Defs::LEVEL_PERSON 
                 )
+				LEFT JOIN tblEntity as PREntity ON (PREntity.intEntityID = PR.intEntityID)
 				LEFT JOIN tblEntity as PaymentEntity ON (PaymentEntity.intEntityID = TL.intEntityPaymentID)
 			WHERE 
                 T.intRealmID = $Data->{'Realm'}
