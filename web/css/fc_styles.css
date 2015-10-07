@@ -2777,9 +2777,9 @@ header .navbar-brand {
    .alert div p { margin: 5px 10px; width: 65%; }
    .dynamic-panel p { font-size: 12px; }
    #block-itc .alert .fa-info { margin-left: -10px; }
-   .document-upload.summary .personal-information .details-left { width: 100%; }
-   .document-upload.summary .contact-details .details-left { width: 100%; }
-   .document-upload.summary .registration-details .details-left { width: 100%; }
+   .document-upload.summary .personal-information .details-left { width: 100%; word-break: break-word;text-align: left !important;}
+   .document-upload.summary .contact-details .details-left { width: 100%; text-align: left !important;}
+   .document-upload.summary .registration-details .details-left { width: 100%; word-break: break-word;text-align:  left !important;}
 	.detail-value{font-size: 12px}
    #worktasks_wrapper #worktasks th:nth-child(1) { display: none; }
    #worktasks_wrapper #worktasks td:nth-child(2) { display: none; }
@@ -2788,7 +2788,7 @@ header .navbar-brand {
    #regdetails td:nth-child(2) { display: none; }
    #regdetails th:nth-child(3) { display: none; }
    #regdetails td:nth-child(3) { display: none; }
-   .read-only ul li span.details-left { width: 100%; font-size: 12px; }
+   .read-only ul li span.details-left { width: 100%; font-size: 12px; word-break: break-word;text-align:  left !important;}
    .read-only, .fieldSectionGroupWrapper-DisplayOnly { margin-bottom: 20px; }
    .member-home-page .details-left { width: 100%; }
    form#flowFormID #fsg-main label { text-align: left; }
