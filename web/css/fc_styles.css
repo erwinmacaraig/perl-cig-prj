@@ -2415,7 +2415,7 @@ header .navbar-brand {
 }
 
 @media (min-width: 800px){
-	#grid_wrapper  {
+	#searchResult_wrapper, #grid_wrapper  {
 		max-width: 100%;
 	    overflow: scroll;
 	    clear: both;
