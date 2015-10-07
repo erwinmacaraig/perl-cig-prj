@@ -2780,9 +2780,9 @@ header .navbar-brand {
    .document-upload.summary .personal-information .details-left { width: 100%; }
    .document-upload.summary .contact-details .details-left { width: 100%; }
    .document-upload.summary .registration-details .details-left { width: 100%; }
-	.details-row > .details-left{ width: 10%; word-break: break-word; }
+	.details-row > .details-left, .details-left{ width: 100% !important; word-break: break-word; }
 	.details-left.detail-value{ width: 100%; word-break: break-word; }
-	.detail-value{font-size: 12px}
+	.detail-value{font-size: 12px;width:  100%;}
    #worktasks_wrapper #worktasks th:nth-child(1) { display: none; }
    #worktasks_wrapper #worktasks td:nth-child(2) { display: none; }
 
