@@ -317,6 +317,7 @@ sub getPreviousRegos {
             prq.intPersonRequestID,
             prq.dtLoanTo,
             prq.intOpenLoan,
+            E.intIsInternationalTransfer,
             existprq.intOpenLoan as existOpenLoan
         FROM
             tblSelfUserAuth AS A
@@ -424,6 +425,12 @@ sub getPreviousRegos {
             $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
             $dref->{'allowAddTransaction'} = 1;
         }
+        if ($dref->{'intIsInternationalTransfer'})  {
+            $dref->{'allowAddTransaction'} = 0 ;
+            $dref->{'allowTransfer'} = 0;
+            $dref->{'renewlink'} = '';
+        }
+            
         push @{$regos{$pID}}, $dref; 
     }
    
