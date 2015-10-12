@@ -1879,11 +1879,14 @@ i.documents-rejected {
 	padding: 5px 0px;
 	outline:  none;
 	min-width:  100%;
+	max-width:  100%;
 }
 #ffg_venue td select {
 	width: 100%;
 	border: 1px solid #cccccc;
 	outline:  none;
+	min-width:  100%;
+	max-width:  100%;
 }
 
 /*a class called upon a condition on the complete screen - 
@@ -2419,7 +2422,7 @@ header .navbar-brand {
 @media (min-width: 800px){
 	#grid_wrapper  {
 		max-width: 100%;
-	    overflow: scroll;
+	    overflow: auto;
 	    clear: both;
 	}
 }
@@ -2565,6 +2568,9 @@ header .navbar-brand {
   .utilities { /* display: none; */ }
   /*.logo-area { display: none; }*/
   .dataTables_info, .dataTables_length, .order-override { display: none; }
+  .dataTables_wrapper {
+  	overflow: auto;
+  }
 	div#worktasks_filter {
 	    background-color: #1870a5;
     	padding: 6px 0;
