@@ -76,6 +76,7 @@ sub handlePersonRequest {
             $TemplateData{'Lang'} = $Data->{'lang'};
             $TemplateData{'client'} = $Data->{'client'};
             $TemplateData{'target'} = $Data->{'target'};
+            $TemplateData{'SystemConfig'} = $Data->{'SystemConfig'};
             #$TemplateData{'transferTypeOption'} = $transferTypeOption;
             #$TemplateData{'script'} = qq[
             #    <script>
@@ -130,6 +131,7 @@ sub handlePersonRequest {
             $TemplateData{'Lang'} = $Data->{'lang'};
             $TemplateData{'client'} = $Data->{'client'};
             $TemplateData{'target'} = $Data->{'target'};
+            $TemplateData{'SystemConfig'} = $Data->{'SystemConfig'};
 
             $body = runTemplate(
                 $Data,
@@ -252,6 +254,7 @@ sub listPeople {
         'client' => $Data->{'client'},
         'target' => $Data->{'target'},
         'search_keyword' => $searchKeyword,
+        'SystemConfig' => $Data->{'SystemConfig'},
     );
 
     $sphinx->SetServer($Defs::Sphinx_Host, $Defs::Sphinx_Port);
