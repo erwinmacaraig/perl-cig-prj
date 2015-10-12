@@ -44,7 +44,7 @@ sub rolloverRegoItems {
 
     my $stDEL = qq[
         DELETE FROM tblRegistrationItem
-        WHERE intRealmID=$realmID
+        WHERE intRealmID IN (1,$realmID)
             AND intID>$maxOldProductID
             AND strItemType='PRODUCT'
     ];
