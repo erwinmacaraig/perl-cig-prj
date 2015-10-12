@@ -1878,6 +1878,7 @@ i.documents-rejected {
 	width: 100%;
 	padding: 5px 0px;
 	outline:  none;
+	min-width:  100%;
 }
 #ffg_venue td select {
 	width: 100%;
