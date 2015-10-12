@@ -69,7 +69,7 @@ sub _getConfiguration {
             strDiscipline=> [ 'Sport', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::entitySportType, translate => 1, dbfield => "E.strDiscipline",} ],
             strOrganisationLevel=> [ 'Level', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::organisationLevel, translate => 1,dbfield => "E.strOrganisationLevel",} ],
 
-            strPostalCode => [ 'Postal Code', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "strPostalCode",} ],
+            strPostalCode => [ 'Postal Code', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strPostalCode",} ],
             strPhone => [ 'Phone', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strPhone', } ],
             strFax => [ 'Fax', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strFax', } ],
             strEmail => [ 'Email', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strEmail', } ],
