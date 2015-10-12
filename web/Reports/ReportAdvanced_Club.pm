@@ -53,7 +53,7 @@ sub _getConfiguration {
             strMAID=> [ "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} No", { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strMAID",} ],
             strContact=> [ 'Contact', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strContact",} ],
             strAddress => [ 'Address Line 1', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress",} ],
-            strAddress2 => [ 'Address Line 2', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "Address2",} ],
+            strAddress2 => [ 'Address Line 2', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress2",} ],
             strCity => [ 'City', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strCity",} ],
             strState => [ 'State', { displaytype   => 'text', fieldtype     => 'text', allowsort     => 1, allowgrouping => 1, dbfield => "E.strState",} ],
 
