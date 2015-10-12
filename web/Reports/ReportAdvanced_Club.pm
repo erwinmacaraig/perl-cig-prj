@@ -52,7 +52,7 @@ sub _getConfiguration {
             strLatinShortName => [ "Short Name (International)", { displaytype => 'text', fieldtype   => 'text', active => 1, allowsort   => 1, dbfield => "E.strLatinShortName",} ],
             strMAID=> [ "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} No", { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strMAID",} ],
             strContact=> [ 'Contact', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strContact",} ],
-            strAddress1 => [ 'Address Line 1', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress1",} ],
+            strAddress => [ 'Address Line 1', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress",} ],
             strAddress2 => [ 'Address Line 2', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "Address2",} ],
             strCity => [ 'City', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strCity",} ],
             strState => [ 'State', { displaytype   => 'text', fieldtype     => 'text', allowsort     => 1, allowgrouping => 1, dbfield => "E.strState",} ],
@@ -111,7 +111,7 @@ sub _getConfiguration {
                 strDiscipline
                 strOrganisationLevel
               strContact
-              strAddress1
+              strAddress
               strAddress2
               strCity
               strState
