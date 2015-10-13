@@ -1,0 +1,19 @@
+<p>Regos</p>
+<table>
+    <tr>
+        <td>Select Registration to copy</td>
+        <td>Period</td>
+        <td>Type</td>
+        <td>Move Documents ?</td>
+        <td>Copy Payment History ?</td>
+    </tr>
+[% FOREACH r IN regos_ref %]
+    <tr>
+        <td><input type="checkbox" name="rego_[% r.intPersonRegistrationID %]" value="1"></td>
+        <td>Period [% r.strNationalPeriodName %]</td>
+        <td>Type [% r.PersonType %]</td>
+        <td><input type="checkbox" name="regoDocuments_[% r.intPersonRegistrationID %]" value="1"></td>
+        <td><input type="checkbox" name="regoPayments_[% r.intPersonRegistrationID %]" value="1"></td>
+    </tr>
+[% END %]
+</table>

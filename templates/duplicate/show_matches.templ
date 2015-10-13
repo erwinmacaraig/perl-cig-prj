@@ -1,0 +1,6 @@
+<p>People</p>
+[% FOREACH m IN Matches_ref %]
+<input type="radio" name="parentPersonID" value="[% m.intPersonID %]" [% singleRecordSelected %]>
+<p>Firtsname [% m.strLocalFirstname %]</p>
+<p>MA ID [% m.strNationalNum %]</p>
+[% END %]

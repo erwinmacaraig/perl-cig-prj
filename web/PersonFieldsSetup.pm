@@ -1012,7 +1012,7 @@ strTerms
                 strDescription
             )],
             sections => [
-                [ 'main',        $Data->{'lang'}->txt('Add New Certification') ],
+                [ 'main',        $Data->{'lang'}->txt('Add iiNew Certification') ],
             ],
         },
     };

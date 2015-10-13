@@ -66,6 +66,7 @@ use PersonRequest;
 use BulkPersons;
 use PersonLanguages;
 use ListAuditLog;
+use DuplicateFlow;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -2117,50 +2118,9 @@ sub PersonDupl {
 
     $personID ||= 0;
     return '' if !$personID;
-    return '' if !DuplicatesUtils::isCheckDupl($Data);
+    my ( $resultHTML, $pageHeading ) = handleDuplicateFlow($action, $Data, $personID);
+    return $resultHTML;
 
-    if ( $action eq 'P_DUP_S' ) {
-        my $st = qq[
-			UPDATE tblPerson
-			SET intSystemStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
-			WHERE intPersonID = $personID
-			LIMIT 1
-		];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute;
-        my $msg = qq[
-			<p class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} has been marked as a duplicate</p>
-		];
-        if ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_ASSOC ) {
-            my $client = setClient( $Data->{'clientValues'} ) || '';
-            my $dupllink = "$Data->{'target'}?client=$client&amp;a=DUPL_L";
-            $msg .= qq[<p>To resolve this duplicate click <a href="$dupllink">Resolve Duplicates</a>.</p>];
-        }
-        auditLog( $personID, $Data, 'Mark as Duplicates', 'Duplicates' );
-        return ( $msg, "$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} marked as a duplicate" );
-    }
-    else {
-        my $client = setClient( $Data->{'clientValues'} ) || '';
-        my $st = qq[SELECT * FROM tblPerson WHERE intPersonID = $personID];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute;
-        my $dref = $query->fetchrow_hashref();
-
-        my $msg = qq[
-			<form action="$Data->{'target'}" method="POST" style="float:left;" onsubmit="document.getElementById('btnsubmit').disabled=true;return true;">
-				<p>If you believe the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} named below is a possible duplicate, click the <b>'Mark as Duplicate'</b> button.  </p>
-
-		<p>This will mark this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} as a duplicate for your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} to verify and resolve.</p>
-			<p> <b>$dref->{strLocalFirstname} $dref->{strLocalSurname}</b></p>
-			<p>
-				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}, not the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you believe may be the original</span>.</p><br><br>
-				<input type="hidden" name="a" value="P_DUP_S">
-				<input type="hidden" name="client" value="$client">
-				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="btn-main">
-			</form>
-		];
-        return ( $msg, 'Mark as Duplicate' );
-    }
 }
 
 sub check_valid_date {

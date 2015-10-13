@@ -1224,6 +1224,13 @@ sub getPersonMenuData {
                  url => $baseurl."a=P_CLR",
             };
         }
+print STDERR "SSS" . $SystemConfig->{'AllowDuplicateMarking'};
+        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
+            $menuoptions{'dup'} = {
+                    name => $lang->txt('Mark as Duplicate'),
+                 url => $baseurl."a=P_DUP_",
+            };
+        }
     }
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
@@ -1238,6 +1245,7 @@ sub getPersonMenuData {
             'auditlog'
         ]],
         [ $lang->txt('Documents'), 'menu','docs'],
+        [ $lang->txt('Mark as Duplicate'), 'menu','dup'],
     );
         #[ $lang->txt('Transfer History'), 'menu','clr'],
     #    [ $lang->txt('System'), 'system',[
