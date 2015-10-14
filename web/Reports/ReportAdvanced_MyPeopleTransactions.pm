@@ -282,6 +282,21 @@ sub _getConfiguration {
 					fieldtype=>'text', 
 				}
 			],
+            PREntityShortName=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} Short Name],
+				{
+					displaytype=>'text', 
+					fieldtype=>'text', 
+				}
+			],
+            PREntityLatinName=> [
+				qq[$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} $Data->{'LevelNames'}{$Defs::LEVEL_CLUB} International Name],
+				{
+					displaytype=>'text', 
+					fieldtype=>'text', 
+				}
+			],
+
 		},
 
 		Order => [qw(
@@ -305,6 +320,8 @@ sub _getConfiguration {
 			TXNNotes
 			EntityPaymentID
             PREntityName
+            PREntityShortName
+            PREntityLatinName
 		)],
 		OptionGroups => {
 			default => ['Details',{}],
@@ -368,6 +385,8 @@ sub SQLBuilder  {
 				TL.strComments as TLComments,  
 				PaymentEntity.strLocalName AS EntityPaymentID,
 				PREntity.strLocalName AS PREntityName,
+				PREntity.strLocalShortName AS PREntityShortName,
+				PREntity.strLatinName AS PREntityLatinName,
 				P.strName
 			FROM tblTransactions as T
                 LEFT JOIN $PRtablename as PR ON (
