@@ -36,6 +36,7 @@ use RenewalDetails;
 
 use RegoProducts;
 use PlayerPassport;
+use SphinxUpdate;
 
 sub setProcessOrder {
     my $self = shift;
@@ -223,7 +224,6 @@ print STDERR "ALL OK\n";
 sub display_regos { 
     my $self = shift;
     my $parentPersonID= $self->{'RunParams'}{'parentPersonID'} || 0;
-print STDERR "PP_ID" . $parentPersonID;
 
     my $id = $self->ID() || 0;
     if($id)   {
@@ -393,17 +393,119 @@ sub FinaliseDuplicateFlow   {
         $personID,
         \%Reg
     );
+    my $stMovePR = qq[
+        UPDATE tblPersonRegistration_$Data->{'Realm'}
+        SET intPersonID = ?
+        WHERE 
+            intPersonID = ?
+            AND intPersonRegistrationID = ?
+        LIMIT 1
+    ];
+    my $qMovePR=$Data->{'db'}->prepare($stMovePR);
+
+    my $stMoveTXNs = qq[
+        UPDATE tblTransactions
+        SET intID = ?
+        WHERE
+            intID = ?
+            AND intTableType=1
+            AND intPersonRegistrationID = ?
+    ];
+    my $qMoveTXNs=$Data->{'db'}->prepare($stMoveTXNs);
+
+    my $stMoveWFTask= qq[
+         UPDATE tblWFTask
+        SET intPersonID = ?
+        WHERE 
+            intPersonID = ?
+            AND intPersonRegistrationID = ?
+    ];
+    my $qMoveWFTask=$Data->{'db'}->prepare($stMoveWFTask);
+
+    my $stMovePersonReq= qq[
+         UPDATE tblPersonRequest
+        SET intPersonID = ?
+        WHERE 
+            intPersonID = ?
+            AND intExistingPersonRegistrationID = ?
+    ];
+    my $qMovePersonReq=$Data->{'db'}->prepare($stMovePersonReq);
+
+    my $stMoveIntTransfer= qq[
+         UPDATE tblIntTransfer
+        SET intPersonID = ?
+        WHERE 
+            intPersonID = ?
+    ];
+    my $qMoveIntTransfer=$Data->{'db'}->prepare($stMoveIntTransfer);
+
+    my $stMovePersonCert= qq[
+         UPDATE tblPersonCertifications
+        SET intPersonID = ?
+        WHERE 
+            intPersonID = ?
+    ];
+    my $qMovePersonCert=$Data->{'db'}->prepare($stMovePersonCert);
+
+
+
+    my $stMarkPerson= qq[
+        UPDATE tblPerson
+        SET strStatus='DUPLICATE'
+        WHERE 
+            intPersonID = ?
+        LIMIT 1
+    ];
+    my $qMarkPerson=$Data->{'db'}->prepare($stMarkPerson);
+    $qMarkPerson->execute($personID);
+
+    my $stInsLinkage= qq[
+        INSERT INTO tblPersonDuplicates
+        (intChildPersonID, intParentPersonID, dtAdded, dtUpdated)
+        VALUES (?,?,NOW(), NOW())
+    ];
+    my $qInsLinkage=$Data->{'db'}->prepare($stInsLinkage);
+    $qInsLinkage->execute($personID, $parentPersonID);
+    
+    my $stUpdOldLinkage= qq[
+        UPDATE tblPersonDuplicates
+        SET intParentPersonID = ?, dtUpdated = NOW()
+        WHERE intParentPersonID = ?
+    ];
+    my $qUpdLinkage=$Data->{'db'}->prepare($stUpdOldLinkage);
+    $qUpdLinkage->execute($parentPersonID, $personID);
+    
+
+
     foreach my $rego (@{$regs_ref})  {
         my $copyRego = $regosToCopy->{$rego->{'intPersonRegistrationID'}};
+        my $regoIDToCopy = $rego->{'intPersonRegistrationID'} || next;
         next if $copyRego ne "1";
 
-        print STDERR "DECIDE IF COPY OR MOVE tblPersonRego, tblIntTransfer, tblPersonReq etc...\n";
-        if ($docsToCopy->{$rego->{'intPersonRegistrationID'}} eq "1")  {
+        $qMovePR->execute($parentPersonID, $personID, $regoIDToCopy);
+        $qMoveWFTask->execute($parentPersonID, $personID, $regoIDToCopy);
+        $qMovePersonReq->execute($parentPersonID, $personID, $regoIDToCopy);
+        $qMoveIntTransfer->execute($parentPersonID, $personID);
+        $qMovePersonCert->execute($parentPersonID, $personID);
+        if ($docsToCopy->{$regoIDToCopy} eq "1")  {
+           moveDocuments($Data, $regoIDToCopy, $parentPersonID);
         }
-        if ($paysToCopy->{$rego->{'intPersonRegistrationID'}} eq "1")  {
+        
+        if ($paysToCopy->{$regoIDToCopy} eq "1")  {
+            $qMoveTXNs->execute($parentPersonID, $personID, $regoIDToCopy);
         }
     }    
- 
+    {
+        my $personObject = getInstanceOf($Data, 'person',$personID);
+        updateSphinx($Data->{'db'},$Data->{'cache'}, 'Person','update',$personObject);
+        auditLog($personID, $Data, 'Person Marked as Duplicate', 'Person');
+    }
+    {
+        my $personObject = getInstanceOf($Data, 'person',$parentPersonID);
+        updateSphinx($Data->{'db'},$Data->{'cache'}, 'Person','update',$personObject);
+        auditLog($parentPersonID, $Data, 'Person Registrations merged', 'Person');
+    }
+
     savePlayerPassport($Data, $parentPersonID)
 }
 sub displayDuplicateComplete    {
@@ -668,16 +770,15 @@ strISOFatherCountry
 }
 
 sub moveDocuments {
-    my $self = shift;
-    my ($oldRegoID, $newRegoID) = @_;
+    my ($Data, $regoID, $newPersonID) = @_;
 
     my $st = qq[
         UPDATE tblDocuments
-        SET intPersonRegistrationID = ?
+        SET intPersonID= ?
         WHERE intPersonRegistrationID = ?
     ];
-    my $q=$self->{'Data'}->{'db'}->prepare($st);
-    $q->execute($oldRegoID, $newRegoID);
+    my $q=$Data->{'db'}->prepare($st);
+    $q->execute($newPersonID, $regoID);
     $q->finish();
     return 1;
 }
