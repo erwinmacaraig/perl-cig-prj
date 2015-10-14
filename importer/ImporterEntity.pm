@@ -34,28 +34,38 @@ sub insertEntityRecord {
     my $stINS = qq[
         INSERT INTO tblEntity (
             intRealmID,
+            intRealmApproved,
             intEntityLevel,
+            strEntityType,
             strImportEntityCode,
-            strNationalNum,
+            strMAID,
             strStatus,
             strLocalName,
+            strLocalShortName,
             intLocalLanguage,
             strLatinName,
+            strLatinShortName,
+            dtFrom,
+            dtTo,
             strISOCountry,
+            strRegion,
+            strCity,
+            strState,
             strFax,
-            strPhoneHome,
-            strAddress1,
+            strPhone,
+            strAddress,
             strAddress2,
             strPostalCode,
-            strSuburb,
+            strWebURL,
             strEmail,
-            strOtherPersonIdentifier,
-            intOtherPersonIdentifierTypeID,
-            strOtherPersonIdentifierIssueCountry,
-            dtOtherPersonIdentifierValidDateFrom,
-            dtOtherPersonIdentifierValidDateTo
+            dtAdded,
+            strDiscipline,
+            intAcceptSelfRego,
+            intNotifications,
+            strOrganisationLevel,
         )
         VALUES (
+            1,
             1,
             ?,
             ?,
@@ -73,6 +83,14 @@ sub insertEntityRecord {
             ?,
             ?,
             ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            NOW(),
             ?,
             ?,
             ?,
@@ -122,41 +140,41 @@ sub insertEntityRecord {
         my $otherIdentifierType = 0;
         
         my $entityLevel = 3;
-        my $parentEntityID = $ParentIDs{$dref->{'strEntityParentCode'}} || 0;
+        my $entityType= 'CLUB';
+        my $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
         
         if ($maCode eq 'HKG')   {
             ## Config here for HKG
         }
-        else    {
-            ## Finland at moment
-            $gender = 1 if ($dref->{'strGender'} eq 'MALE');
-            $gender = 2 if ($dref->{'strGender'} eq 'FEMALE');
-            $otherIdentifierType = 0; ## Needs work from tmpPerspn.strIdentifierType
-            $localLang = 0; ## Needs work from tmpPerson.strLocalLanguage
-        }
-
         
         $qryINS->execute(
             $entityLevel,
+            $entityType,
             $dref->{'intID'},
-            $dref->{'strNationalNum'},
+            $dref->{'strMAID'},
             $status,
-            $dref->{'strLocalFirstname'},
+            $dref->{'strLocalName'},
+            $dref->{'strLocalShortName'},
             $localLang,
-            $dref->{'strLatinFirstname'},
-            $dref->{'strISOCountryOfBirth'},
+            $dref->{'strLatinName'},
+            $dref->{'strLatinShortName'},
+            $dref->{'dtFrom'},
+            $dref->{'dtTo'},
+            $dref->{'strISOCountry'},
+            $dref->{'strRegion'},
+            $dref->{'strCity'},
+            $dref->{'strState'},
             $dref->{'strFax'},
             $dref->{'strPhone'},
-            $dref->{'strAddress1'},
+            $dref->{'strAddress'},
             $dref->{'strAddress2'},
             $dref->{'strPostalCode'},
-            $dref->{'strSuburb'},
+            $dref->{'strWebURL'},
             $dref->{'strEmail'},
-            $dref->{'strIdentifier'},
-            $otherIdentifierType,
-            $dref->{'strIdentifierCountryIssued'},
-            $dref->{'dtIdentifierFrom'},
-            $dref->{'dtIdentifierTo'}
+            $dref->{'strDiscipline'},
+            $dref->{'intAcceptSelfRego'},
+            $dref->{'intNotifications'},
+            $dref->{'strOrganisationLevel'},
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
         $qryELINS->execute(
@@ -202,30 +220,34 @@ while (<INFILE>)	{
         ## Update field mapping for HKG 
     }
     else    {
-        ## Finland at moment
+        ## NEED GHANA MAPPING
 #SystemID;PalloID;Status;LocalFirstName;LocalLastName;LocalPreviousLastName;LocalLanguageCode;PreferedName;LatinFirstName;LatinLastName;LatinPreviousLastName;DateOfBirth;Gender;Nationality;CountryOfBirth;RegionOfBirth;PlaceOfBirth;Fax;Phone;Address1;Address2;PostalCode;Town;Suburb;Email;Identifier;IdentifierType;CountryIssued;DateFrom;DateTo
 
     	$parts{'ENTITYCODE'} = $fields[0] || '';
-    	$parts{'NATIONALNUM'} = $fields[1] || '';
+    	$parts{'MAID'} = $fields[1] || '';
 	    $parts{'STATUS'} = $fields[2] || '';
 	    $parts{'LOCALNAME'} = $fields[3] || '';
-	    $parts{'LOCALLANGUAGE'} = $fields[4] || '';
-	    $parts{'INTNAME'} = $fields[5] || '';
-	    $parts{'ISO_COUNTRY'} = $fields[6] || ''; 
-	    $parts{'FAX'} = $fields[7] || ''; 
-	    $parts{'PHONE'} = $fields[8] || ''; 
-	    $parts{'ADDRESS1'} = $fields[9] || ''; 
-	    $parts{'ADDRESS2'} = $fields[10] || ''; 
-	    $parts{'POSTALCODE'} = $fields[11] || ''; 
-	    $parts{'TOWN'} = $fields[12] || ''; 
-	    $parts{'SUBURB'} = $fields[13] || ''; 
-	    $parts{'EMAIL'} = $fields[14] || ''; 
-	    $parts{'OTHERIDENTIFIER'} = $fields[15] || ''; 
-	    $parts{'OTHERIDENTIFIERTYPE'} = $fields[16] || ''; 
-	    $parts{'OTHERIDENTIFIERCOUNTRY'} = $fields[17] || ''; 
-	    $parts{'OTHERIDENTIFIER_dtFROM'} = $fields[18] || '0000-00-00'; 
-	    $parts{'OTHERIDENTIFIER_dtTO'} = $fields[19] || '0000-00-00'; 
-	    $parts{'PARENTCODE'} = $fields[20] || ''; 
+	    $parts{'LOCALSHORTNAME'} = $fields[4] || '';
+	    $parts{'LOCALLANGUAGE'} = $fields[5] || '';
+	    $parts{'INTNAME'} = $fields[6] || '';
+	    $parts{'INTSHORTNAME'} = $fields[7] || '';
+	    $parts{'dtFROM'} = $fields[8] || '0000-00-00'; 
+	    $parts{'dtTO'} = $fields[9] || '0000-00-00'; 
+	    $parts{'ISO_COUNTRY'} = $fields[10] || ''; 
+	    $parts{'REGION'} = $fields[11] || ''; 
+	    $parts{'CITY'} = $fields[12] || ''; 
+	    $parts{'STATE'} = $fields[13] || ''; 
+	    $parts{'FAX'} = $fields[14] || ''; 
+	    $parts{'PHONE'} = $fields[15] || ''; 
+	    $parts{'ADDRESS'} = $fields[16] || ''; 
+	    $parts{'ADDRESS2'} = $fields[17] || ''; 
+	    $parts{'POSTALCODE'} = $fields[18] || ''; 
+	    $parts{'WEBURL'} = $fields[19] || ''; 
+	    $parts{'DISCIPLINE'} = $fields[20] || ''; 
+	    $parts{'ACCEPTREGO'} = $fields[21] || 0; 
+	    $parts{'NOTIFICATIONS'} = $fields[22] || 0; 
+	    $parts{'ORGLEVEL'} = $fields[23] || ''; 
+	    $parts{'PARENTCODE'} = $fields[24] || ''; 
         
     }
 	if ($countOnly)	{
@@ -238,27 +260,39 @@ while (<INFILE>)	{
 		(
             strFileType, 
             strEntityCode, 
-            strNationalNum, 
+            strMAID, 
             strStatus,
             strLocalName,
+            strLocalShortName,
             strLocalLanguage,
             strLatinName,
+            strLatinShortName,
+            dtFrom,
+            dtTo,
             strISOCountry,
+            strRegion,
+            strCity,
+            strState,
             strFax,
             strPhone,
-            strAddress1,
+            strAddress,
             strAddress2,
             strPostalCode,
-            strSuburb,
             strEmail,
-            strIdentifier,
-            strIdentifierType,
-            strIdentifierCountryIssued,
-            dtIdentifierFrom,
-            dtIdentifierTo,
+            strWebURL,
+            strDiscipline,
+            intAcceptSelfRego,
+            intNotifications,
+            strOrganisationLevel,
             strParentCode
         )
         VALUES (
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -286,24 +320,30 @@ while (<INFILE>)	{
  	$query->execute(
         $type,
         $parts{'ENTITYCODE'},
-        $parts{'NATIONALNUM'},
+        $parts{'MAID'},
         $parts{'STATUS'},
         $parts{'LOCALNAME'},
+        $parts{'LOCALSHORTNAME'},
         $parts{'LOCALLANGUAGE'},
         $parts{'INTNAME'},
+        $parts{'INTSHORTNAME'},
+        $parts{'dtFROM'},
+        $parts{'dtTO'},
         $parts{'ISO_COUNTRY'},
+        $parts{'REGION'},
+        $parts{'CITY'},
+        $parts{'STATE'},
         $parts{'FAX'},
         $parts{'PHONE'},
-        $parts{'ADDRESS1'},
+        $parts{'ADDRESS'},
         $parts{'ADDRESS2'},
         $parts{'POSTALCODE'},
-        $parts{'TOWN'},
         $parts{'EMAIL'},
-	    $parts{'OTHERIDENTIFIER'},
-	    $parts{'OTHERIDENTIFIERTYPE'},
-	    $parts{'OTHERIDENTIFIERCOUNTRY'},
-	    $parts{'OTHERIDENTIFIER_dtFROM'},
-	    $parts{'OTHERIDENTIFIER_dtTO'},
+        $parts{'WEBURL'},
+        $parts{'DISCIPLINE'},
+	    $parts{'ACCEPTREGO'},
+	    $parts{'NOTIFICATIONS'},
+	    $parts{'ORGLEVEL'},
 	    $parts{'PARENTCODE'}
     ) or print "ERROR";
 }
