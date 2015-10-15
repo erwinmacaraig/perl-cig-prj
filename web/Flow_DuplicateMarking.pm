@@ -451,13 +451,13 @@ sub FinaliseDuplicateFlow   {
 
     my $stMarkPerson= qq[
         UPDATE tblPerson
-        SET strStatus='DUPLICATE'
+        SET strStatus=?
         WHERE 
             intPersonID = ?
         LIMIT 1
     ];
     my $qMarkPerson=$Data->{'db'}->prepare($stMarkPerson);
-    $qMarkPerson->execute($personID);
+    $qMarkPerson->execute($Defs::PERSON_STATUS_DUPLICATE, $personID);
 
     my $stInsLinkage= qq[
         INSERT INTO tblPersonDuplicates

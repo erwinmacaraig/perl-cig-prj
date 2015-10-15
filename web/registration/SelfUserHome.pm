@@ -82,6 +82,9 @@ sub showHome {
     my $selfRegoMatrixOptions = getSelfRegoMatrixOptions($Data);
 	foreach my $person (@{$people}){
 		$count++;
+        if ($person->{'PersonStatus'} eq $Defs::PERSON_STATUS_DUPLICATE)    {
+            $selfRegoMatrixOptions = '';
+        }
 		if(!$activeAccordion && !$tempAccordion){
                     $tempAccordion = $person->{'intPersonID'};
 		}
@@ -373,7 +376,7 @@ sub getPreviousRegos {
                 intPersonID => $pID,
                 NationalNum => $dref->{'strNationalNum'},
                 formattedName => $formattedName,
-               
+                PersonStatus => $dref->{'PersonStatus'},
             };
         } 
         if(!exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}){
@@ -425,7 +428,9 @@ sub getPreviousRegos {
             $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
             $dref->{'allowAddTransaction'} = 1;
         }
-        if ($dref->{'intIsInternationalTransfer'})  {
+print STDERR "SSSSSSSSSS $dref->{'PersonStatus'}|$Defs::PERSON_STATUS_DUPLICATE\n";
+        if ($dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_DUPLICATE || $dref->{'intIsInternationalTransfer'})  {
+print STDERR "IN HERE\n";
             $dref->{'allowAddTransaction'} = 0 ;
             $dref->{'allowTransfer'} = 0;
             $dref->{'renewlink'} = '';
