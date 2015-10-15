@@ -1,14 +1,16 @@
 #!/usr/bin/perl
 
 use strict;
-use lib "..", "../web";
+use lib '.', '..', "../web", "../web/user", "../web/PaymentSplit", "../web/RegoForm", "../web/dashboard", "../web/RegoFormBuilder","../web/user", "../web/Clearances", "../web/registration", "../web/registration/user";
 use Utils;
 use DBI;
 use Defs;
 use PersonRegistrationStatusChange;
+use SystemConfig;
 
 use Data::Dumper;
 
+main();
 sub main {
     my $db = connectDB();
     my $realmID = 1;
@@ -19,20 +21,21 @@ sub main {
 
     #Rollover a number of periods
     my $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_1'} || 0;
-    rolloverRegoRecords($db, $npID, $realmID) if ($npID);
+    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
     $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_2'} || 0;
-    rolloverRegoRecords($db, $npID, $realmID) if ($npID);
+    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
     $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_3'} || 0;
-    rolloverRegoRecords($db, $npID, $realmID) if ($npID);
+    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
 
 }
 
 sub rolloverRegoRecords {
 
-    my ($db, $npID, $realmID) = @_;
+    my ($Data, $npID, $realmID) = @_;
+    my $db = $Data->{'db'};
     return if (!$npID or !$realmID);
 
     my $stUPD = qq[
@@ -53,6 +56,7 @@ sub rolloverRegoRecords {
         WHERE
             intNationalPeriodID = ?
             AND strStatus='ACTIVE'
+        LIMIT 1
     ];
     my $q = $db->prepare($st);
     $q->execute($npID);
