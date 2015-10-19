@@ -63,6 +63,7 @@ sub migrateRecords{
         WHERE
             PR.intEntityID = ?
             AND PR.strPersonType= 'PLAYER'
+            AND PR.strRegistrationNature <> 'INT_TRANSFER_OUT'
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
             AND PR.intPersonRegistrationID = 1963088
     ];
