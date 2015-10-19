@@ -1224,13 +1224,19 @@ sub getPersonMenuData {
                  url => $baseurl."a=P_CLR",
             };
         }
-print STDERR "SSS" . $SystemConfig->{'AllowDuplicateMarking'};
         if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
             $menuoptions{'dup'} = {
                     name => $lang->txt('Mark as Duplicate'),
                  url => $baseurl."a=P_DUP_",
             };
         }
+        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
+            $menuoptions{'duphistory'} = {
+                    name => $lang->txt('Duplicate Merging History'),
+                 url => $baseurl."a=P_DUPH_",
+            };
+        }
+
     }
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
@@ -1242,7 +1248,8 @@ print STDERR "SSS" . $SystemConfig->{'AllowDuplicateMarking'};
         [ $lang->txt('History'), 'menu',[
             'regos',
             'clr',
-            'auditlog'
+            'auditlog',
+            'duphistory'
         ]],
         [ $lang->txt('Documents'), 'menu','docs'],
         [ $lang->txt('Mark as Duplicate'), 'menu','dup'],

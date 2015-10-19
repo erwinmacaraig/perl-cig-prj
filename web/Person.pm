@@ -170,6 +170,10 @@ sub handlePerson {
         ($resultHTML , $title)= personRegistrationsHistory( $Data, $personID ) ;
         $title = $lang->txt('Registration History');
     }
+    elsif ( $action =~ /P_DUPH/ ) {
+        ($resultHTML , $title)= personDupMergingHistory( $Data, $personID ) ;
+        $title = $lang->txt('Duplicate Merging History');
+    }
     elsif ( $action eq 'P_REGO' ) {
         my $entityID = getLastEntityID($Data->{'clientValues'});
         my $prID = safe_param( 'prID', 'number' );
@@ -228,7 +232,121 @@ sub listPlayerPassport {
 	 return ($resultHTML, $title);
 }
 
+sub personDupMergingHistory {
 
+
+    my ($Data, $personID) = @_;
+
+    my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
+    my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
+    my $lang = $Data->{'lang'};
+
+    my $st = qq[
+        SELECT
+            PD.intChildPersonID,
+            P.strNationalNum,
+            P.strLocalFirstname,
+            P.strLocalSurname,
+            P.strLatinFirstname,
+            P.strLatinSurname,
+            P.dtDOB,
+            PD.dtUpdated
+        FROM
+            tblPersonDuplicates as PD
+            INNER JOIN tblPerson as P ON (
+                P.intPersonID = PD.intChildPersonID
+            )
+        WHERE PD.intParentPersonID = ?
+    ];
+            
+	my $qry = $Data->{'db'}->prepare($st); 
+    $qry->execute($personID);
+    
+    my %RegFilters=();
+    my @rowdata = ();
+    my $results = 0;
+    my $client           = setClient( $Data->{'clientValues'} ) || '';
+   
+    my %tempClientValues = getClient($client);
+    $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+    while (my $rego = $qry->fetchrow_hashref()) {
+      $results=1;
+      $tempClientValues{personID} = $rego->{intChildPersonID};
+        my $tempClient = setClient(\%tempClientValues);
+      push @rowdata, {
+        id => $rego->{'intChildPersonID'} || 0,
+        NationalNum=> $rego->{'strNationalNum'} || '',
+        LocalFirstname=> $rego->{'strLocalFirstname'} || '',
+        LocalSurname=> $rego->{'strLocalSurname'} || '',
+        LatinFirstname=> $rego->{'strLatinFirstname'} || '',
+        LatinSurname=> $rego->{'strLatinSurname'} || '',
+        dtUpdated=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtUpdated'},'MEDIUM','SHORT') || '',
+        dtUpdated_RAW=> $rego->{'dtUpdated'} || '',
+        dob=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtDOB'},'MEDIUM',''),
+        dob_RAW => $rego->{'dtDOB'},
+        SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=P_HOME",
+      };
+    }
+
+    my $addlink='';
+    my $title=$lang->txt('Duplicate Merging History');
+    my @headers = (
+        {
+            name  => $Data->{'lang'}->txt($natnumname),
+            field => 'NationalNum',
+        },
+        {
+            name  => $FieldLabels->{'strLocalFirstname'},
+            field => 'LocalFirstname',
+        },
+        {
+            name  => $FieldLabels->{'strLocalSurname'},
+            field  => 'LocalSurname',
+            width  => 30,
+        },
+        {
+            name  => $FieldLabels->{'strLatinFirstname'},
+            field => 'LatinFirstname',
+        },
+        {
+            name  => $FieldLabels->{'strLatinSurname'},
+            field  => 'LatinSurname',
+            width  => 30,
+        },
+
+        {
+            name  => $FieldLabels->{'dtDOB'},
+            field  => 'dob',
+            width  => 30,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Date Merged'),
+            field => 'dtUpdated',
+            sortdata => 'dtUpdated_RAW',
+            defaultShow => 1,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
+    );
+
+    my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '100%',
+    );
+
+    my $resultHTML = qq[
+        <div class="clearfix">
+            $grid
+        </div>
+    ];
+
+    return ($resultHTML,$title);
+}
 sub personRegistrationsHistory   {
 
 
