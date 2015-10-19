@@ -207,7 +207,7 @@ sub _getConfiguration {
 					displaytype=>'date', 
 					fieldtype=>'datetime', 
 					allowsort=>1, 
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
 					dbfield=>'T.dtPaid'
 				}
 			],
@@ -217,7 +217,7 @@ sub _getConfiguration {
 					displaytype=>'date', 
 					fieldtype=>'date', 
 					allowsort=>1, 
-                    datetimeformat => ['MEDIUM',''],
+                    TZdatetimeformat => ['MEDIUM',''],
 					dbfield=>'TL.dtSettlement', 
 					allowgrouping=>1, 
 					sortfield=>'TL.dtSettlement'

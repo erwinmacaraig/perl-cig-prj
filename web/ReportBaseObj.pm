@@ -449,7 +449,7 @@ sub _processrow	{
                 $outvalue = $obj->format(@p);
             }
 			if($totalRowCount < $maxRows and $fieldopts->{'TZdatetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
-                my @p = @{$fieldopts->{'datetimeformat'}};
+                my @p = @{$fieldopts->{'TZdatetimeformat'}};
                 my $obj = $self->{'Config'}->{'Config'}{'DateTimeFormatObject'};
                 unshift @p, $outvalue;
                 $outvalue = $obj->TZformat(@p);

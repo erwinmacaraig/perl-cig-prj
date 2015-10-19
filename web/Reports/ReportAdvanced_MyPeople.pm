@@ -413,6 +413,28 @@ sub _getConfiguration {
                 }
             ],
 
+            PRdtApproved=> [
+                'Date Approved',
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'date',
+                    allowsort   => 1,
+                    dbfield     => 'PR.dtApproved',
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'regos'
+                }
+            ],
+            PRdtAdded => [
+                $lang->txt('Date Added'),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'date',
+                    allowsort   => 1,
+                    dbfield     => 'PR.dtAdded',
+                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'regos'
+                }
+            ],
 
             PRdtFrom=> [
                 'Date From',
@@ -1598,7 +1620,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtPaid'
                 }
@@ -1609,7 +1631,7 @@ sub _getConfiguration {
                     displaytype   => 'date',
                     fieldtype     => 'date',
                     allowsort     => 1,
-                    datetimeformat => ['MEDIUM',''],
+                    TZdatetimeformat => ['MEDIUM',''],
                     optiongroup   => 'transactions',
                     dbfield       => 'TL.dtSettlement',
                     allowgrouping => 1,
@@ -1776,6 +1798,8 @@ sub _getConfiguration {
                 PRstrStatus
                 PRstrSport
                 PRintNationalPeriodID
+                PRdtAdded
+                PRdtApproved
                 PRdtFrom
                 PRdtTo
                 PRstrRegistrationNature
