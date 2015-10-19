@@ -418,7 +418,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtApproved=> [
-                'Date Approved',
+                'Date Registration Approved',
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
@@ -429,7 +429,7 @@ sub _getConfiguration {
                 }
             ],
             PRdtAdded => [
-                $lang->txt('Date Added'),
+                $lang->txt('Date Registration Added'),
                 {
                     displaytype => 'date',
                     fieldtype   => 'date',
