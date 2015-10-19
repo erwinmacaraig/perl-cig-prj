@@ -1586,7 +1586,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtTransaction',
                     sortfield   => 'TX.dtTransaction'

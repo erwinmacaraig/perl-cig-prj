@@ -448,6 +448,12 @@ sub _processrow	{
                 unshift @p, $outvalue;
                 $outvalue = $obj->format(@p);
             }
+			if($totalRowCount < $maxRows and $fieldopts->{'TZdatetimeformat'} and $self->{'Config'}->{'Config'}{'DateTimeFormatObject'})  {
+                my @p = @{$fieldopts->{'datetimeformat'}};
+                my $obj = $self->{'Config'}->{'Config'}{'DateTimeFormatObject'};
+                unshift @p, $outvalue;
+                $outvalue = $obj->TZformat(@p);
+            }
 			if($totalRowCount < $maxRows and $fieldopts->{'translate'} and $self->{'Lang'})   {
                 $outvalue = $self->{'Lang'}->txt($outvalue);
             }
