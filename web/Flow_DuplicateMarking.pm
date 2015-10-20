@@ -46,14 +46,14 @@ sub setProcessOrder {
         {
             'action' => 'findparent',
             'function' => 'display_find_parent',
-            'label'  => $lang->txt('Find Record'),
-            'title'  => $lang->txt('Find other Record'),
+            'label'  => $lang->txt('Find Master'),
+            'title'  => $lang->txt('Find Master Record'),
         },
         {
             'action' => 'showmatches',
             'function' => 'display_show_matches',
-            'label'  => $lang->txt('Show Record'),
-            'title'  => $lang->txt('Show other records'),
+            'label'  => $lang->txt('Show Master'),
+            'title'  => $lang->txt('Select Master Record'),
         },
         {
             'action' => 'sid',
@@ -186,8 +186,11 @@ sub display_show_matches {
     );
     my @Matches = ();
     my $hideContinueBtn= 1;
+    my $isocountries  = getISOCountriesHash();
     while (my $dref=$q->fetchrow_hashref()) {
         $hideContinueBtn=0;
+        $dref->{'Nationality'} = $isocountries->{$dref->{'strISONationality'}} || '';
+    
         push @Matches, $dref;
     }
     my $singleRecordSelected = (scalar @Matches == 1) ? "checked" : '';

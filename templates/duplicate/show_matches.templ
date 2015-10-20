@@ -1,4 +1,4 @@
-<p>Master record matches</p>
+<p>[% Lang.txt('Master record matches') %]</p>
 [% IF Matches_ref.size %]
 <table>
     <tr>
@@ -7,6 +7,7 @@
         <td>[% Lang.txt('First Name') %]</td>
         <td>[% Lang.txt('Family Name') %]</td>
         <td>[% Lang.txt('Date of Birth') %]</td>
+        <td>[% Lang.txt('Nationality') %]</td>
     </tr>
 [% FOREACH m IN Matches_ref %]
     <tr>
@@ -15,6 +16,7 @@
         <td>[% m.strLocalFirstname %]</td>
         <td>[% m.strLocalSurname %]</td>
         <td>[% DateFormat.format(m.dtDOB,'MEDIUM') %]</td>
+        <td>[% m.Nationality %]</td>
     </tr>
 [% END %]
 </table>
