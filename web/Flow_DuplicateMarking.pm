@@ -96,7 +96,10 @@ sub setupValues    {
 
 sub display_find_parent { 
     my $self = shift;
-	$self->addCarryField('club_vstd', 1);
+    $self->addCarryField('parentPersonID','');
+    $self->addCarryField('copyRegos','');
+    $self->addCarryField('copyRegoDocs','');
+    $self->addCarryField('copyRegoPays','');
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -144,7 +147,14 @@ sub display_find_parent {
 sub display_show_matches { 
     my $self = shift;
 
+    $self->addCarryField('parentPersonID','');
+    $self->addCarryField('copyRegos','');
+    $self->addCarryField('copyRegoDocs','');
+    $self->addCarryField('copyRegoPays','');
+
     my $ma_id= $self->{'RunParams'}{'findMA_ID'} || '';
+    $self->addCarryField('findMA_ID',$ma_id);
+    ##BAFF
 	$self->addCarryField('cd_vstd', 1);
     my $id = $self->ID() || 0;
     if($id)   {
@@ -175,7 +185,9 @@ sub display_show_matches {
         $id
     );
     my @Matches = ();
+    my $hideContinueBtn= 1;
     while (my $dref=$q->fetchrow_hashref()) {
+        $hideContinueBtn=0;
         push @Matches, $dref;
     }
     my $singleRecordSelected = (scalar @Matches == 1) ? "checked" : '';
@@ -206,6 +218,7 @@ my %DuplPageData = (
         TextTop => '',
         FlowSummaryContent => personSummaryPanel($self->{'Data'}, $id) || '',
         ContinueButtonText => $self->{'Lang'}->txt('Continue'),
+        NoContinueButton => $hideContinueBtn,
         TextBottom => '',
     );
 
@@ -230,8 +243,12 @@ print STDERR "ALL OK\n";
 sub display_regos { 
     my $self = shift;
     my $parentPersonID= $self->{'RunParams'}{'parentPersonID'} || 0;
+    $self->addCarryField('copyRegos','');
+    $self->addCarryField('copyRegoDocs','');
+    $self->addCarryField('copyRegoPays','');
 
     my $id = $self->ID() || 0;
+    my $hideContinueBtn = 1;
     if($id)   {
         my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
         $personObj->load();
@@ -240,6 +257,14 @@ sub display_regos {
             $self->setupValues($objectValues);
         }
     }
+    if($parentPersonID)   {
+        my $parentPersonObj = new PersonObj(db => $self->{'db'}, ID => $parentPersonID, cache => $self->{'Data'}{'cache'});
+        $parentPersonObj->load();
+        if($parentPersonObj->ID())    {
+            $hideContinueBtn=0;
+        }
+    }
+
 
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'core'}, 'Person',);
     my($fieldsContent, undef, $scriptContent, $tabs) = $self->displayFields($memperm);
@@ -259,6 +284,7 @@ my %DuplPageData = (
         Lang => $self->{'Data'}->{'lang'},
         regos_ref => $regs,
         NoFormFields=>1,
+        NoContinueButton => $hideContinueBtn,
   );
 
     my $content= runTemplate(

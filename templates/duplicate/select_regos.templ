@@ -1,19 +1,31 @@
-<p>Regos</p>
+<p>[% Lang.txt('Registrations to move') %]</p>
+[% IF regos_ref.size %]
 <table>
     <tr>
-        <td>Select Registration to copy</td>
-        <td>Period</td>
-        <td>Type</td>
-        <td>Move Documents ?</td>
-        <td>Copy Payment History ?</td>
+        <td>[% Lang.txt('Move') %]</td>
+        <td>[% Lang.txt('Period') %]</td>
+        <td>[% Lang.txt('Status') %]</td>
+        <td>[% Lang.txt('Type') %]</td>
+        <td>[% Lang.txt('Level') %]</td>
+        <td>[% Lang.txt('Sport') %]</td>
+        <td>[% Lang.txt('AgeLevel') %]</td>
+        <td>[% Lang.txt('Move Documents ?') %]</td>
+        <td>[% Lang.txt('Move Payment History ?') %]</td>
     </tr>
 [% FOREACH r IN regos_ref %]
     <tr>
         <td><input type="checkbox" name="rego_[% r.intPersonRegistrationID %]" value="1"></td>
-        <td>Period [% r.strNationalPeriodName %]</td>
-        <td>Type [% r.PersonType %]</td>
+        <td>[% r.strNationalPeriodName %]</td>
+        <td>[% r.Status %]</td>
+        <td>[% r.PersonType %][% IF r.strEntityRoleName%] - [% Lang.txt(r.strEntityRoleName) %][% END %]</td>
+        <td>[% r.PersonLevel %]</td>
+        <td>[% r.Sport %]</td>
+        <td>[% r.AgeLevel %]</td>
         <td><input type="checkbox" name="regoDocuments_[% r.intPersonRegistrationID %]" value="1"></td>
         <td><input type="checkbox" name="regoPayments_[% r.intPersonRegistrationID %]" value="1"></td>
     </tr>
 [% END %]
 </table>
+[% ELSE %]
+    <p>[% Lang.txt('There are no registrations to select') %]</p>
+[% END %]
