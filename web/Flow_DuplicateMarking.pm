@@ -110,11 +110,13 @@ sub display_find_parent {
     my $memperm = ProcessPermissions($self->{'Data'}->{'Permissions'}, $self->{'FieldSets'}{'contactdetails'}, 'Person',);
     my $scriptContent = '';
 
+    my $natnumname = $self->{'Data'}->{'SystemConfig'}{'NationalNumName'} || 'National Number';
    my %DuplPageData = (
         HiddenFields => $self->stringifyCarryField(),
         target => $self->{'Data'}{'target'},
         Lang => $self->{'Data'}->{'lang'},
         NoFormFields=>1,
+        natnumname => $natnumname,
   );
 
     my $content= runTemplate(
@@ -164,17 +166,20 @@ sub display_show_matches {
         WHERE 
             strStatus IN ('REGISTERED')
             AND strNationalNum = ?
+            AND intPersonID <> ?
         LIMIT 100
     ];
     my $q = $self->{'Data'}->{'db'}->prepare($st) or query_error($st);
     $q->execute(
-        $ma_id
+        $ma_id,
+        $id
     );
     my @Matches = ();
     while (my $dref=$q->fetchrow_hashref()) {
         push @Matches, $dref;
     }
     my $singleRecordSelected = (scalar @Matches == 1) ? "checked" : '';
+    my $natnumname = $self->{'Data'}->{'SystemConfig'}{'NationalNumName'} || 'National Number';
 my %DuplPageData = (
         HiddenFields => $self->stringifyCarryField(),
         target => $self->{'Data'}{'target'},
@@ -182,6 +187,7 @@ my %DuplPageData = (
         Matches_ref => \@Matches,
         singleRecordSelected => $singleRecordSelected || '',
         NoFormFields=>1,
+        natnumname => $natnumname,
   );
 
     my $content= runTemplate(
@@ -319,11 +325,49 @@ sub copy_regos {
 }
 
 sub buildDuplicateSummary   {
-    my ($Data, $personID, $otherPersonID, $regosToCopy) = @_;
+    my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy, $paysToCopy, $carryString) = @_;
+    
+    my $changelink =  $Data->{'target'}."?".$carryString;
+    my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
+    my $lang = $Data->{'lang'};
+    my $parentPersonObj = getInstanceOf($Data, 'person', $parentPersonID);
+    my %parentPersonData = ();
+    $parentPersonData{'Name'} = $parentPersonObj->getValue('strLocalFirstname');
+    $parentPersonData{'Familyname'} = $parentPersonObj->getValue('strLocalSurname');
+    $parentPersonData{'LatinName'} = $parentPersonObj->getValue('strLatinFirstname');
+    $parentPersonData{'LatinFamilyname'} = $parentPersonObj->getValue('strLatinSurname');
+    $parentPersonData{'MAID'} = $parentPersonObj->getValue('strNationalNum');
+    $parentPersonData{'DOB'} = $parentPersonObj->getValue('dtDOB');
 
-    my $content = '';
-    $content = qq[We want to MARK $personID as a DUPLICATE and the PARENT is $otherPersonID<br>];
-    $content .= qq[In doing this we will copy ] . scalar(@{$regosToCopy}) .qq[Registrations];
+    my %Reg = (
+    );
+    my ($count, $regs_ref) = PersonRegistration::getRegistrationData(
+        $Data,
+        $personID,
+        \%Reg
+    );
+ 
+    my @registrations = ();
+    foreach my $rego (@{$regs_ref})  {
+        my $copyRego = $regosToCopy->{$rego->{'intPersonRegistrationID'}};
+        my $regoIDToCopy = $rego->{'intPersonRegistrationID'} || next;
+        next if $copyRego ne "1";
+        $rego->{'moveDocuments'} = $lang->txt('No');
+        $rego->{'movePayments'} = $lang->txt('No');
+        $rego->{'moveDocuments'} = $lang->txt('Yes') if ($docsToCopy->{$regoIDToCopy} eq "1");
+        $rego->{'movePayments'} = $lang->txt('Yes') if ($paysToCopy->{$regoIDToCopy} eq "1");
+        push @registrations, $rego;
+    }
+     my %PageData = (
+        target => $Data->{'target'},
+        Lang => $Data->{'lang'},
+        parentPerson => \%parentPersonData,
+        NationalNumName => $natnumname,
+        changelink => $changelink,
+        registrations=> \@registrations,
+    );
+
+    my $content = runTemplate($Data, \%PageData, 'duplicate/summary.templ') || '';
     return $content;
 }
 
@@ -351,11 +395,33 @@ sub display_summary {
     my $regoIDs= $self->{'RunParams'}{'copyRegos'} || '';
     my @Regos = split /\|/, $regoIDs;
 
+      my %RegoIDs=();
+    foreach my $ID (@Regos) {
+        $RegoIDs{$ID} = 1;
+    }
+
+    my $DocIDs= $self->{'RunParams'}{'copyRegoDocs'} || '';
+    my @Docs = split /\|/, $DocIDs;
+    my %DocRegos=();
+    foreach my $ID (@Docs) {
+        $DocRegos{$ID} = 1;
+    }
+    my $PayIDs= $self->{'RunParams'}{'copyRegoPays'} || '';
+    my @Pays = split /\|/, $PayIDs;
+    my %PayRegos=();
+    foreach my $ID (@Pays) {
+        $PayRegos{$ID} = 1;
+    }
+
+
     my $content = buildDuplicateSummary(
         $self->{'Data'}, 
         $personID,
         $parentPersonID,
-        \@Regos
+        \%RegoIDs,
+        \%DocRegos,
+        \%PayRegos,
+        $self->stringifyURLCarryField()
     );
 
     my %Config = (
@@ -510,7 +576,53 @@ sub FinaliseDuplicateFlow   {
 }
 sub displayDuplicateComplete    {
 
-    return "DONE";
+    my ($Data, $personID, $parentPersonID, $regos_ref) = @_;
+
+    my $lang = $Data->{'lang'};
+    my $parentPersonObj = getInstanceOf($Data, 'person', $parentPersonID);
+    my %parentPersonData = ();
+    $parentPersonData{'Name'} = $parentPersonObj->getValue('strLocalFirstname');
+    $parentPersonData{'Familyname'} = $parentPersonObj->getValue('strLocalSurname');
+    $parentPersonData{'LatinName'} = $parentPersonObj->getValue('strLatinFirstname');
+    $parentPersonData{'LatinFamilyname'} = $parentPersonObj->getValue('strLatinSurname');
+    $parentPersonData{'MAID'} = $parentPersonObj->getValue('strNationalNum');
+
+    my $originLevel = $Data->{'clientValues'}{'authLevel'} || -1;
+    my $cl = setClient($Data->{'clientValues'}) || '';
+    my %cv = getClient($cl);
+     my $clm = setClient(\%cv);
+
+        my $client = $Data->{'client'};
+        my %tempClientValues = getClient($client);
+        $tempClientValues{personID} = $personID;
+        my $tempClient = setClient(\%tempClientValues);
+
+    $cv{'entityID'} = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'authLevel'});
+    $cv{'currentLevel'} = $originLevel;
+    my $originClient = setClient(\%cv);
+
+    my %PageData = (
+        Target => $Data->{'target'},
+        parentPerson => \%parentPersonData,
+        Lang => $lang,
+        Title => '',
+        TextTop => '',
+        FlowSummaryContent => personSummaryPanel($Data, $personID) || '',
+        PersonSummaryPanel=> personSummaryPanel($Data, $personID) || '',
+        ContinueButtonText => $lang->txt('Continue'),
+        TextBottom => '',
+        client=>$clm,
+        clientrego=>$tempClient,
+        originLevel => $originLevel,
+        originClient => $originClient,
+    );
+    my $content= runTemplate(
+        $Data,
+        \%PageData,
+        'duplicate/complete.templ',
+    );
+
+    return ($content);
 }
 
 sub display_complete { 
@@ -523,6 +635,7 @@ sub display_complete {
     my $entityID = getLastEntityID($self->{'ClientValues'}) || 0;
     my $entityLevel = getLastEntityLevel($self->{'ClientValues'}) || 0;
     my $originLevel = $self->{'ClientValues'}{'authLevel'} || 0;
+    print STDERR "DC: $entityID | $entityLevel | $originLevel\n";
     my $regoID = $self->{'RunParams'}{'rID'} || 0;
     my $client = $self->{'Data'}->{'client'};
 

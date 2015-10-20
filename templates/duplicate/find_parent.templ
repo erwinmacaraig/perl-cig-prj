@@ -2,7 +2,8 @@
 <form action="[% target %]" method="POST">
             <input type="hidden" name="a" value="[% nextaction %]">
 [% END %]
-<p>Find MA <input type="text" name="findMA_ID" size="40" value=""></p>
+[% Lang.txt('Search for Person to be the master record for this duplicate') %]
+<p><input type="text" name="findMA_ID" size="40" value="" placeholder="[% Lang.txt('Enter a person\'s Member ID') %]"></p>
 [% IF !NoFormFields %]
 [% FOREACH h IN  hidden_ref %]
 <input type="hidden" name="[% h.key %]" value="[% h.value %]">

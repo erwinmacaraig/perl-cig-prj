@@ -1,6 +1,23 @@
-<p>People</p>
+<p>Master record matches</p>
+[% IF Matches_ref.size %]
+<table>
+    <tr>
+        <td>[% Lang.txt('Select') %]</td>
+        <td>[% natnumname %]</td>
+        <td>[% Lang.txt('First Name') %]</td>
+        <td>[% Lang.txt('Family Name') %]</td>
+        <td>[% Lang.txt('Date of Birth') %]</td>
+    </tr>
 [% FOREACH m IN Matches_ref %]
-<input type="radio" name="parentPersonID" value="[% m.intPersonID %]" [% singleRecordSelected %]>
-<p>Firtsname [% m.strLocalFirstname %]</p>
-<p>MA ID [% m.strNationalNum %]</p>
+    <tr>
+        <td><input type="radio" name="parentPersonID" value="[% m.intPersonID %]" [% singleRecordSelected %]></td>
+        <td>[% m.strNationalNum %]</td>
+        <td>[% m.strLocalFirstname %]</td>
+        <td>[% m.strLocalSurname %]</td>
+        <td>[% DateFormat.format(m.dtDOB,'MEDIUM') %]</td>
+    </tr>
+[% END %]
+</table>
+[% ELSE %]
+    <p>[% Lang.txt('No matches found') %]
 [% END %]
