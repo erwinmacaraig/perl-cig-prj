@@ -220,22 +220,29 @@ $levelWHERE = '';
 				SELECT DISTINCT
 					P.intProductID,
                     P.strName as ProductName,
+                    NP.strNationalPeriodName,
 					$productName
-					strGroup, 
-					intInactive
+					P.strGroup, 
+					P.intInactive
 				FROM tblProducts as P 
+                    LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = P.intProductNationalPeriodID)
 				WHERE P.intRealmID=$Data->{'Realm'}
 					$levelWHERE
-					AND intProductSubRealmID IN (0, $Data->{'RealmSubType'})
+					AND P.intProductSubRealmID IN (0, $Data->{'RealmSubType'})
 					$WHEREClub
 				ORDER BY intInactive, strGroup,ProductName 
 			];
 			my $query = $db->prepare($statement) or query_error($statement);
 			$query->execute or query_error($statement);
 			while (my $dref = $query->fetchrow_hashref() ) {
+                my $prodYear = $dref->{'strNationalPeriodName'} || '';
+                $prodYear = $prodYear . '- ' if ($prodYear);
+                if ($Data->{'SystemConfig'}{'rpts_HideProductYear'})    {   
+                    $prodYear = '';
+                } 
 				my $inactive = $dref->{intInactive} ? qq[(ARCHIVED)-] : '';
 				my $group = $dref->{strGroup} ? qq[$dref->{strGroup}-] : '';
-				$Products{$dref->{'intProductID'}}=qq[$inactive$group$dref->{ProductName}];
+				$Products{$dref->{'intProductID'}}=qq[$prodYear$inactive$group$dref->{ProductName}];
 				push @ProductsOrder, $dref->{intProductID};
 			}
 			$optvalues{'Products'} = {

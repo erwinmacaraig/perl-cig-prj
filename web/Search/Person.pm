@@ -27,7 +27,7 @@ sub process {
             return $self->getUnique($raw);
             #return $self->getUnique();
         }
-        case 'transfer' {
+        case ['transfer', 'int_transfer_out'] {
             return $self->getTransfer($raw);
         }
         case 'access' {
@@ -38,6 +38,9 @@ sub process {
         }
         case 'default' {
             return $self->getPersonRegistration($raw);
+        }
+        case 'int_transfer_return' {
+            return $self->getIntTransferReturn($raw);
         }
         else {
             return $self->getUnique($raw);
@@ -157,6 +160,7 @@ sub getTransfer {
     my ($self) = shift;
     my ($raw) = @_;
 
+    my $searchType = $self->getSearchType();
     my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
     my $filters = $self->setupFilters($subNodes);
 
@@ -253,6 +257,7 @@ sub getTransfer {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PR.intPersonRegistrationID,
                 PR.intPersonID,
                 PR.dtFrom,
@@ -324,8 +329,11 @@ sub getTransfer {
 
         my %validRecords = ();
         my @sportsFilter;
-
-        while(my $dref = $q->fetchrow_hashref()) {
+       
+        while(my $dref = $q->fetchrow_hashref()) {            
+            next if(PersonRegistration::hasPendingRegistration($self->getData(), $dref->{'intPersonID'}, $dref->{'strSport'}, [] ));
+            next if $dref->{'intIsInternationalTransfer'} == 1; #club must not be able to request from holding club of international transfer out/return
+       
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
@@ -345,7 +353,7 @@ sub getTransfer {
                     id => $result->{'intPersonID'} || next,
                     name => $name,
                     sport => $Defs::sportType{$personSport},
-                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=transfer&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
+                    link => "$target?client=$client&amp;a=PRA_getrecord&request_type=$searchType&amp;search_keyword=$result->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$result->{'intPersonRegistrationID'}",
                     otherdetails => {
                         dob => $result->{'dtDOB'},
                         dtadded => $result->{'dtadded'},
@@ -516,6 +524,7 @@ sub getPlayerLoan {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PR.intPersonRegistrationID,
                 PR.intPersonID,
                 PR.dtFrom,
@@ -589,6 +598,8 @@ sub getPlayerLoan {
         my @sportsFilter;
 
         while(my $dref = $q->fetchrow_hashref()) {
+            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+
             next if $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}};
 
             $validRecords{$dref->{'intPersonID'}}{$dref->{'strSport'}} = $dref;
@@ -732,7 +743,7 @@ sub getPersonRegistration {
             tblPerson
             INNER JOIN tblPersonRegistration_$realmID AS PR ON (
                 tblPerson.intPersonID = PR.intPersonID
-                AND (PR.strStatus IN ('ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
+                AND (PR.strStatus IN ('TRANSFERRED', 'ACTIVE', 'PASSIVE') OR PR.intOnLoan = 1)
                 AND PR.intEntityID IN ($entity_list)
             )
             INNER JOIN tblEntity AS E ON (
@@ -868,6 +879,7 @@ sub getPersonAccess {
                 E.strLocalName AS EntityName,
                 E.intEntityID,
                 E.intEntityLevel,
+                E.intIsInternationalTransfer,
                 PRQinprogress.intPersonRequestID as existingInProgressRequestID,
                 PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
                 PRQactive.intPersonRequestID as existingPersonRegistrationID,
@@ -926,6 +938,8 @@ sub getPersonAccess {
         my $target = $self->getData()->{'target'};
         my $client = $self->getData()->{'client'};
         while(my $dref = $q->fetchrow_hashref()) {
+            next if $dref->{'intIsInternationalTransfer'}; #club must not be able to request from holding club of international transfer out/return
+
             $count++;
             my $name = formatPersonName($self->getData(), $dref->{'strLocalFirstname'}, $dref->{'strLocalSurname'}, '') || '';
             my $acceptedRequestLink = ($dref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$dref->{'existingAcceptedRequestID'}" : '';
@@ -966,5 +980,152 @@ sub getPersonAccess {
     }
 
 }
+
+
+sub getIntTransferReturn {
+
+    my ($self) = shift;
+    my ($raw) = @_;
+
+    my $searchType = $self->getSearchType();
+    my ($intermediateNodes, $subNodes) = $self->getIntermediateNodes(0);
+    my $filters = $self->setupFilters($subNodes);
+
+    my $realmID = $self->getData()->{'Realm'};
+    $self->getSphinx()->ResetFilters();
+    $self->getSphinx()->SetFilter('intrealmid', [$filters->{'realm'}]);
+
+    #exclude persons that are already in the CLUB initiating the transfer
+#    $self->getSphinx()->SetFilter('intentityid', [$filters->{'club'}], 1) if $filters->{'club'};
+    my $indexName = $Defs::SphinxIndexes{'Person'}.'_r'.$filters->{'realm'};
+    my $results = $self->getSphinx()->Query($self->getKeyword(1), $indexName);
+    my @persons = ();
+
+    if($results and $results->{'total'})  {
+        for my $r (@{$results->{'matches'}})  {
+            push @persons, $r->{'doc'};
+        }
+    }
+
+    my $clubID = $self->getData()->{'clientValues'}{'clubID'} || 0;
+    $clubID = 0 if $clubID == $Defs::INVALID_ID;
+
+    my @memarray = ();
+    if(@persons)  {
+        my $person_list = join(',',@persons);
+        my %personRegMapping = ();
+
+        my $pst = qq [
+            SELECT
+                it.*,
+                tp.strLocalFirstname,
+                tp.strLocalSurname,
+                tp.strNationalNum,
+                tp.dtDOB,
+                PR.intPersonRegistrationID,
+                PR.strStatus,
+                PRQinprogress.intPersonRequestID as existingInProgressRequestID,
+                PRQaccepted.intPersonRequestID as existingAcceptedRequestID,
+                PRQactive.intPersonRequestID as existingPersonRegistrationID,
+                ePR.intPersonRegistrationID as existingPendingRegistrationID
+            FROM
+                tblIntTransfer it
+            INNER JOIN
+                tblPersonRegistration_$realmID PR ON (PR.intPersonID = it.intPersonID AND PR.intPersonRequestID = it.intPersonRequestID)
+            INNER JOIN
+                tblPerson tp ON (tp.intPersonID = it.intPersonID)
+            LEFT JOIN tblPersonRequest AS PRQinprogress ON (
+                PRQinprogress.strRequestType = "INT_TRANSFER_RETURN"
+                AND PRQinprogress.intPersonID = tp.intPersonID
+                AND PRQinprogress.strSport =  PR.strSport
+                AND PRQinprogress.strPersonType = PR.strPersonType
+                AND PRQinprogress.strRequestStatus NOT IN ("PENDING", "COMPLETED", "DENIED", "REJECTED", "CANCELLED")
+            )
+            LEFT JOIN tblPersonRequest AS PRQaccepted ON (
+                PRQaccepted.strRequestType = "INT_TRANSFER_RETURN"
+                AND PRQaccepted.intPersonID = tp.intPersonID
+                AND PRQaccepted.strSport =  PR.strSport
+                AND PRQaccepted.strPersonType = PR.strPersonType
+                AND PRQaccepted.strRequestStatus = "PENDING" AND PRQaccepted.strRequestResponse = "ACCEPTED"
+                AND PRQaccepted.intRequestFromEntityID = "$clubID"
+            )
+            LEFT JOIN tblPersonRegistration_$realmID ePR
+            ON (
+                ePR.intEntityID = "$clubID"
+                AND ePR.intPersonID = tp.intPersonID
+                AND ePR.intRealmID = tp.intRealmID
+                AND ePR.strStatus IN ('PENDING')
+                AND ePR.strSport = PR.strSport
+                AND ePR.strPersonType = PR.strPersonType
+            )
+            LEFT JOIN tblPersonRequest as PRQactive
+            ON  (
+                PRQactive.intPersonRequestID = PR.intPersonRequestID
+                )
+            WHERE
+                it.intPersonID IN ($person_list)
+                AND it.intTransferReturn = 0
+                AND PR.strRegistrationNature IN ('INT_TRANSFER_OUT')
+                AND PR.strStatus IN ('ACTIVE')
+            ORDER BY
+                it.intPersonID
+        ];
+
+        my $precheck = $self->getData->{'db'}->prepare($pst);
+        $precheck->execute();
+
+        my $count = 0;
+        my $target = $self->getData()->{'target'};
+        my $client = $self->getData()->{'client'};
+
+        my %validRecords = ();
+        my @sportsFilter;
+
+        while(my $pdref = $precheck->fetchrow_hashref()) {
+            next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
+
+            push @sportsFilter, $Defs::sportType{$pdref->{'strSport'}} if !(grep /$Defs::sportType{$pdref->{'strSport'}}/, @sportsFilter);
+            my $name = formatPersonName($self->getData(), $pdref->{'strLocalFirstname'}, $pdref->{'strLocalSurname'}, '') || '';
+            my $acceptedRequestLink = ($pdref->{'existingAcceptedRequestID'}) ? "$target?client=$client&amp;a=PRA_V&rid=$pdref->{'existingAcceptedRequestID'}" : '';
+            push @memarray, {
+                id => $pdref->{'intPersonID'} || next,
+                name => $name,
+                sport => $Defs::sportType{$pdref->{'strSport'}},
+                link => "$target?client=$client&amp;a=PRA_getrecord&request_type=$searchType&amp;search_keyword=$pdref->{'strNationalNum'}&amp;transfer_type=&amp;tprID=$pdref->{'intPersonRegistrationID'}",
+                otherdetails => {
+                    dob => $pdref->{'dtDOB'},
+                    dtadded => $pdref->{'dtadded'},
+                    ma_id => $pdref->{'strNationalNum'} || '',
+                    org => $pdref->{'EntityName'} || '',
+                },
+                inProgressRequestExists => $pdref->{'existingInProgressRequestID'},
+                acceptedRequestLink => $acceptedRequestLink,
+                submittedPersonRegistrationExists => $pdref->{'existingPendingRegistrationID'},
+            };
+
+            $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = "ACTIVE";
+            $count++;
+        }
+
+        return if(!$count); #no existing record in tblIntTranfer, or has been transferred return already
+
+        if($raw){
+            return \@memarray;
+        }
+        else {
+
+            my %filters = (
+                sports => \@sportsFilter,
+            );
+
+            return $self->displayResultGrid(\@memarray, \%filters) if $count;
+
+            return $count;
+        }
+
+    }
+
+}
+
 
 1;

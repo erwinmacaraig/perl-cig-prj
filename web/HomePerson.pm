@@ -71,7 +71,7 @@ sub showPersonHome	{
 		}
 
 	}
-    my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1";
+        my $addregistrationURL = "$Data->{'target'}?client=$client&amp;a=PF_&rfp=r&amp;_ss=r&amp;es=1";
 	my $accreditations = ($Data->{'SystemConfig'}{'NationalAccreditation'}) ? AccreditationDisplay::ActiveNationalAccredSummary($Data, $personID) : '';#ActiveAccredSummary($Data, $personID, $Data->{'clientValues'}{'assocID'});
 
     my $readonly = !( ($personObj->getValue('strStatus') eq 'REGISTERED' ? 1 : 0) || ( $Data->{'clientValues'}{'authLevel'} >= $Defs::LEVEL_NATIONAL ? 1 : 0 ) );
@@ -356,8 +356,9 @@ sub showPersonHome	{
     }
 	
 	#$Reg_ref->[0]{'documents'} = \@reg_docs;
-	#push @{$Reg_ref},\%reg_docs;
-	
+	#push @{$Reg_ref},\%reg_docs; $personID
+    PersonRegistration::hasPendingRegistration($Data, $personID, undef, $Reg_ref);
+    PersonRegistration::hasPendingTransferRegistration($Data,$personID,undef, $Reg_ref);
     $TemplateData{'RegistrationInfo'} = $Reg_ref;
 	
 

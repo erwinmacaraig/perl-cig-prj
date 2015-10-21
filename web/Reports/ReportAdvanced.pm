@@ -15,102 +15,103 @@ use SearchLevels;
 use TTTemplate;
 use FormHelpers;
 use JSON;
-
+use utf8;
+use Encode;
 use strict;
 
 sub _getConfiguration {
-	my $self = shift;
-	return undef;
+        my $self = shift;
+        return undef;
 }
 
 sub makeSQL {
-	my $self = shift;
+        my $self = shift;
 
 
-	my %OptVals = ();
-	my $activefields = undef;
-	my $sortvals = undef;
-	my $continue = 1;
-	my $msg = '';
+        my %OptVals = ();
+        my $activefields = undef;
+        my $sortvals = undef;
+        my $continue = 1;
+        my $msg = '';
   (
-		$activefields, 
-		$OptVals{'WHERE_LIST'}, 
-		$sortvals, 
-		$OptVals{'FROM_LIST'}, 
-		$OptVals{'HAVING_LIST'},
-		$continue,
-		$msg,
-		) = $self->processSubmission();
-	$continue ||=0;
-	if(!$continue)	{
-		#Something has come up, we should return early
-		return ('', $continue, $msg || '');
-	}
-	$self->{'RunParams'}{'ActiveFields'} = $activefields;
-	$self->afterSubmission();
-	my $reportLevel = $self->{'Config'}{'ReportLevel'} || $self->{'EntityTypeID'} || 0;
-	my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_PERSON;
-	my $reportStats = $self->{'Config'}{'StatsReport'} || 0;
-	my %otheroptions = ($self->{'SystemConfig'}{'ShowInactiveMembersInClubSearch'})
+                $activefields, 
+                $OptVals{'WHERE_LIST'}, 
+                $sortvals, 
+                $OptVals{'FROM_LIST'}, 
+                $OptVals{'HAVING_LIST'},
+                $continue,
+                $msg,
+                ) = $self->processSubmission();
+        $continue ||=0;
+        if(!$continue)  {
+                #Something has come up, we should return early
+                return ('', $continue, $msg || '');
+        }
+        $self->{'RunParams'}{'ActiveFields'} = $activefields;
+        $self->afterSubmission();
+        my $reportLevel = $self->{'Config'}{'ReportLevel'} || $self->{'EntityTypeID'} || 0;
+        my $reportEntity = $self->{'Config'}{'ReportEntity'} || $Defs::LEVEL_PERSON;
+        my $reportStats = $self->{'Config'}{'StatsReport'} || 0;
+        my %otheroptions = ($self->{'SystemConfig'}{'ShowInactiveMembersInClubSearch'})
       ? (ShowInactiveMembersInClubSearch => 1)
       : ();
   my $reportNotMemberTeam = !($self->{'Config'}{'MemberTeam'} || 0);
-	my $otheroptions = '';
-	(
-		$OptVals{'FROM_LEVELS'}, 
-		$OptVals{'WHERE_LEVELS'}, 
-		$OptVals{'SELECT_LEVELS'}, 
-		$OptVals{'CURRENT_FROM'}, 
-		$OptVals{'CURRENT_WHERE'}
-		) = getLevelQueryStuff(
-			$reportLevel,  
-			$reportEntity, 
-			$self->{'Data'}, 
-			$reportStats, 
-			$reportNotMemberTeam,
-			\%otheroptions
-		);
-	$OptVals{'SELECT'} = $self->genSelect($activefields);
+        my $otheroptions = '';
+        (
+                $OptVals{'FROM_LEVELS'}, 
+                $OptVals{'WHERE_LEVELS'}, 
+                $OptVals{'SELECT_LEVELS'}, 
+                $OptVals{'CURRENT_FROM'}, 
+                $OptVals{'CURRENT_WHERE'}
+                ) = getLevelQueryStuff(
+                        $reportLevel,  
+                        $reportEntity, 
+                        $self->{'Data'}, 
+                        $reportStats, 
+                        $reportNotMemberTeam,
+                        \%otheroptions
+                );
+        $OptVals{'SELECT'} = $self->genSelect($activefields);
 
 
-	my $w_join1 = '';
-	if($OptVals{'WHERE_LEVELS'} and $OptVals{'CURRENT_WHERE'} and $OptVals{'CURRENT_WHERE'}!~/^\s*(and|or)/i)	{
-		$w_join1 = ' AND ';
-	}
-	my $w_join2 = '';
-	if($OptVals{'WHERE_LIST'} and ($OptVals{'WHERE_LEVELS'} or $OptVals{'CURRENT_WHERE'}) and $OptVals{'WHERE_LIST'}!~/^\s*(and|or)/i)	{
-		$w_join2 = ' AND ';
-	}
-	$self->{'Config'}{'Sort'} = $sortvals;
-	my $sql = '';
-	my $error = '';
-	if($self->{'Config'}{'SQLBuilder'})	{
-		($sql, $error) = $self->{'Config'}{'SQLBuilder'}->($self,\%OptVals, $self->{'RunParams'}{'ActiveFields'});
-		return ('', 0, qq[<div class="warningmsg">$error</div>]) if $error;
-	}
-	$sql ||= $self->{'Config'}{'SQL'} || qq[
-		SELECT $OptVals{'SELECT'}
-		FROM $OptVals{'FROM_LEVELS'} $OptVals{'CURRENT_FROM'} $OptVals{'FROM_LIST'}
-		WHERE  $OptVals{'WHERE_LEVELS'} $w_join1 $OptVals{'CURRENT_WHERE'} $w_join2 $OptVals{'WHERE_LIST'}
-	];
-	my @opts = (qw(
-		FROM_LEVELS 
-		WHERE_LEVELS 
-		SELECT_LEVELS 
-		CURRENT_FROM 
-		CURRENT_WHERE
-		FROM_LIST
-		WHERE_LIST
-		SELECT
-	));
-	for my $i (@opts)	{
-		$sql =~s/###$i###/$OptVals{$i}/g;	
-	}
-	return ($sql || '', $continue, '');
+        my $w_join1 = '';
+        if($OptVals{'WHERE_LEVELS'} and $OptVals{'CURRENT_WHERE'} and $OptVals{'CURRENT_WHERE'}!~/^\s*(and|or)/i)       {
+                $w_join1 = ' AND ';
+        }
+        my $w_join2 = '';
+        if($OptVals{'WHERE_LIST'} and ($OptVals{'WHERE_LEVELS'} or $OptVals{'CURRENT_WHERE'}) and $OptVals{'WHERE_LIST'}!~/^\s*(and|or)/i)      {
+                $w_join2 = ' AND ';
+        }
+        $self->{'Config'}{'Sort'} = $sortvals;
+        my $sql = '';
+        my $error = '';
+        if($self->{'Config'}{'SQLBuilder'})     {
+                ($sql, $error) = $self->{'Config'}{'SQLBuilder'}->($self,\%OptVals, $self->{'RunParams'}{'ActiveFields'});
+                return ('', 0, qq[<div class="warningmsg">$error</div>]) if $error;
+        }
+        $sql ||= $self->{'Config'}{'SQL'} || qq[
+                SELECT $OptVals{'SELECT'}
+                FROM $OptVals{'FROM_LEVELS'} $OptVals{'CURRENT_FROM'} $OptVals{'FROM_LIST'}
+                WHERE  $OptVals{'WHERE_LEVELS'} $w_join1 $OptVals{'CURRENT_WHERE'} $w_join2 $OptVals{'WHERE_LIST'}
+        ];
+        my @opts = (qw(
+                FROM_LEVELS 
+                WHERE_LEVELS 
+                SELECT_LEVELS 
+                CURRENT_FROM 
+                CURRENT_WHERE
+                FROM_LIST
+                WHERE_LIST
+                SELECT
+        ));
+        for my $i (@opts)       {
+                $sql =~s/###$i###/$OptVals{$i}/g;       
+        }        
+        return ($sql || '', $continue, '');
 }
 
 sub displayOptions {
-	my $self = shift;
+        my $self = shift;
 
 
   my $prefix = $self->{'Config'}{'FormFieldPrefix'} || '';
@@ -119,33 +120,33 @@ sub displayOptions {
   $formname||='updateform';
   my $fields_ref=$self->{'Config'}->{'Fields'};
   my $order_ref=$self->{'Config'}->{'Order'};
-	my $perms_ref = $self->{'Permissions'};
+        my $perms_ref = $self->{'Permissions'};
 
   my @sort=();
   my @grouping=();
   my $lastoptiongroup='';
-	my $lang = $self->{'Lang'};
-	my @groupingorder = ();
-	my %seengrouping = ();
-	my %groupdata = ();
+        my $lang = $self->{'Lang'};
+        my @groupingorder = ();
+        my %seengrouping = ();
+        my %groupdata = ();
   for my $i (0 .. $#$order_ref) {
     my $field_name=$order_ref->[$i] || '';
     my $linestr='';
     next if !$field_name;
     if(!exists $fields_ref->{$field_name})  {next;}
-		my ($displayname, $options)=@{$fields_ref->{$field_name}};
+                my ($displayname, $options)=@{$fields_ref->{$field_name}};
     next if !$displayname;
-		my $perms_type = $self->{'Config'}->{'DefaultPermType'} 
-			|| $options->{'permissionType'}
-			|| 'Person';
-		if (
-			$perms_ref 
-			and exists $perms_ref->{$perms_type} 
-			and exists $perms_ref->{$perms_type}{$field_name} 
-			and !$perms_ref->{$perms_type}{$field_name}
-		)	{
-			next;
-		}
+                my $perms_type = $self->{'Config'}->{'DefaultPermType'} 
+                        || $options->{'permissionType'}
+                        || 'Person';
+                if (
+                        $perms_ref 
+                        and exists $perms_ref->{$perms_type} 
+                        and exists $perms_ref->{$perms_type}{$field_name} 
+                        and !$perms_ref->{$perms_type}{$field_name}
+                )       {
+                        next;
+                }
     #if(!exists $fields_ref->{$field_name}) {print STDERR " ERROR: Cannot find $field_name\n";next;}
 
     $displayname = $lang->txt($displayname);
@@ -153,137 +154,137 @@ sub displayOptions {
     next if $options->{'disable'};
     next if (exists $options->{'enabled'} and !$options->{'enabled'});
     my $def_val1=(
-				defined $options->{'defaultvalue'} 
-					and $options->{'defaultvalue'} ne ''
-			) 
-			?  $options->{'defaultvalue'} 
-			: '';
+                                defined $options->{'defaultvalue'} 
+                                        and $options->{'defaultvalue'} ne ''
+                        ) 
+                        ?  $options->{'defaultvalue'} 
+                        : '';
     my $def_val2=(
-				defined $options->{'defaultvalue2'} 
-					and $options->{'defaultvalue2'} ne ''
-			) 
-			?  $options->{'defaultvalue2'} 
-			: '';
+                                defined $options->{'defaultvalue2'} 
+                                        and $options->{'defaultvalue2'} ne ''
+                        ) 
+                        ?  $options->{'defaultvalue2'} 
+                        : '';
     my $displ_1= $def_val1 ne '' ? 'inline' : 'none';
     my $displ_2= $def_val2 ne '' ? 'inline' : 'none';
     if($options->{'fieldtype'} eq 'text') {
-			my $f1 = txt_field(
-				'f_'.$field_name.'_1',
-				$def_val1,
-				$options->{'size'} || 20,
-				80,
-			);
-			my $f2 = txt_field(
-				'f_'.$field_name.'_2',
-				$def_val2,
-				$options->{'size'} || 20,
-				80,
-			);
-			$linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
-			$linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2</div>];
+                        my $f1 = txt_field(
+                                'f_'.$field_name.'_1',
+                                $def_val1,
+                                $options->{'size'} || 20,
+                                80,
+                        );
+                        my $f2 = txt_field(
+                                'f_'.$field_name.'_2',
+                                $def_val2,
+                                $options->{'size'} || 20,
+                                80,
+                        );
+                        $linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
+                        $linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2</div>];
     }
     if($options->{'fieldtype'} eq 'dropdown') {
-			my $f1 = drop_down(
-				'f_'.$field_name.'_1',$options->{'dropdownoptions'}, 
-				$options->{'dropdownorder'}, 
-				$def_val1, 
-				$options->{'size'} || 1, 
-				$options->{'multiple'} || 0,
-				'',
-			);
+                        my $f1 = drop_down(
+                                'f_'.$field_name.'_1',$options->{'dropdownoptions'}, 
+                                $options->{'dropdownorder'}, 
+                                $def_val1, 
+                                $options->{'size'} || 1, 
+                                $options->{'multiple'} || 0,
+                                '',
+                        );
       $linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
       $linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"></div>];
     }
     if($options->{'fieldtype'} eq 'date' or $options->{'fieldtype'} eq 'datetime')  {
-			my $f1 = txt_field(
-				'f_'.$field_name.'_1',
-				$def_val1,
-				10,
-				10,
-				'dateinput',
-			);
- 			my $f2 = txt_field(
-				'f_'.$field_name.'_2',
-				$def_val2,
-				10,
-				10,
-				'dateinput',
-			);
-			$linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1<i>(dd/mm/yyyy)</i></div>];
-			$linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2<i>(dd/mm/yyyy)</i></div>];
+                        my $f1 = txt_field(
+                                'f_'.$field_name.'_1',
+                                $def_val1,
+                                10,
+                                10,
+                                'dateinput',
+                        );
+                        my $f2 = txt_field(
+                                'f_'.$field_name.'_2',
+                                $def_val2,
+                                10,
+                                10,
+                                'dateinput',
+                        );
+                        $linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1<i>(dd/mm/yyyy)</i></div>];
+                        $linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2<i>(dd/mm/yyyy)</i></div>];
     }
     if($options->{'fieldtype'} eq 'datetimefull')  {
-			my $f1 = txt_field(
-				'f_'.$field_name.'_1',
-				$def_val1,
-				20,
-				10,
-				'datetimeinput',
-			);
- 			my $f2 = txt_field(
-				'f_'.$field_name.'_2',
-				$def_val2,
-				20,
-				10,
-				'datetimeinput',
-			);
-			$linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
-			$linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2</div>];
+                        my $f1 = txt_field(
+                                'f_'.$field_name.'_1',
+                                $def_val1,
+                                20,
+                                10,
+                                'datetimeinput',
+                        );
+                        my $f2 = txt_field(
+                                'f_'.$field_name.'_2',
+                                $def_val2,
+                                20,
+                                10,
+                                'datetimeinput',
+                        );
+                        $linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
+                        $linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"> and $f2</div>];
     }
     if($options->{'fieldtype'} eq 'none') {
       $linestr='';
     }
     my $comp_options='';
     $comp_options=compare_options(
-			$field_name, 
-			$prefix, 
-			$options->{'fieldtype'}, 
-			$options->{'defaultcomp'}, 
-			$options->{'multiple'} || 0,
+                        $field_name, 
+                        $prefix, 
+                        $options->{'fieldtype'}, 
+                        $options->{'defaultcomp'}, 
+                        $options->{'multiple'} || 0,
             $lang,
-		) if $options->{'fieldtype'};
+                ) if $options->{'fieldtype'};
 
     my $active='';
     $active=' CHECKED ' if $options->{'active'};
     my $optiongroup=$options->{'optiongroup'} || 'default';
-		next if $self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'disable'};
-		next if(exists  $self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'enable'}
-			and !$self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'disable'});
-		push @groupingorder, $optiongroup if !$seengrouping{$optiongroup};
-		$seengrouping{$optiongroup} = 1;
+                next if $self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'disable'};
+                next if(exists  $self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'enable'}
+                        and !$self->{'Config'}->{'OptionGroups'}{$optiongroup}[1]{'disable'});
+                push @groupingorder, $optiongroup if !$seengrouping{$optiongroup};
+                $seengrouping{$optiongroup} = 1;
 
     my $nclass    = '';
     my $fonlytext = '';
 
     if (defined $options->{'filteronly'} and $options->{'filteronly'}) {
-			$nclass = 'ROfonly';
-			$fonlytext = ' [<i>' . $lang->txt('Filter Only') . '</i>] ';
-		}
-		my $displaylabel = $lang->txt('Display');
-		my $filterlabel = $lang->txt('Filter');
-		my $removetxt = $lang->txt('Remove');
-		$comp_options = qq[<label for ="f_chk_$field_name">$filterlabel :</label> $comp_options] if $comp_options;
-   	my $fieldblock =qq[
+                        $nclass = 'ROfonly';
+                        $fonlytext = ' [<i>' . $lang->txt('Filter Only') . '</i>] ';
+                }
+                my $displaylabel = $lang->txt('Display');
+                my $filterlabel = $lang->txt('Filter');
+                my $removetxt = $lang->txt('Remove');
+                $comp_options = qq[<label for ="f_chk_$field_name">$filterlabel :</label> $comp_options] if $comp_options;
+        my $fieldblock =qq[
       <div class="RO_fieldblock" id="fld_$field_name" style = "display:none;">
-				<div class="RO_remove">
-					<a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
-				</div>
-				<div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
-				<div class="RO_fieldname $nclass"><span class = "handle">$displayname</span>$fonlytext</div>
-				<div class="RO_fielddata">
-					<div class="RO_compoption">$comp_options</div>
-					<div class="RO_valfields">$linestr<br></div>
-				</div>
-				<div class="RO_fieldblockbottom">
+                                <div class="RO_remove">
+                                        <a href="" onclick="removefield('$field_name'); return false;"><span class ="fa fa-close"></span></a> 
+                                </div>
+                                <div class="RO_fielddisplay"><input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb" id="f_chk_$field_name" checked title="$displaylabel"></div>
+                                <div class="RO_fieldname $nclass"><span class = "handle">$displayname</span>$fonlytext</div>
+                                <div class="RO_fielddata">
+                                        <div class="RO_compoption">$comp_options</div>
+                                        <div class="RO_valfields">$linestr<br></div>
+                                </div>
+                                <div class="RO_fieldblockbottom">
                 </div>
       </div>
     ];
-   	my $nameblock =qq[
+        my $nameblock =qq[
       <div class="RO_fieldnameblock" id="fldname_$field_name">
             <input type="checkbox" name="f_chk_$field_name" value="1" class="ROnb fieldcheck" data-fieldname = "$field_name" id="f_namechk_$field_name" title="$displaylabel"><label for = "f_namechk_$field_name">$displayname$fonlytext</label>
       </div>
     ];
-	push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock, $nameblock];
+        push @{$groupdata{$optiongroup}}, [$field_name, $fieldblock, $nameblock];
     if(exists $options->{'allowsort'} and $options->{'allowsort'})  {
       push @sort, $field_name;
     }
@@ -294,86 +295,86 @@ sub displayOptions {
 
   my $allfields ='';
   my $outputfields = '';
-	for my $group (@groupingorder)	{
-		my $grpdata = '';
-		for my $i (@{$groupdata{$group}})	{
-			$grpdata .= qq[<li class="fieldblock-li">$i->[2]</li>] || '';
-			$outputfields .= $i->[1] || '';
-		}
-		my $groupname = $lang->txt($self->{'Config'}->{'OptionGroups'}{$group}[0]);
-		if($grpdata)	{
-			$allfields .= qq[
-				<h3><a href="#">].$lang->txt($groupname).qq[</a></h3>
-				<div>
-					<ul class="" id="fieldgrouping_$group">
-						$grpdata
-					</ul>
-				</div>	
-			];
-		}
-	}
+        for my $group (@groupingorder)  {
+                my $grpdata = '';
+                for my $i (@{$groupdata{$group}})       {
+                        $grpdata .= qq[<li class="fieldblock-li">$i->[2]</li>] || '';
+                        $outputfields .= $i->[1] || '';
+                }
+                my $groupname = $lang->txt($self->{'Config'}->{'OptionGroups'}{$group}[0]);
+                if($grpdata)    {
+                        $allfields .= qq[
+                                <h3><a href="#">].$lang->txt($groupname).qq[</a></h3>
+                                <div>
+                                        <ul class="" id="fieldgrouping_$group">
+                                                $grpdata
+                                        </ul>
+                                </div>  
+                        ];
+                }
+        }
   my $returnstr='';
   if ($self->{'Config'}->{'Config'}{'RunButtonLabel'}) {
 
-		my $run_button_label = $lang->txt($self->{'Config'}->{'Config'}{'RunButtonLabel'});
-		$returnstr.=qq[
-			<div class="ROrunButton"><input type="submit" value="$run_button_label" class="btn-main ROButRun"></div>
-		];
-	}
+                my $run_button_label = $lang->txt($self->{'Config'}->{'Config'}{'RunButtonLabel'});
+                $returnstr.=qq[
+                        <div class="ROrunButton"><input type="submit" value="$run_button_label" class="btn-main ROButRun"></div>
+                ];
+        }
   if (
-		not exists $self->{'Config'}->{'Config'}{'ShowDistinct'}
-		or (exists  $self->{'Config'}->{'Config'}{'ShowDistinct'}
-				and  $self->{'Config'}->{'Config'}{'ShowDistinct'} == 1)
-	) {
+                not exists $self->{'Config'}->{'Config'}{'ShowDistinct'}
+                or (exists  $self->{'Config'}->{'Config'}{'ShowDistinct'}
+                                and  $self->{'Config'}->{'Config'}{'ShowDistinct'} == 1)
+        ) {
 
-		my @record_filter_options = (
-				[ 'DISTINCT', $lang->txt('Unique Records Only') ],
-				(
-						$self->{'Config'}->{'Config'}{'NoSummaryData'}
-								? ()
-								: ( [ 'SUMMARY', $lang->txt('Summary Data') ] )
-				),
-				[ 'ALL', $lang->txt('All Records') ],
-		);
+                my @record_filter_options = (
+                                [ 'DISTINCT', $lang->txt('Unique Records Only') ],
+                                (
+                                                $self->{'Config'}->{'Config'}{'NoSummaryData'}
+                                                                ? ()
+                                                                : ( [ 'SUMMARY', $lang->txt('Summary Data') ] )
+                                ),
+                                [ 'ALL', $lang->txt('All Records') ],
+                );
 
-		my $record_filter_options = '';
-		for my $i (@record_filter_options)	{
-			my $selected = $i->[0] eq 'DISTINCT' ? ' CHECKED ' : '';
-			$record_filter_options .= qq[<input type="radio" name="RO_RecordFilter" value="$i->[0]" id="RO_RF_$i->[0]" $selected><label for="RO_RF_$i->[0]">$i->[1]</label>];
-		}
+                my $record_filter_options = '';
+                for my $i (@record_filter_options)      {
+                        my $selected = $i->[0] eq 'DISTINCT' ? ' CHECKED ' : '';
+                        $record_filter_options .= qq[<input type="radio" name="RO_RecordFilter" value="$i->[0]" id="RO_RF_$i->[0]" $selected><label for="RO_RF_$i->[0]">$i->[1]</label>];
+                }
 
-		my $options_header = $lang->txt('Options');
-		my $show_label     = $lang->txt('Show');
+                my $options_header = $lang->txt('Options');
+                my $show_label     = $lang->txt('Show');
 
-		$returnstr.=qq[
-			<div class="ROoptionblock">
+                $returnstr.=qq[
+                        <div class="ROoptionblock">
                 <h3 class = "panel-header ROoptionblock-header">$options_header</h3>
                 <div class = "panel-body">
-				<table>
-						<tr>
-								<td>$show_label</td>
-								<td>
-										$record_filter_options
-								</td>
-						</tr>
-		];
-	}
+                                <table>
+                                                <tr>
+                                                                <td>$show_label</td>
+                                                                <td>
+                                                                                $record_filter_options
+                                                                </td>
+                                                </tr>
+                ];
+        }
 
   if(@sort) {
 
-		my $sort_by_label           = $lang->txt('Sort by');
-		my $secondary_sort_by_label = $lang->txt('Secondary sort by');
-		my $ascending_option        = $lang->txt('Ascending');
-		my $descending_option       = $lang->txt('Descending');
-		my $none_option             = $lang->txt('None');
+                my $sort_by_label           = $lang->txt('Sort by');
+                my $secondary_sort_by_label = $lang->txt('Secondary sort by');
+                my $ascending_option        = $lang->txt('Ascending');
+                my $descending_option       = $lang->txt('Descending');
+                my $none_option             = $lang->txt('None');
 
     my $sort1list = '';
-		for my $field (@sort) {
-			$sort1list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
-		}
+                for my $field (@sort) {
+                        $sort1list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
+                }
     my $sort=qq[
-			<tr>
-				<td>$sort_by_label</td>
+                        <tr>
+                                <td>$sort_by_label</td>
         <td><select name="RO_SortBy1" size="1" class = "chzn-select">$sort1list</select>
       &nbsp;
       <select name="RO_SortByDir1" size="1">
@@ -384,18 +385,18 @@ sub displayOptions {
       </tr>
     ];
     if(exists $self->{'Config'}->{'Config'}{'SecondarySort'} and  $self->{'Config'}->{'Config'}{'SecondarySort'} == 1)  {
-			my $sort2list = '';
-			for my $field (@sort) {
-				$sort2list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
-			}
+                        my $sort2list = '';
+                        for my $field (@sort) {
+                                $sort2list .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
+                        }
       $sort.=qq[
       <tr>
-				<td>$secondary_sort_by_label</td>
+                                <td>$secondary_sort_by_label</td>
         <td>
-					<select name="RO_SortBy2" size="1" class = "chzn-select">
+                                        <select name="RO_SortBy2" size="1" class = "chzn-select">
           <option value="">$none_option</option>
-					$sort2list
-				 </select>
+                                        $sort2list
+                                 </select>
         &nbsp;
         <select name="RO_SortByDir2" size="1">
           <option value="ASC">$ascending_option</option>
@@ -408,10 +409,10 @@ sub displayOptions {
     $returnstr.=$sort || '';
   }
 
-	my $group_by_label = $lang->txt('Group By');
+        my $group_by_label = $lang->txt('Group By');
 
   if(@grouping) {
-		my $grouplist = '';
+                my $grouplist = '';
     for my $field (@grouping) {
       $grouplist .=qq[<option value="$field">].$lang->txt($fields_ref->{$field}[0]).qq[</option>];
     }
@@ -420,7 +421,7 @@ sub displayOptions {
       <td>$group_by_label</td>
       <td><select name="RO_GroupBy" size="1" class = "chzn-select">
           <option value="">].$lang->txt('No Grouping').qq[</option>
-					$grouplist
+                                        $grouplist
         </select>
       </td>
     </tr>
@@ -452,25 +453,25 @@ sub displayOptions {
       <div class="ROrunButton"><input type="submit" value="].$lang->txt($self->{'Config'}->{'Config'}{'RunButtonLabel'}).qq[" class="btn-main ROButRun"></div>
   ] if $self->{'Config'}->{'Config'}{'RunButtonLabel'};
   if($returnstr)  {
-		my $carryfields = '';
-		if($self->{'CarryFields'})	{
-			for my $k (keys %{$self->{'CarryFields'}})	{
-				$carryfields .= qq[<input type="hidden" name="$k" value="$self->{'CarryFields'}{$k}">];
-			}
-		}
-	my $preblock = $self->{'Config'}{'PreBlock'} 
-		? qq[<div id= "ROPreBlock">$self->{'Config'}{'PreBlock'}</div>]
-		: '';
-	my $preblock_beforeform = $self->{'Config'}{'PreBlockBeforeForm'} 
-		? qq[<div id= "ROPreBlock">$self->{'Config'}{'PreBlockBeforeForm'}</div>]
-		: '';
-	my $postblock = $self->{'Config'}{'PostBlock'} 
-		? qq[<div id= "ROPostBlock">$self->{'Config'}{'PostBlock'}</div>]
-		: '';
-	my $returl = $self->{'ReturnURL'}
-		? qq[ <a href="$self->{'ReturnURL'}">&lt; Return to Report Manager</a>]
-		: '';
-			#$returl
+                my $carryfields = '';
+                if($self->{'CarryFields'})      {
+                        for my $k (keys %{$self->{'CarryFields'}})      {
+                                $carryfields .= qq[<input type="hidden" name="$k" value="$self->{'CarryFields'}{$k}">];
+                        }
+                }
+        my $preblock = $self->{'Config'}{'PreBlock'} 
+                ? qq[<div id= "ROPreBlock">$self->{'Config'}{'PreBlock'}</div>]
+                : '';
+        my $preblock_beforeform = $self->{'Config'}{'PreBlockBeforeForm'} 
+                ? qq[<div id= "ROPreBlock">$self->{'Config'}{'PreBlockBeforeForm'}</div>]
+                : '';
+        my $postblock = $self->{'Config'}{'PostBlock'} 
+                ? qq[<div id= "ROPostBlock">$self->{'Config'}{'PostBlock'}</div>]
+                : '';
+        my $returl = $self->{'ReturnURL'}
+                ? qq[ <a href="$self->{'ReturnURL'}">&lt; Return to Report Manager</a>]
+                : '';
+                        #$returl
     $returnstr=qq[
   <script type="text/javascript" src = "js/advancedreports.js"></script>
   <script type="text/javascript" src = "js/timepicker.js"></script>
@@ -487,31 +488,31 @@ sub displayOptions {
 .ui-timepicker-rtl dl { text-align: right; }
 .ui-timepicker-rtl dl dd { margin: 0 65px 10px 10px; }
 </style>
-		<div id = "ROallfields-wrapper">
-			<div id = "ROallfields">
-			$allfields
-			</div>
-		</div>
-		<div id = "ROreportselect-wrapper">
-				$preblock_beforeform
-			<form action = "$self->{'Data'}{'target'}" method="POST" id="reportform">
-				$preblock
+                <div id = "ROallfields-wrapper">
+                        <div id = "ROallfields">
+                        $allfields
+                        </div>
+                </div>
+                <div id = "ROreportselect-wrapper">
+                                $preblock_beforeform
+                        <form action = "$self->{'Data'}{'target'}" method="POST" id="reportform">
+                                $preblock
                 <h3 class = "panel-header">].$lang->txt('Selected Fields').qq[</h3>
-				<div id = "ROselectedfields-wrapper" class = "panel-body">
-					<div id = "ROselectedfields">
-						<ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>
-					</div>
-				</div>
-					$returnstr
-					<input type="hidden" name="d_ROselectedfieldlist" id="ROselectedfieldlist">
-					$carryfields
-					$postblock
-				</form>
-			</div>
+                                <div id = "ROselectedfields-wrapper" class = "panel-body">
+                                        <div id = "ROselectedfields">
+                                                <ul class="connectedSortable" id="ROselectedfields-list"> $outputfields</ul>
+                                        </div>
+                                </div>
+                                        $returnstr
+                                        <input type="hidden" name="d_ROselectedfieldlist" id="ROselectedfieldlist">
+                                        $carryfields
+                                        $postblock
+                                </form>
+                        </div>
     ];
   }
   my $params = $self->{'FormParams'};
-  if($params->{'repID'})	{
+  if($params->{'repID'})        {
       my ($reportname, $reportdata) = $self->loadSavedReportData($params->{'repID'});
       $reportname =~s/"/&quot;/g;
       $self->{'DBData'}{'Saved'}{'strReportName'} = $reportname || '';
@@ -526,8 +527,8 @@ sub displayOptions {
 }
 
 sub processSubmission {
-	my $self = shift;
-	my $db = $self->{'db'};
+        my $self = shift;
+        my $db = $self->{'db'};
 
   my $fields_ref = $self->{'Config'}{'Fields'};
   my $order_ref = $self->{'Config'}{'Order'};
@@ -540,20 +541,20 @@ sub processSubmission {
   my @activeFromlist=();
   my %activeWherelist=();
 
-	my $params = $self->{'FormParams'};
+        my $params = $self->{'FormParams'};
     $self->processSavedReportData($params->{'repID'}) if $params->{'repID'};
     my ($newID) = $self->saveReportData($params);
     $params->{'repID'} = $newID;
     $self->{'SavedReportID'} = $newID;
-	if($params->{'d_ROselectedfieldlist'})	{
-		my @o = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
-		for my $o (@o)	{
-			$o=~s/^fld_//g;
-		}
-		$self->{'RunParams'}{'Order'} = \@o || $self->{'Config'}{'Order'};
-	}
-	$order_ref = $self->{'RunParams'}{'Order'};
-	my @OutputOrder = ();
+        if($params->{'d_ROselectedfieldlist'})  {
+                my @o = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
+                for my $o (@o)  {
+                        $o=~s/^fld_//g;
+                }
+                $self->{'RunParams'}{'Order'} = \@o || $self->{'Config'}{'Order'};
+        }
+        $order_ref = $self->{'RunParams'}{'Order'};
+        my @OutputOrder = ();
   for my $fieldname (@{$order_ref}) {
     next if !exists $fields_ref->{$fieldname};
     my $usehaving = $fields_ref->{$fieldname}[1]{'usehaving'} || 0;
@@ -566,46 +567,46 @@ sub processSubmission {
       if(exists $fields_ref->{$fieldname}[1]{'filteronly'} and $fields_ref->{$fieldname}[1]{'filteronly'})  {
         delete $activefields{$fieldname};
       }
-			push @OutputOrder, $fieldname if $activefields{$fieldname};
+                        push @OutputOrder, $fieldname if $activefields{$fieldname};
       my $DBfieldname=$fieldname;
       if(exists $fields_ref->{$fieldname}[1]{'dbfield'} and $fields_ref->{$fieldname}[1]{'dbfield'})  {
         $DBfieldname=$fields_ref->{$fieldname}[1]{'dbfield'}
       }
       my $op=$params->{'f_comp_'.$fieldname} || '';
-			$activefields{'RAW_f_comp'.$fieldname} = $op;
+                        $activefields{'RAW_f_comp'.$fieldname} = $op;
       my $val1=(defined $params->{'f_'.$fieldname.'_1'} and $params->{'f_'.$fieldname.'_1'} ne '') 
-				? $params->{'f_'.$fieldname.'_1'} 
-				: '';
-			$activefields{'RAW_f_'.$fieldname.'_1'} = $val1;
-      if($val1 =~/\0/)	{
-				my @v = split /\0/,$val1;
-				$activefields{'RAW_f_'.$fieldname.'_1'} = \@v;
-			}
+                                ? $params->{'f_'.$fieldname.'_1'} 
+                                : '';
+                        $activefields{'RAW_f_'.$fieldname.'_1'} = $val1;
+      if($val1 =~/\0/)  {
+                                my @v = split /\0/,$val1;
+                                $activefields{'RAW_f_'.$fieldname.'_1'} = \@v;
+                        }
       my $val2=(defined $params->{'f_'.$fieldname.'_2'} and $params->{'f_'.$fieldname.'_2'} ne '') 
-				? $params->{'f_'.$fieldname.'_2'} 
-				: '';
-			$activefields{'RAW_f_'.$fieldname.'_2'} = $val2;
+                                ? $params->{'f_'.$fieldname.'_2'} 
+                                : '';
+                        $activefields{'RAW_f_'.$fieldname.'_2'} = $val2;
 
       if( $fields_ref->{$fieldname}[1]{'fieldtype'} eq 'datetimefull')  {
-	$val1= _fixDateTime($val1) if $val1;
+        $val1= _fixDateTime($val1) if $val1;
         $val2= _fixDateTime($val2) if $val2;
       }
       if( $fields_ref->{$fieldname}[1]{'fieldtype'} eq 'date')  {
-	$val1= _fixDate($val1) if $val1;
+        $val1= _fixDate($val1) if $val1;
         $val2= _fixDate($val2) if $val2;
       }
       if( $fields_ref->{$fieldname}[1]{'fieldtype'} eq 'datetime')    {
-				$val1= _fixDate($val1) if $val1;
-				$val2= _fixDate($val2) if $val2;
-	if ($val2)  {
-					$val2 = "$val2 23:59:59";
+                                $val1= _fixDate($val1) if $val1;
+                                $val2= _fixDate($val2) if $val2;
+        if ($val2)  {
+                                        $val2 = "$val2 23:59:59";
         }
         else  {
-					$val2 = "$val1 23:59:59" if $val1;
+                                        $val2 = "$val1 23:59:59" if $val1;
         }
-				$val1 = "$val1 00:00:00" if $val1;
-				$op = 'between' if ($op eq 'equal');
-			}
+                                $val1 = "$val1 00:00:00" if $val1;
+                                $op = 'between' if ($op eq 'equal');
+                        }
       if($op eq 'between' and $val1 ne '' and $val2 ne '')  {
         if($usehaving)  {
           $havinglist.=qq[ AND ] if $havinglist;
@@ -674,8 +675,8 @@ sub processSubmission {
       }
       #Check to see if we have to add tables or join conditions
       if(
-				exists $fields_ref->{$fieldname}[1]{'dbfrom'} 
-			 	and $fields_ref->{$fieldname}[1]{'dbfrom'})  {
+                                exists $fields_ref->{$fieldname}[1]{'dbfrom'} 
+                                and $fields_ref->{$fieldname}[1]{'dbfrom'})  {
 
         if(ref $fields_ref->{$fieldname}[1]{'dbfrom'})  {
           #Array of dbfroms
@@ -690,14 +691,14 @@ sub processSubmission {
         }
       }
       if(exists $fields_ref->{$fieldname}[1]{'dbwhere'} 
-				and $fields_ref->{$fieldname}[1]{'dbwhere'})  {
+                                and $fields_ref->{$fieldname}[1]{'dbwhere'})  {
         $activeWherelist{$fields_ref->{$fieldname}[1]{'dbwhere'}}=1;
       }
       if(exists $fields_ref->{$fieldname}[1]{'optiongroup'} 
-				and $fields_ref->{$fieldname}[1]{'optiongroup'})  {
+                                and $fields_ref->{$fieldname}[1]{'optiongroup'})  {
         if(exists $self->{'Config'}->{'OptionGroups'} 
-					and exists $self->{'Config'}->{'OptionGroups'}{$fields_ref->{$fieldname}[1]{'optiongroup'}} 
-					and $self->{'Config'}->{'OptionGroups'}{$fields_ref->{$fieldname}[1]{'optiongroup'}}[1] ) {
+                                        and exists $self->{'Config'}->{'OptionGroups'}{$fields_ref->{$fieldname}[1]{'optiongroup'}} 
+                                        and $self->{'Config'}->{'OptionGroups'}{$fields_ref->{$fieldname}[1]{'optiongroup'}}[1] ) {
 
           my $group_options=$self->{'Config'}->{'OptionGroups'}{$fields_ref->{$fieldname}[1]{'optiongroup'}}[1];
           if($group_options and exists $group_options->{'from'} and $group_options->{'from'}) {
@@ -715,28 +716,28 @@ sub processSubmission {
             }
           }
           if($group_options 
-						and exists $group_options->{'where'} 
-						and $group_options->{'where'}) {
+                                                and exists $group_options->{'where'} 
+                                                and $group_options->{'where'}) {
             $activeWherelist{$group_options->{'where'}}=1;
           }
         }
       }
     }
   }
-	my @sort_data = ();
-	my $sortby=$self->untaint($params->{'RO_SortBy1'},'string') || '';
+        my @sort_data = ();
+        my $sortby=$self->untaint($params->{'RO_SortBy1'},'string') || '';
   my $sortby_field=$sortby;
   #if(exists $fields_ref->{$sortby_field}[1]{'dbfield'} 
-		#and $fields_ref->{$sortby_field}[1]{'dbfield'})  {
+                #and $fields_ref->{$sortby_field}[1]{'dbfield'})  {
     #$sortby=$fields_ref->{$sortby_field}[1]{'dbfield'};
   #}
   #if(exists $fields_ref->{$sortby_field}[1]{'sortfield'} 
-		#and $fields_ref->{$sortby_field}[1]{'sortfield'} ne '')  {
+                #and $fields_ref->{$sortby_field}[1]{'sortfield'} ne '')  {
     #$sortby=$fields_ref->{$sortby_field}[1]{'sortfield'};
   #}
   if(!$activefields{$sortby_field}) {
     if(exists $fields_ref->{$sortby_field}[1]{'dbfrom'} 
-			and $fields_ref->{$sortby_field}[1]{'dbfrom'})  {
+                        and $fields_ref->{$sortby_field}[1]{'dbfrom'})  {
       if(ref $fields_ref->{$sortby_field}[1]{'dbfrom'}) {
         #Array of dbfroms
         for my $f (@{$fields_ref->{$sortby_field}[1]{'dbfrom'}})  {
@@ -750,15 +751,15 @@ sub processSubmission {
       }
     }
     if(exists $fields_ref->{$sortby_field}[1]{'dbwhere'} 
-			and $fields_ref->{$sortby_field}[1]{'dbwhere'})  {
+                        and $fields_ref->{$sortby_field}[1]{'dbwhere'})  {
       $activeWherelist{$fields_ref->{$sortby_field}[1]{'dbwhere'}}=1;
     }
   }
   my $RO_SortByDir =$params->{'RO_SortByDir1'} || 'ASC';
-	push @sort_data, [ $sortby, $RO_SortByDir, $fields_ref->{$sortby_field}[1]{'sorttype'} || 'string'];
+        push @sort_data, [ $sortby, $RO_SortByDir, $fields_ref->{$sortby_field}[1]{'sorttype'} || 'string'];
 
   if(exists $self->{'Config'}{'Config'}{'SecondarySort'} 
-		and  $self->{'Config'}{'Config'}{'SecondarySort'} == 1)  {
+                and  $self->{'Config'}{'Config'}{'SecondarySort'} == 1)  {
 
     my $sortby2=$self->untaint($params->{'RO_SortBy2'},'string') || '';
     my $sortby2_field=$sortby2;
@@ -768,13 +769,13 @@ sub processSubmission {
     #if(exists $fields_ref->{$sortby2_field}[1]{'sortfield'} and $fields_ref->{$sortby2_field}[1]{'sortfield'} ne '')  {
       #$sortby2=$fields_ref->{$sortby2_field}[1]{'sortfield'};
     #}
-	  if($sortby2)	{
-			my $RO_SortByDir2 = $params->{'RO_SortByDir2'} || 'ASC';
-			push @sort_data, [ $sortby2, $RO_SortByDir2, $fields_ref->{$sortby2_field}[1]{'sorttype'} || 'string'];
-		}
+          if($sortby2)  {
+                        my $RO_SortByDir2 = $params->{'RO_SortByDir2'} || 'ASC';
+                        push @sort_data, [ $sortby2, $RO_SortByDir2, $fields_ref->{$sortby2_field}[1]{'sorttype'} || 'string'];
+                }
     if(!$activefields{$sortby2_field})  {
       if(exists $fields_ref->{$sortby2_field}[1]{'dbfrom'} 
-				and $fields_ref->{$sortby2_field}[1]{'dbfrom'})  {
+                                and $fields_ref->{$sortby2_field}[1]{'dbfrom'})  {
         if(ref $fields_ref->{$sortby2_field}[1]{'dbfrom'})  {
           #Array of dbfroms
           for my $f (@{$fields_ref->{$sortby2_field}[1]{'dbfrom'}}) {
@@ -788,7 +789,7 @@ sub processSubmission {
         }
       }
       if(exists $fields_ref->{$sortby2_field}[1]{'dbwhere'} 
-				and $fields_ref->{$sortby2_field}[1]{'dbwhere'})  {
+                                and $fields_ref->{$sortby2_field}[1]{'dbwhere'})  {
         $activeWherelist{$fields_ref->{$sortby2_field}[1]{'dbwhere'}}=1;
       }
     }
@@ -796,13 +797,13 @@ sub processSubmission {
 
   $activefields{'RO_RecordFilter'}= $params->{'RO_RecordFilter'} || 'DISTINCT';
   $activefields{'RO_RecordFilter'}= 'DISTINCT' if $activefields{'DISTINCT'};
-	$self->{'RunParams'}{'Distinct'} = 1 if $activefields{'RO_RecordFilter'} eq 'DISTINCT';
-	$self->{'RunParams'}{'Summarise'} = 1 if $activefields{'RO_RecordFilter'} eq 'SUMMARY';
-	$self->{'RunParams'}{'Limit'} = $params->{'limit'} || '';
-	$self->{'RunParams'}{'ViewType'} = $params->{'RO_OutputType'} || '';
-	$self->{'RunParams'}{'SendToEmail'} = $params->{'RO_OutputEmail'} || '';
-	$self->{'RunParams'}{'Download'} = $params->{'RO_download'} || '';
-	$self->{'FormParams'}{'ReturnData'} = 1 if $params->{'retprocess'};
+        $self->{'RunParams'}{'Distinct'} = 1 if $activefields{'RO_RecordFilter'} eq 'DISTINCT';
+        $self->{'RunParams'}{'Summarise'} = 1 if $activefields{'RO_RecordFilter'} eq 'SUMMARY';
+        $self->{'RunParams'}{'Limit'} = $params->{'limit'} || '';
+        $self->{'RunParams'}{'ViewType'} = $params->{'RO_OutputType'} || '';
+        $self->{'RunParams'}{'SendToEmail'} = $params->{'RO_OutputEmail'} || '';
+        $self->{'RunParams'}{'Download'} = $params->{'RO_download'} || '';
+        $self->{'FormParams'}{'ReturnData'} = 1 if $params->{'retprocess'};
 
   $activefields{'exformat'}= $params->{'exformat'} || '';
   $activefields{'exformat'}=~s/^W_//;
@@ -811,13 +812,13 @@ sub processSubmission {
     push @activeFromlist, $f if !$activeFromlist{$f};
     $activeFromlist{$f}=1;
   }
-	$self->{'RunParams'}{'GroupBy'} = $self->untaint($params->{'RO_GroupBy'},'string') || '';
+        $self->{'RunParams'}{'GroupBy'} = $self->untaint($params->{'RO_GroupBy'},'string') || '';
   if($self->{'RunParams'}{'GroupBy'})  {
     if(!$activefields{$self->{'RunParams'}{'GroupBy'}})  {
       $activefields{$self->{'RunParams'}{'GroupBy'}}=1;
       my $f=$self->{'RunParams'}{'GroupBy'};
       if(exists $fields_ref->{$f}[1]{'dbformat'} 
-				and $fields_ref->{$f}[1]{'dbformat'})  {
+                                and $fields_ref->{$f}[1]{'dbformat'})  {
         if(ref $fields_ref->{$f}[1]{'dbformat'})  {
           #Array of dbfroms
           for my $g (@{$fields_ref->{$f}[1]{'dbformat'}}) {
@@ -831,7 +832,7 @@ sub processSubmission {
         }
       }
       if(exists $fields_ref->{$f}[1]{'dbwhere'} 
-				and $fields_ref->{$f}[1]{'dbwhere'})  {
+                                and $fields_ref->{$f}[1]{'dbwhere'})  {
         $activeWherelist{$fields_ref->{$f}[1]{'dbwhere'}}=1;
       }
     }
@@ -843,24 +844,24 @@ sub processSubmission {
   for my $k (keys %{$params}) {
     $activefields{$k} = $params->{$k} if $k=~/^_EXT/;
   }
-	
-	$self->{'RunParams'}{'Order'} = \@OutputOrder;
-	#Generate Labels
-	if($self->{'RunParams'}{'GroupBy'})	{
-		#Change the order to make group by column first
-		@{$self->{'RunParams'}{'Order'}} = grep { $_ ne $self->{'RunParams'}{'GroupBy'}} @{$self->{'RunParams'}{'Order'}};
-		unshift @{$self->{'RunParams'}{'Order'}}, $self->{'RunParams'}{'GroupBy'};
-	}
-	for my $i (@{$self->{'RunParams'}{'Order'}})	{
-		next if !$activefields{$i};
-		next if $self->{'Config'}{'Fields'}{$i}[1]{'filteronly'};
-		push @{$self->{'Config'}{'Labels'}}, [ $i, $self->{'Config'}{'Fields'}{$i}[0]];
-	}
+        
+        $self->{'RunParams'}{'Order'} = \@OutputOrder;
+        #Generate Labels
+        if($self->{'RunParams'}{'GroupBy'})     {
+                #Change the order to make group by column first
+                @{$self->{'RunParams'}{'Order'}} = grep { $_ ne $self->{'RunParams'}{'GroupBy'}} @{$self->{'RunParams'}{'Order'}};
+                unshift @{$self->{'RunParams'}{'Order'}}, $self->{'RunParams'}{'GroupBy'};
+        }
+        for my $i (@{$self->{'RunParams'}{'Order'}})    {
+                next if !$activefields{$i};
+                next if $self->{'Config'}{'Fields'}{$i}[1]{'filteronly'};
+                push @{$self->{'Config'}{'Labels'}}, [ $i, $self->{'Config'}{'Fields'}{$i}[0]];
+        }
   return (\%activefields, $wherelist, \@sort_data, $fromlist, $havinglist, 1, '');
 }
 
 sub genSelect {
-	my $self = shift;
+        my $self = shift;
   my($activefields)=@_;
 
   my $groupby_vals='';
@@ -869,28 +870,28 @@ sub genSelect {
   my $fields_ref=$self->{'Config'}{'Fields'};
   my $emaildata= $activefields->{'RO_OutputType'} eq 'email' ? 1 : 0;
   my $retprocessdata= (
-		$self->{'FormParams'}{'ReturnData'}
-			and $self->{'Config'}->{'Config'}{'ReturnProcessData'}
-	) ? 1 : 0;
-  for my $field (@{$self->{'RunParams'}{'Order'}})	{
+                $self->{'FormParams'}{'ReturnData'}
+                        and $self->{'Config'}->{'Config'}{'ReturnProcessData'}
+        ) ? 1 : 0;
+  for my $field (@{$self->{'RunParams'}{'Order'}})      {
     if($activefields->{$field}) {
       next if !exists $fields_ref->{$field};
       next if(
-				exists $fields_ref->{$field}[1]{'dbfield'}  
-				and !defined $fields_ref->{$field}[1]{'dbfield'} 
-			);
+                                exists $fields_ref->{$field}[1]{'dbfield'}  
+                                and !defined $fields_ref->{$field}[1]{'dbfield'} 
+                        );
       if($fields_ref->{$field}[1]{'dbformat'} ) {
         $selected_fields{$fields_ref->{$field}[1]{'dbformat'} . " AS $field"} = 1;
-      	if($fields_ref->{$field}[1]{'dbfield'} ) {
-					$selected_fields{"$fields_ref->{$field}[1]{'dbfield'} AS $field".'_RAW'} = 1;
-				}
+        if($fields_ref->{$field}[1]{'dbfield'} ) {
+                                        $selected_fields{"$fields_ref->{$field}[1]{'dbfield'} AS $field".'_RAW'} = 1;
+                                }
       }
       elsif($fields_ref->{$field}[1]{'dbfield'} ) {
         $selected_fields{$fields_ref->{$field}[1]{'dbfield'}. " AS $field"} = 1;
       }
       else  { 
-				$selected_fields{$field} = 1;
-			}
+                                $selected_fields{$field} = 1;
+                        }
       $selected_values{$field}=1;
     }
   }
@@ -899,7 +900,7 @@ sub genSelect {
     #We are not writing the select line, as it may affect the grouping and distincts
     for my $i (@{$self->{'Config'}->{'Config'}{'ReturnProcessData'}}) {
       if(!exists $selected_values{$i})  {
-				$selected_fields{$i} = 1;
+                                $selected_fields{$i} = 1;
         $selected_values{$i}=1;
       }
     }
@@ -918,13 +919,13 @@ sub genSelect {
       }
     }
   }
-	my $select_vals = join(', ',keys %selected_fields);
+        my $select_vals = join(', ',keys %selected_fields);
   return $select_vals;
 }
 
 sub _fixDateTime  {
   my($date)=@_;
-	return $date if $date!~/\//;
+        return $date if $date!~/\//;
   my ($day, $month, $year, $hms)=split /\/| /,$date;
 
   if(defined $year and $year ne '' and defined $month and $month ne '' and defined $day and $day ne '') {
@@ -940,7 +941,7 @@ sub _fixDateTime  {
 
 sub _fixDate  {
   my($date)=@_;
-	return $date if $date!~/\//;
+        return $date if $date!~/\//;
   my ($day, $month, $year)=split /\//,$date;
 
   if(defined $year and $year ne '' and defined $month and $month ne '' and defined $day and $day ne '') {
@@ -988,7 +989,7 @@ sub compare_options {
     push @options,['morethan','More Than'];
     push @options,['between','Between'];
   }
-	my $options = '';
+        my $options = '';
   for my $i (@options)  {
     my $selected=$value eq $i->[0] ? ' SELECTED ' : '';
     $options .=
@@ -1000,317 +1001,319 @@ sub compare_options {
   my $subBody=qq[
   <select id="fid_comp_$fieldname" name="f_comp_$fieldname" size="1" onchange="displaybox('$prefix$fieldname');">
     <option value="">&nbsp;</option>
-		$options
+                $options
   </select>
   ];
 }
 
-sub _getSavedReportList	{
-	my $self = shift;
-	my $db = $self->{'db'};
-	my $id = $self->{'ID'} || 0;
-	my ($defval) = @_;
-	$defval = '' if !defined $defval;
+sub _getSavedReportList {
+        my $self = shift;
+        my $db = $self->{'db'};
+        my $id = $self->{'ID'} || 0;
+        my ($defval) = @_;
+        $defval = '' if !defined $defval;
 
-	my $st = qq[
-		SELECT 
-			intSavedReportID,
-			strReportName
-		FROM tblSavedReports
-		WHERE 
-			intLevelID = ?
-			AND intID = ?
-			AND intReportID = ?
-		ORDER BY strReportName
-	];
-	my $q = $db->prepare($st);
-	$q->execute(
-		$self->{'EntityTypeID'},
-		$self->{'EntityID'},
-		$id,
-	);
-	my $options = '';
-	while(my($id, $value) = $q->fetchrow_array())	{
-		my $selected = $defval == $id ? ' SELECTED ' : '';
-		$options .=qq[<option value="$id" $selected >$value</option>];
-	}
-	return '' if !$options;
-	my $list = qq[
-		<select name="repID" size="1" class = "chzn-select">
-			<option value=""></option>
-			$options
-		</select>
-	];
-	return $list || '';
+        my $st = qq[
+                SELECT 
+                        intSavedReportID,
+                        strReportName
+                FROM tblSavedReports
+                WHERE 
+                        intLevelID = ?
+                        AND intID = ?
+                        AND intReportID = ?
+                ORDER BY strReportName
+        ];
+        my $q = $db->prepare($st);
+        $q->execute(
+                $self->{'EntityTypeID'},
+                $self->{'EntityID'},
+                $id,
+        );
+        my $options = '';
+        while(my($id, $value) = $q->fetchrow_array())   {
+                my $selected = $defval == $id ? ' SELECTED ' : '';
+                $options .=qq[<option value="$id" $selected >$value</option>];
+        }
+        return '' if !$options;
+        my $list = qq[
+                <select name="repID" size="1" class = "chzn-select">
+                        <option value=""></option>
+                        $options
+                </select>
+        ];
+        return $list || '';
 }
 
-sub loadSavedReportData	{
-	my $self = shift;
-	my $db = $self->{'db'};
-	my ($reportID) = @_;
-	my $st = qq[
-		SELECT 
-			strReportName,
-			strReportData
-		FROM tblSavedReports
-		WHERE 
-			intSavedReportID = ?
+sub loadSavedReportData {
+        my $self = shift;
+        my $db = $self->{'db'};
+        my ($reportID) = @_;
+        my $st = qq[
+                SELECT 
+                        strReportName,
+                        strReportData
+                FROM tblSavedReports
+                WHERE 
+                        intSavedReportID = ?
             AND intLevelID = ?
             AND (intID = 0 OR intID = ?)
-	];
-	my $q = $db->prepare($st);
-	$q->execute(
-		$reportID,
-		$self->{'EntityTypeID'},
-		$self->{'AuthID'},
-	);
-	my ($name, $data) = $q->fetchrow_array();
-	$q->finish();
-	return ($name || '', $data || '');
+        ];
+        my $q = $db->prepare($st);
+        $q->execute(
+                $reportID,
+                $self->{'EntityTypeID'},
+                $self->{'AuthID'},
+        );
+        my ($name, $data) = $q->fetchrow_array();
+        $q->finish();
+        return ($name || '', $data || '');
 }
 
-sub processSavedReportData	{
-	my $self = shift;
-	my $db = $self->{'db'};
-	my ($reportID) = @_;
-	$self->loadSaved($reportID);
-	my ($reportname, $reportdata) = $self->loadSavedReportData($reportID);
+sub processSavedReportData      {
+        my $self = shift;
+        my $db = $self->{'db'};
+        my ($reportID) = @_;
+        $self->loadSaved($reportID);
+        my ($reportname, $reportdata) = $self->loadSavedReportData($reportID);
     $self->{'DBData'}{'Saved'}{'strReportName'} = $reportname || '';
-	return undef if !$reportdata;
-	my $json = from_json($reportdata || '');
-	for my $k (keys %{$json->{'options'}})	{
-		if($k =~ /^_EXT/)	{
-			$self->{'FormParams'}{$k} = $json->{'options'}{$k};
-		}
-		else	{
-			$self->{'FormParams'}{'RO_'.$k} = $json->{'options'}{$k};
-		}
-	}
-	my %seenfields = ();
-	for my $r (@{$json->{'fields'}})	{
-		my $fieldname = $r->{'name'} || next;
-		next if $seenfields{$fieldname};	
-		$seenfields{$fieldname} = 1;
-		$self->{'FormParams'}{'d_ROselectedfieldlist'} .= 'fld_'.$fieldname.',';
-		$self->{'FormParams'}{'f_comp_'.$fieldname} = $r->{'comp'};
-		$self->{'FormParams'}{'f_chk_'.$fieldname} = $r->{'display'};
-		$self->{'FormParams'}{'f_'.$fieldname.'_1'} = $r->{'v1'};
-		$self->{'FormParams'}{'f_'.$fieldname.'_2'} = $r->{'v2'};
-	}
+        return undef if !$reportdata;
+        my $json = from_json($reportdata || '');
+        for my $k (keys %{$json->{'options'}})  {
+                if($k =~ /^_EXT/)       {
+                        $self->{'FormParams'}{$k} = $json->{'options'}{$k};
+                }
+                else    {
+                        $self->{'FormParams'}{'RO_'.$k} = $json->{'options'}{$k};
+                }
+        }
+        my %seenfields = ();
+        for my $r (@{$json->{'fields'}})        {
+                my $fieldname = $r->{'name'} || next;
+                next if $seenfields{$fieldname};        
+                $seenfields{$fieldname} = 1;
+                $self->{'FormParams'}{'d_ROselectedfieldlist'} .= 'fld_'.$fieldname.',';
+                $self->{'FormParams'}{'f_comp_'.$fieldname} = $r->{'comp'};
+                $self->{'FormParams'}{'f_chk_'.$fieldname} = $r->{'display'};
+                $self->{'FormParams'}{'f_'.$fieldname.'_1'} = $r->{'v1'};
+                $self->{'FormParams'}{'f_'.$fieldname.'_2'} = $r->{'v2'};
+        }
 }
 
-sub saveReportData	{
-	my $self = shift;
-	my $db = $self->{'db'};
+sub saveReportData      {
+        my $self = shift;
+        my $db = $self->{'db'};
 
-	my $params = $self->{'FormParams'};
+        my $params = $self->{'FormParams'};
 
-	my %options = ();
-	my @fields = ();
-	my @optarray = (qw(
-		RO_RecordFilter 
-		RO_SortBy1 
-		RO_SortByDir1 
-		RO_SortBy2 
-		RO_SortByDir2 
-		RO_GroupBy 
-		RO_OutputType 
-		RO_OutputEmail
-	));
-	for my $o (@optarray)	{
-		my $okey = $o;
-		$okey =~ s/^RO_//;
-		$options{$okey} = $params->{$o};
-	}
-	for my $k (keys %{$params})	{
-		if($k =~ /^_EXT/)	{
-			$options{$k} = $params->{$k};
-		}
-	}
+        my %options = ();
+        my @fields = ();
+        my @optarray = (qw(
+                RO_RecordFilter 
+                RO_SortBy1 
+                RO_SortByDir1 
+                RO_SortBy2 
+                RO_SortByDir2 
+                RO_GroupBy 
+                RO_OutputType 
+                RO_OutputEmail
+        ));
+        for my $o (@optarray)   {
+                my $okey = $o;
+                $okey =~ s/^RO_//;
+                $options{$okey} = $params->{$o};
+        }
+        for my $k (keys %{$params})     {
+                if($k =~ /^_EXT/)       {
+                        $options{$k} = $params->{$k};
+                }
+        }
 
-	if($params->{'d_ROselectedfieldlist'})	{
-		my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
-		for my $o (@order)	{
-			$o=~s/^fld_//g;
-			push @fields, {
-				name => $o,
-				comp => $params->{'f_comp_'.$o},
-				display => $params->{'f_chk_'.$o},
-				v1 => $params->{'f_'.$o.'_1'},
-				v2 => $params->{'f_'.$o.'_2'},
-			};
-		}
-	}
-	my %reportdatahash = (
-		fields => \@fields,
-		options => \%options
-	);
-	my $json = to_json(\%reportdatahash);
-	return ('',0) if !$json;
-	my $st = qq[
-		INSERT INTO tblSavedReports(
-			intReportID,
-			intLevelID,
-			intID,
-			strReportData,
+        if($params->{'d_ROselectedfieldlist'})  {
+                my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
+                for my $o (@order)      {
+                        $o=~s/^fld_//g;
+                        push @fields, {
+                                name => $o,
+                                comp => $params->{'f_comp_'.$o},
+                                display => $params->{'f_chk_'.$o},
+                                v1 => decode_utf8($params->{'f_'.$o.'_1'}),
+                                v2 => decode_utf8($params->{'f_'.$o.'_2'}),
+                        };
+                }
+        }
+        my %reportdatahash = (
+                fields => \@fields,
+                options => \%options
+        );
+       
+        my $json = to_json(\%reportdatahash);
+       
+        return ('',0) if !$json;
+        my $st = qq[
+                INSERT INTO tblSavedReports(
+                        intReportID,
+                        intLevelID,
+                        intID,
+                        strReportData,
             intTemporary
-		)
-		VALUES (
-			?,
-			?,
-			?,
-			?,
+                )
+                VALUES (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
             1
-		)
-	];
-	my $q=$self->{'db'}->prepare($st);
-	$q->execute(
-		$self->{'ID'},
-		$self->{'EntityTypeID'},
-		$self->{'AuthID'},
-		$json,
-	);
-	my $newID = $q->{mysql_insertid} || 0;
-	return $newID || 0;
+                )
+        ];
+        my $q=$self->{'db'}->prepare($st);
+        $q->execute(
+                $self->{'ID'},
+                $self->{'EntityTypeID'},
+                $self->{'AuthID'},
+                $json,
+        );
+        my $newID = $q->{mysql_insertid} || 0;
+        return $newID || 0;
 }
 
 sub saveReportName {
-	my $self = shift;
-	my $db = $self->{'db'};
+        my $self = shift;
+        my $db = $self->{'db'};
 
-	my $params = $self->{'FormParams'};
+        my $params = $self->{'FormParams'};
 
-	my %options = ();
-	my @fields = ();
-	my @optarray = (qw(
-		RO_RecordFilter 
-		RO_SortBy1 
-		RO_SortByDir1 
-		RO_SortBy2 
-		RO_SortByDir2 
-		RO_GroupBy 
-		RO_OutputType 
-		RO_OutputEmail
-	));
-	for my $o (@optarray)	{
-		my $okey = $o;
-		$okey =~ s/^RO_//;
-		$options{$okey} = $params->{$o};
-	}
-	for my $k (keys %{$params})	{
-		if($k =~ /^_EXT/)	{
-			$options{$k} = $params->{$k};
-		}
-	}
+        my %options = ();
+        my @fields = ();
+        my @optarray = (qw(
+                RO_RecordFilter 
+                RO_SortBy1 
+                RO_SortByDir1 
+                RO_SortBy2 
+                RO_SortByDir2 
+                RO_GroupBy 
+                RO_OutputType 
+                RO_OutputEmail
+        ));
+        for my $o (@optarray)   {
+                my $okey = $o;
+                $okey =~ s/^RO_//;
+                $options{$okey} = $params->{$o};
+        }
+        for my $k (keys %{$params})     {
+                if($k =~ /^_EXT/)       {
+                        $options{$k} = $params->{$k};
+                }
+        }
 
-	if($params->{'d_ROselectedfieldlist'})	{
-		my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
-		for my $o (@order)	{
-			$o=~s/^fld_//g;
-			push @fields, {
-				name => $o,
-				comp => $params->{'f_comp_'.$o},
-				display => $params->{'f_chk_'.$o},
-				v1 => $params->{'f_'.$o.'_1'},
-				v2 => $params->{'f_'.$o.'_2'},
-			};
-		}
-	}
-	my %reportdatahash = (
-		fields => \@fields,
-		options => \%options
-	);
-	my $json = to_json(\%reportdatahash);
-	return ('',0) if !$json;
-	my $name = $params->{'RO_NewReportName'} || 'Saved Report';
+        if($params->{'d_ROselectedfieldlist'})  {
+                my @order = split(/\s*,\s*/,$params->{'d_ROselectedfieldlist'});
+                for my $o (@order)      {
+                        $o=~s/^fld_//g;
+                        push @fields, {
+                                name => $o,
+                                comp => $params->{'f_comp_'.$o},
+                                display => $params->{'f_chk_'.$o},
+                                v1 => $params->{'f_'.$o.'_1'},
+                                v2 => $params->{'f_'.$o.'_2'},
+                        };
+                }
+        }
+        my %reportdatahash = (
+                fields => \@fields,
+                options => \%options
+        );
+        my $json = to_json(\%reportdatahash);
+        return ('',0) if !$json;
+        my $name = $params->{'RO_NewReportName'} || 'Saved Report';
 
-	#Check existing
-	{
-		my %existing_names = ();
-		my $max_num  = 0;
-		my $st = qq[
-			SELECT strReportName
-			FROM tblSavedReports
-			WHERE
-				intLevelID = ?	
-				AND intID = ?
-				AND intReportID = ?	
-		];
-		my $q=$self->{'db'}->prepare($st);
-		$q->execute(
-			$self->{'EntityTypeID'},
-			$self->{'AuthID'},
-			$self->{'ID'},
-		);
-		my $existing_count = 0;
-		while(my ($existing_name) = $q->fetchrow_array())	{
-			$existing_count++ if $existing_name eq $name;	
-			if($existing_name =~/^$name Copy \d+/)	{
-				$existing_count++;
-				my ($num) = $existing_name =~/Copy (\d+)/;
-				$max_num = $num if $num> $max_num;
-			}
-		}
-		if($existing_count)	{
-			$name = $name." Copy ".++$max_num if $existing_count;
-		}
-	}
+        #Check existing
+        {
+                my %existing_names = ();
+                my $max_num  = 0;
+                my $st = qq[
+                        SELECT strReportName
+                        FROM tblSavedReports
+                        WHERE
+                                intLevelID = ?  
+                                AND intID = ?
+                                AND intReportID = ?     
+                ];
+                my $q=$self->{'db'}->prepare($st);
+                $q->execute(
+                        $self->{'EntityTypeID'},
+                        $self->{'AuthID'},
+                        $self->{'ID'},
+                );
+                my $existing_count = 0;
+                while(my ($existing_name) = $q->fetchrow_array())       {
+                        $existing_count++ if $existing_name eq $name;   
+                        if($existing_name =~/^$name Copy \d+/)  {
+                                $existing_count++;
+                                my ($num) = $existing_name =~/Copy (\d+)/;
+                                $max_num = $num if $num> $max_num;
+                        }
+                }
+                if($existing_count)     {
+                        $name = $name." Copy ".++$max_num if $existing_count;
+                }
+        }
 
-	my $st = qq[
-		INSERT INTO tblSavedReports(
-			intReportID,
-			strReportName,
-			intLevelID,
-			intID,
-			strReportData
-		)
-		VALUES (
-			?,
-			?,
-			?,
-			?,
-			?
-		)
-	];
-	my $q=$self->{'db'}->prepare($st);
-	$q->execute(
-		$self->{'ID'},
-		$name,
-		$self->{'EntityTypeID'},
-		$self->{'AuthID'},
-		$json,
-	);
-	my $newID = $q->{mysql_insertid} || 0;
-	my $response = '<div class="OKmsg">Report Saved</div>';
-	return ($response, $newID);
+        my $st = qq[
+                INSERT INTO tblSavedReports(
+                        intReportID,
+                        strReportName,
+                        intLevelID,
+                        intID,
+                        strReportData
+                )
+                VALUES (
+                        ?,
+                        ?,
+                        ?,
+                        ?,
+                        ?
+                )
+        ];
+        my $q=$self->{'db'}->prepare($st);
+        $q->execute(
+                $self->{'ID'},
+                $name,
+                $self->{'EntityTypeID'},
+                $self->{'AuthID'},
+                $json,
+        );
+        my $newID = $q->{mysql_insertid} || 0;
+        my $response = '<div class="OKmsg">Report Saved</div>';
+        return ($response, $newID);
 }
 
 
-sub deleteSavedReportData	{
-	my $self = shift;
-	my $db = $self->{'db'};
-	my ($reportID) = @_;
-	my $st = qq[
-		DELETE
-		FROM tblSavedReports
-		WHERE 
-			intLevelID = ?
-			AND intID = ?
-			AND intSavedReportID = ?
-	];
-	my $q = $db->prepare($st);
-	$q->execute(
-		$self->{'EntityTypeID'},
-		$self->{'EntityID'},
-		$reportID,
-	);
-	$q->finish();
-	return '<div class="OKmsg">Saved Report has been deleted</div>';
+sub deleteSavedReportData       {
+        my $self = shift;
+        my $db = $self->{'db'};
+        my ($reportID) = @_;
+        my $st = qq[
+                DELETE
+                FROM tblSavedReports
+                WHERE 
+                        intLevelID = ?
+                        AND intID = ?
+                        AND intSavedReportID = ?
+        ];
+        my $q = $db->prepare($st);
+        $q->execute(
+                $self->{'EntityTypeID'},
+                $self->{'EntityID'},
+                $reportID,
+        );
+        $q->finish();
+        return '<div class="OKmsg">Saved Report has been deleted</div>';
 }
 
 sub afterSubmission {
-	my $self = shift;
-	return undef;
+        my $self = shift;
+        return undef;
 }
 
 1;

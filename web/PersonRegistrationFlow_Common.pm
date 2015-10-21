@@ -19,6 +19,7 @@ require Exporter;
     bulkRegoCreate
     checkUploadedRegoDocuments
     getRegoTXNDetails
+    displaySelfRegoAddProductComplete
 );
 
 use strict;
@@ -197,6 +198,10 @@ sub displayRegoFlowSummary {
             or $rego_ref->{'registrationNature'} eq 'TRANSFER'
             or $rego_ref->{'strRegistrationNature'} eq 'DOMESTIC_LOAN'
             or $rego_ref->{'registrationNature'} eq 'DOMESTIC_LOAN'
+            or $rego_ref->{'strRegistrationNature'} eq 'INT_TRANSFER_OUT'
+            or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_OUT'
+            or $rego_ref->{'strRegistrationNature'} eq 'INT_TRANSFER_RETURN'
+            or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_RETURN'
     ) {
         $ok=1;
     }
@@ -384,7 +389,7 @@ $sth = $Data->{'db'}->prepare($query);
         $hidden_ref->{'payMethod'} = 'notrequired' if (! $amountDue);
         my %PaymentConfig = (
             totalAmountDue => $amountDue,
-			totalPaymentDue => $amountDue,
+            totalPaymentDue => $amountDue,
             dollarSymbol => $Data->{'SystemConfig'}{'DollarSymbol'} || '$',
             paymentMethodText => $Defs::paymentMethod{$hidden_ref->{'payMethod'}} || '',
         );
@@ -431,7 +436,12 @@ sub displayRegoFlowComplete {
 
     my $ok = 1;
     my $run = $hidden_ref->{'run'} || param('run') || 0;
-    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL' or $rego_ref->{'registrationNature'} eq 'RENEWAL' or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER' or $rego_ref->{'registrationNature'} eq 'TRANSFER') {
+    if ($rego_ref->{'strRegistrationNature'} eq 'RENEWAL'
+        or $rego_ref->{'registrationNature'} eq 'RENEWAL'
+        or $rego_ref->{'strRegistrationNature'} eq 'TRANSFER'
+        or $rego_ref->{'registrationNature'} eq 'TRANSFER'
+        or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_OUT'
+        or $rego_ref->{'registrationNature'} eq 'INT_TRANSFER_RETURN') {
         $ok=1;
     }
     else    {
@@ -584,10 +594,10 @@ sub displayRegoFlowComplete {
             payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
             payNowStatus=> $payStatus,
             person_home_url => $url,
-			person => \%personData,
-			registration => $rego_ref,
+            person => \%personData,
+            registration => $rego_ref,
             gateways => $gateways,
-			txnCount => $txnCount,
+	    txnCount => $txnCount,
             target => $Data->{'target'},
             RegoStatus => $rego_ref->{'strStatus'},
             hidden_ref=> $hidden_ref,
@@ -601,15 +611,27 @@ sub displayRegoFlowComplete {
             originLevel => $originLevel,
             originClient => $originClient,
             PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
+            ConfirmationHeader => $Data->{'lang'}->txt("Registration has been submitted for approval"),
         );
         
+
+        print STDERR Dumper %PageData;
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
+        }
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_OUT) {
+            $PageData{'ConfirmationHeader'} = $Data->{'lang'}->txt("Player has been marked as Transferred Out");
+
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/out_complete.templ') || '';
+        }
+        if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_INT_TRANSFER_RETURN) {
+            $body = runTemplate($Data, \%PageData, 'personrequest/transfer/return_complete.templ') || '';
         }
         else {
             #my $template = 'registration/complete.templ';
             my $template = $Data->{'SystemConfig'}{'regoFlow_ApprovalMessage'} || 'registration/complete.templ';            
             $template = 'registration/complete_sr.templ' if ($Data->{'SelfRego'});
+            
             $body = runTemplate($Data, \%PageData, $template) || '';
         }
     }
@@ -1079,9 +1101,9 @@ sub displayRegoFlowProducts {
         0,
         $rego_ref,
     );
-	
+    
     my @prodIDs = ();
-	my $totalamountchk = 0;
+    my $totalamountchk = 0;
     my %ProductRules=();
     foreach my $product (@{$CheckProducts})  {
         #next if($product->{'UseExistingThisEntity'} && checkExistingProduct($Data, $product->{'ID'}, $Defs::LEVEL_PERSON, $personID, $entityID, 'THIS_ENTITY'));
@@ -1092,13 +1114,13 @@ sub displayRegoFlowProducts {
         if ($product->{'HaveForThisEntity'} == 1 or $product->{'HaveForAnyEntity'} == 1)    {
             next unless ($Data->{'SystemConfig'}{'Products_DontHideExisting'});
         }
-
+        
         push @prodIDs, $product->{'ID'};
         $ProductRules{$product->{'ID'}} = $product;
 		#$totalamountchk += $product->{'ProductPrice'};
 		$totalamountchk += $product->{'ProductPrice'} if($product->{'Required'} && $product->{'ProductPrice'} > 0);
      }
-    my $product_body='';
+    my $product_body=''; print STDERR "\n REGO PRODUCT IDS: @prodIDs \n";
     if (@prodIDs)   {
         $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0, 0);
 
@@ -1171,11 +1193,16 @@ sub displayRegoFlowProductsBulk {
      }
     my $product_body='';
     if (@prodIDs)   {
-        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1);
+        $product_body= getRegoProducts($Data, \@prodIDs, 0, $entityID, $regoID, $personID, $rego_ref, 0, \%ProductRules, 0,1,1);
      }
     else    {
         return '';
     }
+
+    my $maObj = getInstanceOf($Data, 'national');
+    my $maName = $maObj
+        ? $maObj->name()
+        : '';
 
      my %PageData = (
         nextaction=>"PREGFB_PU",
@@ -1188,8 +1215,9 @@ sub displayRegoFlowProductsBulk {
         Lang => $Data->{'lang'},
         NoFormFields =>1,
         client=>$client,
-		amountCheck => $totalamountchk,
-		payMethod => $rego_ref->{'payMethod'},
+	AssociationName => $maName,
+	amountCheck => $totalamountchk,
+	payMethod => $rego_ref->{'payMethod'},
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
@@ -1326,6 +1354,8 @@ sub add_rego_record{
     warn "REGISTRATION NATURE $rego_ref->{'registrationNature'}";
     if ($rego_ref->{'registrationNature'} ne 'RENEWAL'
         and $rego_ref->{'registrationNature'} ne 'TRANSFER'
+        and $rego_ref->{'registrationNature'} ne 'INT_TRANSFER_OUT'
+        and $rego_ref->{'registrationNature'} ne 'INT_TRANSFER_RETURN'
         and $rego_ref->{'registrationNature'} ne 'DOMESTIC_LOAN') {
         print STDERR "ABOUT TO CHECK TYP LIMITS FOR : " . $rego_ref->{'sport'} . "|" . $rego_ref->{'personType'} . "|" . $rego_ref->{'personLevel'} . "|" . $rego_ref->{'entityID'} ."\n\n";
         my $ok = checkRegoTypeLimits($Data, $personID, 0, $rego_ref->{'sport'}, $rego_ref->{'personType'}, $rego_ref->{'personEntityRole'}, $rego_ref->{'personLevel'}, $rego_ref->{'ageLevel'}, $rego_ref->{'entityID'}); 
@@ -1572,5 +1602,75 @@ sub bulkRegoSubmit {
 #    );
 #
 #}
+sub displaySelfRegoAddProductComplete {
+    my ($Data, $regoID, $client, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
+    my $lang=$Data->{'lang'};
+
+    my $ok = 1;
+    my $run = $hidden_ref->{'run'} || param('run') || 0;
+    
+    my $payMethod= $hidden_ref->{'payMethod'} || param('payMethod') || '';
+    my $body = '';
+    my $gateways = '';
+
+    if ($ok)   {
+        my @products= split /:/, $hidden_ref->{'prodIds'};
+        foreach my $prod (@products){ $hidden_ref->{"prod_$prod"} =1;}
+        my @productQty= split /:/, $hidden_ref->{'prodQty'};
+        foreach my $prodQty (@productQty){ 
+            my ($prodID, $qty) = split /-/, $prodQty;
+            $hidden_ref->{"prodQTY_$prodID"} =$qty;
+        }       
+        
+        my $pay_url = $Data->{'target'}."?client=$client&amp;a=P_TXNLog_list;";
+        my $txnCount = 0;
+        my $logIDs;
+        my $amountDue = 0;
+        my $originalAmount=0;
+        my $txn_invoice_url = $Defs::base_url."/printinvoice.cgi?client=$client&amp;rID=$hidden_ref->{'rID'}&amp;pID=$personID";
+        ($txnCount, $amountDue, $logIDs, $originalAmount) = getPersonRegoTXN($Data, $personID, $regoID);
+        if (! $originalAmount and defined $logIDs) {
+            foreach my $id (keys %{$logIDs}) {
+                next if ! $id;
+                product_apply_transaction($Data, $id);
+                my $valid =0;
+                ($valid, $rego_ref) = validateRegoID(
+                    $Data,
+                    $personID,
+                    $regoID,
+                    $entityID
+                );
+            }
+        }
+        
+        my $personObj = getInstanceOf($Data, 'person', $personID);
+        ## PaymentMethod
+        #payLaterOn      = 1/0
+        my $logID = param('tl') || 0;
+        my $paymentResult = '';
+        my $payStatus = 0;
+        ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
+
+        $payMethod = '' if (!$amountDue and $payStatus == -1);
+        my %PageData = (
+            payLaterFlag=> ($amountDue and $payMethod eq 'later') ? 1 : 0,
+            payNowFlag=> ($payMethod eq 'now') ? 1 : 0,
+            payNowMsg=> (! $amountDue and $payMethod eq 'now') ? $paymentResult : '',
+            payNowStatus=> $payStatus,            
+            target => $Data->{'target'},
+            Lang => $Data->{'lang'},
+            url => $Defs::base_url,           
+            PersonSummaryPanel => personSummaryPanel($Data, $personObj->ID()),
+        );
+          
+            
+        $body = runTemplate($Data, \%PageData, 'selfrego/selfrego_add_product_complete.templ') || '';
+        
+    }
+    return ($body, $gateways);
+}
+
+
+
 1;
 

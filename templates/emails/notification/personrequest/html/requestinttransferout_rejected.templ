@@ -1,0 +1,52 @@
+<tr>
+    <td colspan="3" style="background-color: #f6f6f6; padding:40px;">
+
+        <h2 style="color: #555e68; font-weight:bold; font-family:arial, sans-serif;">
+        [% Lang.txt("Dear") %] [% RecipientName %],
+        </h2>
+
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Lang.txt("The") %] [% MA %] [% Lang.txt("has REJECTED this transfer. The reason for this is detailed below. This transaction is now cancelled. Please note that when a task is rejected it cannot be resumed. You would need start over and resubmit a new task through") %] [% SysName %]. [% Lang.txt("For further information please contact") %] [% SysName %] [% Lang.txt("help desk") %].
+        </p>
+
+        <table style="font-family: arial, sans-serif; font-size:12px; color: #555e68; margin-left:-5px;" cellpadding="5">
+            <tr>
+                <td>[% Lang.txt("Work Task") %]:</td>
+                <td><strong>[% Lang.txt(WorkTaskType) %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Person") %]:</td>
+                <td><strong>[% Person %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Current Club") %]:</td>
+                <td><strong>[% CurrentClub %]</strong></td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Requesting Club") %]:</td>
+                <td><strong>[% RequestingClub %]</strong></td>
+            </tr>
+
+           <tr>
+                <td>[% Lang.txt("Status") %]:</td>
+                <td>
+                    <span class="status-common status-[% Status %]">[% Lang.txt(Status) %]</span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>[% Lang.txt("Reason") %]:</td>
+                <td><strong>[% Reason %]</strong></td>
+            </tr>
+
+        </table>
+
+        <p style="font-family:arial, sans-serif; font-size:14px; color: #7d8892;">
+            [% Lang.txt("Regards") %],<br />
+            [% SenderName %]
+        </p>
+    </td>
+</tr>

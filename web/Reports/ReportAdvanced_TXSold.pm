@@ -205,7 +205,7 @@ sub SQLBuilder  {
 			? qq[ AND ML.intClubID = $intID ] 
 			: '';
 		$sql = qq[
-      SELECT DISTINCT
+      SELECT 
 				TL.intLogID,
 				TL.intAmount,
 				TL.strTXN,

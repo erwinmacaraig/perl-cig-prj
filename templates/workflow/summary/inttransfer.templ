@@ -1,0 +1,60 @@
+[% USE Dumper %]
+<!--<div class="row">-->
+    <div class="col-md-3">
+        [% PersonSummaryPanel %]
+        <div class="registration-approved">[% Lang.txt('Complete') %]</div>
+    </div>
+    <div class="col-md-9">
+        <h3 class="panel-header">
+            [% PersonRegistrationDetails.personFirstname %] [% PersonRegistrationDetails.personSurname %]
+        </h3>
+        <div class="panel-body">
+            <br/>
+            <p>[% Lang.txt('The following International Transfer Out has been') %] <strong>[% Lang.txt('approved') %].</strong> [% Lang.txt('[_1] and [_2] have been notified.', TransferDetails.TransferTo, TransferDetails.TransferFrom) %]</p>
+            <br/>
+			<div class="read-only">
+				<h4>[% Lang.txt('Transfer Details') %]</h4>
+				<div class="read-only-text">
+					<div class="">
+					  	<span class="">[% Lang.txt('Member ID') %]:</span>
+					  	<span class="detail-value"><strong>[% PersonRegistrationDetails.MID %]</strong></span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Registration Status') %]:</span>
+					  	<span class="detail-value"><strong>[% PersonRegistrationDetails.Status %]</strong></span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Registration Date From') %]:</span>
+					  	<span class="detail-value"><strong>[% TransferDetails.TransferFrom %], [% DateFormat.format(TransferDetails.DateFrom, 'MEDIUM') %]</strong></span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Registration Date to') %]:</span>
+					  	<span class="detail-value"><strong>[% TransferDetails.TransferTo %], [% DateFormat.format(TransferDetails.DateTo, 'MEDIUM') %]</strong></span>
+				    </div>
+					<div class="">
+					  	<span class="">[% Lang.txt('Summary Clubs transfer') %]:</span>
+					  	<span class="detail-value"><strong>[% TransferDetails.Summary %]</strong></span>
+				    </div>
+
+				</div>
+			</div>
+
+            <!--
+            [% FOREACH request IN personRequests %]
+            <label>[% Lang.txt('The [_1] request (ID: [_2]) -- [_3]/[_4] has been sent to [_5].', request.requestType, request.id, request.personType, request.sport, request.requestTo) %].</label>
+            <br/>
+            [% END %]
+            -->
+            <div class="top-bottom-spacer">
+            
+            <div class="pull-right">
+            <p>[% Lang.txt('What would you like to do now?') %]</p>
+            <p>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=C_HOME" title="" class="">[% Lang.txt('Go to your dashboard') %]</a>
+                <a href="main.cgi?client=[% TaskAction.client %]&amp;a=WF_VNA" title="" class="btn-main btn-proceed">[% Lang.txt('View next available task') %]</a>
+            </p>
+            </div>
+            </div>
+        </div>
+    </div>
+<!--</div>-->

@@ -50,6 +50,9 @@ CREATE TABLE `tblProducts` (
   `strNationality_NOTIN` VARCHAR(200) NULL COMMENT 'Product Invisibility',
     intCanResetPaymentRequired TINYINT DEFAULT 0,
     intMinAddSingleTXNLevel TINYINT DEFAULT 0,
+ intOldProductID INT DEFAULT 0,
+    tmpDtMin_Att4 VARCHAR(50) default '', 
+    tmpDtMax_Att3 VARCHAR(50) default '',
 
   PRIMARY KEY (`intProductID`),
   KEY `index_intEntityID` (`intEntityID`),

@@ -146,6 +146,12 @@ sub clubFieldsSetup {
         1 => 'On',
     );
 
+    my %intTransferHoldingClubOptions = (
+        0 => 'No',
+        1 => 'Yes',
+    );
+
+
     my $regionName = '';
     if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION) {
         my $RAObj = getInstanceOf($Data, 'region');
@@ -493,6 +499,18 @@ sub clubFieldsSetup {
                     visible_for_add => $Data->{'SystemConfig'}{'allow_SelfRego'} ? 1 : 0,
                     visible_for_edit => $Data->{'SystemConfig'}{'allow_SelfRego'} ? 1 : 0,
                 },
+                intIsInternationalTransfer => {
+                    label       => $FieldLabels->{'intIsInternationalTransfer'},
+                    value       => $values->{'intIsInternationalTransfer'},
+                    type        => 'lookup',
+                    options     => \%intTransferHoldingClubOptions,
+                    class       => 'fcToggleGroup',
+                    compulsory => 1,
+                    firstoption => [ '', " " ],
+                    noadd      => 1,
+                    #noedit      => 1,
+                },                
+
 
             },
             'order' => [qw(
@@ -504,9 +522,10 @@ sub clubFieldsSetup {
                 strMANotes
                 strBankAccountNumber
                 intAcceptSelfRego
+                intIsInternationalTransfer
             )],
             sections => [
-                [ 'main',        $Data->{'lang'}->txt('Organisation Details'),'','',$values->{'footer-roledetails'} ],
+                [ 'main',        $Data->{'lang'}->txt('Organisation'),'','',$values->{'footer-roledetails'} ],
             ],
         },
     };
