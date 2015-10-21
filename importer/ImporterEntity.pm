@@ -62,7 +62,8 @@ sub insertEntityRecord {
             strDiscipline,
             intAcceptSelfRego,
             intNotifications,
-            strOrganisationLevel
+            strOrganisationLevel,
+            strGender
         )
         VALUES (
             1,
@@ -94,7 +95,8 @@ sub insertEntityRecord {
             ?,
             ?,
             ?,
-            ?
+            ?,
+            'ALL'
         )
     ];
     my $qryINS= $db->prepare($stINS) or query_error($stINS);
