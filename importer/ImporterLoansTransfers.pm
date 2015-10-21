@@ -479,6 +479,9 @@ sub importLTFile  {
     my ($db, $countOnly, $type, $infile) = @_;
 
 open INFILE, "<$infile" or die "Can't open Input File";
+my $stDEL = "DELETE FROM tmpLoansTransfers WHERE strRecordType = ?";
+my $qDEL= $db->prepare($stDEL) or query_error($stDEL);
+$qDEL->execute($type);
 
 my $count = 0;
                                                                                                         
@@ -500,7 +503,8 @@ while (<INFILE>)	{
 	$line=~s///g;
 	#$line=~s/,/\-/g;
 	$line=~s/"//g;
-	my @fields=split /;/,$line;
+	#my @fields=split /;/,$line;
+	my @fields=split /\t/,$line;
 #Transfers:
 #PersonCode;ClubFrom;ClubCodeTo;DateApplied;DateApproved;Sport;PersonLevel;ProductCode;ProductAmount;Paid;TransactionNo;ApprovedBy
 #Loans:
