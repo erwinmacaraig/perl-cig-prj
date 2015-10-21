@@ -91,6 +91,7 @@ sub insertPersonRegoRecord {
 
     my $stINS = qq[
         INSERT INTO tblPersonRegistration_1 (
+            intOriginLevel,
             intRealmID,
             dtAdded,
             dtApproved,
@@ -118,6 +119,7 @@ sub insertPersonRegoRecord {
             tmpdtPaid
         )
         VALUES (
+            100,
             1,
             NOW(),
             NOW(),
@@ -421,7 +423,8 @@ while (<INFILE>)	{
 	$line=~s///g;
 	#$line=~s/,/\-/g;
 	$line=~s/"//g;
-	my @fields=split /;/,$line;
+	#my @fields=split /;/,$line;
+	my @fields=split /\t/,$line;
 
     #:PersonCode;OrganisationCode;Status;RegistrationNature;PersonType;Role;Level;Sport;AgeLevel;DateFrom;DateTo;Transferred;IsLoan;NationalSeason;ProductCode;Amount;IsPaid;PaymentReference
     if ($maCode eq 'HKG')   {
@@ -506,7 +509,7 @@ while (<INFILE>)	{
 
         ## Update field mapping for HKG 
     }
-    else    {
+    elsif ($maCode eq 'FIN')   {
         ## Finland at moment
     	$parts{'PERSONCODE'} = $fields[0] || '';
 	    $parts{'ENTITYCODE'} = $fields[1] || '';
@@ -528,6 +531,45 @@ while (<INFILE>)	{
 	    $parts{'ISPAID'} = $fields[16] || '';
 	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
 	    $parts{'DATEPAID'} = $fields[17] || '';
+        
+        $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
+        $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
+        $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
+        if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+
+        $parts{'CERTIFICATIONS'} = '';
+        
+    }
+    elsif ($maCode eq 'GHA')    {
+        ## Finland at moment
+    	$parts{'PERSONCODE'} = $fields[0] || '';
+	    $parts{'ENTITYCODE'} = $fields[1] || '';
+	    $parts{'STATUS'} = uc($fields[2]) || '';
+	    $parts{'REGNATURE'} = uc($fields[3]) || '';
+	    $parts{'PERSONTYPE'} = $fields[4] || '';
+	    $parts{'PERSONROLE'} = $fields[5] || '';
+	    $parts{'PERSONLEVEL'} = $fields[6] || '';
+	    $parts{'SPORT'} = $fields[7] || '';
+	    $parts{'AGELEVEL'} = $fields[8] || '';
+	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
+	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
+	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
+	    $parts{'NATIONALPERIODID'} = 0;
+	    $parts{'PRODUCTCODE'} = $fields[12] || '';
+
+	    $parts{'ISLOAN'} = '';
+	    $parts{'DATETRANSFERRED'} = '0000-00-00';
+	    $parts{'PRODUCTAMOUNT'} = 0;
+	    $parts{'ISPAID'} = '';
+	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
+	    $parts{'DATEPAID'} = '';
         
         $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
         $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';

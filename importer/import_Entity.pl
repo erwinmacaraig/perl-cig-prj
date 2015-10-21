@@ -16,7 +16,7 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='Club.csv';
+    my $infile1='GHA_TEST_clubs.txt';
 
     importEntityFile($db, $countOnly, 'CLUB', $infile1);
 

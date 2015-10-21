@@ -2,6 +2,7 @@ DROP TABLE IF EXISTS tmpEntity;
 CREATE TABLE tmpEntity (
     intID INT NOT NULL AUTO_INCREMENT,
     strFileType varchar(30) default '',
+    strEntityType varchar(30) default '',
     strParentCode varchar(45) default '',
     strEntityCode varchar(30) default '',
     strMAID varchar(30) default '',
@@ -29,7 +30,6 @@ CREATE TABLE tmpEntity (
     strOrganisationLevel varchar(100) default '',
     intAcceptSelfRego INT DEFAULT 0,
     intNotifications INT DEFAULT 0,
-    strParentCode varchar(100) default '',
     
     PRIMARY KEY (intID),
     INDEX index_strFileType (strFileType),

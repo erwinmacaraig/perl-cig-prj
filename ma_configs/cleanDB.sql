@@ -1,7 +1,7 @@
 DELETE FROM tblEntity WHERE intEntityID<>1;
-DELETE FROM tblUser;
-DELETE FROM tblUserAuth;
-DELETE FROM tblUserHash;
+#DELETE FROM tblUser;
+#DELETE FROM tblUserAuth;
+#DELETE FROM tblUserHash;
 DELETE FROM tblPerson;
 DELETE FROM tblPersonRegistration_1;
 DELETE FROM tblPersonRegistrationStatusChangeLog;

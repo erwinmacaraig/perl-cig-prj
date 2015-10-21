@@ -62,7 +62,7 @@ sub insertEntityRecord {
             strDiscipline,
             intAcceptSelfRego,
             intNotifications,
-            strOrganisationLevel,
+            strOrganisationLevel
         )
         VALUES (
             1,
@@ -140,7 +140,8 @@ sub insertEntityRecord {
         my $otherIdentifierType = 0;
         
         my $entityLevel = 3;
-        my $entityType= 'CLUB';
+        my $entityType= $dref->{'strEntityType'} || 'CLUB';
+        $dref->{'strOrganisationLevel'}||= 'BOTH';
         my $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
         
         if ($maCode eq 'HKG')   {
@@ -150,7 +151,7 @@ sub insertEntityRecord {
         $qryINS->execute(
             $entityLevel,
             $entityType,
-            $dref->{'intID'},
+            $dref->{'strEntityCode'},
             $dref->{'strMAID'},
             $status,
             $dref->{'strLocalName'},
@@ -172,11 +173,13 @@ sub insertEntityRecord {
             $dref->{'strWebURL'},
             $dref->{'strEmail'},
             $dref->{'strDiscipline'},
-            $dref->{'intAcceptSelfRego'},
-            $dref->{'intNotifications'},
+            $dref->{'intAcceptSelfRego'} || 0,
+            $dref->{'intNotifications'} || 0,
             $dref->{'strOrganisationLevel'},
-        );
-        my $ID = $qryINS->{mysql_insertid} || 0;
+        ) or print "SQL ERROR\n";
+        my $ID = $qryINS->{mysql_insertid};
+        print "ID IS $ID\n";
+        next if (! $ID);
         $qryELINS->execute(
             $parentEntityID,
             $ID, 
@@ -214,41 +217,47 @@ while (<INFILE>)	{
 	$line=~s///g;
 	#$line=~s/,/\-/g;
 	$line=~s/"//g;
-	my @fields=split /;/,$line;
+#	my @fields=split /;/,$line;
+	my @fields=split /\t/,$line;
 
     if ($maCode eq 'HKG')   {
         ## Update field mapping for HKG 
     }
-    else    {
+    elsif ($maCode eq 'GHA')   {
+        ## Update field mapping for HKG 
         ## NEED GHANA MAPPING
 #SystemID;PalloID;Status;LocalFirstName;LocalLastName;LocalPreviousLastName;LocalLanguageCode;PreferedName;LatinFirstName;LatinLastName;LatinPreviousLastName;DateOfBirth;Gender;Nationality;CountryOfBirth;RegionOfBirth;PlaceOfBirth;Fax;Phone;Address1;Address2;PostalCode;Town;Suburb;Email;Identifier;IdentifierType;CountryIssued;DateFrom;DateTo
 
     	$parts{'ENTITYCODE'} = $fields[0] || '';
-    	$parts{'MAID'} = $fields[1] || '';
-	    $parts{'STATUS'} = $fields[2] || '';
-	    $parts{'LOCALNAME'} = $fields[3] || '';
-	    $parts{'LOCALSHORTNAME'} = $fields[4] || '';
-	    $parts{'LOCALLANGUAGE'} = $fields[5] || '';
-	    $parts{'INTNAME'} = $fields[6] || '';
-	    $parts{'INTSHORTNAME'} = $fields[7] || '';
-	    $parts{'dtFROM'} = $fields[8] || '0000-00-00'; 
-	    $parts{'dtTO'} = $fields[9] || '0000-00-00'; 
-	    $parts{'ISO_COUNTRY'} = $fields[10] || ''; 
-	    $parts{'REGION'} = $fields[11] || ''; 
-	    $parts{'CITY'} = $fields[12] || ''; 
-	    $parts{'STATE'} = $fields[13] || ''; 
+	    $parts{'PARENTCODE'} = $fields[1] || ''; 
+	    $parts{'STATUS'} = uc($fields[2]) || '';
+	    $parts{'ENTITYTYPE'} = $fields[3] || ''; 
+	    $parts{'LOCALNAME'} = $fields[4] || '';
+	    $parts{'LOCALSHORTNAME'} = $fields[5] || '';
+	    $parts{'LOCALLANGUAGE'} = $fields[6] || '';
+	    $parts{'INTNAME'} = $fields[7] || '';
+	    $parts{'INTSHORTNAME'} = $fields[8] || '';
+	    $parts{'dtFROM'} = $fields[9] || '0000-00-00'; 
+	    $parts{'dtTO'} = $fields[10] || '0000-00-00'; 
+	    $parts{'DISCIPLINE'} = $fields[11] || ''; 
+	    $parts{'ISO_COUNTRY'} = $fields[12] || ''; 
+	    $parts{'WEBURL'} = $fields[13] || ''; 
 	    $parts{'FAX'} = $fields[14] || ''; 
 	    $parts{'PHONE'} = $fields[15] || ''; 
 	    $parts{'ADDRESS'} = $fields[16] || ''; 
 	    $parts{'ADDRESS2'} = $fields[17] || ''; 
 	    $parts{'POSTALCODE'} = $fields[18] || ''; 
-	    $parts{'WEBURL'} = $fields[19] || ''; 
-	    $parts{'DISCIPLINE'} = $fields[20] || ''; 
-	    $parts{'ACCEPTREGO'} = $fields[21] || 0; 
-	    $parts{'NOTIFICATIONS'} = $fields[22] || 0; 
-	    $parts{'ORGLEVEL'} = $fields[23] || ''; 
-	    $parts{'PARENTCODE'} = $fields[24] || ''; 
-        
+	    $parts{'REGION'} = $fields[19] || ''; 
+	    $parts{'CITY'} = $fields[19] || ''; 
+	    $parts{'STATE'} = $fields[20] || ''; 
+	    $parts{'EMAIL'} = $fields[21] || ''; 
+
+	    $parts{'ORGLEVEL'} = 'BOTH';
+    	#$parts{'MAID'} = $fields[1] || '';
+	    #$parts{'ACCEPTREGO'} = $fields[21] || 0; 
+	    #$parts{'NOTIFICATIONS'} = $fields[22] || 0; 
+    }
+    else    {
     }
 	if ($countOnly)	{
 		$insCount++;
@@ -259,6 +268,7 @@ while (<INFILE>)	{
 		INSERT INTO tmpEntity
 		(
             strFileType, 
+            strEntityType,
             strEntityCode, 
             strMAID, 
             strStatus,
@@ -313,12 +323,14 @@ while (<INFILE>)	{
             ?,
             ?,
             ?,
+            ?,
             ?
         )
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
         $type,
+        $parts{'ENTITYTYPE'},
         $parts{'ENTITYCODE'},
         $parts{'MAID'},
         $parts{'STATUS'},
