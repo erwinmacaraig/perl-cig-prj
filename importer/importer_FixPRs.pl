@@ -25,7 +25,7 @@ sub main	{
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    my $maxNPID = 119 ; #2014
+    my $maxNPID = 39 ; #2014
     
     my $st = qq[
         SELECT
@@ -111,15 +111,18 @@ sub main	{
 
     ## Now set rest to PASSIVE
     my $stPASSIVE = qq[
-        UPDATE tblPersonRegistration_$Data{'Realm'}
+        UPDATE tblPersonRegistration_$Data{'Realm'} as PR
+            LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         SET 
-            strStatus="PASSIVE"
+            PR.strStatus="PASSIVE", PR.strOldStatus='ACTIVE'
         WHERE
-            intNationalPeriodID <= ?
-            AND strStatus IN ("ACTIVE")
+            NP.intCurrentNew=0 
+            AND NP.intCurrentRenewal=0 
+            AND PR.strStatus IN ("ACTIVE")
     ];
     my $qryPASSIVE= $db->prepare($stPASSIVE);
-    $qryPASSIVE->execute($maxNPID);
+    #$qryPASSIVE->execute($maxNPID);
+    $qryPASSIVE->execute();
 
 
 print "PR RECORDS DONE\n";
