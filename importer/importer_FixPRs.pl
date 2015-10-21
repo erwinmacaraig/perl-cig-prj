@@ -44,6 +44,7 @@ sub main	{
     my $stTSNF = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="TRANSFERRED",
             dtTo = ?
         WHERE
@@ -58,6 +59,7 @@ sub main	{
     my $stLEVEL = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="ROLLED_OVER",
             dtTo = ?
         WHERE
@@ -73,6 +75,7 @@ sub main	{
     my $stROLLOVER = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="ROLLED_OVER"
         WHERE
             intPersonID=?
@@ -114,7 +117,8 @@ sub main	{
         UPDATE tblPersonRegistration_$Data{'Realm'} as PR
             LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         SET 
-            PR.strStatus="PASSIVE", PR.strOldStatus='ACTIVE'
+            PR.strOldStatus=PR.strStatus,
+            PR.strStatus="PASSIVE"
         WHERE
             NP.intCurrentNew=0 
             AND NP.intCurrentRenewal=0 

@@ -155,6 +155,10 @@ sub insertPersonRegoRecord {
         $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
     }
+    if ($maCode eq 'GHA')   {
+        $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
+        $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
+    }
 
     my $st = qq[
         SELECT
@@ -164,7 +168,7 @@ sub insertPersonRegoRecord {
             tmpPersonRego
         $orderBy
     ];
-print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
+#print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     my %existingRecord;
