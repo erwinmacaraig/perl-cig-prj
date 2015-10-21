@@ -443,7 +443,7 @@ sub step2 {
 					<input type="submit" name="subbut" value=" ]. $lang->txt('Confirm Payment') . qq[ " class="btn-main">
 				</form>
 				<div style="clear:both;"></div>
-				<form action="$Data->{'target'}" method="POST" style="position: absolute; bottom: 50px; margin-left: 418px;">
+				<form action="$Data->{'target'}" method="POST" style="position: relative; bottom: 51px; float: right;">
 					<input type="hidden" name="a" value="P_TXNLog_list">
 					<input type="hidden" name="client" value="$client">
 					<input type="submit" name="subbut" value=" ]. $lang->txt('Cancel Payment') . qq[ " class="btn-main">
@@ -539,8 +539,8 @@ sub getTransList {
 	my $intTXNEntityID = getEntityID($Data->{'clientValues'});
 	if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB){                       
             $TXNEntityID .= qq[ AND t.intTXNEntityID = $intTXNEntityID ];                   
-        }
-        elsif(1==2 and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
+    }
+    elsif(1==2 and $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_REGION){
             my $subquery = qq[SELECT intChildEntityID FROM tblEntityLinks WHERE intParentEntityID = $intTXNEntityID];
             my $st = $Data->{'db'}->prepare($subquery);
             my @clubs = ();

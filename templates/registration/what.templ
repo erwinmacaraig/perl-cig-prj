@@ -32,7 +32,7 @@
 <div class = "panel-body">
     <div class = "regoptions">
     <fieldset>
-[% IF existing.type %]
+[% IF existing.type AND !displaydetailsonly %]
         <div class="alert existingReg">
             <div>
                 <span class="fa fa-info"></span>

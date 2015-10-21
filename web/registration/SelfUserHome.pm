@@ -232,7 +232,8 @@ sub getSelfRegoTransactionHistory{
 	my $txns = '';
 	my %transactions = ();
 	my $sth; 
-
+	
+        my @arr = ();
 		foreach my $regoDetail (@{$previousRegos}){
 			my $query = qq[ SELECT
             T.intQty,
@@ -243,42 +244,51 @@ sub getSelfRegoTransactionHistory{
             T.intStatus,
             T.intTransactionID,
             TL.intPaymentType,
-			I.strInvoiceNumber
+            I.strInvoiceNumber
         FROM
             tblTransactions as T
             INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID)
-			INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblInvoice as I ON (T.intInvoiceID = I.intInvoiceID)
+            INNER JOIN tblPersonRegistration_$Data->{'Realm'} as PR ON (T.intPersonRegistrationID = PR.intPersonRegistrationID AND T.intRealmID = PR.intRealmID) 
             LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
         WHERE
            
              T.intTableType = $Defs::LEVEL_PERSON
+             AND PR.strStatus NOT IN ('', 'INPROGRESS')
             AND T.intPersonRegistrationID = ?];			
 			$sth = $Data->{'db'}->prepare($query);
 			$sth->execute($regoDetail->{'intPersonRegistrationID'}); #$personIdKeyArr,  #T.intID = ? AND
 			while(my $dref = $sth->fetchrow_hashref()){
-				push @{$transactions{'txn'}},{
-					TransactionNumber => $dref->{'intTransactionID'},
-					InvoiceNumber => $dref->{'strInvoiceNumber'},
-           			PaymentLogID=> $dref->{'intTransLogID'},
-                    ProductName=> $dref->{'ProductName'},
-                    ProductType=> $dref->{'ProductType'},
-                    Amount=> $dref->{'curAmount'},
-                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
-                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
-                    Qty=> $dref->{'intQty'},				
-				}
+                               push @{$transactions{'txn'}},{
+                                    TransactionNumber => $dref->{'intTransactionID'},
+                                    InvoiceNumber => $dref->{'strInvoiceNumber'},
+                                    PaymentLogID=> $dref->{'intTransLogID'},
+                                    ProductName=> $dref->{'ProductName'},
+                                    ProductType=> $dref->{'ProductType'},
+                                    Amount=> $dref->{'curAmount'},
+                                    TXNStatus => $Defs::TransactionStatus{$dref->{'intStatus'}},
+                                    PaymentType=> $Defs::paymentTypes{$dref->{'intPaymentType'}} || '-',
+                                    Qty=> $dref->{'intQty'},
+                                    regoID => $regoDetail->{'intPersonRegistrationID'},
+                                    personID => $regoDetail->{'intPersonID'},
+                                    
+				};			
 			}
+			#$txns .= runTemplate(
+                        #        $Data,
+                        #         \%transactions,
+                        #        'selfrego/selfregotxnbody.templ'                        
+                        #);
+                        #%transactions = ();
 
 		}
-	
-	
 
 	$transactions{'CurrencySymbol'} = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
 	$txns = runTemplate(
-				$Data,
-				\%transactions,
-				'selfrego/selfregotxnbody.templ'			
-			);
+                                $Data,
+                                \%transactions,
+                                'selfrego/selfregotxnbody.templ'                        
+                        );
 	return $txns;
 	
 }
@@ -307,6 +317,7 @@ sub getPreviousRegos {
             prq.intPersonRequestID,
             prq.dtLoanTo,
             prq.intOpenLoan,
+            E.intIsInternationalTransfer,
             existprq.intOpenLoan as existOpenLoan
         FROM
             tblSelfUserAuth AS A
@@ -347,11 +358,11 @@ sub getPreviousRegos {
     my %found = ();
     my @people = ();
     my %renewLinks = ();
-    my $allowTransferShown=0;
+    my %allowTransferShown=();
     while(my $dref = $q->fetchrow_hashref())    {
         my $pID = $dref->{'intPersonID'} || next;
         if(!exists $regos{$pID})    {
-            $allowTransferShown=0;
+            %allowTransferShown=();
             $formattedName = formatPersonName($Data,$dref->{'strLocalFirstname'},$dref->{'strLocalSurname'},'');
             push @people, {
                 strLocalFirstname => $dref->{'strLocalFirstname'} || '',
@@ -383,14 +394,15 @@ sub getPreviousRegos {
         $dref->{'renewlink'} = '';
         $dref->{'transferlink'} = '';
         $dref->{'allowTransfer'} =0;
+        $dref->{'allowAddTransaction'} = 0;
         $dref->{'PRStatus'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
         if (
-            ! $allowTransferShown
+            ! $allowTransferShown{$dref->{'strSport'}}
             and $Data->{'SystemConfig'}{'selfRego_' . $dref->{'strPersonLevel'} . '_allowTransfer'} 
             and ($dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE or $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE)
             and $dref->{'strPersonType'} eq $Defs::PERSON_TYPE_PLAYER)    {
             $dref->{'allowTransfer'} =1;
-            $allowTransferShown=1;
+            $allowTransferShown{$dref->{'strSport'}}=1;
             $dref->{'transferlink'} = "?a=TRANSFER_INIT&amp;pID=$pID&amp;rtargetid=$dref->{'intPersonRegistrationID'}";
         }
         if ($Data->{'SystemConfig'}{'selfRego_RENEW_'.$dref->{'strPersonType'}} 
@@ -398,7 +410,7 @@ sub getPreviousRegos {
             and $dref->{'PersonStatus'} eq $Defs::PERSON_STATUS_REGISTERED
         )   {
             my ($nationalPeriodID, undef, undef) = getNationalReportingPeriod($Data->{db}, $Data->{'Realm'}, $Data->{'RealmSubType'}, $dref->{'strSport'}, $dref->{'strPersonType'}, 'RENEWAL');
-            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1) {
+            if ($dref->{'intNationalPeriodID'} != $nationalPeriodID or $dref->{'intIsLoanedOut'} == 1 or ($dref->{'intNationalPeriodID'} == $nationalPeriodID and $dref->{'existOpenLoan'} == 0 and $dref->{'strStatus'} eq $Defs::PERSONREGO_STATUS_PASSIVE)) {
                 $dref->{'existOpenLoan'} ||= 0;
                 $dref->{'intOpenLoan'} ||= 0;
                 if (
@@ -409,14 +421,24 @@ sub getPreviousRegos {
                 }
             }
         }
-
+        if($Data->{'SystemConfig'}{'selfRego_allow_addTransaction_'. $dref->{'strPersonType'}}){       
+            $dref->{'addproductlink'} = "?a=ADD_PROD&srp=&pID=$pID&dtype=&rID=$dref->{'intPersonRegistrationID'}&rfp=r&_ss=r&es=1";
+            $dref->{'allowAddTransaction'} = 1;
+        }
+        if ($dref->{'intIsInternationalTransfer'})  {
+            $dref->{'allowAddTransaction'} = 0 ;
+            $dref->{'allowTransfer'} = 0;
+            $dref->{'renewlink'} = '';
+        }
+            
         push @{$regos{$pID}}, $dref; 
     }
    
     #do some processing with regards to displaying renewal button    
     foreach my $person (@people){
         foreach my $r (@{$regos{$person->{'intPersonID'}}}){
-            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} == $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
+            #if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} == $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
+            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} != $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
                     $r->{'renewlink'} = '';
             }
         }

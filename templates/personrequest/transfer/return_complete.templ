@@ -1,0 +1,54 @@
+<div class="col-md-3 reg-complete-summary-left-bar">
+    [% PersonSummaryPanel %]
+    <!-- DO IF TEST HERE ON registration.strStatus -->
+    [% IF registration.strStatus == "PENDING" %]
+    	<div class="registration-pending">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% ELSIF registration.strStatus == "ACTIVE" %]
+    	<div class="registration-approved">[% Lang.txt(registration.personRegoStatus) %]</div>
+    [% END %]
+
+</div>
+
+<div class="col-md-9">
+	<h3 class="panel-header">[% Lang.txt("Thank you") %]</h3>
+	<div class="panel-body">
+		<div class="reg-complete-wrapper">
+			<p class="reg-complete-text">
+                [% Lang.txt('Your transfer request has been processed.') %]
+                [% IF registration.changeLevel %]
+                        <br/><strong>[% Lang.txt('Status Change') %]:</strong> [% Lang.txt('New Level/Status') %]: <strong>[% Lang.txt(registration.PersonLevel) %]</strong>, [% Lang.txt('Previous Level/Status') %]:<strong> [% Lang.txt(registration.PreviousPersonLevel) %]</strong>.<br />[% Lang.txt(' Please note that any Level/Status change is subject to') %] [% registration.MA %] [% Lang.txt('approval') %].<br />
+                    [% END %]
+            <br/>
+            <br/>
+			</p>
+[% IF payLaterFlag %]
+                       <br><br><br>
+                        <p class="reg-complete-text">[% Lang.txt("An invoice for this registration has been created.  You can find all your invoices under the 'Payments' Menu.") %]</p>
+                        <p class="reg-complete-text">[% Lang.txt("We would like to remind you that the Member Association will not approve the registration until payment is completed.") %]</p>
+                    [% END %]
+
+		</div>
+
+	</div>
+                    [% IF payNowFlag and payNowStatus == 1%]
+                       [% payNowMsg %]
+                    [% END %]
+                    [% IF payNowFlag and payNowStatus == 3 %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.') %]</div>
+                    [% END %]
+                    [% IF payNowFlag and (payNowStatus != 1 and payNowStatus != 3) %]
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('We are sorry, there was a problem with your payment.') %]</div>
+                        <div class="panel-body">
+                            <div class="reg-complete-wrapper">
+                                <p class="reg-complete-text">[% Lang.txt('Registration has been submitted to') %]: <strong>[% registration.MA %]</strong> [% Lang.txt('and an invoice has been created for this registration.  You can pay anytime by going to the Payments Menu and choose the corresponding invoice') %]<br /><br /></p>
+                            </div>
+                        </div>
+                    [% END %]
+    <div class = "button-row">
+        <ul class="row-btn-complete">
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a></li>
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PENDPR_" class="btn-main">[% Lang.txt("View all currently submitted registrations") %]</a></li>
+            <li><a href="[% url %]/[% target %]?client=[% client %]&amp;a=PRA_T" class="btn-main">[% Lang.txt("Transfer another player") %]</a></li>
+        </ul>
+    </div>
+</div>

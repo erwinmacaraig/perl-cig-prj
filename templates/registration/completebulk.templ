@@ -15,10 +15,10 @@
                        [% payNowMsg %]
                     [% END %]
                     [% IF payNowFlag and payNowStatus == 3 %]
-                        <div align="center" class="warningmsg" style="font-size:14px;">Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.</div>
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('Your payment has been put on Hold.<br>Once processed you will be notified as to Payment Status.') %]</div>
                     [% END %]
                     [% IF payNowFlag and (payNowStatus != 1 and payNowStatus != 3) %]
-                        <div align="center" class="warningmsg" style="font-size:14px;">We are sorry, there was a problem with your payment.</div>
+                        <div align="center" class="warningmsg" style="font-size:14px;">[% Lang.txt('We are sorry, there was a problem with your payment.') %]</div>
                         <div class="panel-body">
                             <div class="reg-complete-wrapper">
                                 <p class="reg-complete-text">[% Lang.txt('Registrations have been submitted to') %]: <strong>[% MAName %]</strong> [% Lang.txt('and an invoice has been created.  You can pay anytime by going to the Payments Menu and choose the corresponding invoice') %]<br /><br /></p>
