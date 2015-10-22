@@ -191,7 +191,7 @@ while (<INFILE>)	{
         $parts{'STATUS'} = 'REGISTERED';
 	    $parts{'LOCALFIRSTNAME'} = $fields[2] || '';
 	    $parts{'LOCALSURNAME'} = $fields[3] || '';
-	    $parts{'LOCALLANGUAGE'} = $fields[4] || '';
+	    $parts{'LOCALLANGUAGE'} = 1; #$fields[4] || '';
 	    $parts{'PREFERREDNAME'} = $fields[5] || '';  ## Don't think we use it
 	    $parts{'INTFIRSTNAME'} = $fields[6] || '';
 	    $parts{'INTSURNAME'} = $fields[7] || '';

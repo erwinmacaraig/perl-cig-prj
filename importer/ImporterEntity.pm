@@ -236,7 +236,7 @@ while (<INFILE>)	{
 	    $parts{'ENTITYTYPE'} = $fields[3] || ''; 
 	    $parts{'LOCALNAME'} = $fields[4] || '';
 	    $parts{'LOCALSHORTNAME'} = $fields[5] || '';
-	    $parts{'LOCALLANGUAGE'} = $fields[6] || '';
+	    $parts{'LOCALLANGUAGE'} = 1; #$fields[6] || '';
 	    $parts{'INTNAME'} = $fields[7] || '';
 	    $parts{'INTSHORTNAME'} = $fields[8] || '';
 	    $parts{'dtFROM'} = $fields[9] || '0000-00-00'; 
