@@ -155,10 +155,10 @@ sub insertPersonRegoRecord {
         $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
     }
-    if ($maCode eq 'GHA')   {
-        $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
-        $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
-    }
+    #if ($maCode eq 'GHA')   {
+    #    $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
+    #    $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
+    #}
 
     my $st = qq[
         SELECT
