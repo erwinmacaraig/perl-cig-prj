@@ -615,7 +615,7 @@ sub displayRegoFlowComplete {
         );
         
 
-        print STDERR Dumper %PageData;
+        #print STDERR Dumper %PageData;
         if($rego_ref->{'strRegistrationNature'} eq $Defs::REGISTRATION_NATURE_TRANSFER) {
             $body = runTemplate($Data, \%PageData, 'personrequest/transfer/complete.templ') || '';
         }

@@ -133,6 +133,7 @@ sub rolloverExistingPersonRegistrations {
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
         my $oldStatus = $rego->{'strStatus'};
+        my $originaldtTo = $rego->{'dtTo_'};
 
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
@@ -140,7 +141,12 @@ sub rolloverExistingPersonRegistrations {
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
-        $thisRego->{'dtTo'} = "$Year-$Month-$Day";
+        $Day = sprintf("%02s", $Day);
+        $Month= sprintf("%02s", $Month);
+        my $dtNow = "$Year$Month$Day";
+        if (! $originaldtTo or $originaldtTo eq "00000000" or $originaldtTo > $dtNow) {
+            $thisRego->{'dtTo'} = "$Year-$Month-$Day";
+        }
         
         addPersonRegistrationStatusChangeLog($Data, $rego->{'intPersonRegistrationID'}, $oldStatus, $Defs::PERSONREGO_STATUS_ROLLED_OVER);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
