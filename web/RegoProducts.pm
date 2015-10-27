@@ -44,6 +44,9 @@ sub getRegoProducts {
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
 
+    return '' if (!scalar(@{$regoProducts}));
+
+
     my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 
     my $i            = 0;
