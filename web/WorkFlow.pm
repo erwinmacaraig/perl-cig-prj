@@ -1098,8 +1098,6 @@ sub addWorkFlowTasks {
                 (r.intUsingPersonLevelChangeFilter = 1 AND r.intPersonLevelChange = pr.intPersonLevelChanged)
             )
 		];
-print STDERR $st;
-print STDERR "UNKNOWN COLUMN VALUES : $itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature\n";
 
 	    $q = $db->prepare($st);
 	    $itc ||= 0;
