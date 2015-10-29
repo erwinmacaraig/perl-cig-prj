@@ -200,6 +200,20 @@ sub main	{
         $gatewaySpecific = MAGateway_HKPayDollar(\%MAGateway, $paymentSettings);
         $paymentURL = $gatewaySpecific->{'paymentURL'};
     }
+    if ($paymentSettings->{'gatewayCode'} eq 'sg_easypay')  {
+        my %MAGateway= ();
+        $MAGateway{'nh'} = $Data{'noheader'};
+        $MAGateway{'client'} = $client;
+        $MAGateway{'ci'} = $payRef;
+        $MAGateway{'chkv'} = $chkvalue;
+        $MAGateway{'session'} = $session;
+        $MAGateway{'amount'} = $amount;
+        $MAGateway{'logID'} = $logID;
+        $MAGateway{'currentLang'} = $currentLang;
+
+        $gatewaySpecific = MAGateway_SGEasyPay(\%MAGateway, $paymentSettings);
+        $paymentURL = $gatewaySpecific->{'paymentURL'};
+    }
 
 
     markTXNSentToGateway(\%Data, $logID);
