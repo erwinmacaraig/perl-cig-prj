@@ -135,6 +135,7 @@ UNION ALL
         $personID,
         $personID,
         $personID,
+        $personID,
     );
 	my @rowdata = ();
 	while(my $ref= $sth->fetchrow_hashref()){
