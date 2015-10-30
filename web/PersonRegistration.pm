@@ -1218,7 +1218,7 @@ sub getRegistrationDetail {
 #
 sub hasPendingRegistration {
     my ($Data, $personID, $sport, $existingRegos) = @_;
-    if(scalar @{$existingRegos}){
+    if(1==2 and scalar @{$existingRegos}){
         my $count = 0;
         my %renewalCtrlForRego = ();
         foreach my $rego (@{$existingRegos}){
