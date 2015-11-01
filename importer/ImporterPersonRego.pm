@@ -567,6 +567,7 @@ while (<INFILE>)	{
 	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
 	    $parts{'NATIONALPERIODID'} = 0;
 	    $parts{'PRODUCTCODE'} = $fields[12] || '';
+	    $parts{'CLIENTPRIMPORTCODE'} = $fields[16] || '';
 
 	    $parts{'ISLOAN'} = '';
 	    $parts{'DATETRANSFERRED'} = '0000-00-00';
@@ -597,8 +598,8 @@ while (<INFILE>)	{
 
 	my $st = qq[
 		INSERT INTO tmpPersonRego
-		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, intNationalPeriodID, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid, strCertifications)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, intNationalPeriodID, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid, strCertifications, strClientPRImportCode)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
@@ -623,7 +624,8 @@ while (<INFILE>)	{
         $parts{'ISPAID'},
         $parts{'TRANSACTIONNO'},
         $parts{'DATEPAID'},
-        $parts{'CERTIFICATIONS'}
+        $parts{'CERTIFICATIONS'},
+        $parts{'CLIENTPRIMPORTCODE'}
     ) or print "ERROR";
 }
 
