@@ -359,6 +359,7 @@ strong {
 .txtright {
 	text-align: right;
 } 
+
 .txtcenter {
 	text-align: center;
 } 
@@ -970,6 +971,8 @@ header nav ul#menu ul {
 		width: 100%;
 		margin-bottom: 5px
 	}
+	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
+
 }
 
 header ul#menu ul li a:hover {
@@ -1314,6 +1317,9 @@ div.transfertabs.tab-content > .active {
 }
 .res-headers th, .document-table-header th{
 	text-align: left !important;
+}
+.res-invisible {
+    display: table-cell !important;
 }
 
 .member-data {
