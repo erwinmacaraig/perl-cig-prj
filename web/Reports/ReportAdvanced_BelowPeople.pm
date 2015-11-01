@@ -527,6 +527,24 @@ sub _getConfiguration {
                     allowgrouping => 1,
                 }
             ],
+             PRstrLocalShortName=> [
+                $lang->txt('Entity Short Name'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLocalShortName',
+                    optiongroup => 'regos'
+                }
+            ],
+            PRstrLatinName=> [
+                $lang->txt('Name (International)'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLatinName',
+                    optiongroup => 'regos'
+                }
+            ],
               strClubName => [
                 (
                       $currentLevel > $Defs::LEVEL_CLUB
@@ -1833,6 +1851,8 @@ sub _getConfiguration {
                 PRintOnLoan
                 PRintIsLoanedOut
                 PRstrLocalName
+                PRstrLocalShortName
+                PRstrLatinName
                 strClubName 
                 strRegionName 
 

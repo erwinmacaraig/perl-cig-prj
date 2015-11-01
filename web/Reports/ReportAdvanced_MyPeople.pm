@@ -518,7 +518,24 @@ sub _getConfiguration {
                     optiongroup => 'regos'
                 }
             ],
-
+            PRstrLocalShortName=> [
+                $lang->txt('Entity Short Name'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLocalShortName',
+                    optiongroup => 'regos'
+                }
+            ],
+            PRstrLatinName=> [
+                $lang->txt('Name (International)'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLatinName',
+                    optiongroup => 'regos'
+                }
+            ],
 
 
            strAddress1 => [
@@ -1807,6 +1824,8 @@ sub _getConfiguration {
                 PRintOnLoan
                 PRintIsLoanedOut
                 PRstrLocalName
+                PRstrLocalShortName
+                PRstrLatinName
 
               strAddress1
               strAddress2
