@@ -1315,6 +1315,9 @@ div.transfertabs.tab-content > .active {
 .res-headers th, .document-table-header th{
 	text-align: left !important;
 }
+.res-invisible {
+    display: table-cell !important;
+}
 
 .member-data {
 	padding-left: 10px;
