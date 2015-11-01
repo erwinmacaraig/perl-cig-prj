@@ -359,6 +359,7 @@ strong {
 .txtright {
 	text-align: right;
 } 
+
 .txtcenter {
 	text-align: center;
 } 
@@ -970,6 +971,13 @@ header nav ul#menu ul {
 		width: 100%;
 		margin-bottom: 5px
 	}
+	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
+	.button-row {
+		margin: 20px 0;
+		clear: both;
+		float: none;
+		text-align: right;
+	}
 }
 
 header ul#menu ul li a:hover {
@@ -1550,7 +1558,8 @@ header nav ul li a {
 .button-row {
     margin: 20px 0;
     clear:both;
-
+    float:  none;
+    text-align:  right;
 }
 .button-row .button-right {
     float:right;
