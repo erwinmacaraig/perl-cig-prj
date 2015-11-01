@@ -963,15 +963,27 @@ header nav ul#menu ul {
 	position: absolute;
 }
 
-@media (max-width: 992px){
+@media (min-width: 769px) and (max-width: 992px){
+	header nav ul#menu ul {
+		top:0px;
+		position: absolute;
+		width: 100%;
+		margin-bottom: 5px;
+		min-width: 200px;
+		top: 49px
+	}
+}
+
+@media (max-width: 768px){
 	header nav ul#menu ul {
 		top:0px;
 		position: relative;
 		width: 100%;
-		margin-bottom: 5px
+		margin-bottom: 5px;
+		min-width: 200px;
+		top: 0px
 	}
 }
-
 header ul#menu ul li a:hover {
 	/*
 	background-color: #085a8c;
