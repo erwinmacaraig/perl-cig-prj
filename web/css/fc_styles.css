@@ -973,7 +973,15 @@ header nav ul#menu ul {
 		min-width: 200px;
 		top: 49px
 	}
+}
+@media (min-width: 250px) and (max-width: 992px){
 	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
+	#itc_selection li {
+		display: block;
+		width: 100%;
+		clear: both;
+		padding: 20px 0px 0px
+	}
 
 }
 
