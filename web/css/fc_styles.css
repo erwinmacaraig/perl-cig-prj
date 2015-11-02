@@ -2448,6 +2448,10 @@ header .navbar-brand {
 @media (min-width: 768px) and (max-width: 992px){
 	header .logo-area ul { margin: 0; }
 	  #worktasks_length { display: none; }
+	.pageHeading {
+		font-size: 18px;
+	  }
+
 
 }
 @media (min-width: 480px) and (max-width: 768px) {
