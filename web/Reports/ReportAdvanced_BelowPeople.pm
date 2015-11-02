@@ -435,7 +435,7 @@ sub _getConfiguration {
                     fieldtype   => 'date',
                     allowsort   => 1,
                     dbfield     => 'PR.dtAdded',
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'regos'
                 }
             ],
