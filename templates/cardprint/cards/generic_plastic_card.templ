@@ -1,28 +1,111 @@
 [% WRAPPER cardprint/PersonCard_Wrapper.templ %]
+<style>
+    .cardblock {
+        width:322px;
+        position: relative;
+    }
+    .card-header {
+        height:20px;
+        line-height:20px;
+        padding:3px;
+        border-bottom:double #ccc 2px;
+        margin-bottom:5px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .card-photo {
+        width:90px;
+        height:116px;
+        float:left;
+        margin-left:10px;
+        border: solid #000 1px;
+    }
+    .card-info {
+        float:left;
+        width:200px;
+        margin-left:10px;
+    }
+    .card-front, .card-back {
+        clear:both;
+        height:202px;
+        border: solid #000 1px;
+    }
+    .card-info .name    {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size:14px;
+    }
+    .card-regotype  {
+        font-weight: bold;
+        text-transform: uppercase;
+        background-color:#ccc;
+        margin-top:3px;
+        padding:3px 6px;
+    }
+    .card-regolevel  {
+        font-weight: normal;
+        float:right;
+        text-transform: none;
+    }
+    .card-regovalidity {
+        float:left;
+        margin:3px;
+    }
+    .card-terms {
+        padding:6px;
+    }
+    .card-bgimg {
+        opacity: .1;
+        height:200px;
+        position: absolute;
+        right: 10px;
+    }
+</style>
     [% FOREACH p = cardData %]
-        <div id="card">
-                <b>Member ID:</b> [% p.intMemberID %] <br>
-                <b>FFA Number:</b> [% p.strNationalNum %] <br>
-                <b>Firstname:</b> [% p.strFirstname %] <br>
-                <b>Lastname:</b> [% p.strSurname %] <br>
-                <b>DOB:</b> [% p.dtDOB %] <br>
-                <b>Age In Year:</b> [% p.intAgeInYear %] <br>
-                <b>Season:</b> [% p.strSeasonName %] <br>
-                <b>Age Group:</b> [% p.intAgeInYear %] <br>
-                <b>Assoc:</b> [% p.strAssocName %] <br>
-                <b>Clubs:</b>
-                [% FOREACH s = p.Seasons %]
-                    [% NEXT IF s.intMSRecStatus != 1 %]
-                    [% NEXT IF s.intClubID < 1 %]
-                    [% varClub = s.intClubID %]
+<div class = "cardblock">
+    <div class = "card-front">
+        <img src = "images/cards/ghana.png" class = "card-bgimg">
+        <div class = "card-header">
+            [% maName %]
+        </div><!-- end cardheader -->
+        <div class = "card-body">
+            <div class = "card-photo"></div>
+            <div class = "card-info">
+                <div class = "name">[% p.strLocalFirstname %] [% p.strLocalSurname %] </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Lang.txt('Date of Birth') %]</div>
+                    <div class = "card-info-data">[% DateFormat.format(p.dtDOB,'MEDIUM') %]</div>
+                </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Lang.txt('Nationality') %]</div>
+                    <div class = "card-info-data">[% p.nationality %]</div>
+                </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Data.SystemConfig.NationalNumName %]</div>
+                    <div class = "card-info-data">[% p.strNationalNum %]</div>
+                </div>
+                [% FOREACH r = p.registrations %]
+                    <div class = "card-regotype">[% Lang.txt(r.PersonType) %]
+                        <div class = "card-regolevel">[% Lang.txt(r.Level) %]</div>
+                    </div>
+                    <div>[% r.EntityLocalName %]</div>
                 [% END %]
-                [% FOREACH c = p.Clubs %]
-                    [% NEXT IF c.intStatus != 1 %]
-                    [% NEXT IF c.intAssocID != 12371 %]
-                    [% NEXT IF c.intClubID != varClub %]
-                    [% c.strName %] <br>
-                [% END %]
-                <br>
+            </div><!-- end cardinfo -->
+        </div><!-- end card-body-->
+    </div><!-- end card-front -->
+    <div class = "card-back">
+        <img src = "images/cards/ghana.png" class = "card-bgimg">
+        <div class = "card-terms">
+            <p>This certifies that the bearer of this card has been medically examined to play football by a qualified medical doctor for the current season. The use of this license by the bearer is regulated by the Federation. Any form of abuse shall result in the license being withdrawn.</p>
         </div>
+        [% FOREACH r = p.registrations %]
+            <div class = "card-regovalidity">
+                <div class = "card-regotype">[% Lang.txt(r.PersonType) %]</div>
+                [% Lang.txt('From') %]: [% DateFormat.format(r.dtFrom,'MEDIUM') %]<br>
+                [% Lang.txt('To') %]: [% DateFormat.format(r.dtTo,'MEDIUM') %]
+            </div>
+        [% END %]
+</div><!-- end card-back -->
+</div><!-- end card-block -->
     [% END %]
 [% END %]

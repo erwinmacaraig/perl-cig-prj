@@ -66,6 +66,7 @@ sub main	{
     my $batchInfo = getBatchInfo(\%Data, $batchID);
     my $cardInfo = getCardInfo(\%Data, $batchInfo->{'intCardID'});
     my $cardData = generateCardData(\%Data, $batchID, $cardInfo);
+    my $ma = getInstanceOf(\%Data, 'national');
 
     my $locale = $Data{'lang'}->getLocale();
     $resultHTML = runTemplate(
@@ -73,6 +74,7 @@ sub main	{
       {
         cardData => $cardData,
         cardInfo => $cardInfo,
+        maName => $ma->name(),
       },
       'cardprint/cards/'.$cardInfo->{'strTemplateFilename'} || '',
     );
@@ -96,11 +98,16 @@ sub generateCardData {
     return undef if !$cardInfo;
     my $cardtypes = join("','",@{$cardInfo->{'types'}});
 
+    my $isocountries  = getISOCountriesHash();
     my $realmID = $Data->{'Realm'} || 1;
     my $st = qq[
       SELECT 
-        PR.*
-
+        PR.*,
+        E.strLocalName AS EntityLocalName,
+        E.strLocalShortName AS EntityLocalShortName,
+        E.strLatinName AS EntityLatinName,
+        E.strLatinShortName AS EntityLatinShortName,
+        E.strMAID AS EntityMAID
       FROM
         tblPersonCardPrint AS PCP  
         INNER JOIN tblPersonRegistration_$realmID AS PR ON (
@@ -108,6 +115,8 @@ sub generateCardData {
             AND PR.strStatus = 'ACTIVE'
             AND PR.strPersonType IN ('$cardtypes')
         )
+        INNER JOIN tblEntity AS E
+            ON PR.intEntityID = E.intEntityID
       WHERE
         PCP.intBatchID = ?
     ];
@@ -117,6 +126,14 @@ sub generateCardData {
     my %regodata = ();
     while(my $dref = $q->fetchrow_hashref())   {
         my $pID = $dref->{'intPersonID'} || 0;
+
+        $dref->{'Status'} = $Defs::personRegoStatus{$dref->{'strStatus'}} || '';
+        $dref->{'RegoType'} = $Defs::registrationNature{$dref->{'strRegistrationNature'}} || '';
+        $dref->{'Sport'} = $Defs::sportType{$dref->{'strSport'}} || '';
+        $dref->{'Level'} = $Defs::personLevel{$dref->{'strPersonLevel'}} || '';
+        $dref->{'AgeLevel'} = $Defs::ageLevel{$dref->{'strAgeLevel'}} || '';
+        $dref->{'PersonType'} = $Defs::personType{$dref->{'strPersonType'}} || '';
+
         push @{$regodata{$pID}}, $dref;
     }
     $q->finish();
@@ -141,6 +158,8 @@ sub generateCardData {
     my @carddata = ();
     while(my $dref = $q->fetchrow_hashref())   {
         my $pID = $dref->{'intPersonID'} || 0;
+        $dref->{'nationality'} = $isocountries->{$dref->{'strISONationality'}};
+        $dref->{'gender'} = $Defs::genderInfo->{$dref->{'intGender'}};
         $dref->{'registrations'} = $regodata{$pID} || [];
         push @carddata, $dref;
     }
