@@ -1552,6 +1552,16 @@ sub _getConfiguration {
                     ddbfield    => 'P.strGroup'
                 }
               ],
+            strProductType=> [
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Type') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions',
+                    ddbfield    => 'P.strProductType'
+                }
+              ],
               curAmount => [
                 $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Line Item Total') : '',
                 {
@@ -1937,6 +1947,7 @@ sub _getConfiguration {
               intProductNationalPeriodID
               intProductID
               strGroup
+                strProductType
               intQty
               curAmount
               dtTransaction
