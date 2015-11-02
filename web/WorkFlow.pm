@@ -1060,6 +1060,7 @@ sub addWorkFlowTasks {
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			pr.intPersonID,
+            r.intEntityLevel,
 			pr.intPersonRegistrationID,
 			pr.intEntityID as RegoEntity,
 			pr.intCreatedByUserID,
@@ -1175,6 +1176,8 @@ sub addWorkFlowTasks {
     
     my $emailNotification = new EmailNotifications::WorkFlow();
 	
+    my $activeRuleSkipped = 0;
+    my @Tasks=();
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
 			
@@ -1190,6 +1193,29 @@ sub addWorkFlowTasks {
                 $emailNotification->setFromEntityID($problemEntityID);
             }
 
+            if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeEntityLevel'}) {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intEntityLevel'});
+            }
+            if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeMA'}) {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, 100);
+            }
+            #if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToClub'}) {
+            #    $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, 3);
+            #}
+    
+            if ($Data->{'SystemConfig'}{'allowRuleSkip'})   {
+                if (! $approvalEntityID)    {
+                    $activeRuleSkipped = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE);
+                    next;
+                }
+                if ($activeRuleSkipped)   {
+                    $activeRuleSkipped = 0;
+                    $dref->{'strTaskStatus'}  = $Defs::WF_TASK_STATUS_ACTIVE;
+                }
+            }
+                
+                
+                
             next if (! $approvalEntityID and ! $problemEntityID);
             print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
             
@@ -1210,7 +1236,9 @@ sub addWorkFlowTasks {
                 $dref->{'intPersonRegistrationID'},
                 $dref->{'DocumentID'}
             );			
-            my $task = getTask($Data, $qINS->{mysql_insertid});
+            my $tID = $qINS->{mysql_insertid};
+            push @Tasks, $tID;
+            my $task = getTask($Data, $tID);
 			
             my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
             if($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}){
@@ -1250,28 +1278,50 @@ sub addWorkFlowTasks {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-	$st = qq[
-		INSERT IGNORE INTO tblWFTaskPreReq (
-			intWFTaskID,
-			intWFRuleID,
-			intPreReqWFRuleID
-		)
-		SELECT
-			t.intWFTaskID,
-			t.intWFRuleID,
-			rpr.intPreReqWFRuleID
-		FROM tblWFTask AS t
-		INNER JOIN tblWFRulePreReq AS rpr
-			ON t.intWFRuleID = rpr.intWFRuleID
-		WHERE t.intPersonRegistrationID = ?
-		];
+    if (scalar @Tasks)  {
+        my $taskWHERE = '';
+        foreach my $tID (@Tasks)    {
+            $taskWHERE .= "," if ($taskWHERE);
+            $taskWHERE .= qq[$tID];
+        }
+        $st = qq[
+            INSERT IGNORE INTO tblWFTaskPreReq (
+                intWFTaskID,
+                intWFRuleID,
+                intPreReqWFRuleID
+            )
+            SELECT
+                t.intWFTaskID,
+                t.intWFRuleID,
+                rpr.intPreReqWFRuleID
+            FROM tblWFTask AS t
+            INNER JOIN tblWFRulePreReq AS rpr ON (
+                t.intWFRuleID = rpr.intWFRuleID
+            )
+            INNER JOIN tblWFTask as task1 ON (
+                task1.intWFRuleID = rpr.intPreReqWFRuleID
+                AND task1.intWFTaskID IN ($taskWHERE)
+            )
+            WHERE 
+                t.intWFTaskID IN ($taskWHERE)
+                AND t.intEntityID = ?
+                AND t.intPersonID = ?
+                AND t.intPersonRegistrationID = ?
+            ];
 
-  	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
+            if ($taskWHERE) {
+                $q = $db->prepare($st);
+                $q->execute(
+                    $entityID,
+                    $personID,
+                    $personRegistrationID
+                );
 
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st;
-	}
+                if ($q->errstr) {
+                    return $q->errstr . '<br>' . $st;
+                }
+            }
+    }
 
 	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
