@@ -1,0 +1,25 @@
+<div id = "cardprint-batchoptions">
+[% IF cardcount > 0 %]
+<p>[% Lang.txt('You have [_1] card requests ready to print',cardcount) %]</p>
+<p>[% Lang.txt('Actual number of cards printed may be less due to duplicates') %]</p>
+
+<form method = "">
+    <input type="submit" class="btn-inside-panels" value = "[% Lang.txt('Cancel Batch') %]">
+    <input type = "hidden" name = "client" value = "[% client %]">
+    <input type = "hidden" name = "a" value = "PCARD_CANCEL">
+</form>
+<form method = "">
+    <input type="submit" class="btn-inside-panels" value = "[% Lang.txt('View Cards') %]">
+    <input type = "hidden" name = "client" value = "[% client %]">
+    <input type = "hidden" name = "a" value = "PCARD_CANCEL">
+</form>
+<form method = "">
+    <input type="submit" class="btn-inside-panels" value = "[% Lang.txt('Mark as Printed') %]">
+    <input type = "hidden" name = "client" value = "[% client %]">
+    <input type = "hidden" name = "a" value = "PCARD_MARK">
+</form>
+[% ELSE %]
+    <p>[% Lang.txt('Your printing criteria did not match any card requests') %]</p>
+[% END %]
+
+</div>
