@@ -90,7 +90,9 @@ sub create_batch{
     if($limit !~/^\d+$/)   { $limit = 10; }
 
     my $batchID = newBatchID($Data, $cardID);
-    my $cardTypes = "'PLAYER','COACH'";
+    my $cardInfo = getCardInfo($Data, $cardID);
+    my $cardTypes = join("','",@{$cardInfo->{'types'}});
+
     my $levelJoin = '';
     my $realmID = $Data->{'Realm'} || 1;
     my @values = ();
@@ -112,7 +114,7 @@ sub create_batch{
         SET PCP.intBatchID = ?,
             intCardID = ?
         WHERE
-            PCP.strType IN ($cardTypes)        
+            PCP.strType IN ('$cardTypes')        
             AND PCP.intBatchID = 0
         LIMIT $limit
 

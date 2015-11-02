@@ -8,6 +8,8 @@ require Exporter;
     cancel_batch
     mark_batch
     getBatchCount
+    getBatchInfo
+    getCardInfo
 );
 
 use strict;
@@ -172,4 +174,53 @@ sub getBatchCount {
 	$q->finish();
     return $count || 0;
 }
+
+sub getCardInfo {
+    my ($Data, $cardID) = @_;
+
+    return undef if !$cardID;
+    my $st = qq[
+      SELECT * 
+      FROM tblPersonCard
+      WHERE intPersonCardID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute($cardID);
+    my($carddata) = $q->fetchrow_hashref();
+    $q->finish();
+    return undef if !$carddata;
+
+    $st = qq[
+      SELECT strType
+      FROM tblPersonCardTypes
+      WHERE intPersonCardID = ?
+    ];
+
+    $q = $Data->{'db'}->prepare($st);
+    $q->execute($cardID);
+    while(my($type) = $q->fetchrow_array()) {
+        push @{$carddata->{'types'}}, $type;
+    }
+    $q->finish();
+    return $carddata || undef;
+}
+
+sub getBatchInfo {
+    my ($Data, $batchID) = @_;
+
+    return undef if !$batchID;
+    my $st = qq[
+      SELECT * 
+      FROM tblPersonCardBatch
+      WHERE intPersonCardBatchID = ?
+    ];
+
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute($batchID);
+    my($dref) = $q->fetchrow_hashref();
+    $q->finish();
+    return $dref || undef;
+}
+
 1;

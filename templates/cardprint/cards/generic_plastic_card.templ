@@ -1,0 +1,28 @@
+[% WRAPPER cardprint/PersonCard_Wrapper.templ %]
+    [% FOREACH p = cardData %]
+        <div id="card">
+                <b>Member ID:</b> [% p.intMemberID %] <br>
+                <b>FFA Number:</b> [% p.strNationalNum %] <br>
+                <b>Firstname:</b> [% p.strFirstname %] <br>
+                <b>Lastname:</b> [% p.strSurname %] <br>
+                <b>DOB:</b> [% p.dtDOB %] <br>
+                <b>Age In Year:</b> [% p.intAgeInYear %] <br>
+                <b>Season:</b> [% p.strSeasonName %] <br>
+                <b>Age Group:</b> [% p.intAgeInYear %] <br>
+                <b>Assoc:</b> [% p.strAssocName %] <br>
+                <b>Clubs:</b>
+                [% FOREACH s = p.Seasons %]
+                    [% NEXT IF s.intMSRecStatus != 1 %]
+                    [% NEXT IF s.intClubID < 1 %]
+                    [% varClub = s.intClubID %]
+                [% END %]
+                [% FOREACH c = p.Clubs %]
+                    [% NEXT IF c.intStatus != 1 %]
+                    [% NEXT IF c.intAssocID != 12371 %]
+                    [% NEXT IF c.intClubID != varClub %]
+                    [% c.strName %] <br>
+                [% END %]
+                <br>
+        </div>
+    [% END %]
+[% END %]
