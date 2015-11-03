@@ -48,9 +48,9 @@
         <label for="d_lang" class="col-md-4 control-label">[% Lang.txt('Print Language') %]</label>
         <div class="col-md-8">
             <select name = "lang" id = "d_lang">
-                <option value="" >[% Lang.txt('All') %]</option>
+                <option value="" >[% Lang.txt('Default') %]</option>
             [% FOREACH l IN languages %]
-                <option value = "[% l.intLanguageID %]">[% l.language %]</option>
+                <option value = "[% l.strLocale %]">[% l.language %]</option>
             [% END %]
             </select>
         </div>

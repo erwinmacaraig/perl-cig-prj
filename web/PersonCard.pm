@@ -10,6 +10,7 @@ require Exporter;
     getBatchCount
     getBatchInfo
     getCardInfo
+    logCardPrintRequest
 );
 
 use strict;
@@ -69,7 +70,7 @@ sub getExistingBatchID {
 }
 
 sub newBatchID {
-	my ($Data, $cardID) = @_;
+	my ($Data, $cardID, $lang) = @_;
 
     my $level = $Data->{'clientValues'}{'authLevel'} || 0;
     my $id = getID($Data->{'clientValues'}, $level || 0);
@@ -78,10 +79,12 @@ sub newBatchID {
             intEntityTypeID,
             intEntityID,
             intCardID,
+            strLocale,
             intStatus,
             dtAdded
         )
         VALUES (
+            ?,
             ?,
             ?,
             ?,
@@ -90,8 +93,7 @@ sub newBatchID {
         )
     ];
 	my $q = $Data->{'db'}->prepare($st);
-	warn("DB ($level, $id, $cardID)");
-	$q->execute($level, $id, $cardID);
+	$q->execute($level, $id, $cardID, $lang);
     my $newBatchId = $q->{'mysql_insertid'} || 0;
     $q->finish();
     return $newBatchId || 0;
@@ -223,4 +225,42 @@ sub getBatchInfo {
     return $dref || undef;
 }
 
+sub logCardPrintRequest {
+    my (
+        $Data, 
+        $personID,
+        $registrationID,
+   ) = @_;
+
+    my $realmID = $Data->{'Realm'} || 1;
+    my $st = qq[
+        INSERT INTO tblPersonCardPrint (
+            intPersonID,
+            strType,
+            intRegistrationID,
+            intCardID,
+            dtAdded
+        )
+        SELECT
+            PR.intPersonID,
+            PR.strPersonType,
+            PR.intPersonRegistrationID,
+            PC.intPersonCardID,
+            NOW()
+        FROM
+            tblPersonRegistration_$realmID AS PR
+            INNER JOIN tblPersonCardTypes AS PCT
+                ON PR.strPersonType = PCT.strType
+            INNER JOIN tblPersonCard AS PC
+                ON PCT.intPersonCardID = PC.intPersonCardID
+        WHERE
+            PR.intPersonRegistrationID = ?
+            AND PC.intActive = 1
+    ];
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute($registrationID);
+    $q->finish();
+
+    return 1;
+}
 1;

@@ -38,7 +38,12 @@ sub main	{
 
   getDBConfig(\%Data);
   $Data{'SystemConfig'}=getSystemConfig(\%Data);
-  my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
+  my $batchID = getExistingBatchID(\%Data);
+  my $batchInfo = $batchID 
+    ? getBatchInfo(\%Data, $batchID)    
+    : {};
+  my $locale = $batchInfo->{'strLocale'} || '';
+  my $lang   = Lang->get_handle($locale, $Data{'SystemConfig'}) || die "Can't get a language handle!";
   $Data{'lang'}=$lang;
   $Data{'LocalConfig'}=getLocalConfig(\%Data);
 
@@ -59,11 +64,9 @@ sub main	{
   initLocalisation(\%Data);
   updateSystemConfigTranslation(\%Data);
 
-  my $batchID = getExistingBatchID(\%Data);
   my $resultHTML = '';
   my %TemplateData = ();
   if($batchID)   {
-    my $batchInfo = getBatchInfo(\%Data, $batchID);
     my $cardInfo = getCardInfo(\%Data, $batchInfo->{'intCardID'});
     my $cardData = generateCardData(\%Data, $batchID, $cardInfo);
     my $ma = getInstanceOf(\%Data, 'national');
@@ -101,7 +104,7 @@ sub generateCardData {
     my $isocountries  = getISOCountriesHash();
     my $realmID = $Data->{'Realm'} || 1;
     my $st = qq[
-      SELECT 
+      SELECT DISTINCT
         PR.*,
         E.strLocalName AS EntityLocalName,
         E.strLocalShortName AS EntityLocalShortName,
@@ -139,7 +142,7 @@ sub generateCardData {
     $q->finish();
 
     $st = qq[
-      SELECT 
+      SELECT DISTINCT
         P.*
 
       FROM

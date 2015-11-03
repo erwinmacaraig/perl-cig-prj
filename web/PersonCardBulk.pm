@@ -89,7 +89,7 @@ sub create_batch{
     my $limit = param('limit') || 10;
     if($limit !~/^\d+$/)   { $limit = 10; }
 
-    my $batchID = newBatchID($Data, $cardID);
+    my $batchID = newBatchID($Data, $cardID, $lang);
     my $cardInfo = getCardInfo($Data, $cardID);
     my $cardTypes = join("','",@{$cardInfo->{'types'}});
 

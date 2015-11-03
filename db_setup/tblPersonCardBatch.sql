@@ -4,6 +4,7 @@ CREATE TABLE tblPersonCardBatch (
     intEntityTypeID INT NOT NULL,
     intEntityID INT NOT NULL,
     intCardID INT NOT NULL,
+    strLocale VARCHAR(10) NOT NULL,
     dtAdded DATETIME NOT NULL DEFAULT '0000-00-00 00:00:00',
     intStatus TINYINT DEFAULT 0, /* 0 = available, 1 = complete, 2 = cancelled */
 
