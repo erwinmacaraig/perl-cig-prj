@@ -413,7 +413,7 @@ sub linkLOANLendingPR {
                 AND strPersonLevel = ?
                 AND intEntityID = ?
                 AND dtFrom <= ?
-            ORDER BY dtFrom DESC
+            ORDER BY intIsLoanedOut DESC, dtFrom DESC
             LIMIT 1
         ];
         my $qryFROM = $db->prepare($stFROM) or query_error($stFROM);

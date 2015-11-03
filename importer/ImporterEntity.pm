@@ -231,6 +231,8 @@ while (<INFILE>)	{
 #SystemID;PalloID;Status;LocalFirstName;LocalLastName;LocalPreviousLastName;LocalLanguageCode;PreferedName;LatinFirstName;LatinLastName;LatinPreviousLastName;DateOfBirth;Gender;Nationality;CountryOfBirth;RegionOfBirth;PlaceOfBirth;Fax;Phone;Address1;Address2;PostalCode;Town;Suburb;Email;Identifier;IdentifierType;CountryIssued;DateFrom;DateTo
 
     	$parts{'ENTITYCODE'} = $fields[0] || '';
+next if ($parts{'ENTITYCODE'} eq '1014'); # Skip MA
+next if ($parts{'ENTITYCODE'} <= 33);
 	    $parts{'PARENTCODE'} = $fields[1] || ''; 
 	    $parts{'STATUS'} = uc($fields[2]) || '';
 	    $parts{'ENTITYTYPE'} = $fields[3] || ''; 

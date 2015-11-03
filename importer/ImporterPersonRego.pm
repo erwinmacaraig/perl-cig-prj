@@ -182,11 +182,15 @@ sub insertPersonRegoRecord {
         my $isLoanedOut= 0; 
         my $status = $dref->{'strStatus'};
 
-        if ($dref->{'isLoan'} eq 'YES')    {
+        if ($dref->{'strRegoNature'} eq 'LOAN' and $dref->{'isLoan'} eq 'YES')    {
         #$status eq 'ONLOAN' and 
             $onLoan = 1;
             $dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
+        }
+        if ($dref->{'strRegoNature'} eq 'BACK LOAN')    {
+            $isLoanedOut=1;
+            $dref->{'strRegoNature'} = 'NEW';
         }
         if ($dref->{'dtTransferred'} and $dref->{'dtTransferred'} ne '0000-00-00')  {
             $dtTo = $dref->{'dtTransferred'};
@@ -570,6 +574,7 @@ while (<INFILE>)	{
 	    $parts{'CLIENTPRIMPORTCODE'} = $fields[16] || '';
 
 	    $parts{'ISLOAN'} = '';
+	    $parts{'ISLOAN'} = 1 if ($parts{'REGNATURE'} eq "LOAN");
 	    $parts{'DATETRANSFERRED'} = '0000-00-00';
 	    $parts{'PRODUCTAMOUNT'} = 0;
 	    $parts{'ISPAID'} = '';
