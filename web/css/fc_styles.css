@@ -973,6 +973,8 @@ header nav ul#menu ul {
 		min-width: 200px;
 		top: 49px
 	}
+}
+@media (min-width: 250px) and (max-width: 992px){
 	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
 	.table-responsive {
 		width: 100%;
@@ -982,8 +984,20 @@ header nav ul#menu ul {
 		-webkit-overflow-scrolling: touch;
 		-ms-overflow-style: -ms-autohiding-scrollbar;
 		border: 1px solid #ddd;
+    }
+	#itc_selection li {
+		display: block;
+		width: 100%;
+		clear: both;
+		padding: 20px 0px 0px
 	}
-
+	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
+	.button-row {
+		margin: 20px 0;
+		clear: both;
+		float: none;
+		text-align: right;
+	}
 }
 
 @media (max-width: 768px){
@@ -1574,7 +1588,8 @@ header nav ul li a {
 .button-row {
     margin: 20px 0;
     clear:both;
-
+    float:  none;
+    text-align:  right;
 }
 .button-row .button-right {
     float:right;
