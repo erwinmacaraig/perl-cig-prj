@@ -991,7 +991,13 @@ header nav ul#menu ul {
 		clear: both;
 		padding: 20px 0px 0px
 	}
-
+	.col-md-5.txtright, .col-md-2.txtright {text-align:left}
+	.button-row {
+		margin: 20px 0;
+		clear: both;
+		float: none;
+		text-align: right;
+	}
 }
 
 @media (max-width: 768px){
@@ -1582,7 +1588,8 @@ header nav ul li a {
 .button-row {
     margin: 20px 0;
     clear:both;
-
+    float:  none;
+    text-align:  right;
 }
 .button-row .button-right {
     float:right;
