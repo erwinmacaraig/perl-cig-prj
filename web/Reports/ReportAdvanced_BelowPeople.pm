@@ -417,6 +417,28 @@ sub _getConfiguration {
                     allowgrouping   => 1
                 }
             ],
+            PRdtApproved=> [
+                'Date Registration Approved',
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'date',
+                    allowsort   => 1,
+                    dbfield     => 'PR.dtApproved',
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'regos'
+                }
+            ],
+            PRdtAdded => [
+                $lang->txt('Date Registration Added'),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'date',
+                    allowsort   => 1,
+                    dbfield     => 'PR.dtAdded',
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'regos'
+                }
+            ],
             PRdtFrom=> [
                 $lang->txt('Date From'),
                 {
@@ -503,6 +525,24 @@ sub _getConfiguration {
                     optiongroup => 'regos',
                     allowsort   => 1,
                     allowgrouping => 1,
+                }
+            ],
+             PRstrLocalShortName=> [
+                $lang->txt('Entity Short Name'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLocalShortName',
+                    optiongroup => 'regos'
+                }
+            ],
+            PRstrLatinName=> [
+                $lang->txt('Name (International)'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    dbfield     => 'E.strLatinName',
+                    optiongroup => 'regos'
                 }
             ],
               strClubName => [
@@ -1512,6 +1552,16 @@ sub _getConfiguration {
                     ddbfield    => 'P.strGroup'
                 }
               ],
+            strProductType=> [
+                $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Type') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions',
+                    ddbfield    => 'P.strProductType'
+                }
+              ],
               curAmount => [
                 $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Line Item Total') : '',
                 {
@@ -1612,7 +1662,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtTransaction',
                     sortfield   => 'TX.dtTransaction'
@@ -1624,7 +1674,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'datetime',
                     allowsort   => 1,
-                    datetimeformat => ['MEDIUM','MEDIUM'],
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
                     optiongroup => 'transactions',
                     dbfield     => 'TX.dtPaid'
                 }
@@ -1635,7 +1685,7 @@ sub _getConfiguration {
                     displaytype   => 'date',
                     fieldtype     => 'date',
                     allowsort     => 1,
-                    datetimeformat => ['MEDIUM',''],
+                    TZdatetimeformat => ['MEDIUM',''],
                     optiongroup   => 'transactions',
                     dbfield       => 'TL.dtSettlement',
                     allowgrouping => 1,
@@ -1802,6 +1852,8 @@ sub _getConfiguration {
                 PRstrStatus
                 PRstrSport
                 PRintNationalPeriodID
+                PRdtAdded
+                PRdtApproved
                 PRdtFrom
                 PRdtTo
                 PRstrRegistrationNature
@@ -1809,6 +1861,8 @@ sub _getConfiguration {
                 PRintOnLoan
                 PRintIsLoanedOut
                 PRstrLocalName
+                PRstrLocalShortName
+                PRstrLatinName
                 strClubName 
                 strRegionName 
 
@@ -1893,6 +1947,7 @@ sub _getConfiguration {
               intProductNationalPeriodID
               intProductID
               strGroup
+                strProductType
               intQty
               curAmount
               dtTransaction
