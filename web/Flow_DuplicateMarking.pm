@@ -99,7 +99,7 @@ sub display_find_parent {
     $self->addCarryField('parentPersonID','');
     $self->addCarryField('copyRegos','');
     $self->addCarryField('copyRegoDocs','');
-    $self->addCarryField('copyRegoPays','');
+    #$self->addCarryField('copyRegoPays','');
     my $id = $self->ID() || 0;
     if(!doesUserHaveAccess($self->{'Data'}, $id,'WRITE')) {
         return ('Invalid User',0);
@@ -150,7 +150,7 @@ sub display_show_matches {
     $self->addCarryField('parentPersonID','');
     $self->addCarryField('copyRegos','');
     $self->addCarryField('copyRegoDocs','');
-    $self->addCarryField('copyRegoPays','');
+    #$self->addCarryField('copyRegoPays','');
 
     my $ma_id= $self->{'RunParams'}{'findMA_ID'} || '';
     $self->addCarryField('findMA_ID',$ma_id);
@@ -248,7 +248,7 @@ sub display_regos {
     my $parentPersonID= $self->{'RunParams'}{'parentPersonID'} || 0;
     $self->addCarryField('copyRegos','');
     $self->addCarryField('copyRegoDocs','');
-    $self->addCarryField('copyRegoPays','');
+    #$self->addCarryField('copyRegoPays','');
 
     my $id = $self->ID() || 0;
     my $hideContinueBtn = 1;
@@ -347,14 +347,14 @@ sub copy_regos {
     my $copyRegoDocs = join('|',@Docs);
     if (scalar @Docs)  { $self->addCarryField('copyRegoDocs' , $copyRegoDocs); }
 
-    my $copyRegoPays = join('|',@Pays);
-    if (scalar @Pays)  { $self->addCarryField('copyRegoPays' , $copyRegoPays); }
+   # my $copyRegoPays = join('|',@Pays);
+   # if (scalar @Pays)  { $self->addCarryField('copyRegoPays' , $copyRegoPays); }
 
     return ('',1);
 }
 
 sub buildDuplicateSummary   {
-    my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy, $paysToCopy, $carryString) = @_;
+    my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy, $carryString) = @_;
     
     my $changelink =  $Data->{'target'}."?".$carryString;
     my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
@@ -382,9 +382,9 @@ sub buildDuplicateSummary   {
         my $regoIDToCopy = $rego->{'intPersonRegistrationID'} || next;
         next if $copyRego ne "1";
         $rego->{'moveDocuments'} = $lang->txt('No');
-        $rego->{'movePayments'} = $lang->txt('No');
+        #$rego->{'movePayments'} = $lang->txt('No');
         $rego->{'moveDocuments'} = $lang->txt('Yes') if ($docsToCopy->{$regoIDToCopy} eq "1");
-        $rego->{'movePayments'} = $lang->txt('Yes') if ($paysToCopy->{$regoIDToCopy} eq "1");
+        #$rego->{'movePayments'} = $lang->txt('Yes') if ($paysToCopy->{$regoIDToCopy} eq "1");
         push @registrations, $rego;
     }
      my %PageData = (
@@ -435,12 +435,12 @@ sub display_summary {
     foreach my $ID (@Docs) {
         $DocRegos{$ID} = 1;
     }
-    my $PayIDs= $self->{'RunParams'}{'copyRegoPays'} || '';
-    my @Pays = split /\|/, $PayIDs;
-    my %PayRegos=();
-    foreach my $ID (@Pays) {
-        $PayRegos{$ID} = 1;
-    }
+    #my $PayIDs= $self->{'RunParams'}{'copyRegoPays'} || '';
+    #my @Pays = split /\|/, $PayIDs;
+    #my %PayRegos=();
+    #foreach my $ID (@Pays) {
+    #    $PayRegos{$ID} = 1;
+    #}
 
 
     my $content = buildDuplicateSummary(
@@ -449,7 +449,6 @@ sub display_summary {
         $parentPersonID,
         \%RegoIDs,
         \%DocRegos,
-        \%PayRegos,
         $self->stringifyURLCarryField()
     );
 
@@ -477,7 +476,7 @@ sub display_summary {
 
 sub FinaliseDuplicateFlow   {
 
-    my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy, $paysToCopy) = @_;
+    my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy) = @_;
 
     $personID ||= 0;
     return if (! $personID);
@@ -586,9 +585,9 @@ sub FinaliseDuplicateFlow   {
            moveDocuments($Data, $regoIDToCopy, $parentPersonID);
         }
         
-        if ($paysToCopy->{$regoIDToCopy} eq "1")  {
+        #if ($paysToCopy->{$regoIDToCopy} eq "1")  {
             $qMoveTXNs->execute($parentPersonID, $personID, $regoIDToCopy);
-        }
+        #}
     }    
     {
         my $personObject = getInstanceOf($Data, 'person',$personID);
@@ -672,8 +671,10 @@ sub display_complete {
     my $regoIDs= $self->{'RunParams'}{'copyRegos'} || '';
     my @Regos = split /\|/, $regoIDs;
     my %RegoIDs=();
+    my %PayRegos=();
     foreach my $ID (@Regos) {
         $RegoIDs{$ID} = 1;
+        $PayRegos{$ID} = 1;
     }
 
     my $DocIDs= $self->{'RunParams'}{'copyRegoDocs'} || '';
@@ -683,12 +684,12 @@ sub display_complete {
         $DocRegos{$ID} = 1;
     }
 
-    my $PayIDs= $self->{'RunParams'}{'copyRegoPays'} || '';
-    my @Pays = split /\|/, $PayIDs;
-    my %PayRegos=();
-    foreach my $ID (@Pays) {
-        $PayRegos{$ID} = 1;
-    }
+    #my $PayIDs= $self->{'RunParams'}{'copyRegoPays'} || '';
+    #my @Pays = split /\|/, $PayIDs;
+    #my %PayRegos=();
+    #foreach my $ID (@Pays) {
+   #     $PayRegos{$ID} = 1;
+    #}
 
     my $content = '';
 
@@ -704,7 +705,6 @@ sub display_complete {
                 $parentPersonID,        
                 \%RegoIDs,
                 \%DocRegos,
-                \%PayRegos,
             );
         }
 
