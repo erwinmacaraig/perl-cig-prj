@@ -25,7 +25,7 @@ sub main	{
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    my $maxNPID = 39 ; #2014
+    my $maxNPID = 41 ; #2014
     
     my $st = qq[
         SELECT

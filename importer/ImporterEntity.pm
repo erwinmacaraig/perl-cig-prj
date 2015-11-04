@@ -145,6 +145,11 @@ sub insertEntityRecord {
         my $entityType= $dref->{'strEntityType'} || 'CLUB';
         $dref->{'strOrganisationLevel'}||= 'BOTH';
         my $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
+
+        if ($dref->{'strParentCode'} ne '1014') {
+            $dref->{'strParentCode'} = '1014';
+            $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
+        }
         
         if ($maCode eq 'HKG')   {
             ## Config here for HKG
@@ -180,7 +185,7 @@ sub insertEntityRecord {
             $dref->{'strOrganisationLevel'},
         ) or print "SQL ERROR\n";
         my $ID = $qryINS->{mysql_insertid};
-        print "ID IS $ID\n";
+        #print "ID IS $ID\n";
         next if (! $ID);
         $qryELINS->execute(
             $parentEntityID,
@@ -234,6 +239,7 @@ while (<INFILE>)	{
 next if ($parts{'ENTITYCODE'} eq '1014'); # Skip MA
 next if ($parts{'ENTITYCODE'} <= 33);
 	    $parts{'PARENTCODE'} = $fields[1] || ''; 
+    
 	    $parts{'STATUS'} = uc($fields[2]) || '';
 	    $parts{'ENTITYTYPE'} = $fields[3] || ''; 
 	    $parts{'LOCALNAME'} = $fields[4] || '';

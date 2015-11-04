@@ -20,9 +20,9 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infileLoans='Loans.csv';
+    my $infileLoans= 'GHA_TEST_loans.txt';
     my $infileTransfers='GHA_TEST_transfers.txt';
-    #importLTFile($db, $countOnly, 'LOAN', $infileLoans);
+    importLTFile($db, $countOnly, 'LOAN', $infileLoans);
     importLTFile($db, $countOnly, 'TRANSFER', $infileTransfers);
 };
 

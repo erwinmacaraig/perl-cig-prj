@@ -173,7 +173,6 @@ sub insertLOANPersonRequestRecord   {
             ''
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
-
         if ($ID and $dref->{'intToPersonRegoID'})   {
             my $stUPD = qq[
                 UPDATE tblPersonRegistration_1
@@ -335,7 +334,7 @@ sub linkLOANBorrowingPR{
 
     my $stPRTO= qq[
         UPDATE tblPersonRegistration_1
-        SET strRegistrationNature = 'DOMESTIC_LOAN'
+        SET strRegistrationNature = 'DOMESTIC_LOAN', dtTo = ?
         WHERE intPersonRegistrationID = ?
     ];
     my $qryPRTO= $db->prepare($stPRTO) or query_error($stPRTO);
@@ -355,7 +354,7 @@ sub linkLOANBorrowingPR{
                 AND strSport = ?
                 AND strPersonLevel IN (?, 'HOBBY', '')
                 AND dtFrom = ?
-                AND dtTo = ? 
+                AND dtTo IN ('0000-00-00', ? )
                 AND intEntityID = ?
             LIMIT 1
         ];
@@ -372,7 +371,39 @@ sub linkLOANBorrowingPR{
         my $TOref= $qryTO->fetchrow_hashref();
         if ($TOref->{'intPersonRegistrationID'})  {
             $qryUPDtmp->execute($TOref->{'intPersonRegistrationID'}, $dref->{'intID'});
-            $qryPRTO->execute($TOref->{'intPersonRegistrationID'});
+            $qryPRTO->execute($TOref->{'intPersonRegistrationID'}, $dref->{'dtExpiry'});
+        }
+        else    {
+            ## Any other level
+            my $stTO = qq[
+                SELECT *
+                FROM tblPersonRegistration_1
+                WHERE
+                    intPersonID = ?
+                    AND (intOnLoan=1)
+                    AND strPersonType='PLAYER'
+                    AND strSport = ?
+                    AND strPersonLevel IN (?, 'HOBBY', '')
+                    AND dtFrom = ?
+                    AND intEntityID = ?
+                LIMIT 1
+            ];
+            my $qryTO = $db->prepare($stTO) or query_error($stTO);
+            $qryTO->execute(
+                $dref->{'intPersonID'},
+                $dref->{'strSport'},
+                $dref->{'strPersonLevel'},
+                $dref->{'dtCommenced'},
+                #$dref->{'dtExpiry'},
+                #$dref->{'intEntityFromID'},
+                $dref->{'intEntityToID'},
+            );
+            my $TOref= $qryTO->fetchrow_hashref();
+            if ($TOref->{'intPersonRegistrationID'})  {
+                $qryUPDtmp->execute($TOref->{'intPersonRegistrationID'}, $dref->{'intID'});
+            #    $qryPRTO->execute($TOref->{'intPersonRegistrationID'});
+                $qryPRTO->execute($TOref->{'intPersonRegistrationID'}, $dref->{'dtExpiry'});
+            }
         }
     }
 
@@ -402,7 +433,6 @@ sub linkLOANLendingPR {
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     while (my $dref= $qry->fetchrow_hashref())    {
-
         my $stFROM = qq[
             SELECT *
             FROM tblPersonRegistration_1
@@ -428,6 +458,36 @@ sub linkLOANLendingPR {
         if ($FROMref->{'intPersonRegistrationID'})  {
             $qryUPDtmp->execute($FROMref->{'intPersonRegistrationID'}, $dref->{'intID'});
             $qryPRFROM->execute($FROMref->{'intPersonRegistrationID'});
+        }
+        else    {
+            ## Lets check for ANY personlevel
+            my $stFROM = qq[
+                SELECT *
+                FROM tblPersonRegistration_1
+                WHERE
+                    intPersonID = ?
+                    AND strPersonType='PLAYER'
+                    AND strSport = ?
+                    AND strPersonLevel <> ?
+                    AND intEntityID = ?
+                    AND dtFrom <= ?
+                ORDER BY intIsLoanedOut DESC, dtFrom DESC
+                LIMIT 1
+            ];
+            my $qryFROM = $db->prepare($stFROM) or query_error($stFROM);
+            $qryFROM->execute(
+                $dref->{'intPersonID'},
+                $dref->{'strSport'},
+                $dref->{'strPersonLevel'},
+                $dref->{'intEntityFromID'},
+                $dref->{'dtCommenced'}
+            );
+            my $FROMref= $qryFROM->fetchrow_hashref();
+            if ($FROMref->{'intPersonRegistrationID'})  {
+                $qryUPDtmp->execute($FROMref->{'intPersonRegistrationID'}, $dref->{'intID'});
+                $qryPRFROM->execute($FROMref->{'intPersonRegistrationID'});
+            }
+
         }
     }
 
@@ -528,7 +588,7 @@ while (<INFILE>)	{
 	$parts{'SPORT'} = $fields[5] || '';
 	$parts{'PERSONLEVEL'} = $fields[6] || '';
     if ($type eq 'LOAN')    {
-	    $parts{'STATUS'} = $fields[7] || '';
+	    $parts{'STATUS'} = 'APPROVED'; #$fields[7] || '';
 	    $parts{'PRODUCTCODE'} = $fields[8] || '';
 	    $parts{'PRODUCTAMOUNT'} = $fields[9] || 0;
 	    $parts{'ISPAID'} = $fields[10] || '';

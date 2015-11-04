@@ -21,6 +21,8 @@ sub main	{
     my $db=connectDB();
     insertLOANPersonRequestRecord($db);
     insertTRANSFERPersonRequestRecord($db);
-    insertLTTransactions($db);
+    #insertLTTransactions($db);
+    my $st = qq[UPDATE tblPersonRequest SET intOpenLoan =0  WHERE strRequestType ='LOAN' and dtLoanTo<NOW();];
+    $db->do($st);
 }
 

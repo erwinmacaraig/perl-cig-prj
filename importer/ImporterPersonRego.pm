@@ -175,6 +175,7 @@ sub insertPersonRegoRecord {
 
     while (my $dref= $qry->fetchrow_hashref())    {
         #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+        $dref->{'strRegoNature'} = uc($dref->{'strRegoNature'});
 
         my $dtFrom = $dref->{'dtFrom'};
         my $dtTo   = $dref->{'dtTo'};
@@ -182,13 +183,13 @@ sub insertPersonRegoRecord {
         my $isLoanedOut= 0; 
         my $status = $dref->{'strStatus'};
 
-        if ($dref->{'strRegoNature'} eq 'LOAN' and $dref->{'isLoan'} eq 'YES')    {
+        if ($dref->{'strRegoNature'} eq 'LOAN' or $dref->{'isLoan'} eq 'YES')    {
         #$status eq 'ONLOAN' and 
             $onLoan = 1;
             $dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
         }
-        if ($dref->{'strRegoNature'} eq 'BACK LOAN')    {
+        if (uc($dref->{'strRegoNature'}) eq 'BACK LOAN')    {
             $isLoanedOut=1;
             $dref->{'strRegoNature'} = 'NEW';
         }
