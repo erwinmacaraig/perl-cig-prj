@@ -135,6 +135,7 @@ sub insertEntityRecord {
         $ParentIDs{$dref->{'strImportEntityCode'}} = $dref->{'intEntityID'};
     }
 
+print "ENTITY LINKS ARE ALL FOR 1000\n";
     while (my $dref= $qry->fetchrow_hashref())    {
         my $status = $dref->{'strStatus'};
         my $localLang = 0; ## NEEDS LINKING TO tmpPerson.strLocalLanguage
@@ -147,7 +148,7 @@ sub insertEntityRecord {
         my $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
 
         if ($dref->{'strParentCode'} ne '1014') {
-            $dref->{'strParentCode'} = '1014';
+            $dref->{'strParentCode'} = '1000';
             $parentEntityID = $ParentIDs{$dref->{'strParentCode'}} || 0;
         }
         
