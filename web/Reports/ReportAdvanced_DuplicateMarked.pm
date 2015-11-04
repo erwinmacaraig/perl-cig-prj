@@ -1303,15 +1303,13 @@ sub SQLBuilder {
     $sql = qq[
         SELECT ###SELECT###
         FROM
-            $from_levels
-            $current_from
-            $from_list
+            tblPerson
         WHERE
-            $where_levels
             $where_list
             $current_where
             AND tblPerson.strStatus = 'DUPLICATE'
     ];
+
     return ( $sql, '' );
 }
 
