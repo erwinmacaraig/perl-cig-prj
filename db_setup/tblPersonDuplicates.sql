@@ -8,5 +8,5 @@ CREATE TABLE `tblPersonDuplicates` (
     PRIMARY KEY (`intPersonDuplicateID`),
     INDEX key_ChildPersonID (intChildPersonID),
     INDEX key_ParentPersonID (intParentPersonID)
-) DEFAULT CHARACTER SET = utf8;
+)  ENGINE=InnoDB DEFAULT CHARACTER SET = utf8;
 
