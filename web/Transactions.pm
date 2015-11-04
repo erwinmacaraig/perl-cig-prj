@@ -324,16 +324,23 @@ sub displayTransaction	{
 	my $amount_readonly = ! $dref->{intStatus} ? 0: 1;
 	$amount_readonly = 1 if ! $id;
 	my $prod_readonly= $id ? 1: 0;
+    my %PaymentStatusOptions = ();
+    $PaymentStatusOptions{$Defs::TXN_CANCELLED} = $Defs::TransactionStatus{$Defs::TXN_CANCELLED};
+    $PaymentStatusOptions{$Defs::TXN_PAID} = $Defs::TransactionStatus{$Defs::TXN_PAID} if ($dref->{'intStatus'} == $Defs::TXN_PAID);
+    $PaymentStatusOptions{$Defs::TXN_HOLD} = $Defs::TransactionStatus{$Defs::TXN_HOLD} if ($dref->{'intStatus'} == $Defs::TXN_HOLD);
+    my $PaymentStatus_readonly = 0;
+    $PaymentStatus_readonly =1 if ($dref->{'intStatus'} == $Defs::TXN_HOLD);
+    $PaymentStatus_readonly =1 if ($dref->{'intStatus'} == $Defs::TXN_CANCELLED);
 	my %FieldDefs = (
 		TXN => {
 			fields => {
 				intStatus=> {
-			        	label => $id ? $lang->txt("Paid ?") : '',
-		                	value => $dref->{'intStatus'},
-                			type  => 'lookup',
-                			options=> {$Defs::TXN_PAID => $Defs::TransactionStatus{$Defs::TXN_PAID}, $Defs::TXN_CANCELLED=> $Defs::TransactionStatus{$Defs::TXN_CANCELLED}, $Defs::TXN_HOLD => $Defs::TransactionStatus{$Defs::TXN_HOLD}},
-					readonly=>$readonly,
-            			},
+			        label => $id ? $lang->txt("Paid ?") : '',
+		            value => $dref->{'intStatus'},
+                	type  => 'lookup',
+                	options=> \%PaymentStatusOptions,
+					readonly=>$PaymentStatus_readonly,
+            	},
 				intDelivered=> {
 			        	label => $lang->txt("Delivered"),
 		                	value => $dref->{'intDelivered'},
