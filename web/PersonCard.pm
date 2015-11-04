@@ -21,9 +21,13 @@ use Reg_common;
 use Utils;
 
 sub getAllowedCards {
-	my ($Data) = @_;
+	my ($Data, $singleprint) = @_;
 
     my $level = $Data->{'clientValues'}{'authLevel'} || 0;
+    $singleprint ||= 0;
+    my $field = $singleprint
+        ? 'intPrintFromLevelID'
+        : 'intBulkPrintFromLevelID';
 	my $query = qq[ 
         SELECT 
             intPersonCardID,
@@ -31,7 +35,7 @@ sub getAllowedCards {
         FROM 
             tblPersonCard
         WHERE
-            intBulkPrintFromLevelID <= ?
+            $field <= ?
     ];
 
 	my $sth = $Data->{'db'}->prepare($query);
@@ -230,9 +234,24 @@ sub logCardPrintRequest {
         $Data, 
         $personID,
         $registrationID,
+        $cardID
    ) = @_;
 
     my $realmID = $Data->{'Realm'} || 1;
+    if(!($cardID or $registrationID))  {
+        return 0;
+    }
+    my $value = '';
+    my $where = '';
+    $cardID ||= 0;
+    if($registrationID) {
+        $value = $registrationID;
+        $where = "PR.intPersonRegistrationID = ?";
+    }
+    else    {
+        $value = $cardID;
+        $where = "PC.intPersonCardID = ?";
+    }
     my $st = qq[
         INSERT INTO tblPersonCardPrint (
             intPersonID,
@@ -254,11 +273,12 @@ sub logCardPrintRequest {
             INNER JOIN tblPersonCard AS PC
                 ON PCT.intPersonCardID = PC.intPersonCardID
         WHERE
-            PR.intPersonRegistrationID = ?
+            $where
+            AND PR.intPersonID = ?
             AND PC.intActive = 1
     ];
     my $q = $Data->{'db'}->prepare($st);
-    $q->execute($registrationID);
+    $q->execute($value, $personID);
     $q->finish();
 
     return 1;

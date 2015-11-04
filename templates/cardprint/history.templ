@@ -1,0 +1,41 @@
+[% IF history.size >= 1 %]
+    <table class = "table">
+        <thead>
+            <tr>
+                <th>[% Lang.txt("Card") %]</th>
+                <th>[% Lang.txt("Date Printed") %]</th>
+            </tr>
+        </thead>
+        <tbody>
+    [% FOREACH row = history %]
+        <tr>
+            <td>[% row.strName %]</td>
+            <td>[% DateFormat.TZformat(row.dtPrinted,'MEDIUM','MEDIUM') %]
+                [% IF row.intReprint %] ( [% Lang.txt('Reprint') %] )[% END %]
+            </td>
+        </tr>
+    [% END %]
+        </tbody>
+    </table>
+
+    [% IF cardlist.size >= 1 %]
+    <h3>[% Lang.txt('Request a Reprint ') %]</h3>
+    <form>
+        <p>[% Lang.txt('Choose the card to reprint') %]</p>
+        <select name = "cardID" id = "d_cardID">
+        [% FOREACH card = cardlist %]
+            <option value = "[% card.id %]">[% card.name %]</option>
+        [% END %]
+        </select>
+        <br>
+        <br>
+        <input type = "hidden" name = "client" value = "[% client %]">
+        <input type = "hidden" name = "a" value = "PCARD_REPRINT">
+        <input type="submit" class="btn-inside-panels" value = "[% Lang.txt('Make Request') %]">
+
+
+    </form>
+    [% END %]
+[% ELSE %]
+    [% Lang.txt("There have been no cards printed for this person") %]
+[% END %]
