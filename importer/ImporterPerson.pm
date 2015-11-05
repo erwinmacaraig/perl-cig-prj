@@ -198,7 +198,7 @@ while (<INFILE>)	{
 	    $parts{'INTFIRSTNAME'} = $fields[6] || '';
 	    $parts{'INTSURNAME'} = $fields[7] || '';
 	    $parts{'DOB'} = $fields[8] || '0000-00-00';
-	    $parts{'GENDER'} = $fields[9] || '';
+	    $parts{'GENDER'} = uc($fields[9]) || '';
 	    $parts{'ISO_NATIONALITY'} = $fields[10] || ''; 
 	    $parts{'ISO_COUNTRYOFBIRTH'} = $fields[11] || ''; 
 	    $parts{'REGIONOFBIRTH'} = $fields[12] || ''; 

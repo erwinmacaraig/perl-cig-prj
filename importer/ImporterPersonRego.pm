@@ -567,7 +567,7 @@ while (<INFILE>)	{
 	    $parts{'PERSONROLE'} = uc($fields[5]) || '';
 	    $parts{'PERSONLEVEL'} = uc($fields[6]) || '';
 	    $parts{'SPORT'} = uc($fields[7]) || '';
-	    $parts{'AGELEVEL'} = uc($fields[8]) || '';
+	    $parts{'AGELEVEL'} = uc($fields[8]) || 'ADULT';
 	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
 	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
 	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
