@@ -155,10 +155,11 @@ sub insertPersonRegoRecord {
         $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
     }
-    #if ($maCode eq 'GHA')   {
+    if ($maCode eq 'GHA')   {
     #    $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
+        $orderBy = qq[ ORDER BY dtFrom ASC, dtTo ASC];
     #    $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
-    #}
+    }
 
     my $st = qq[
         SELECT
@@ -186,7 +187,7 @@ sub insertPersonRegoRecord {
         if ($dref->{'strRegoNature'} eq 'LOAN' or $dref->{'isLoan'} eq 'YES')    {
         #$status eq 'ONLOAN' and 
             $onLoan = 1;
-            $dtTo = $dref->{'dtTransferred'};
+            #$dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
         }
         if (uc($dref->{'strRegoNature'}) eq 'BACK LOAN')    {
@@ -562,11 +563,11 @@ while (<INFILE>)	{
 	    $parts{'ENTITYCODE'} = $fields[1] || '';
 	    $parts{'STATUS'} = uc($fields[2]) || '';
 	    $parts{'REGNATURE'} = uc($fields[3]) || '';
-	    $parts{'PERSONTYPE'} = $fields[4] || '';
-	    $parts{'PERSONROLE'} = $fields[5] || '';
-	    $parts{'PERSONLEVEL'} = $fields[6] || '';
-	    $parts{'SPORT'} = $fields[7] || '';
-	    $parts{'AGELEVEL'} = $fields[8] || '';
+	    $parts{'PERSONTYPE'} = uc($fields[4]) || '';
+	    $parts{'PERSONROLE'} = uc($fields[5]) || '';
+	    $parts{'PERSONLEVEL'} = uc($fields[6]) || '';
+	    $parts{'SPORT'} = uc($fields[7]) || '';
+	    $parts{'AGELEVEL'} = uc($fields[8]) || '';
 	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
 	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
 	    $parts{'NATIONALPERIOD'} = $fields[11] || '';

@@ -27,6 +27,7 @@ sub main	{
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     my $maxNPID = 41 ; #2014
     
+    $db->do(qq[UPDATE tblPersonRegistration_1 as PR INNER JOIN tblPersonRequest as PRQ ON (PRQ.intPersonID=PR.intPersonID) SET PR.dtTo = PRQ.dtLoanTo WHERE strRequestType ='LOAN' AND PR.dtTo = '0000-00-00']);
     my $st = qq[
         SELECT
             *
@@ -128,6 +129,7 @@ sub main	{
     #$qryPASSIVE->execute($maxNPID);
     $qryPASSIVE->execute();
 
+    $db->do(qq[UPDATE tblPersonRegistration_1 as PR INNER JOIN tblPersonRequest as PRQ ON (PRQ.intPersonID=PR.intPersonID) SET PR.dtTo = PRQ.dtLoanTo WHERE strRequestType ='LOAN' AND PR.dtTo = '0000-00-00']);
 
 print "PR RECORDS DONE\n";
 }

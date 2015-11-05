@@ -116,6 +116,8 @@ sub insertPersonRecord {
             $otherIdentifierType = 0; ## Needs work from tmpPerspn.strIdentifierType
             $localLang = 0; ## Needs work from tmpPerson.strLocalLanguage
         }
+        $otherIdentifierType = 558018 if ($dref->{'strIdentifierType'} eq 'NATIONALIDNUMBER');
+        $otherIdentifierType = 558019 if ($dref->{'strIdentifierType'} eq 'PASSPORT');
 
         
         $qryINS->execute(
