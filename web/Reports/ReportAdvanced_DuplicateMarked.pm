@@ -76,9 +76,21 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 1,
-                    optiongroup => 'details'
+                    optiongroup => 'details',
+                    dbfield     => 'P.strNationalNum'
                 }
             ],
+            MasterNationalNum => [
+                $lang->txt('Master - ') . $natnumname,
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'details',
+                    dbfield     => 'PMaster.strNationalNum'
+                }
+            ],
+ 
             MemberID => [
                 'Person ID',
                 {
@@ -86,7 +98,7 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     allowsort   => 1,
                     optiongroup => 'details',
-                    dbfield     => 'tblPerson.intPersonID'
+                    dbfield     => 'P.intPersonID'
                 }
             ],
             strMemberNo => [
@@ -97,13 +109,14 @@ sub _getConfiguration {
                     fieldtype     => 'text',
                     allowsort     => 1,
                     optiongroup   => 'details',
-                    allowgrouping => 1
+                    allowgrouping => 1,
+                    dbfield     => 'P.strMemberNo'
                 }
             ],
             PstrImportCode=> [
                 $lang->txt('Imported Person Code'),
                 {
-                    dbfield         => 'tblPerson.strImportPersonCode',
+                    dbfield         => 'P.strImportPersonCode',
                     displaytype   => 'text',
                     fieldtype     => 'text',
                     allowsort     => 1,
@@ -114,7 +127,7 @@ sub _getConfiguration {
             PstrStatus=> [
                 'Person Status',
                 {
-                    dbfield         => 'tblPerson.strStatus',
+                    dbfield         => 'P.strStatus',
                     displaytype     => 'lookup',
                     fieldtype       => 'dropdown',
                     dropdownoptions => \%Defs::personStatus,
@@ -123,6 +136,55 @@ sub _getConfiguration {
                     allowgrouping   => 1
                 }
             ],
+            MasterLatinFirstname => [
+                'Master - International First name',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    active      => 1,
+                    allowsort   => 1,
+                    dbfield         => 'PMaster.strLatinFirstname',
+                    optiongroup => 'details'
+                }
+            ],
+
+            MasterLatinSurname => [
+                'Master - International Family name',
+                {
+                    displaytype   => 'text',
+                    fieldtype     => 'text',
+                    active        => 1,
+                    allowsort     => 1,
+                    optiongroup   => 'details',
+                    dbfield         => 'PMaster.strLatinSurname',
+                    allowgrouping => 1
+                }
+            ],
+            MasterLocalFirstname => [
+                'Master - First Name',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    active      => 1,
+                    allowsort   => 1,
+                    dbfield         => 'PMaster.strLocalFirstname',
+                    optiongroup => 'details'
+                }
+            ],
+
+            MasterLocalSurname => [
+                'Master - Family Name',
+                {
+                    displaytype   => 'text',
+                    fieldtype     => 'text',
+                    active        => 1,
+                    allowsort     => 1,
+                    optiongroup   => 'details',
+                    dbfield         => 'PMaster.strLocalSurname',
+                    allowgrouping => 1
+                }
+            ],
+
             strLatinFirstname => [
                 'International First name',
                 {
@@ -130,6 +192,7 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     active      => 1,
                     allowsort   => 1,
+                    dbfield         => 'P.strLatinFirstname',
                     optiongroup => 'details'
                 }
             ],
@@ -142,6 +205,7 @@ sub _getConfiguration {
                     active        => 1,
                     allowsort     => 1,
                     optiongroup   => 'details',
+                    dbfield         => 'P.strLatinSurname',
                     allowgrouping => 1
                 }
             ],
@@ -152,6 +216,7 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     active      => 1,
                     allowsort   => 1,
+                    dbfield         => 'P.strLocalFirstname',
                     optiongroup => 'details'
                 }
             ],
@@ -164,6 +229,7 @@ sub _getConfiguration {
                     active        => 1,
                     allowsort     => 1,
                     optiongroup   => 'details',
+                    dbfield         => 'P.strLocalSurname',
                     allowgrouping => 1
                 }
             ],
@@ -175,21 +241,11 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'Countries'},
                     allowsort       => 1,
                     optiongroup     => 'details',
-                    dbfield         => 'UCASE(strISONationality)',
+                    dbfield         => 'UCASE(P.strISONationality)',
                     allowgrouping   => 1
                 }
             ],
 
-
-            strPreferredName => [
-                'Preferred Name',
-                {
-                    displaytype => 'text',
-                    fieldtype   => 'text',
-                    allowsort   => 1,
-                    optiongroup => 'details'
-                }
-            ],
             strISOCountryOfBirth => [
                 'Country of Birth',
                 {
@@ -198,7 +254,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'Countries'},
                     allowsort       => 1,
                     optiongroup     => 'details',
-                    dbfield         => 'UCASE(strISOCountryOfBirth)',
+                    dbfield         => 'UCASE(P.strISOCountryOfBirth)',
                     allowgrouping   => 1
                 }
             ],
@@ -209,7 +265,7 @@ sub _getConfiguration {
                     displaytype => 'date',
                     fieldtype   => 'date',
                     allowsort   => 1,
-                    dbfield     => 'tblPerson.dtDOB',
+                    dbfield     => 'P.dtDOB',
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'details'
                 }
@@ -222,8 +278,8 @@ sub _getConfiguration {
                     fieldtype     => 'text',
                     allowgrouping => 1,
                     allowsort     => 1,
-                    dbfield       => 'YEAR(tblPerson.dtDOB)',
-                    dbformat      => ' YEAR(tblPerson.dtDOB)',
+                    dbfield       => 'YEAR(P.dtDOB)',
+                    dbformat      => ' YEAR(P.dtDOB)',
                     optiongroup   => 'details'
                 }
             ],
@@ -234,6 +290,7 @@ sub _getConfiguration {
                     fieldtype     => 'text',
                     allowsort     => 0,
                     optiongroup   => 'details',
+                    dbfield         => 'P.strRegionOfBirth',
                     allowgrouping => 1
                 }
             ],
@@ -246,6 +303,7 @@ sub _getConfiguration {
                     fieldtype     => 'text',
                     allowsort     => 0,
                     optiongroup   => 'details',
+                    dbfield         => 'P.strPlaceOfBirth',
                     allowgrouping => 1
                 }
             ],
@@ -263,6 +321,7 @@ sub _getConfiguration {
                     optiongroup   => 'details',
                     translate       => 1,
                     allowgrouping => 1,
+                    dbfield         => 'P.intGender',
                     allowsort     => 1
                 }
             ],
@@ -276,6 +335,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-8},
                     translate       => 1,
                     optiongroup     => 'details',
+                    dbfield         => 'P.intEthnicityID',
                     allowgrouping   => 1
                 }
             ],
@@ -293,6 +353,7 @@ sub _getConfiguration {
                     },
                     translate       => 1,
                     optiongroup     => 'details',
+                    dbfield         => 'P.intMinorProtection',
                     allowgrouping   => 1
                 }
             ],
@@ -302,7 +363,7 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
-                    dbfield     => 'tblPerson.strAddress1',
+                    dbfield     => 'P.strAddress1',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -312,7 +373,7 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
-                    dbfield     => 'tblPerson.strAddress2',
+                    dbfield     => 'P.strAddress2',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -322,7 +383,7 @@ sub _getConfiguration {
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
-                    dbfield       => 'tblPerson.strSuburb',
+                    dbfield       => 'P.strSuburb',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -334,7 +395,7 @@ sub _getConfiguration {
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
-                    dbfield       => 'tblPerson.strState',
+                    dbfield       => 'P.strState',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -346,7 +407,7 @@ sub _getConfiguration {
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
-                    dbfield       => 'tblPerson.strISOCountry',
+                    dbfield       => 'P.strISOCountry',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -358,7 +419,7 @@ sub _getConfiguration {
                 {
                     displaytype   => 'text',
                     fieldtype     => 'text',
-                    dbfield       => 'tblPerson.strPostalCode',
+                    dbfield       => 'P.strPostalCode',
                     allowsort     => 1,
                     optiongroup   => 'contactdetails',
                     allowgrouping => 1
@@ -370,6 +431,7 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
+                    dbfield       => 'P.strPhoneHome',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -379,6 +441,7 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
+                    dbfield       => 'P.strPhoneMobile',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -388,7 +451,7 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
-                    dbfield     => 'tblPerson.strEmail',
+                    dbfield     => 'P.strEmail',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -399,6 +462,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strEmergContName',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -409,6 +473,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strEmergContRel',
                     optiongroup => 'contactdetails'
                 }
             ],
@@ -419,6 +484,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strEmergContNo',
                     optiongroup => 'contactdetails',
                 }
             ],
@@ -429,6 +495,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strEmergContNo2',
                     optiongroup => 'contactdetails',
                 }
             ],
@@ -440,6 +507,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strPreferredLang',
                     optiongroup => 'identifications'
                 }
             ],
@@ -450,6 +518,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strBirthCert',
                     optiongroup => 'identifications'
                 }
             ],
@@ -459,6 +528,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strBirthCertDesc',
                     optiongroup => 'identifications'
                 }
             ],
@@ -470,7 +540,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'Countries'},
                     allowsort       => 1,
                     optiongroup     => 'identifications',
-                    dbfield         => 'UCASE(strBirthCertCountry)',
+                    dbfield         => 'UCASE(P.strBirthCertCountry)',
                     allowgrouping   => 1
                 }
             ],
@@ -483,7 +553,7 @@ sub _getConfiguration {
                     allowsort   => 1,
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
-                    dbfield     => 'tblPerson.dtBirthCertValidityDateFrom'
+                    dbfield     => 'P.dtBirthCertValidityDateFrom'
                 }
             ],
             dtBirthCertValidityDateTo=> [
@@ -494,7 +564,7 @@ sub _getConfiguration {
                     allowsort   => 1,
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
-                    dbfield     => 'tblPerson.dtBirthCertValidityDateTo'
+                    dbfield     => 'P.dtBirthCertValidityDateTo'
                 }
             ],
 
@@ -504,6 +574,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strOtherPersonIdentifier',
                     optiongroup => 'identifications'
                 }
             ],
@@ -513,6 +584,7 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
+                    dbfield     => 'P.strOtherPersonIdentifierDesc',
                     optiongroup => 'identifications'
                 }
             ],
@@ -524,7 +596,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'Countries'},
                     allowsort       => 1,
                     optiongroup     => 'identifications',
-                    dbfield         => 'UCASE(strOtherPersonIdentifierIssueCountry)',
+                    dbfield         => 'UCASE(P.strOtherPersonIdentifierIssueCountry)',
                     allowgrouping   => 1
                 }
             ],
@@ -537,7 +609,7 @@ sub _getConfiguration {
                     allowsort   => 1,
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
-                    dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateFrom'
+                    dbfield     => 'P.dtOtherPersonIdentifierValidDateFrom'
                 }
             ],
             dtOtherPersonIdentifierValidDateTo=> [
@@ -548,7 +620,7 @@ sub _getConfiguration {
                     allowsort   => 1,
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'identifications',
-                    dbfield     => 'tblPerson.dtOtherPersonIdentifierValidDateTo'
+                    dbfield     => 'P.dtOtherPersonIdentifierValidDateTo'
                 }
             ],
             intOtherPersonIdentifierTypeID=> [
@@ -558,7 +630,8 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => $CommonVals->{'DefCodes'}{-20},
                     optiongroup => 'identifications',
-                    allowgrouping   => 1
+                    allowgrouping   => 1,
+                    dbfield     => 'P.intOtherPersonIdentifierTypeID'
                 }
             ],
 
@@ -570,6 +643,7 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     allowsort   => 0,
                     optiongroup => 'parents',
+                    dbfield     => 'P.strP1FName'
                 }
             ],
 
@@ -580,6 +654,7 @@ sub _getConfiguration {
                     fieldtype   => 'text',
                     allowsort   => 0,
                     optiongroup => 'parents',
+                    dbfield     => 'P.strP1SName'
                 }
             ],
 
@@ -588,7 +663,8 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
-                    optiongroup => 'parents'
+                    optiongroup => 'parents',
+                    dbfield     => 'P.strP1Phone'
                 }
             ],
 
@@ -597,7 +673,8 @@ sub _getConfiguration {
                 {
                     displaytype => 'text',
                     fieldtype   => 'text',
-                    optiongroup => 'parents'
+                    optiongroup => 'parents',
+                    dbfield     => 'P.strP1Email'
                 }
             ],
             intOccupationID => [
@@ -607,7 +684,8 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => $CommonVals->{'DefCodes'}{-9},
                     optiongroup     => 'otherfields',
-                    allowgrouping   => 1
+                    allowgrouping   => 1,
+                    dbfield     => 'P.intOccupationID'
                 }
             ],
 
@@ -618,7 +696,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr1'
                 }
             ],
 
@@ -628,7 +707,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr2'
                 }
             ],
 
@@ -638,7 +718,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr3'
                 }
             ],
 
@@ -648,7 +729,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr4'
                 }
             ],
 
@@ -658,7 +740,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr5'
                 }
             ],
 
@@ -668,7 +751,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr6'
                 }
             ],
 
@@ -678,7 +762,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr7'
                 }
             ],
 
@@ -688,7 +773,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr8'
                 }
             ],
 
@@ -698,7 +784,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr9'
                 }
             ],
 
@@ -708,7 +795,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr10'
                 }
             ],
 
@@ -718,7 +806,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr11'
                 }
             ],
 
@@ -728,7 +817,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr12'
                 }
             ],
 
@@ -738,7 +828,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr13'
                 }
             ],
 
@@ -748,7 +839,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr14'
                 }
             ],
 
@@ -758,7 +850,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.strNatCustomStr15'
                 }
             ],
 
@@ -768,7 +861,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl1'
                 }
             ],
 
@@ -778,7 +872,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl2'
                 }
             ],
 
@@ -788,7 +883,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl3'
                 }
             ],
 
@@ -798,7 +894,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl4'
                 }
             ],
 
@@ -808,7 +905,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl5'
                 }
             ],
 
@@ -818,7 +916,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl6'
                 }
             ],
 
@@ -828,7 +927,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl7'
                 }
             ],
 
@@ -838,7 +938,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl8'
                 }
             ],
 
@@ -848,7 +949,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl9'
                 }
             ],
 
@@ -858,7 +960,8 @@ sub _getConfiguration {
                     displaytype => 'text',
                     fieldtype   => 'text',
                     allowsort   => 0,
-                    optiongroup => 'otherfields'
+                    optiongroup => 'otherfields',
+                    dbfield     => 'P.dblNatCustomDbl10'
                 }
             ],
 
@@ -870,7 +973,7 @@ sub _getConfiguration {
                     allowsort   => 0,
                     optiongroup => 'otherfields',
                     datetimeformat => ['MEDIUM',''],
-                    dbfield => 'tblPerson.dtNatCustomDt1'
+                    dbfield => 'P.dtNatCustomDt1'
                 }
             ],
 
@@ -882,7 +985,7 @@ sub _getConfiguration {
                     allowsort   => 0,
                     optiongroup => 'otherfields',
                     datetimeformat => ['MEDIUM',''],
-                    dbfield => 'tblPerson.dtNatCustomDt2'
+                    dbfield => 'P.dtNatCustomDt2'
                 }
             ],
 
@@ -894,7 +997,7 @@ sub _getConfiguration {
                     allowsort   => 0,
                     optiongroup => 'otherfields',
                     datetimeformat => ['MEDIUM',''],
-                    dbfield => 'tblPerson.dtNatCustomDt3'
+                    dbfield => 'P.dtNatCustomDt3'
                 }
             ],
 
@@ -906,7 +1009,7 @@ sub _getConfiguration {
                     allowsort   => 0,
                     optiongroup => 'otherfields',
                     datetimeformat => ['MEDIUM',''],
-                    dbfield => 'tblPerson.dtNatCustomDt4'
+                    dbfield => 'P.dtNatCustomDt4'
                 }
             ],
 
@@ -918,7 +1021,7 @@ sub _getConfiguration {
                     allowsort   => 0,
                     optiongroup => 'otherfields',
                     datetimeformat => ['MEDIUM',''],
-                    dbfield => 'tblPerson.dtNatCustomDt5'
+                    dbfield => 'P.dtNatCustomDt5'
                 }
             ],
 
@@ -930,6 +1033,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-53},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU1',
                     multiple        => 1
                 }
             ],
@@ -942,6 +1046,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-54},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU2',
                     multiple        => 1
                 }
             ],
@@ -954,6 +1059,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-55},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU3',
                     multiple        => 1
                 }
             ],
@@ -966,6 +1072,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-64},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU4',
                     multiple        => 1
                 }
             ],
@@ -978,6 +1085,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-65},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU5',
                     multiple        => 1
                 }
             ],
@@ -990,6 +1098,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-66},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU6',
                     multiple        => 1
                 }
             ],
@@ -1002,6 +1111,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-67},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU7',
                     multiple        => 1
                 }
             ],
@@ -1014,6 +1124,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-68},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU8',
                     multiple        => 1
                 }
             ],
@@ -1026,6 +1137,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-69},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU9',
                     multiple        => 1
                 }
             ],
@@ -1038,6 +1150,7 @@ sub _getConfiguration {
                     dropdownoptions => $CommonVals->{'DefCodes'}{-70},
                     optiongroup     => 'otherfields',
                     size            => 3,
+                    dbfield => 'P.intNatCustomLU10',
                     multiple        => 1
                 }
             ],
@@ -1049,6 +1162,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
+                    dbfield => 'P.intNatCustomBool1',
                     optiongroup   => 'otherfields',
                 }
             ],
@@ -1060,6 +1174,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
+                    dbfield => 'P.intNatCustomBool2',
                     optiongroup   => 'otherfields',
                 }
             ],
@@ -1071,6 +1186,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
+                    dbfield => 'P.intNatCustomBool3',
                     optiongroup   => 'otherfields',
                 }
             ],
@@ -1082,6 +1198,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
+                    dbfield => 'P.intNatCustomBool4',
                     optiongroup   => 'otherfields',
                 }
             ],
@@ -1093,6 +1210,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
+                    dbfield => 'P.intNatCustomBool5',
                     optiongroup   => 'otherfields',
                 }
             ],
@@ -1117,7 +1235,7 @@ sub _getConfiguration {
                     fieldtype       => 'dropdown',
                     dropdownoptions => { 0 => 'No', 1 => 'Yes' },
                     dropdownorder => [ 0, 1 ],
-                    dbfield       => 'tblPerson.intPhoto',
+                    dbfield       => 'P.intPhoto',
                     optiongroup   => 'otherfields',
                     allowgrouping => 1
                 }
@@ -1131,7 +1249,7 @@ sub _getConfiguration {
                     allowsort   => 1,
                     datetimeformat => ['MEDIUM',''],
                     optiongroup => 'otherfields',
-                    dbfield     => 'tblPerson.dtSuspendedUntil'
+                    dbfield     => 'P.dtSuspendedUntil'
                 }
             ],
 
@@ -1148,6 +1266,12 @@ sub _getConfiguration {
 
           Order => [
             qw(
+              MasterNationalNum
+              MasterLocalFirstname
+              MasterLocalSurname
+              MasterLatinFirstname
+              MasterLatinSurname
+
               strNationalNum
               PstrImportCode
               strLocalFirstname
@@ -1303,11 +1427,13 @@ sub SQLBuilder {
     $sql = qq[
         SELECT ###SELECT###
         FROM
-            tblPerson
+            tblPerson as P
+            LEFT JOIN tblPersonDuplicates as PD ON (PD.intChildPersonID = P.intPersonID)
+            LEFT JOIN tblPerson as PMaster ON (PMaster.intPersonID = PD.intParentPersonID)
         WHERE
             $where_list
             $current_where
-            AND tblPerson.strStatus = 'DUPLICATE'
+            AND P.strStatus = 'DUPLICATE'
     ];
 
     return ( $sql, '' );
