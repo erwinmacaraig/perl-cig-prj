@@ -2459,6 +2459,7 @@ header .navbar-brand {
 
 @media (max-width: 992px){
 	.result-message { padding: 0; }
+	.member-home-page .col-md-3 {clear: both}
 }
 
 @media (min-width: 800px){
