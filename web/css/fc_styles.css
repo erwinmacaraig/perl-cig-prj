@@ -1973,7 +1973,7 @@ form#flowFormID #fsg-core label {
 }
 form#flowFormID #fsg-main label.txtright {
 	margin-top: 6px;
-	text-align: left;
+	text-align: right;
 }
 form#flowFormID #fsgw-other label {
 	margin-top: 6px;
