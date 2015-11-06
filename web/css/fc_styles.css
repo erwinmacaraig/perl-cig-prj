@@ -2460,6 +2460,15 @@ header .navbar-brand {
 @media (max-width: 992px){
 	.result-message { padding: 0; }
 	.member-home-page .col-md-3 {clear: both}
+	div[id*="doctab"] .documents-list table.table .task-list .status-col span {
+		float: left;
+		padding-left: 3px;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+	div[id*="doctab"] .documents-list table.table .task-list .status-col span a{
+		width: 100px !important;
+	}
 }
 
 @media (min-width: 800px){
