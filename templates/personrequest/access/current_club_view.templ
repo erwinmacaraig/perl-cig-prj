@@ -173,69 +173,67 @@
 			</div>
 		</div>
 	</div>
+	<div class="col-md-3">
+		<div id = "">
+			[% PersonSummaryPanel %]
+			<div class="transfer-pending">[% Lang.txt('Request Status: Pending') %]</div>
+			<br/>
+			<!--
+			[% IF RequestAction.showAction == 1 %]
+			<div>
+					<div style="width: 100%; float: left">
+							<form style="width: 100%;" action="[% RequestAction.target %]" method="POST" class="pull-left">
+									<input type="hidden" name="client" value="[% RequestAction.client %]">
+									<input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+									<input type="hidden" name="a" value="[% RequestAction.action %]">
+									<input type="hidden" name="rid" value="[% RequestAction.rid %]">
+									<input type="hidden" name="response" value="accept">
+									<input class="btn-main" style="width: 100%" type="submit" name="action" value="[% Lang.txt('Approve transfer') %]">
+							</form>
+					</div>
+					<div style="width: 100%; float: left">
+							<a style="width: 100%;" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+									[% Lang.txt('Reject transfer') %]
+							</a>
+					</div>
+			</div>
+			[% END %]
+			-->
+		</div>
+	</div>
 </div>
-<div class="col-md-3">
-	<div id = "">
-		[% PersonSummaryPanel %]
-		<div class="transfer-pending">[% Lang.txt('Request Status: Pending') %]</div>
-		<br/>
-		<!--
-		[% IF RequestAction.showAction == 1 %]
-		<div>
-			<div style="width: 100%; float: left">
-				<form style="width: 100%;" action="[% RequestAction.target %]" method="POST" class="pull-left">
+<div class="modal fade" id="showDenyRequestNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+	<div class="modal-dialog" style="z-index:9999;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
+				<h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Access Rejected') %]</h4>
+			</div>
+			
+			<form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
+				<div class="modal-body">
+					<label>[% Lang.txt("Please specify why request access was rejected.") %]</label>
+					<textarea name="request_notes"></textarea>
+				</div>
+				<div id="hiddenfields" style="display: none">
 					<input type="hidden" name="client" value="[% RequestAction.client %]">
 					<input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
 					<input type="hidden" name="a" value="[% RequestAction.action %]">
 					<input type="hidden" name="rid" value="[% RequestAction.rid %]">
-					<input type="hidden" name="response" value="accept">
-					<input class="btn-main" style="width: 100%" type="submit" name="action" value="[% Lang.txt('Approve transfer') %]">
-				</form>
-			</div>
-			<div style="width: 100%; float: left">
-				<a style="width: 100%;" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-					[% Lang.txt('Reject transfer') %]
-				</a>
-			</div>
+					<input type="hidden" name="response" value="deny">
+				</div>
+				<div class="modal-footer">
+					<a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+					<input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
+				</div>
+			</form>
+			
 		</div>
-		[% END %]
-		-->
 	</div>
-</div>
-</div>
-<div class="modal fade" id="showDenyRequestNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-<div class="modal-dialog" style="z-index:9999;">
-	<div class="modal-content">
-		<div class="modal-header">
-			<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
-			<h4 class="modal-title" id="myModalLabel">[% Lang.txt('Request Access Rejected') %]</h4>
-		</div>
-		
-		<form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
-			<div class="modal-body">
-				<label>[% Lang.txt("Please specify why request access was rejected.") %]</label>
-				<textarea name="request_notes"></textarea>
-			</div>
-			<div id="hiddenfields" style="display: none">
-				<input type="hidden" name="client" value="[% RequestAction.client %]">
-				<input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-				<input type="hidden" name="a" value="[% RequestAction.action %]">
-				<input type="hidden" name="rid" value="[% RequestAction.rid %]">
-				<input type="hidden" name="response" value="deny">
-			</div>
-			<div class="modal-footer">
-				<a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
-				<input class="btn-main" type="submit" name="submitb" value="[% Lang.txt('Submit') %]">
-			</div>
-		</form>
-		
-	</div>
-</div>
 </div>
 <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
 <script type="text/javascript">
 jQuery().ready(function() {
-
 jQuery("a.transfer-deny").click(function(e){
 e.preventDefault();
 jQuery("div#showDenyRequestNotes").modal();
