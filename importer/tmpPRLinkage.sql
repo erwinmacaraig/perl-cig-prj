@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS tmpPRLinkage;
+CREATE TABLE tmpPRLinkage (
+    intPersonRegistrationID INT default 0,
+    strClientPRImportCode varchar(100) default '',
+    
+    INDEX index_intPRID (intPersonRegistrationID),
+    INDEX index_strCode (strClientPRImportCode)
+) DEFAULT CHARACTER SET = utf8;
