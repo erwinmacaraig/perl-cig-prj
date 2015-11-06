@@ -641,6 +641,7 @@ sub displayDuplicateComplete    {
         TextBottom => '',
         client=>$clm,
         clientrego=>$tempClient,
+        url => $Defs::base_url,
         originLevel => $originLevel,
         originClient => $originClient,
     );
