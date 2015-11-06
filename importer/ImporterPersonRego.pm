@@ -586,9 +586,8 @@ while (<INFILE>)	{
         $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
         $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
         $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
-        if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
-            $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
-            $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        if ($parts{'PERSONTYPE'} eq 'MATCH OFFICIAL')    {
+            $parts{'PERSONTYPE'} = 'MAOFFICIAL';
         }
         if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
             $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
