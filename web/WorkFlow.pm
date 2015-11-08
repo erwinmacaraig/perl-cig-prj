@@ -61,6 +61,7 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 use PersonUtils;
+use PersonCard;
 use PersonUserAccess;
 use Logo;
 
@@ -1760,9 +1761,9 @@ sub checkForOutstandingTasks {
                     );
                 }
                 my $personObject = getInstanceOf($Data, 'person',$personID);
-
                 updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 auditLog($personID, $Data, 'Person Registered', 'Person');
+                logCardPrintRequest($Data, $personID,$personRegistrationID);
 
         	#}
         }
