@@ -39,6 +39,7 @@ sub savePlayerPassport{
             IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 10 YEAR), PR.dtFrom, DATE_ADD(dtDOB,INTERVAL 10 YEAR)) as WhenFrom,
             IF(PR.dtFrom > DATE_ADD(dtDOB,INTERVAL 10 YEAR), DATE_FORMAT(PR.dtFrom, "%Y%m%d"), DATE_FORMAT(DATE_ADD(dtDOB,INTERVAL 10 YEAR), "%Y%m%d")) as WhenFrom_,
             IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo) as orderdtTo,
+            IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', 0, 1) as orderdtToWeight,
             PR.dtTo,
             DATE_FORMAT(PR.dtTo, "%Y%m%d") as dtTo_,
             DATE_FORMAT(PR.dtFrom, "%Y%m%d") as dtFrom_,
@@ -59,7 +60,7 @@ sub savePlayerPassport{
             AND PR.dtFrom IS NOT NULL
         HAVING
             PRToCalc > When10
-            ORDER BY PR.dtFrom, orderdtTo, PR.dtAdded
+            ORDER BY PR.dtFrom, orderdtToWeight DESC, PR.dtAdded
     ];	
     #ORDER BY PR.dtFrom, PR.intPersonRegistrationID ASC, NP.dtFrom
 

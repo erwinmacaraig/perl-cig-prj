@@ -1,21 +1,16 @@
 <div class="member-home-page">
-    <div class="col-md-9">
-        <div class="member-detail">
-
-				<div class="">
-
+	<div class="col-md-9">
+		<div class="member-detail">
+			<div class="">
 				<p class="transfer-text">[% requestTo %] [% Lang.txt('has released') %] [% personFirstname %] [% personSurname %]. [% Lang.txt('Please continue the transfer process.') %]</p>
-
 				<div class="alert">
 					<div>
 						<span class="fa fa-exclamation"></span>
 						<p>[% Lang.txt('Please check and update all details before submitting to') %] [% MA %] [% Lang.txt('Member Association for final approval.') %]</p>
 					</div>
 				</div>
-
-
 				<br/>
-		    	<ul class="nav nav-tabs">
+				<ul class="nav nav-tabs">
 					<li><a data-toggle="tab" href="#oldclubdetails">[% Lang.txt('Old Club Details') %]</a></li>
 					<li class="active"><a data-toggle="tab" href="#playerdetails">[% Lang.txt('Player Details') %]</a></li>
 					<!--<li><a data-toggle="tab" href="#documentsdetails">[% Lang.txt('Documents') %]</a></li>-->
@@ -23,288 +18,270 @@
 				<div class="tab-content">
 					<div id="oldclubdetails" class="tab-pane fade">
 						<div style="margin-top: 35px;">
-						<div class="read-only">
-							<h4>[% Lang.txt('Old Club Details') %]</h4>
-							<div class="read-only-text">
-								<div class="clearfix">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Club") %]:</span>
-								        <span class="details-left detail-value">[% requestTo %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Sport") %]:</span>
-								        <span class="details-left detail-value">[% requestToDiscipline %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Country") %]:</span>
-								        <span class="details-left detail-value">[% requestToISOCountry %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Address") %]:</span>
-								        <span class="details-left detail-value">[% requestToAddress %] [% requestToAddress2 %] [%%] [% requestToCity %] [% requestToPostal %] [% requestToRegion %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Phone") %]:</span>
-								        <span class="details-left detail-value">[% requestToPhone %]</span>
-								    </span>
+							<div class="read-only">
+								<h4>[% Lang.txt('Old Club Details') %]</h4>
+								<div class="read-only-text">
+									<div class="clearfix">
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Club") %]:</span>
+											<span class="details-left detail-value">[% requestTo %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Sport") %]:</span>
+											<span class="details-left detail-value">[% requestToDiscipline %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Country") %]:</span>
+											<span class="details-left detail-value">[% requestToISOCountry %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Address") %]:</span>
+											<span class="details-left detail-value">[% requestToAddress %] [% requestToAddress2 %] [%%] [% requestToCity %] [% requestToPostal %] [% requestToRegion %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Phone") %]:</span>
+											<span class="details-left detail-value">[% requestToPhone %]</span>
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
-						</div>
-                    </div>
-
+					</div>
 					<div id="playerdetails" class="tab-pane fade in active">
 						<div style="margin-top: 35px;">
-						<div class="read-only">
-							<h4>[% Lang.txt('Personal Information') %]</h4>
-							<div class="read-only-text">
-								<div class="clearfix">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Family Name") %]:</span>
-								        <span class="details-left detail-value">[% personSurname %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("First Name") %]:</span>
-								        <span class="details-left detail-value">[% personFirstname %]</span>
-								    </span>								    
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
-                                        <span class="details-left detail-value">[% DateFormat.format(DOB,'MEDIUM') %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Gender") %]:</span>
-								        <span class="details-left detail-value">[% personGender %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Nationality") %]:</span>
-								        <span class="details-left detail-value">[% ISONationality %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Country of Birth") %]:</span>
-								        <span class="details-left detail-value">[% ISOCountryOfBirth %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Region of Birth") %]:</span>
-								        <span class="details-left detail-value">[% RegionOfBirth %]</span>
-								    </span>
+							<div class="read-only">
+								<h4>[% Lang.txt('Personal Information') %]</h4>
+								<div class="read-only-text">
+									<div class="clearfix">
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Family Name") %]:</span>
+											<span class="details-left detail-value">[% personSurname %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("First Name") %]:</span>
+											<span class="details-left detail-value">[% personFirstname %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Date of Birth") %]:</span>
+											<span class="details-left detail-value">[% DateFormat.format(DOB,'MEDIUM') %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Gender") %]:</span>
+											<span class="details-left detail-value">[% personGender %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Nationality") %]:</span>
+											<span class="details-left detail-value">[% ISONationality %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Country of Birth") %]:</span>
+											<span class="details-left detail-value">[% ISOCountryOfBirth %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Region of Birth") %]:</span>
+											<span class="details-left detail-value">[% RegionOfBirth %]</span>
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
-						</div>
-
 						<div style="margin-top: 35px;">
-						<div class="read-only">
-							<h4>[% Lang.txt('Contact Details') %]</h4>
-							<div class="read-only-text">
-								<div class="clearfix">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt('Address 1') %]:</span>
-								        <span class="details-left detail-value">[% contactAddress1 %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt('Address 2') %]:</span>
-								        <span class="details-left detail-value">[% contactAddress2 %]</span>
-								    </span>								    
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt('City') %]:</span>
-								        <span class="details-left detail-value">[% contactCity %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt ('State') %]:</span>
-								        <span class="details-left detail-value">[% contactState %]</span>
-								    </span>								    
-									<span class="details-row">
-								        <span class="details-left">[% Lang.txt('Postal Code') %]:</span>
-								        <span class="details-left detail-value">[% contactPostalCode %]</span>
-								    </span>								    
-									<span class="details-row">
-								        <span class="details-left">[% Lang.txt('Country') %]:</span>
-								        <span class="details-left detail-value">[% contactISOCountry %]</span>
-								    </span>									
-									<span class="details-row">
-								        <span class="details-left">[% Lang.txt('Phone Number') %]:</span>
-								        <span class="details-left detail-value">[% contactPhoneHome %]</span>
-								    </span>									
-									<span class="details-row">
-								        <span class="details-left">[% Lang.txt('Email Address') %]:</span>
-								        <span class="details-left detail-value">[% contactEmail %]</span>
-								    </span>
+							<div class="read-only">
+								<h4>[% Lang.txt('Contact Details') %]</h4>
+								<div class="read-only-text">
+									<div class="clearfix">
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Address 1') %]:</span>
+											<span class="details-left detail-value">[% contactAddress1 %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Address 2') %]:</span>
+											<span class="details-left detail-value">[% contactAddress2 %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('City') %]:</span>
+											<span class="details-left detail-value">[% contactCity %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt ('State') %]:</span>
+											<span class="details-left detail-value">[% contactState %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Postal Code') %]:</span>
+											<span class="details-left detail-value">[% contactPostalCode %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Country') %]:</span>
+											<span class="details-left detail-value">[% contactISOCountry %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Phone Number') %]:</span>
+											<span class="details-left detail-value">[% contactPhoneHome %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt('Email Address') %]:</span>
+											<span class="details-left detail-value">[% contactEmail %]</span>
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
-						</div>
-
 						<div style="margin-top: 35px;">
-						<div class="read-only">
-							<h4>[% Lang.txt('Transfer Details') %]</h4>
-							<div class="read-only-text">
-								<div class="clearfix">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Transferring to") %]:</span>
-								        <span class="details-left detail-value">[% requestFrom %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Register as") %]:</span>
-								        <span class="details-left detail-value">[% personType %]</span>
-								    </span>
-									<span class="details-row">
-								        <span class="details-left">Sport</span>
-								        <span class="details-left detail-value">[% sport %]</span>
-								    </span>	
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Level") %]:</span>
-								        <span class="details-left detail-value">[% personLevel %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
-								        <span class="details-left detail-value">[% requestNotes %]</span>
-								    </span>
+							<div class="read-only">
+								<h4>[% Lang.txt('Transfer Details') %]</h4>
+								<div class="read-only-text">
+									<div class="clearfix">
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Transferring to") %]:</span>
+											<span class="details-left detail-value">[% requestFrom %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Register as") %]:</span>
+											<span class="details-left detail-value">[% personType %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">Sport</span>
+											<span class="details-left detail-value">[% sport %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Level") %]:</span>
+											<span class="details-left detail-value">[% personLevel %]</span>
+										</span>
+										<span class="details-row">
+											<span class="details-left">[% Lang.txt("Additional Comments") %]:</span>
+											<span class="details-left detail-value">[% requestNotes %]</span>
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
-						</div>
-
 					</div>
 					<div id="documentsdetails" class="tab-pane fade">
-                        <br/>
-                        documents here
-                        <!--
-						<div class="read-only">
-							<h4>[% Lang.txt('Registration Details') %]</h4>
-							<div class="read-only-text">
-								<div class="panel-body">
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Club") %]:</span>
-								        <span class="details-left detail-value">[% requestFrom %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Sport") %]:</span>
-								        <span class="details-left detail-value">[% requestFromDiscipline %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Country") %]:</span>
-								        <span class="details-left detail-value">[% requestFromISOCountry %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Address") %]:</span>
-								        <span class="details-left detail-value">[% requestFromAddress %] [% requestFromAddress2 %] [%%] [% requestFromCity %] [% requestFromPostal %] [% requestFromRegion %]</span>
-								    </span>
-								    <span class="details-row">
-								        <span class="details-left">[% Lang.txt("Phone") %]:</span>
-								        <span class="details-left detail-value">[% requestFromPhone %]</span>
-								    </span>
-								</div>
-							</div>
-						</div>
-                        -->
-                    </div>
+						<br/>
+						documents here
+						<!--
+												<div class="read-only">
+																	<h4>[% Lang.txt('Registration Details') %]</h4>
+																	<div class="read-only-text">
+																						<div class="panel-body">
+																										<span class="details-row">
+																														<span class="details-left">[% Lang.txt("Club") %]:</span>
+																														<span class="details-left detail-value">[% requestFrom %]</span>
+																										</span>
+																										<span class="details-row">
+																														<span class="details-left">[% Lang.txt("Sport") %]:</span>
+																														<span class="details-left detail-value">[% requestFromDiscipline %]</span>
+																										</span>
+																										<span class="details-row">
+																														<span class="details-left">[% Lang.txt("Country") %]:</span>
+																														<span class="details-left detail-value">[% requestFromISOCountry %]</span>
+																										</span>
+																										<span class="details-row">
+																														<span class="details-left">[% Lang.txt("Address") %]:</span>
+																														<span class="details-left detail-value">[% requestFromAddress %] [% requestFromAddress2 %] [%%] [% requestFromCity %] [% requestFromPostal %] [% requestFromRegion %]</span>
+																										</span>
+																										<span class="details-row">
+																														<span class="details-left">[% Lang.txt("Phone") %]:</span>
+																														<span class="details-left detail-value">[% requestFromPhone %]</span>
+																										</span>
+																						</div>
+																	</div>
+												</div>
+						-->
+					</div>
 				</div>
+			</div>
+		</div>
+		<div class="task-actions">
+			<div style="width: 100%; float: left">
+				<a style="float: left" class="" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
+					[% Lang.txt('Back to Dashboard') %]
+				</a>
+				[% IF RequestAction.initiateRequestProcess == 1 %]
+				<div style="float: right">
+					<div class = "pull-left">
+						<a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
+							[% Lang.txt('Cancel Transfer') %]
+						</a>
+					</div>
+					<form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
+						<input type="hidden" name="client" value="[% RequestAction.client %]">
+						<input type="hidden" name="a" value="[% RequestAction.action %]">
+						<input type="hidden" name="sp" value="[% sport %]">
+						<input type="hidden" name="pt" value="[% personType %]">
+						<input type="hidden" name="per" value="[%  %]">
+						<input type="hidden" name="pl" value="[% personLevel %]">
+						<input type="hidden" name="ag" value="[% personAgeLevel %]">
+						<input type="hidden" name="nat" value="[% RequestAction.request_type %]">
+						<input type="hidden" name="ol" value="[% requestOriginLevel %]">
+						<input type="hidden" name="r" value="[%  %]">
+						<input type="hidden" name="sr" value="[%  %]">
+						<input type="hidden" name="eID" value="[% requestEntityID %]">
+						<input type="hidden" name="pID" value="[% personID %]">
+						<input type="hidden" name="reqID" value="[% requestID %]">
+						<input type="hidden" name="prid" value="[% requestID %]">
+						<input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
+						<input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitbtn" value="[% Lang.txt('Continue Transfer') %]">
+					</form>
 				</div>
-           
-                <div class="task-actions">
-                    <div style="width: 100%; float: left">
-                        <a style="float: left" class="" href = "main.cgi?client=[% RequestAction.client %]&a=C_HOME">
-                            [% Lang.txt('Back to Dashboard') %]
-                        </a>
-
-                        [% IF RequestAction.initiateRequestProcess == 1 %]
-                                <div style="float: right">
-
-                                    <div class = "pull-left">
-                                    <a style="" class="btn-main transfer-deny" data-target="#showDenyRequestNotes" data-actiontype="DENY" href = "">
-                                        [% Lang.txt('Cancel Transfer') %]
-                                    </a>
-                                    </div>
-                                    <form style="" action="[% RequestAction.target %]" method="POST" class="pull-left">
-                                        <input type="hidden" name="client" value="[% RequestAction.client %]">
-                                        <input type="hidden" name="a" value="[% RequestAction.action %]">
-                                        <input type="hidden" name="sp" value="[% sport %]">
-                                        <input type="hidden" name="pt" value="[% personType %]">
-                                        <input type="hidden" name="per" value="[%  %]">
-                                        <input type="hidden" name="pl" value="[% personLevel %]">
-                                        <input type="hidden" name="ag" value="[% personAgeLevel %]">
-                                        <input type="hidden" name="nat" value="[% RequestAction.request_type %]">
-                                        <input type="hidden" name="ol" value="[% requestOriginLevel %]">
-                                        <input type="hidden" name="r" value="[%  %]">
-                                        <input type="hidden" name="sr" value="[%  %]">
-                                        <input type="hidden" name="eID" value="[% requestEntityID %]">
-                                        <input type="hidden" name="pID" value="[% personID %]">
-                                        <input type="hidden" name="reqID" value="[% requestID %]">
-                                        <input type="hidden" name="prid" value="[% requestID %]">
-                                        <input type="hidden" name="dnat" value="[% RequestAction.request_type %]">
-
-                                        <input style="border: 0px solid" class="btn-main btn-proceed" type="submit" name="submitbtn" value="[% Lang.txt('Continue Transfer') %]">
-                                    </form>
-
-                                </div>
-                        [% END %]
-                    </div>
-                </div>
-        </div>
-    </div>
+				[% END %]
+			</div>
+		</div>
+	</div>
 	<div class="col-md-3">
-        <div id = "">
-            [% PersonSummaryPanel %]
+		<div id = "">
+			[% PersonSummaryPanel %]
 			<div class="transfer-pending">[% Lang.txt('Transfer Status') %] : [% Lang.txt('Released') %]</div>
-            <br/>
-
-        </div>
-    </div>
+			<br/>
+		</div>
+	</div>
 </div>
-
 <div class="modal fade" id="showDenyRequestNotes" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-dialog" style="z-index:9999;">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
-        <h4 class="modal-title" id="myModalLabel">[% Lang.txt('Transfer cancelled') %]</h4>
-      </div>
-      
-      <form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
-          <div class="modal-body">
-            <label>[% Lang.txt("Please specify why transfer was cancelled.") %]</label>
-            <textarea name="request_notes"></textarea>
-          </div>
-
-          <div id="hiddenfields" style="display: none">
-                <input type="hidden" name="client" value="[% RequestAction.client %]">
-                <input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
-                <input type="hidden" name="a" value="PRA_S">
-                <input type="hidden" name="rid" value="[% RequestAction.rid %]">
-                <input type="hidden" name="response" value="cancel">
-          </div>
-
-          <div class="modal-footer">
-            <a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
-            <input class="btn-main" type="submit" name="submitbtn" value="[% Lang.txt('Submit') %]">
-          </div>
-      </form>
-      
-    </div>
-  </div>
+	<div class="modal-dialog" style="z-index:9999;">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">[% Lang.txt('Close') %]</span></button>
+				<h4 class="modal-title" id="myModalLabel">[% Lang.txt('Transfer cancelled') %]</h4>
+			</div>
+			
+			<form id="personRequestNotes" action="[% RequestAction.target %]" method="POST">
+				<div class="modal-body">
+					<label>[% Lang.txt("Please specify why transfer was cancelled.") %]</label>
+					<textarea name="request_notes"></textarea>
+				</div>
+				<div id="hiddenfields" style="display: none">
+					<input type="hidden" name="client" value="[% RequestAction.client %]">
+					<input type="hidden" name="request_type" value="[% RequestAction.request_type %]">
+					<input type="hidden" name="a" value="PRA_S">
+					<input type="hidden" name="rid" value="[% RequestAction.rid %]">
+					<input type="hidden" name="response" value="cancel">
+				</div>
+				<div class="modal-footer">
+					<a class="btn-main" data-dismiss="modal">[% Lang.txt('Close') %]</a>
+					<input class="btn-main" type="submit" name="submitbtn" value="[% Lang.txt('Submit') %]">
+				</div>
+			</form>
+			
+		</div>
+	</div>
 </div>
-
-
 <script src = "//ajax.aspnetcdn.com/ajax/jquery.validate/1.9/jquery.validate.min.js"></script>
 <script type="text/javascript">
-    jQuery().ready(function() {
-        
-        jQuery("a.transfer-deny").click(function(e){
-            e.preventDefault();
-
-            jQuery("div#showDenyRequestNotes").modal();
-        });
-        // validate the comment form when it is submitted
-        jQuery("#personRequestNotes").validate({
-            rules: {
-                request_notes: {
-                    required: true
-                }
-            },
-            messages: {
-                request_notes: "[% Lang.txt('Please add notes') %]"
-            }
-        });
-    });
+jQuery().ready(function() {
+jQuery("a.transfer-deny").click(function(e){
+e.preventDefault();
+jQuery("div#showDenyRequestNotes").modal();
+});
+// validate the comment form when it is submitted
+jQuery("#personRequestNotes").validate({
+rules: {
+request_notes: {
+required: true
+}
+},
+messages: {
+request_notes: "[% Lang.txt('Please add notes') %]"
+}
+});
+});
 </script>
-

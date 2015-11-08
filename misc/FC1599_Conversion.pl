@@ -65,8 +65,17 @@ sub migrateRecords{
             AND PR.strPersonType= 'PLAYER'
             AND PR.strRegistrationNature <> 'INT_TRANSFER_OUT'
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
+            AND PR.intOnLoan=0
+            AND PR.intIsLoanedOut = 0
             AND PR.intPersonRegistrationID = 1963088
     ];
+
+    # For each of the above people we may need to move the CLUB they are in
+        # Per SPORT
+    # 1. Select from tblPersonRegistration_1
+    # 2. Update tblPersonRequest
+    # 3. Update tblTransactions SELECT COUNT(*) FROM tblTransactions WHERE intTXNEntityID=1659;
+    # 4. Update tblPersonRegistration_1
 
     my $stINS_IntTransfer= qq[
         INSERT IGNORE INTO tblIntTransfer
