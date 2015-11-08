@@ -62,6 +62,7 @@ use EntitySummaryPanel;
 use PersonEntity;
 use PersonUtils;
 use PersonUserAccess;
+use Logo;
 
 use SphinxUpdate;
 use InstanceOf;
@@ -2094,8 +2095,6 @@ sub updateTaskNotes {
         #PersonSummary => personSummaryPanel($Data, $personID) || '',
     );
 
-warn("OO");
-
     $TemplateData{'Notifications'}{'actionResult'} = "ID: $WFTaskID " . $Data->{'lang'}->txt("Work Flow task updated.");
 
 	my $body = runTemplate(
@@ -2215,6 +2214,9 @@ sub verifyDocument {
 			$documentStatus,
         	$documentID
     	);		
+        if($documentStatus eq 'APPROVED')   {
+            handleIfLogo($Data, $documentID);
+        }
 	}
 
 }
@@ -5147,6 +5149,38 @@ sub getInitialTaskAssignee {
         my $dref = $q->fetchrow_hashref();
         return ($Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100}, $dref);
     }
+}
+
+sub handleIfLogo    {
+    my ($Data, $fileID) = @_;
+
+    my $statement=qq[
+        SELECT 
+            intEntityLevel,
+            intEntityID,
+            intPersonID
+        FROM 
+            tblDocuments AS D
+            INNER JOIN tblDocumentType AS DT
+                ON D.intDocumentTypeID = DT.intDocumentTypeID
+        WHERE 
+            intUploadFileID = ?
+            AND strApprovalStatus = 'APPROVED'
+            AND intEntityImage = 1
+    ];
+    my $db = $Data->{'db'};
+    my $query = $db->prepare($statement);
+    $query->execute($fileID);
+    my $dref =$query->fetchrow_hashref();
+    if($dref and $dref->{'intEntityLevel'}) {
+        convertToLogo(
+            $Data,
+            $dref->{'intEntityLevel'},
+            $dref->{'intPersonID'} || $dref->{'intEntityID'},
+            $fileID,
+        );
+    }
+    return 1;
 }
 
 1;

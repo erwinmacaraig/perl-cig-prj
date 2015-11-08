@@ -2,6 +2,9 @@
 <div class = "summaryPanel">
 <h3 class="panel-header">[% IF NationalNum %][% Lang.txt('Member ID') %]: [% NationalNum %][% ELSE %]&nbsp;[% END %]</h3>
     <div class="panel-body">
+        [% IF Photo %]
+            <div class = "person-photo"><img src = "[% Photo %]"></div>
+        [% END %]
         <p class="reg-text">[% FamilyName %]</p>
         <p class="reg-text">[% FirstName %]</p>
         <p class="reg-text">[% gender %]</p>

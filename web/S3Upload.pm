@@ -1,8 +1,8 @@
 package S3Upload;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(putFileToS3 getFileFromS3 deleteFromS3);
-@EXPORT_OK = qw(putFileToS3 getFileFromS3 deleteFromS3);
+@EXPORT = qw(putFileToS3 getFileFromS3 deleteFromS3 copyFileInS3);
+@EXPORT_OK = qw(putFileToS3 getFileFromS3 deleteFromS3 copyFileInS3);
 
 use strict;
 use lib "..",".";
@@ -11,7 +11,6 @@ use Utils;
 
 use Net::Amazon::S3;
 use Net::Amazon::S3::Client;
-use CGI qw(:cgi param unescape escape);
 
 sub _getS3 {
 
@@ -144,6 +143,28 @@ sub deleteFromS3 {
     return 0;
   }
   return '';
+}
+
+sub copyFileInS3 {
+  my ($srcKeyname, $dstKeyname) = @_;
+
+  my $s3 = _getS3();
+  my $bucket = _getS3bucket();
+
+  my $content = eval {
+    my $srcObj = $bucket->object( 
+          key => $srcKeyname,
+    );
+    my $dstObj = $bucket->object( 
+          key => $dstKeyname,
+    );
+    $dstObj->put($srcObj->get());
+  };
+  if($@)  {
+    warn("Error in s3 copy:".$@);
+    return 0;
+  }
+  return 1;
 }
 
 
