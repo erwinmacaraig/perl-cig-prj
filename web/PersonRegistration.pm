@@ -317,7 +317,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
     my @statusNOTIN = ();
-    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE);
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE, $Defs::PERSONREGO_STATUS_DELETED);
 
     %Reg=();
     %Reg = (
@@ -1218,7 +1218,7 @@ sub getRegistrationDetail {
 #
 sub hasPendingRegistration {
     my ($Data, $personID, $sport, $existingRegos) = @_;
-    if(scalar @{$existingRegos}){
+    if(1==2 and scalar @{$existingRegos}){
         my $count = 0;
         my %renewalCtrlForRego = ();
         foreach my $rego (@{$existingRegos}){

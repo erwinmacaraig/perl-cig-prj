@@ -1,7 +1,7 @@
 package MA_Gateways;
 require Exporter;
 @ISA = qw(Exporter);
-@EXPORT=@EXPORT_OK=qw(MAGateway_FI_checkoutFI MAGateway_HKPayDollar calcuatePaymentCheckSum);
+@EXPORT=@EXPORT_OK=qw(MAGateway_FI_checkoutFI MAGateway_HKPayDollar MAGateway_SGEasyPay calcuatePaymentCheckSum);
 
 use lib '.', '..', "comp", 'RegoForm', "dashboard", "RegoFormBuilder",'PaymentSplit', "user" ;
 
@@ -13,6 +13,7 @@ use Utils;
 use CGI qw(param unescape escape);
 
 use Digest::SHA1  qw(sha1 sha1_hex); # sha1_hex sha1_base64);
+use Digest::SHA  qw(sha512_hex);
 use MD5;
 #use POSIX;
 
@@ -152,6 +153,57 @@ print STDERR "HK PAY GATEWAY -- NEED TO IMPLEMENT OTHER LANGS\n";
         return \%gatewaySpecific;
 }
 
+sub MAGateway_SGEasyPay {
+
+    my ($MAGateway_ref, $paymentSettings) = @_;
+
+    my $nh = $MAGateway_ref->{'nh'};
+    my $client = $MAGateway_ref->{'client'};
+    my $payRef = $MAGateway_ref->{'ci'};
+    my $chkvalue = $MAGateway_ref->{'chkv'};
+    my $session = $MAGateway_ref->{'session'};
+    my $amount = $MAGateway_ref->{'amount'};
+    my $logID= $MAGateway_ref->{'logID'};
+    my $currentLang= $MAGateway_ref->{'currentLang'};
+
+    my %gatewaySpecific = ();
+
+    $gatewaySpecific{'paymentURL'} = $paymentSettings->{'gateway_url'} .qq[?nh=$nh&amp;a=P&amp;client=$client&amp;ci=$payRef&amp;chkv=$chkvalue&amp;session=$session];
+    ## Check below
+
+    use Date::Calc qw(Add_Delta_DHMS Today_and_Now);
+    my ($Year,$Month,$Day,$Hr,$Min,$Sec) = Add_Delta_DHMS(Today_and_Now(), 0, 0, 10, 0);
+    #$Year+=1900;
+    #$Month++;
+    $Hr= sprintf("%02s", $Hr);
+    $Min= sprintf("%02s", $Min);
+    $Sec= sprintf("%02s", $Sec);
+    #$Year= sprintf("%04s", $Year);
+    $Month = sprintf("%02s", $Month);
+    $Day = sprintf("%02s", $Day);
+    my $ValidityDate= "$Year-$Month-$Day $Hr:$Min:$Sec";
+
+    my $pa = $paymentSettings->{'gatewayProcessPreGateway'} ==1 ? 0 : 1;
+
+    $gatewaySpecific{'returnurl'} = $Defs::gatewayReturnDemo . qq[/gatewayprocess_sgEP.cgi?da=1&ci=$payRef];
+    $gatewaySpecific{'statusurl'} = $Defs::gatewayReturnDemo . qq[/gatewayprocess_sgEP.cgi?sa=1&da=0&ci=$payRef];
+
+    $gatewaySpecific{'mid'} = $paymentSettings->{'gatewayUsername'};
+    $gatewaySpecific{'rcard'} = "04";
+    $gatewaySpecific{'ref'} = $payRef;
+    $gatewaySpecific{'cur'} = $paymentSettings->{'currency'};
+    $gatewaySpecific{'amt'} = $amount;
+    $gatewaySpecific{'transtype'} = 'SALE';
+    $gatewaySpecific{'locale'} = "en_US" if ($currentLang =~ /^en_/);
+    $gatewaySpecific{'version'} = $paymentSettings->{'gatewayVersion'};
+    $gatewaySpecific{'userfield1'} = $payRef;
+    #$gatewaySpecific{'validity'} = $ValidityDate;
+
+    my $coKey = "$gatewaySpecific{'amt'}$gatewaySpecific{'ref'}$gatewaySpecific{'cur'}$gatewaySpecific{'mid'}$gatewaySpecific{'transtype'}";
+    $gatewaySpecific{'signature'} = uc(sha512_hex($coKey, $paymentSettings->{'gatewayPassword'}));
+
+    return \%gatewaySpecific;
+}
 
 sub calcuatePaymentCheckSum{
     my ($logID) = @_;
