@@ -1,0 +1,13 @@
+DROP TABLE IF EXISTS tblPersonCard;
+CREATE TABLE tblPersonCard (
+    intPersonCardID int NOT NULL AUTO_INCREMENT,
+    strName VARCHAR(200) DEFAULT '' NOT NULL,
+    strTemplateFilename VARCHAR(200) DEFAULT '' NOT NULL,
+    intActive TINYINT DEFAULT 0,
+    intPrintFromLevelID INT DEFAULT 0,
+    intBulkPrintFromLevelID INT DEFAULT 0,
+    tTimeStamp timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+  PRIMARY KEY (intPersonCardID)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+

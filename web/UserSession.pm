@@ -86,6 +86,9 @@ sub load {
   if($self->{'cache'})  {
     $info = $self->{'cache'}->get('swm',"USESSION-$sessionkey");
   }
+  else  {
+    warn("NO MEMCACHE AVAILABLE");
+  }
   if($info) {
     $userID = $info->{'UserID'} || 0;
     $self->{'Info'} = $info || {};

@@ -13,7 +13,7 @@ use TTTemplate;
 use Countries;
 use Switch;
 use FacilityTypes;
-use Data::Dumper;
+use Logo;
 
 
 sub entitySummaryPanel {
@@ -49,6 +49,7 @@ sub entitySummaryPanel {
         else {
         }
     }
+    $templateData{'Logo'} = getLogo($Data, $entityObj->getValue('intEntityLevel'), $entityID) || '';
 
     my $content = runTemplate(
         $Data,

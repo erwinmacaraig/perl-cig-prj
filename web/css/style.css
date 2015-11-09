@@ -4621,3 +4621,14 @@ body.membership-login .login-error-page p {
     padding:10px 10px 20px 10px;
 
 }
+.cropper-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.person-crop .cropper-overlay {
+    background: url("../images/photo_overlay.png") no-repeat scroll right 0 transparent;
+    background-size:100% 100%;
+}

@@ -908,7 +908,8 @@ sub displayRegoFlowDocuments{
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
             COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
-            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
+            COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description,
+            tblDocumentType.intImageCrop AS ImageCrop
 
         FROM tblDocuments
         INNER JOIN tblDocumentType ON (tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID)
@@ -991,6 +992,7 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
             tblUploadedFiles.strOrigFilename,
             tblUploadedFiles.intFileID,
             tblUploadedFiles.intAddedByTypeID as AddedByTypeID,
+            tblDocumentType.intImageCrop AS ImageCrop,
             COALESCE (LT_D.strString1,tblDocumentType.strDocumentName) as Name,
             COALESCE(LT_D.strNote,tblDocumentType.strDescription) AS Description
         FROM 

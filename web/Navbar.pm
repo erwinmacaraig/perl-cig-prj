@@ -22,6 +22,7 @@ use TTTemplate;
 use Log;
 use Data::Dumper;
 use PersonRegisterWhat;
+use PersonCardBulk;
 
 sub navBar {
     my(
@@ -336,13 +337,6 @@ sub getEntityMenuData {
                 };
             }
         }
-        if ($SystemConfig->{'AllowCardPrinting'}) {
-            $menuoptions{'cardprinting'} = {
-                name => $lang->txt('Card Printing'),
-                url => $baseurl."a=MEMCARD_BL",
-            };
-        }
-
         if ($SystemConfig->{'AllowPendingRegistration'}) {
             $menuoptions{'pendingregistration'} = {
                 name => $lang->txt('Pending Registrations'),
@@ -446,6 +440,12 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
 			url => $baseurl."a=TXN_FIND",
 		}; 
     }
+    if ($SystemConfig->{'AllowCardPrinting'}) {
+		$menuoptions{'persons_cards'} = { 
+			name => $lang->txt('Print Cards'),
+			url => $baseurl."a=PCARD_",
+		}; 
+    }
 	if ($SystemConfig->{'allowPayInvoice'}) {
 		$menuoptions{'bulkpayment'} = { 
 			name => $lang->txt('Pay Invoice'),
@@ -487,6 +487,7 @@ if(1==2 and $SystemConfig->{'AllowClearances'} and !$SystemConfig->{'TurnOffRequ
             'persons_addofficial',
             'persons_addmaofficial',
             'persons_addraofficial',
+            'persons_cards',
             'bulk',
             'persons',
         ]],
@@ -1225,6 +1226,12 @@ sub getPersonMenuData {
             };
         }
     }
+    if ($SystemConfig->{'AllowCardPrinting'}) {
+		$menuoptions{'cards'} = { 
+			name => $lang->txt('Cards Printed'),
+			url => $baseurl."a=PCARD_HISTORY",
+		}; 
+    }
 
     $Data->{'SystemConfig'}{'TYPE_NAME_3'} = '' if not exists $Data->{'SystemConfig'}{'TYPE_NAME_3'};
     my @menu_structure = (
@@ -1232,6 +1239,7 @@ sub getPersonMenuData {
         [ $lang->txt('Player Passport'), 'menu','passport'],
         [ $lang->txt('Transactions'), 'menu',['transactions','addtransactions']],
         [ $lang->txt('Certificates'), 'menu','certificates'],
+        [ $lang->txt('Cards'), 'menu','cards'],
         [ $lang->txt('History'), 'menu',[
             'regos',
             'clr',

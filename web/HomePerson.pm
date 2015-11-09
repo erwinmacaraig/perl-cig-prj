@@ -10,7 +10,6 @@ use Reg_common;
 use Utils;
 use InstanceOf;
 
-use Photo;
 use TTTemplate;
 use Notifications;
 use FormHelpers;
@@ -47,7 +46,6 @@ sub showPersonHome	{
     	}
 
 	my ($fields_grouped, $groupdata) = getMemFields($Data, $personID, $FieldDefinitions, $memperms, $personObj, \%configchanges);
-	my ($photo,undef)=handle_photo('P_PH_s',$Data,$personID);
 	#my $name = $personObj->name();
 	my $name = formatPersonName($Data,$personObj->getValue('strLocalFirstname'),$personObj->getValue('strLocalSurname'),'');
 	my $markduplicateURL = '';
@@ -92,7 +90,6 @@ sub showPersonHome	{
 		ReadOnlyLogin => $readonly,
 		EditDetailsLink => showLink($personID,$client,$Data),
 		Notifications => $notifications,
-		Photo => $photo,
 		MarkDuplicateURL => $markduplicateURL || '',
 		AddDocumentURL => $adddocumentURL || '',
 		AddRegistrationURL => $addregistrationURL || '',
