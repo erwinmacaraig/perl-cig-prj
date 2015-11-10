@@ -20,6 +20,9 @@
         margin-left:6px;
         border: solid #000 1px;
     }
+    .card-photo img{
+        width: 100%;
+    }
     .card-info {
         float:left;
         width:210px;
@@ -73,7 +76,7 @@
             [% maName %]
         </div><!-- end cardheader -->
         <div class = "card-body">
-            <div class = "card-photo"></div>
+            <div class = "card-photo">[% IF p.photo %]<img src = "[% p.photo %]">[% END %]</div>
             <div class = "card-info">
                 <div class = "name">[% p.strLocalFirstname %] [% p.strLocalSurname %] </div>
                 <div class = "card-info-row">
@@ -90,7 +93,7 @@
                 </div>
                 [% FOREACH r = p.registrations %]
                     <div class = "card-regotype">[% Lang.txt(r.PersonType) %]
-                        <div class = "card-regolevel">[% Lang.txt(r.Level) %]</div>
+                        <div class = "card-regolevel">[% Lang.txt(r.Level) %] - [% Lang.txt(r.Sport) %]</div>
                     </div>
                     <div>[% r.EntityLocalName %]</div>
                 [% END %]

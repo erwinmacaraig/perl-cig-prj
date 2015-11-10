@@ -110,7 +110,8 @@ sub generateCardData {
         E.strLocalShortName AS EntityLocalShortName,
         E.strLatinName AS EntityLatinName,
         E.strLatinShortName AS EntityLatinShortName,
-        E.strMAID AS EntityMAID
+        E.strMAID AS EntityMAID,
+        IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo) as dtTo
       FROM
         tblPersonCardPrint AS PCP  
         INNER JOIN tblPersonRegistration_$realmID AS PR ON (
@@ -120,6 +121,8 @@ sub generateCardData {
         )
         INNER JOIN tblEntity AS E
             ON PR.intEntityID = E.intEntityID
+        LEFT JOIN tblNationalPeriod AS NP
+            ON PR.intNationalPeriodID = NP.intNationalPeriodID
       WHERE
         PCP.intBatchID = ?
     ];
@@ -143,12 +146,18 @@ sub generateCardData {
 
     $st = qq[
       SELECT DISTINCT
-        P.*
+        P.*,
+        L.strFilename
 
       FROM
         tblPersonCardPrint AS PCP  
         INNER JOIN tblPerson AS P ON 
             PCP.intPersonID = P.intPersonID
+        LEFT JOIN tblLogo AS L
+            ON (
+                L.intEntityID = P.intPersonID
+                AND L.intEntityTypeID = $Defs::LEVEL_PERSON
+            )
       WHERE
         PCP.intBatchID = ?
       ORDER BY
@@ -164,6 +173,14 @@ sub generateCardData {
         $dref->{'nationality'} = $isocountries->{$dref->{'strISONationality'}};
         $dref->{'gender'} = $Defs::genderInfo->{$dref->{'intGender'}};
         $dref->{'registrations'} = $regodata{$pID} || [];
+        if($dref->{'strFilename'})  {
+            my %tmp_clientValues = %{$Data->{'clientValues'}};
+            $tmp_clientValues{'currentLevel'} = $Defs::LEVEL_PERSON;
+            setClientValue(\%tmp_clientValues,$Defs::LEVEL_PERSON, $pID);
+            my $newclient = setClient(\%tmp_clientValues);
+            $dref->{'photo'} = "$Defs::base_url/photologo.cgi?client=$newclient";
+        }
+
         push @carddata, $dref;
     }
     $q->finish();
