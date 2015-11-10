@@ -1973,7 +1973,7 @@ form#flowFormID #fsg-core label {
 }
 form#flowFormID #fsg-main label.txtright {
 	margin-top: 6px;
-	text-align: left;
+	text-align: right;
 }
 form#flowFormID #fsgw-other label {
 	margin-top: 6px;
@@ -2154,7 +2154,7 @@ div[id*="doctab"] .documents-list table.table .task-list .status-col i.fa-circle
 	float: left;
 }
 div[id*="doctab"] .documents-list table.table .task-list .status-col a.btn-inside-docs-panel {
-	width: 95px;
+	width: auto;
 }
 
 .transferCompleteDisplay {
@@ -2460,6 +2460,15 @@ header .navbar-brand {
 @media (max-width: 992px){
 	.result-message { padding: 0; }
 	.member-home-page .col-md-3 {clear: both}
+	div[id*="doctab"] .documents-list table.table .task-list .status-col span {
+		float: left;
+		padding-left: 3px;
+		width: 100%;
+		margin-bottom: 5px;
+	}
+	div[id*="doctab"] .documents-list table.table .task-list .status-col span a{
+		width: 100px !important;
+	}
 }
 
 @media (min-width: 800px){
@@ -2998,4 +3007,9 @@ header .navbar-brand {
     max-height:100px;
     overflow:auto;
     border:1px solid #ddd;
+}
+.summaryPanel .person-photo img{
+    border:1px solid #acacac;
+    max-width:155px;
+    max-height:200px;
 }

@@ -102,6 +102,7 @@ sub getRegistrationItems    {
             COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
             D.strDocumentFor,
 			COALESCE(LT_D.strNote,D.strDescription) AS strDescription,
+			D.intImageCrop,
             COALESCE (LT_P.strString1,P.strName) as strProductName,
             COALESCE(LT_P.strString2,P.strDisplayName) as strProductDisplayName,
             TP.intTransactionID,
@@ -227,6 +228,7 @@ strItemType
         $Item{'Required'} = $dref->{'intRequired'} || 0;
         $Item{'DocumentFor'} = $dref->{'strDocumentFor'} || 0;	
 		$Item{'Description'} = $dref->{'strDescription'} || '';
+		$Item{'ImageCrop'} = $dref->{'intImageCrop'} || 0;
         if ($itemType eq 'DOCUMENT') {
             $Item{'Name'} = $dref->{'strDocumentName'};
         }

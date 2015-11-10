@@ -12,6 +12,7 @@ use PersonObj;
 use TTTemplate;
 use Countries;
 use PersonRegistration;
+use Logo;
 use Data::Dumper;
 
 
@@ -57,12 +58,14 @@ sub personSummaryPanel {
     }
 
     my $isocountries  = getISOCountriesHash();
+    my $photo = getLogo($Data, $Defs::LEVEL_PERSON, $personID);
     my %templateData = (
         #'NationalNum' => $personObj->getValue('strNationalNum') || '',
         #'NationalNum' => $personObj->getValue('strStatus') eq $Defs::PERSON_STATUS_REGISTERED ? $personObj->getValue('strNationalNum') || '' : $personObj->getValue('strNationalNum') ? $Defs::personStatus{$Defs::PERSON_STATUS_PENDING} : '',
         'NationalNum' => $personObj->getValue('strNationalNum') || '',
         'FamilyName' => $personObj->getValue('strLocalSurname') || '',
         'FirstName' => $personObj->getValue('strLocalFirstname') || '',
+        'Photo' => $photo || '',
         'dob' => $personObj->getValue('dtDOB'),
         'gender' => $Data->{'lang'}->txt($Defs::PersonGenderInfo{$personObj->getValue('intGender')}),
         'nationality' => $isocountries->{$personObj->getValue('strISONationality')},

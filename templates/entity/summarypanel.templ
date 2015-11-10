@@ -2,6 +2,9 @@
 <div class = "summaryPanel">
 <h3 class="panel-header">[% IF NationalNum %][% Lang.txt('MA venue ID') %]: [% NationalNum %][% ELSE %]&nbsp;[% END %]</h3>
     <div class="panel-body">
+        [% IF Logo %]
+            <div class = "entity-logo"><img src = "[% Logo %]"></div>
+        [% END %]
         <p class="reg-text">[% LocalName %]</p>
         <p class="reg-text">[% Country %]</p>
         [% IF FacilityType %]
