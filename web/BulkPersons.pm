@@ -113,6 +113,7 @@ sub bulkPersonRollover {
                 existprq.intPersonID= PR.intPersonID
                 AND existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
                 AND existprq.strRequestType = 'LOAN'
+                AND existprq.strRequestStatus IN ('PENDING', 'COMPLETED')
             )
         WHERE 
             P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")
