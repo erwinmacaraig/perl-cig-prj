@@ -73,9 +73,9 @@ sub listPersonAuditLog    {
         FROM
             tblAuditLog as AL
         WHERE
-            AL.intID=?
+            AL.intEntityID=?
             AND AL.strSection IN ("Person Registration")
-            AND AL.strType LIKE 'Update Person Registration%'
+            AND AL.strType  = 'Update Person Registration'
     )
 UNION ALL
      (
@@ -90,7 +90,7 @@ UNION ALL
             PR.intPersonID=?
             AND AL.strSection NOT IN ('Person Entity')
             AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
-            AND AL.strType NOT LIKE 'Update Person Registration%'
+            AND AL.strType != 'Update Person Registration'
     )
 UNION ALL
     (
