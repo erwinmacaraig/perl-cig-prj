@@ -147,12 +147,58 @@ sub migrateRecords{
     my $qry= $db->prepare($st);
     $qry->execute($holdingClubID);
 
+    my $stINSPQ = qq[
+        INSERT INTO tblPersonRequest
+        (
+            intRealmID,
+            strRequestType,
+            intPersonID,
+            intExistingPersonRegistrationID,
+            strSport,
+            strPersonType,
+            strPersonLevel,
+            strNewPersonLevel,
+            intRequestFromEntityID,
+            intRequestToEntityID,
+            strRequestStatus    
+        )
+        VALUES (
+            1,
+            'INT_TRANSFER_OUT',
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $qryINSPQ= $db->prepare($stINSPQ);
     while (my $dref = $qry->fetchrow_hashref()) {
-        if ($dref->{'intPersonRequestID'})  {
-            $qryReq_OUT->execute(
+        if (! $dref->{'intPersonRequestID'})    {
+            $qryINSPQ->execute(
                 $dref->{'intPersonID'},
-                $dref->{'intPersonRequestID'}
+                $dref->{'intPersonRegistrationID'}, 
+                $dref->{'strSport'},
+                $dref->{'strPersonType'},
+                $dref->{'strPersonLevel'},
+                $dref->{'strPersonLevel'},
+                $holdingClubID,
+                $holdingClubID,
+                'COMPLETED'
             );
+            $dref->{'intPersonRequestID'} = $qryINSPQ->{mysql_insertid} || 0;
+        }
+        else    {
+            if ($dref->{'intPersonRequestID'})  {
+                $qryReq_OUT->execute(
+                    $dref->{'intPersonID'},
+                    $dref->{'intPersonRequestID'}
+                );
+            }
         }
         $qryUPD_OUT->execute(
             $dref->{'intPersonID'},
