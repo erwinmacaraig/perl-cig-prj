@@ -67,7 +67,7 @@ sub migrateRecords{
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
             AND PR.intOnLoan=0
             AND PR.intIsLoanedOut = 0
-        LIMIT 5
+            AND PR.intPersonRegistrationID IN (1568, 1572)
     ];
             #AND PersonReq.intPersonRequestID IS NULL
 print " I HAVE REMOVED TEMP IS NULL CHECK\n";
@@ -154,6 +154,7 @@ print " I HAVE REMOVED TEMP IS NULL CHECK\n";
         (
             intRealmID,
             strRequestType,
+            strPersonEntityRole,
             intPersonID,
             intExistingPersonRegistrationID,
             strSport,
@@ -167,6 +168,7 @@ print " I HAVE REMOVED TEMP IS NULL CHECK\n";
         VALUES (
             1,
             'INT_TRANSFER_OUT',
+            '',
             ?,
             ?,
             ?,
