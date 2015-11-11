@@ -67,8 +67,10 @@ sub migrateRecords{
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
             AND PR.intOnLoan=0
             AND PR.intIsLoanedOut = 0
-            AND PR.intPersonRegistrationID = 1963088
+        LIMIT 5
     ];
+            #AND PersonReq.intPersonRequestID IS NULL
+print " I HAVE REMOVED TEMP IS NULL CHECK\n";
 
     # For each of the above people we may need to move the CLUB they are in
         # Per SPORT
@@ -181,7 +183,7 @@ sub migrateRecords{
         if (! $dref->{'intPersonRequestID'})    {
             $qryINSPQ->execute(
                 $dref->{'intPersonID'},
-                $dref->{'intPersonRegistrationID'}, 
+                0, #$dref->{'intPersonRegistrationID'}, 
                 $dref->{'strSport'},
                 $dref->{'strPersonType'},
                 $dref->{'strPersonLevel'},
@@ -191,6 +193,11 @@ sub migrateRecords{
                 'COMPLETED'
             );
             $dref->{'intPersonRequestID'} = $qryINSPQ->{mysql_insertid} || 0;
+            my $stUPPR = qq[
+                UPDATE tblPersonRegistration_1 SET intPersonRequestID = ? WHERE intPersonRegistrationID = ? LIMIT 1
+            ];
+            my $qryUPPR= $db->prepare($stUPPR);
+            $qryUPPR->execute($dref->{'intPersonRequestID'}, $dref->{'intPersonRegistrationID'});
         }
         else    {
             if ($dref->{'intPersonRequestID'})  {
