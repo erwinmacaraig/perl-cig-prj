@@ -67,8 +67,10 @@ sub migrateRecords{
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
             AND PR.intOnLoan=0
             AND PR.intIsLoanedOut = 0
-            AND PR.intPersonRegistrationID = 1963088
+            AND PR.intPersonRegistrationID IN (1568, 1572)
     ];
+            #AND PersonReq.intPersonRequestID IS NULL
+print " I HAVE REMOVED TEMP IS NULL CHECK\n";
 
     # For each of the above people we may need to move the CLUB they are in
         # Per SPORT
@@ -147,12 +149,65 @@ sub migrateRecords{
     my $qry= $db->prepare($st);
     $qry->execute($holdingClubID);
 
+    my $stINSPQ = qq[
+        INSERT INTO tblPersonRequest
+        (
+            intRealmID,
+            strRequestType,
+            strPersonEntityRole,
+            intPersonID,
+            intExistingPersonRegistrationID,
+            strSport,
+            strPersonType,
+            strPersonLevel,
+            strNewPersonLevel,
+            intRequestFromEntityID,
+            intRequestToEntityID,
+            strRequestStatus    
+        )
+        VALUES (
+            1,
+            'INT_TRANSFER_OUT',
+            '',
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?,
+            ?
+        )
+    ];
+    my $qryINSPQ= $db->prepare($stINSPQ);
     while (my $dref = $qry->fetchrow_hashref()) {
-        if ($dref->{'intPersonRequestID'})  {
-            $qryReq_OUT->execute(
+        if (! $dref->{'intPersonRequestID'})    {
+            $qryINSPQ->execute(
                 $dref->{'intPersonID'},
-                $dref->{'intPersonRequestID'}
+                0, #$dref->{'intPersonRegistrationID'}, 
+                $dref->{'strSport'},
+                $dref->{'strPersonType'},
+                $dref->{'strPersonLevel'},
+                $dref->{'strPersonLevel'},
+                $holdingClubID,
+                $holdingClubID,
+                'COMPLETED'
             );
+            $dref->{'intPersonRequestID'} = $qryINSPQ->{mysql_insertid} || 0;
+            my $stUPPR = qq[
+                UPDATE tblPersonRegistration_1 SET intPersonRequestID = ? WHERE intPersonRegistrationID = ? LIMIT 1
+            ];
+            my $qryUPPR= $db->prepare($stUPPR);
+            $qryUPPR->execute($dref->{'intPersonRequestID'}, $dref->{'intPersonRegistrationID'});
+        }
+        else    {
+            if ($dref->{'intPersonRequestID'})  {
+                $qryReq_OUT->execute(
+                    $dref->{'intPersonID'},
+                    $dref->{'intPersonRequestID'}
+                );
+            }
         }
         $qryUPD_OUT->execute(
             $dref->{'intPersonID'},
