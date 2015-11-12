@@ -6,7 +6,7 @@ msgstr ""
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
-"Language: fr_FR\n"
+"Language: EN\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -24,7 +24,7 @@ msgstr ""
 #: Club Field Labels
 #, fuzzy
 msgid "Accept Self Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: Defs::personRequestResponse
 #: Defs::personRequestStatus
@@ -36,19 +36,21 @@ msgstr ""
 #: Defs::personRequestStatus
 #: Defs::person_certification_status
 msgid "Active"
-msgstr "Actif"
+msgstr "Active"
 
 #: Defs::personRegoStatus
 msgid "Active (Pending Payment)"
 msgstr ""
 
 #: Person FieldLabels Club Field Labels
+#, fuzzy
 msgid "Address 1"
-msgstr "Adresse 1"
+msgstr "Address Line 1"
 
 #: Person FieldLabels Club Field Labels
+#, fuzzy
 msgid "Address 2"
-msgstr "Adresse 2"
+msgstr "Address Line 2"
 
 #: Defs::ageLevel
 msgid "Adult"
@@ -57,11 +59,11 @@ msgstr ""
 #: Defs::entitySportType
 #: Defs::documentFor
 msgid "All"
-msgstr "Tous"
+msgstr ""
 
 #: Defs::personLevel
 msgid "Amateur"
-msgstr ""
+msgstr "Amateur"
 
 #: Defs::personLevel
 msgid "Amateur (Under Contract)"
@@ -69,29 +71,29 @@ msgstr ""
 
 #: Defs::registrationNature
 msgid "Amendment"
-msgstr ""
+msgstr "Amendment"
 
 #: Defs::wfTaskType
-#, fuzzy
 msgid "Approve"
-msgstr "Temps Approximatif"
+msgstr ""
 
 #: Defs::fieldGroundNatureType
 msgid "Artificial Turf (Other)"
 msgstr ""
 
 #: Defs::LevelNames
+#, fuzzy
 msgid "Association"
-msgstr "Association"
+msgstr "Action"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Association Nature"
-msgstr "Nom de l'Association"
+msgstr "Action"
 
 #: Club Field Labels
 msgid "Bank Account Details"
-msgstr "Détails du compte en banque"
+msgstr "Bank Account Details"
 
 #: Defs::paymentTypes
 #: Defs::manualPaymentTypes
@@ -99,13 +101,14 @@ msgid "Bank Cheque"
 msgstr ""
 
 #: Defs::paymentTypes
+#, fuzzy
 msgid "Bank Transfer"
-msgstr ""
+msgstr "Transfer"
 
 #: Defs::sportType
 #: Defs::entitySportType
 msgid "Beach Soccer"
-msgstr ""
+msgstr "Beach Soccer"
 
 #: Person FieldLabels
 #, fuzzy
@@ -130,7 +133,7 @@ msgstr "Birth Certificate Number"
 #: Person FieldLabels
 #, fuzzy
 msgid "Birth Country"
-msgstr "Pays"
+msgstr "Country"
 
 #: Defs::ProdTransactionStatus
 #: Defs::TransactionStatus
@@ -150,8 +153,9 @@ msgid "Certification"
 msgstr "Identifications"
 
 #: Defs::wfTaskType
+#, fuzzy
 msgid "Check Document"
-msgstr ""
+msgstr "Details"
 
 #: Person FieldLabels Club Field Labels
 msgid "City"
@@ -160,7 +164,7 @@ msgstr ""
 #: Person FieldLabels
 #, fuzzy
 msgid "City of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: Defs::entityType
 #: Defs::entityInfo
@@ -173,35 +177,34 @@ msgstr "Club"
 #: Defs::VenueTypes
 #, fuzzy
 msgid "Club House"
-msgstr "Clubs"
+msgstr "Details"
 
 #: Defs::personType
 #, fuzzy
 msgid "Club Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: Defs::personType
 #: Defs::memberTypeName
 msgid "Coach"
-msgstr ""
+msgstr "Coach"
 
 #: Defs::entityType
 msgid "College"
 msgstr ""
 
 #: Defs::LevelNames
-#, fuzzy
 msgid "Comp"
-msgstr "Compétition"
+msgstr ""
 
 #: Defs::entityInfo
+#, fuzzy
 msgid "Competition"
-msgstr "Compétition"
+msgstr "Identifications"
 
 #: Defs::personRequestStatus
-#, fuzzy
 msgid "Completed"
-msgstr "Compétition"
+msgstr ""
 
 #: Defs::entityType
 #, fuzzy
@@ -210,72 +213,74 @@ msgstr "Configuration"
 
 #: Person FieldLabels Club Field Labels
 msgid "Contact Email"
-msgstr "Contact e-mail"
+msgstr "Contact Email"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Contact Number"
-msgstr "Nom du Contact"
+msgstr "Emergency Contact Number"
 
 #: Club Field Labels
 msgid "Contact Person"
-msgstr "Nom du Contact"
+msgstr "Contact Person"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Contact Phone"
-msgstr "Contact Phone 2"
+msgstr "Contact Phone 3"
 
 #: Person FieldLabels Club Field Labels
 msgid "Country"
-msgstr "Pays"
+msgstr "Country"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Country of Address"
-msgstr "Passport Country of Issue"
+msgstr "Date of Birth"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Country of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Country of Birth (Father)"
-msgstr ""
+msgstr "Date of Birth"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Country of Birth (Mother)"
-msgstr ""
+msgstr "Date of Birth"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Date Suspended Until"
 msgstr "Date Suspended Until"
 
 #: Person FieldLabels
 msgid "Date of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Date of Death"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: Defs::entityStatus
 #, fuzzy
 msgid "De-registered"
-msgstr "Deregistered"
+msgstr "Date First Registered"
 
 #: Person FieldLabels Defs::personStatus
-#, fuzzy
 msgid "Deceased"
-msgstr "Décédé?"
+msgstr ""
 
 #: Defs::personStatus
 #: Defs::personRegoStatus
 #, fuzzy
 msgid "Deleted"
-msgstr "Effacer"
+msgstr "Delete"
 
 #: Defs::personRequestResponse
 #: Defs::personRequestStatus
@@ -285,11 +290,12 @@ msgstr ""
 #: Club Field Labels
 #, fuzzy
 msgid "Description"
-msgstr "Association"
+msgstr "Position"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Description/Reference"
-msgstr ""
+msgstr "Position"
 
 #: Club Field Labels
 msgid "Dissolved"
@@ -306,7 +312,7 @@ msgstr ""
 #: Defs::wfTaskType
 #, fuzzy
 msgid "Duplicate Resolution Issue"
-msgstr "Résolution des Doublons"
+msgstr "Duplicate Resolution"
 
 #: Defs::paymentTypes
 #: Defs::manualPaymentTypes
@@ -330,7 +336,7 @@ msgstr ""
 
 #: Person FieldLabels
 msgid "Email 2"
-msgstr "E-mail 2"
+msgstr "Email 2"
 
 #: Club Field Labels
 #, fuzzy
@@ -339,24 +345,23 @@ msgstr "Identifications"
 
 #: Person FieldLabels
 msgid "Emergency Contact Name"
-msgstr ""
+msgstr "Emergency Contact Name"
 
 #: Person FieldLabels
 msgid "Emergency Contact Number"
-msgstr ""
+msgstr "Emergency Contact Number"
 
 #: Person FieldLabels
 msgid "Emergency Contact Number 2"
-msgstr ""
+msgstr "Emergency Contact Number 2"
 
 #: Person FieldLabels
 msgid "Emergency Contact Relationship"
-msgstr ""
+msgstr "Emergency Contact Relationship"
 
 #: Defs::LevelNames
-#, fuzzy
 msgid "Event"
-msgstr "Modifier un événement"
+msgstr ""
 
 #: Defs::NationalityType
 msgid "Ex Patriot"
@@ -380,17 +385,17 @@ msgstr ""
 
 #: Person FieldLabels
 msgid "Family Name"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: Defs::memberNameFormat
 #, fuzzy
 msgid "Family Name Only"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: Defs::memberNameFormat
 #, fuzzy
 msgid "Family Name and Initial"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: Person FieldLabels Club Field Labels
 msgid "Fax"
@@ -399,16 +404,16 @@ msgstr "Fax"
 #: Defs::genderInfo
 #: Defs::PersonGenderInfo
 msgid "Female"
-msgstr "Femme"
+msgstr "Female"
 
 #: Person FieldLabels
 msgid "First Name"
-msgstr "Prénom"
+msgstr "First Name"
 
 #: Defs::sportType
 #: Defs::entitySportType
 msgid "Football"
-msgstr ""
+msgstr "Soccer"
 
 #: Defs::DataAccessNames
 msgid "Full Access"
@@ -417,16 +422,16 @@ msgstr ""
 #: Defs::memberNameFormat
 #, fuzzy
 msgid "Full Name"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: Defs::sportType
 #: Defs::entitySportType
 msgid "Futsal"
-msgstr ""
+msgstr "Futsal"
 
 #: Person FieldLabels Club Field Labels
 msgid "Gender"
-msgstr "Sexe"
+msgstr "Gender"
 
 #: Defs::entityType
 msgid "Grassroot Program"
@@ -447,13 +452,14 @@ msgstr ""
 #: Defs::ProdTransactionStatus
 #: Defs::TransactionStatus
 #: Defs::TransLogStatus
+#, fuzzy
 msgid "Hold/Check"
-msgstr ""
+msgstr "Police Check"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Holding Club (International Transfer)"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: Club Field Labels
 #, fuzzy
@@ -475,7 +481,7 @@ msgstr ""
 #: Defs::entityStatus
 #: Defs::person_certification_status
 msgid "Inactive"
-msgstr "Inactif"
+msgstr "Inactive"
 
 #: Defs::NationalityType
 msgid "Indigene"
@@ -489,7 +495,7 @@ msgstr "International"
 #: Defs::LevelNames
 #, fuzzy
 msgid "Inter Zone"
-msgstr "International Zone"
+msgstr "International Zones"
 
 #: Defs::LevelNames
 #: Defs::personTransferType
@@ -500,7 +506,7 @@ msgstr "International"
 #: Defs::manualPaymentTypes
 #, fuzzy
 msgid "International Cheque"
-msgstr "International Zone"
+msgstr "International"
 
 #: Person FieldLabels
 #, fuzzy
@@ -521,25 +527,25 @@ msgstr "International Region"
 #: Defs::personRequest
 #, fuzzy
 msgid "International Transfer Out"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: Defs::registrationNature
 #: Defs::personRequest
 #, fuzzy
 msgid "International Transfer Return"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Language of Name"
-msgstr "Nom du site"
+msgstr ""
 
 #: Club Field Labels
 #, fuzzy
 msgid "Language of Organisation Name"
-msgstr "Toute Organisation"
+msgstr "Registration Number"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Last Updated"
 msgstr "Last Updated"
 
@@ -554,38 +560,40 @@ msgstr "Identification Number"
 
 #: Club Field Labels
 msgid "Level"
-msgstr "Niveau"
+msgstr "Level"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Local Middle name"
-msgstr "Deuxième prénom"
+msgstr "Middle name"
 
 #: Defs::wfTaskStatus
 msgid "Locked"
 msgstr ""
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Loyalty Number"
-msgstr "Loyalty Number"
+msgstr "National Number"
 
 #: Defs::entityType
 msgid "MA Academy"
 msgstr ""
 
 #: Club Field Labels
+#, fuzzy
 msgid "MA Comment"
-msgstr ""
+msgstr "Add Document"
 
 #: Defs::personType
 #, fuzzy
 msgid "MA Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: Club Field Labels
 #, fuzzy
 msgid "MA Organisation ID"
-msgstr "Toute Organisation"
+msgstr "Options"
 
 #: Defs::genderEntityInfo
 msgid "MALE"
@@ -593,21 +601,21 @@ msgstr ""
 
 #: Person FieldLabels
 msgid "Maiden name"
-msgstr "Nom de jeune fille"
+msgstr "Maiden name"
 
 #: Defs::genderInfo
 #: Defs::PersonGenderInfo
 msgid "Male"
-msgstr "Homme"
+msgstr "Male"
 
 #: Defs::memberTypeName
 #, fuzzy
 msgid "Match Official"
-msgstr "Officiel de Match?"
+msgstr "Match Official?"
 
 #: Defs::LevelNames
 msgid "Member"
-msgstr "Membre"
+msgstr "Member"
 
 #: Defs::genderEventInfo
 #, fuzzy
@@ -619,20 +627,19 @@ msgid "Minor"
 msgstr ""
 
 #: Defs::memberTypeName
-#, fuzzy
 msgid "Misc"
-msgstr "Misc?"
+msgstr ""
 
 #: Defs::genderInfo
 #: Defs::genderEventInfo
 msgid "Mixed"
-msgstr "Mixte"
+msgstr ""
 
 #: Defs::paymentTypes
 #: Defs::manualPaymentTypes
 #, fuzzy
 msgid "Money Order"
-msgstr "Ordre de tri"
+msgstr "Sort Order"
 
 #: Club Field Labels
 #, fuzzy
@@ -644,12 +651,12 @@ msgstr "International"
 #: Defs::LevelNames
 #, fuzzy
 msgid "National"
-msgstr "National Team"
+msgstr "National Body"
 
 #: Defs::entityType
 #, fuzzy
 msgid "National Association"
-msgstr "Actif dans l'association"
+msgstr "Action"
 
 #: Person FieldLabels
 msgid "National Number"
@@ -658,19 +665,21 @@ msgstr "National Number"
 #: Person FieldLabels
 #, fuzzy
 msgid "Nationality"
-msgstr "Organisme national"
+msgstr "National Body"
 
 #: Defs::fieldGroundNatureType
 msgid "Natural Grass"
 msgstr ""
 
 #: Defs::registrationNature
+#, fuzzy
 msgid "New Registration"
-msgstr ""
+msgstr "New Registration"
 
 #: Defs::tfInfo
+#, fuzzy
 msgid "No"
-msgstr "Non"
+msgstr "Nov"
 
 #: Defs::DataAccessNames
 msgid "No Access"
@@ -679,7 +688,7 @@ msgstr ""
 #: Defs::ClubType
 #, fuzzy
 msgid "Non-Association"
-msgstr "Association"
+msgstr "Action"
 
 #: Defs::ClubType
 msgid "Non-Playing"
@@ -688,12 +697,13 @@ msgstr ""
 #: Defs::DisplayEntityLevelNames
 #: Defs::LevelNames
 msgid "None"
-msgstr "Aucun"
+msgstr "None"
 
 #: Defs::genderInfo
 #: Defs::PersonGenderInfo
+#, fuzzy
 msgid "None Specified"
-msgstr "Non indiqué"
+msgstr "Non Specified"
 
 #: Defs::ClubType
 msgid "Normal"
@@ -706,7 +716,7 @@ msgstr "Notes"
 #: Defs::memberTypeName
 #, fuzzy
 msgid "Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: Defs::entityStatus
 msgid "On Hold"
@@ -737,44 +747,42 @@ msgid "Organisation Dissolution Date"
 msgstr ""
 
 #: Club Field Labels
-#, fuzzy
 msgid "Organisation Foundation Date"
-msgstr "Organisation"
+msgstr ""
 
 #: Club Field Labels
 #, fuzzy
 msgid "Organisation Name"
-msgstr "Organisation"
+msgstr "Registration Number"
 
 #: Club Field Labels
-#, fuzzy
 msgid "Organisation Short Name"
-msgstr "Organisation"
+msgstr ""
 
 #: Club Field Labels
 #, fuzzy
 msgid "Organisation Type"
-msgstr "Organisation"
+msgstr "Identification Type"
 
 #: Defs::entityType
 #, fuzzy
 msgid "Other"
-msgstr "Autre code"
+msgstr "Other Code"
 
 #: Defs::paymentTypes
 #: Defs::manualPaymentTypes
+#, fuzzy
 msgid "Other / Barter"
-msgstr ""
+msgstr "Identification Number"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Other Identifier"
-msgstr "Autres détails"
+msgstr "Identification Number"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Other Identifier Description"
-msgstr "Identifications"
+msgstr ""
 
 #: Person FieldLabels
 msgid "Other Identifier Issuance Country"
@@ -794,8 +802,9 @@ msgid "Other Identifier Validity Date To"
 msgstr ""
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Pager"
-msgstr "Téléavertisseur"
+msgstr "Manager"
 
 #: Defs::ProdTransactionStatus
 #: Defs::TransactionStatus
@@ -884,15 +893,17 @@ msgstr "Passport Country of Issue"
 
 #: Person FieldLabels
 msgid "Passport Expiry Date"
-msgstr "Date d'expiration du passeport"
+msgstr "Passport Expiry Date"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Passport Nationality"
-msgstr "Nationalité Passeport"
+msgstr "National Body"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Passport Number"
-msgstr "Numéro de passeport"
+msgstr "Offline Number"
 
 #: Defs::entityStatus
 #: Defs::personStatus
@@ -900,42 +911,40 @@ msgstr "Numéro de passeport"
 #: Defs::TransLogStatus
 #: Defs::personRequestStatus
 #: Defs::person_certification_status
-#, fuzzy
 msgid "Pending"
-msgstr "Ascendant"
+msgstr ""
 
 #: Defs::documentFor
-#, fuzzy
 msgid "Person"
-msgstr "Nom du Contact"
+msgstr ""
 
 #: Defs::paymentTypes
 #: Defs::manualPaymentTypes
 #, fuzzy
 msgid "Personal Cheque"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: Person FieldLabels
 msgid "Phone (Mobile)"
-msgstr "Téléphone (Portable)"
+msgstr "Phone (Mobile)"
 
 #: Person FieldLabels
 msgid "Phone (Work)"
-msgstr "Téléphone (Travail)"
+msgstr "Phone (Work)"
 
 #: web/regoformphoto.cgi Line:76
 msgid "Photo"
-msgstr "Photo"
+msgstr ""
 
 #: Defs::personType
 #: Defs::memberTypeName
 msgid "Player"
-msgstr ""
+msgstr "Player"
 
 #: Defs::personRequest
 #, fuzzy
 msgid "Player Loan"
-msgstr "Joueur?"
+msgstr "Player"
 
 #: Person FieldLabels
 #, fuzzy
@@ -943,9 +952,8 @@ msgid "Player Loan End Date"
 msgstr "Payment Type"
 
 #: Person FieldLabels
-#, fuzzy
 msgid "Player Loan Source Club"
-msgstr "Joueur dans<br>le le Club?"
+msgstr ""
 
 #: Person FieldLabels
 #, fuzzy
@@ -955,7 +963,7 @@ msgstr "Payment Type"
 #: Person FieldLabels
 #, fuzzy
 msgid "Player Loan TMS Reference"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: Person FieldLabels
 msgid "Police Check Date"
@@ -972,21 +980,21 @@ msgstr "Police Check Number"
 #: Person FieldLabels Club Field Labels
 #, fuzzy
 msgid "Postcode"
-msgstr "Code postal"
+msgstr "Postal Code"
 
 #: Defs::personRequestStatus
 #, fuzzy
 msgid "Pre-approval"
-msgstr "Temps Approximatif"
+msgstr "Approvals"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Preferred Language"
-msgstr "Nom préféré"
+msgstr "Preferred name"
 
 #: Person FieldLabels
 msgid "Preferred name"
-msgstr "Nom préféré"
+msgstr "Preferred name"
 
 #: Defs::entityType
 msgid "Private Academy"
@@ -994,7 +1002,7 @@ msgstr ""
 
 #: Defs::personLevel
 msgid "Professional"
-msgstr ""
+msgstr "Professional"
 
 #: Defs::LevelNames
 msgid "Program"
@@ -1003,7 +1011,7 @@ msgstr ""
 #: Defs::personType
 #, fuzzy
 msgid "RA Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: Person FieldLabels
 msgid "Race"
@@ -1019,41 +1027,43 @@ msgid "Ready to Approve"
 msgstr ""
 
 #: Defs::personType
+#, fuzzy
 msgid "Referee"
-msgstr ""
+msgstr "Referee"
 
 #: Defs::DisplayEntityLevelNames
 #: Defs::LevelNames
 msgid "Region"
-msgstr "Région"
+msgstr "Region"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Region of Organisation"
-msgstr "Toute Organisation"
+msgstr "Registration Authorisation"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Region or State of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: Defs::entityType
 #, fuzzy
 msgid "Regional Association"
-msgstr "Actif dans l'association"
+msgstr "Registration Authorisation"
 
 #: Defs::personStatus
-#, fuzzy
 msgid "Registered"
-msgstr "Deregistered"
+msgstr ""
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Registering Parent Email"
-msgstr ""
+msgstr "Registration Number"
 
 #: Person FieldLabels
+#, fuzzy
 msgid "Registering Parent Phone"
-msgstr ""
+msgstr "Registration Number"
 
 #: Defs::wfTaskAction
 msgid "Reject"
@@ -1062,17 +1072,18 @@ msgstr ""
 #: Defs::entityStatus
 #: Defs::personRegoStatus
 #: Defs::personRequestStatus
-#, fuzzy
 msgid "Rejected"
-msgstr "Choisis par"
+msgstr ""
 
 #: Defs::registrationNature
+#, fuzzy
 msgid "Renewal"
-msgstr ""
+msgstr "Renewal"
 
 #: Defs::personRequest
+#, fuzzy
 msgid "Request Access (Add Role)"
-msgstr ""
+msgstr "Access"
 
 #: Defs::wfTaskAction
 msgid "Resolve"
@@ -1088,12 +1099,12 @@ msgstr ""
 
 #: Defs::entityType
 msgid "School"
-msgstr "School"
+msgstr ""
 
 #: Defs::personRequest
 #, fuzzy
 msgid "Self Initiated Transfer"
-msgstr "Start Date"
+msgstr "Transfer"
 
 #: Club Field Labels
 #, fuzzy
@@ -1107,12 +1118,11 @@ msgstr "Sport"
 #: Person FieldLabels Club Field Labels Defs::DisplayEntityLevelNames
 #: Defs::LevelNames
 msgid "State"
-msgstr "Etat"
+msgstr "State"
 
 #: Defs::DataAccessNames
-#, fuzzy
 msgid "Statistical Access"
-msgstr "Statistiques"
+msgstr ""
 
 #: Person FieldLabels Club Field Labels
 msgid "Status"
@@ -1120,14 +1130,13 @@ msgstr "Status"
 
 #: Defs::entityStatus
 #: Defs::personStatus
-#, fuzzy
 msgid "Suspended"
-msgstr "Date Suspended Until"
+msgstr ""
 
 #: Defs::wfTaskStatus
 #, fuzzy
 msgid "Task Complete"
-msgstr "Compétition"
+msgstr "Type"
 
 #: Defs::wfTaskStatus
 msgid "Task On Hold"
@@ -1136,22 +1145,22 @@ msgstr ""
 #: Defs::wfTaskStatus
 #, fuzzy
 msgid "Task Pending"
-msgstr "Ascendant"
+msgstr "Ascending"
 
 #: Defs::wfTaskStatus
 #, fuzzy
 msgid "Task Rejected"
-msgstr "Choisis par"
+msgstr "Transfer"
 
 #: Defs::entityInfo
 #: Defs::LevelNames
 msgid "Team"
-msgstr "Equipe"
+msgstr ""
 
 #: Defs::personType
 #, fuzzy
 msgid "Team Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: Person FieldLabels
 msgid "Title"
@@ -1168,27 +1177,28 @@ msgstr ""
 #: Defs::registrationNature
 #: Defs::personRequest
 msgid "Transfer"
-msgstr ""
+msgstr "Transfer"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Transfer Date"
-msgstr "Their Details"
+msgstr "Transfer"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Transfer Source Club"
-msgstr "Their Details"
+msgstr "Transfer"
 
 #: Person FieldLabels
 #, fuzzy
 msgid "Transfer TMS Reference"
-msgstr "Recherche de personne"
+msgstr "Transfer"
 
 #: Defs::personStatus
 #: Defs::personRegoStatus
+#, fuzzy
 msgid "Transferred"
-msgstr ""
+msgstr "Transfer"
 
 #: Defs::personRegoStatus
 #, fuzzy
@@ -1240,23 +1250,22 @@ msgstr ""
 #: Defs::entityInfo
 #: Defs::LevelNames
 #: Defs::documentFor
+#, fuzzy
 msgid "Venue"
-msgstr "Site"
+msgstr "Venue 1"
 
 #: Club Field Labels
 #, fuzzy
 msgid "Venue Type"
-msgstr "View Type"
+msgstr "Venue Type"
 
 #: Defs::memberTypeName
-#, fuzzy
 msgid "Volunteer"
-msgstr "Volunteer?"
+msgstr ""
 
 #: Club Field Labels
-#, fuzzy
 msgid "Web Address"
-msgstr "Adresse 1"
+msgstr ""
 
 #: Defs::genderEventInfo
 msgid "Women"
@@ -1264,8 +1273,9 @@ msgstr ""
 
 #: Defs::sportType
 #: Defs::entitySportType
+#, fuzzy
 msgid "Women's Football"
-msgstr ""
+msgstr "Soccer"
 
 #: Defs::entityType
 msgid "World Federation"
@@ -1273,7 +1283,7 @@ msgstr ""
 
 #: Defs::tfInfo
 msgid "Yes"
-msgstr "Oui"
+msgstr "Yes"
 
 #: Defs::DisplayEntityLevelNames
 #: Defs::LevelNames
@@ -1288,7 +1298,7 @@ msgstr ""
 #: web/paytry.cgi Line:269
 #, fuzzy
 msgid "Continue to Payment"
-msgstr "Voir les types"
+msgstr "Transfer"
 
 #: web/paytry.cgi Line:251
 msgid "If you are not automatically redirected to the payment page within 30 seconds then you can click the Continue to Payment button below"
@@ -1299,30 +1309,27 @@ msgid "No cards available to be printed"
 msgstr ""
 
 #: web/paytry.cgi Line:250
-#, fuzzy
 msgid "Please Wait - Processing"
-msgstr "S'il vous plaît être patient"
+msgstr ""
 
 #: web/emailform.cgi Line:14
 #: web/forgotten_password.cgi Line:21
 #: web/index.cgi
 #: Line:28
 msgid "APPNAME"
-msgstr "SportingPulse - Sportzware Membership"
+msgstr "FIFA Connect"
 
 #: web/user/signup.cgi Line:88
 msgid "Email address is not valid"
 msgstr ""
 
 #: web/user/signup.cgi Line:65
-#, fuzzy
 msgid "Password 1"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: web/user/signup.cgi Line:66
-#, fuzzy
 msgid "Password 2"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: web/user/signup.cgi Line:84
 msgid "Password and Password 2 do not match"
@@ -1330,7 +1337,7 @@ msgstr ""
 
 #: web/user/signup.cgi Line:64
 msgid "Username"
-msgstr "Nom d'utilisateur"
+msgstr ""
 
 #: web/user/signup.cgi Line:94
 msgid "Username already in use"
@@ -1342,7 +1349,7 @@ msgstr ""
 
 #: web/registration/user/signup.cgi Line:88
 msgid "Email"
-msgstr "E-mail"
+msgstr "Email"
 
 #: web/registration/user/signup.cgi Line:119
 msgid "Email already in use"
@@ -1353,14 +1360,12 @@ msgid "Error creating user account"
 msgstr ""
 
 #: web/registration/user/signup.cgi Line:87
-#, fuzzy
 msgid "Family name"
-msgstr "Nom de famille"
+msgstr "Family name"
 
 #: web/registration/user/signup.cgi Line:86
-#, fuzzy
 msgid "First name"
-msgstr "Prénom"
+msgstr "First name"
 
 #: web/registration/user/signup.cgi Line:70
 msgid "Signup"
@@ -1373,7 +1378,7 @@ msgstr ""
 #: web/registration/ajax/aj_search.cgi Line:346
 #, fuzzy
 msgid "Organisations"
-msgstr "Organisation"
+msgstr "Options"
 
 #: web/registrationUser/signup.cgi Line:94
 msgid "Email address already in use"
@@ -1381,44 +1386,42 @@ msgstr ""
 
 #: web/Venues.pm Line:794
 msgid "Add"
-msgstr "Ajouter"
+msgstr "Add"
 
 #: web/Venues.pm Line:1135
 #, fuzzy
 msgid "Add Fields"
-msgstr "Domaine"
+msgstr "Other Fields"
 
 #: web/IncompleteRegistrations.pm Line:193
 #: Line:296
 #, fuzzy
 msgid "Added"
-msgstr "Ajouté par"
+msgstr "Added By"
 
 #: web/IncompleteRegistrations.pm Line:188
-#, fuzzy
 msgid "Age Level"
-msgstr "Niveau"
+msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:965
 msgid "Apr"
-msgstr "Avril"
+msgstr "Apr"
 
 #: web/IncompleteRegistrations.pm Line:108
 #: Line:241
-#, fuzzy
 msgid "Are you sure you want to delete this registration?"
-msgstr "Etes-vous sûr de vouloir supprimer ce membre"
+msgstr ""
 
 #: web/FacilityEdit.pm Line:252
 #: Line:253
 #: Line:256
 #, fuzzy
 msgid "Audit Trail"
-msgstr "Modifier les détails"
+msgstr "Audit Log"
 
 #: web/Flow_DisplayFields.pm Line:969
 msgid "Aug"
-msgstr "Août"
+msgstr ""
 
 #: web/IncompleteRegistrations.pm Line:345
 msgid "Clubs"
@@ -1426,31 +1429,30 @@ msgstr "Clubs"
 
 #: web/FacilityFieldsSetup.pm Line:335
 msgid "Contact Details"
-msgstr "Coordonnées"
+msgstr "Contact Details"
 
 #: web/Flow_DisplayFields.pm Line:1260
 #, fuzzy
 msgid "Date is invalid"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Flow_DisplayFields.pm Line:958
-#, fuzzy
 msgid "Day"
-msgstr "Mai"
+msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:973
 msgid "Dec"
-msgstr "Déc"
+msgstr ""
 
 #: web/IncompleteRegistrations.pm Line:108
 #: Line:241
 msgid "Delete"
-msgstr "Effacer"
+msgstr "Delete"
 
 #: web/Venues.pm Line:1255
 #, fuzzy
 msgid "Delete Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/FacilityEdit.pm Line:220
 msgid "Documents"
@@ -1460,12 +1462,11 @@ msgstr ""
 #: Line:1040
 #, fuzzy
 msgid "Edit Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Venues.pm Line:601
-#, fuzzy
 msgid "Edit Venue"
-msgstr "Modifier un événement"
+msgstr ""
 
 #: web/Venues.pm Line:993
 #: Line:1004
@@ -1491,12 +1492,12 @@ msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:963
 msgid "Feb"
-msgstr "Févr"
+msgstr "Feb"
 
 #: web/FacilityFieldsSetup.pm Line:360
 #, fuzzy
 msgid "Field Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/Flow_DisplayFields.pm Line:1168
 #: Line:1173
@@ -1508,16 +1509,17 @@ msgstr "Payment Type"
 #: web/FacilityEdit.pm Line:186
 #, fuzzy
 msgid "Fields"
-msgstr "Domaine"
+msgstr "Other Fields"
 
 #: web/IncompleteRegistrations.pm Line:355
 #, fuzzy
 msgid "Incomplete Registrations"
-msgstr "Instructor Registration No"
+msgstr "New Registration"
 
 #: web/IncompleteRegistrations.pm Line:413
+#, fuzzy
 msgid "Incomplete registration has been delete"
-msgstr ""
+msgstr "Registration Number"
 
 #: web/IncompleteRegistrations.pm Line:377
 #: Line:420
@@ -1531,64 +1533,66 @@ msgstr "Invalid Date"
 #: Line:1137
 #: Line:1252
 #: Line:1263
+#, fuzzy
 msgid "Invalid Venue/Facility ID."
-msgstr ""
+msgstr "Invalid Date"
 
 #: web/Venues.pm Line:1295
 msgid "Invalid number of fields to be deleted."
 msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:962
-#, fuzzy
 msgid "Jan"
-msgstr "Janv"
+msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:968
 msgid "Jul"
-msgstr "Juil"
+msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:967
 #, fuzzy
 msgid "Jun"
-msgstr "Juin"
+msgstr "Junior?"
 
 #: web/Flow_DisplayFields.pm Line:964
 msgid "Mar"
-msgstr "Mars"
+msgstr "Mar"
 
 #: web/Flow_DisplayFields.pm Line:966
+#, fuzzy
 msgid "May"
-msgstr "Mai"
+msgstr "Mar"
 
 #: web/Flow_DisplayFields.pm Line:961
 msgid "Month"
-msgstr "Mois"
+msgstr "Month"
 
 #: web/IncompleteRegistrations.pm Line:286
 #: web/Venues.pm Line:801
 msgid "Name"
-msgstr "Nom"
+msgstr "Name"
 
 #: web/IncompleteRegistrations.pm Line:353
 #, fuzzy
 msgid "No Incomplete Registrations"
-msgstr "Instructor Registration No"
+msgstr "New Registration"
 
 #: web/Flow_DisplayFields.pm Line:972
+#, fuzzy
 msgid "Nov"
 msgstr "Nov"
 
 #: web/Flow_DisplayFields.pm Line:1239
 #, fuzzy
 msgid "Number is invalid"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Venues.pm Line:1125
 #: Line:1129
 #: Line:1329
 #, fuzzy
 msgid "Number of Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Flow_DisplayFields.pm Line:971
 msgid "Oct"
@@ -1597,11 +1601,12 @@ msgstr "Oct"
 #: web/IncompleteRegistrations.pm Line:328
 #, fuzzy
 msgid "Persons"
-msgstr "Saisons"
+msgstr "Personal Details"
 
 #: web/Flow_DisplayFields.pm Line:1218
+#, fuzzy
 msgid "Please enter a valid URL"
-msgstr ""
+msgstr "is not a valid date"
 
 #: web/Flow_DisplayFields.pm Line:1196
 #, fuzzy
@@ -1611,7 +1616,7 @@ msgstr "is not a valid email address"
 #: web/Flow_DisplayFields.pm Line:1212
 #, fuzzy
 msgid "Please enter a valid number"
-msgstr "is not a valid number"
+msgstr "is not a valid date"
 
 #: web/Flow_DisplayFields.pm Line:1202
 #, fuzzy
@@ -1623,13 +1628,13 @@ msgid "Please enter only digits"
 msgstr ""
 
 #: web/FacilityEdit.pm Line:235
-#, fuzzy
 msgid "Replace"
-msgstr "Remplacer photo"
+msgstr ""
 
 #: web/Flow_DisplayFields.pm Line:633
+#, fuzzy
 msgid "Required"
-msgstr ""
+msgstr "Access"
 
 #: web/Flow_DisplayFields.pm Line:370
 msgid "Required fields"
@@ -1641,37 +1646,37 @@ msgstr ""
 
 #: web/FacilityEdit.pm Line:150
 msgid "Save"
-msgstr "Enregistrer"
+msgstr ""
 
 #: web/FacilityFieldsSetup.pm Line:152
 #: Line:273
 #, fuzzy
 msgid "Select Country"
-msgstr "Pays"
+msgstr "Country"
 
 #: web/FacilityFieldsSetup.pm Line:162
 #, fuzzy
 msgid "Select Language"
-msgstr "Nom préféré"
+msgstr "Preferred name"
 
 #: web/FacilityFieldsSetup.pm Line:108
 #, fuzzy
 msgid "Select Type"
-msgstr "Payment Type"
+msgstr "Venue Type"
 
 #: web/Flow_DisplayFields.pm Line:513
 #, fuzzy
 msgid "Select an option"
-msgstr "Coach Registration No."
+msgstr "Identifications"
 
 #: web/Flow_DisplayFields.pm Line:512
 #, fuzzy
 msgid "Select some options"
-msgstr "Coach Registration No."
+msgstr "Identifications"
 
 #: web/Flow_DisplayFields.pm Line:970
 msgid "Sep"
-msgstr "Sept"
+msgstr "Sep"
 
 #: web/Flow_DisplayFields.pm Line:1191
 #, fuzzy
@@ -1687,26 +1692,26 @@ msgstr "Type"
 #: web/Notifications.pm Line:344
 #: web/Venues.pm Line:539
 msgid "Update"
-msgstr "Mettre à jour"
+msgstr "Update"
 
 #: web/FacilityFieldsSetup.pm Line:216
 #, fuzzy
 msgid "Venue Details"
-msgstr "Détails"
+msgstr "Details"
 
 #: web/Venues.pm Line:810
 msgid "Venue Name"
-msgstr "Nom du site"
+msgstr ""
 
 #: web/IncompleteRegistrations.pm Line:345
 #: web/Venues.pm Line:791
 msgid "Venues"
-msgstr "Sites"
+msgstr ""
 
 #: web/FacilityEdit.pm Line:222
 #: Line:234
 msgid "View"
-msgstr "Vue"
+msgstr "View"
 
 #: web/IncompleteRegistrations.pm Line:126
 #: Line:259
@@ -1737,46 +1742,46 @@ msgstr "Invalid Date"
 #: web/Venues.pm Line:1125
 #, fuzzy
 msgid "required"
-msgstr "Payment Type"
+msgstr "Access"
 
 #: web/Documents.pm Line:247
 #, fuzzy
 msgid "All Files"
-msgstr "Toutes saisons"
+msgstr "All Records"
 
 #: web/Flow_TransferBackend.pm Line:69
 #, fuzzy
 msgid "Check/Update Contact Details"
-msgstr "Coordonnées"
+msgstr "Contact Details"
 
 #: web/Flow_TransferBackend.pm Line:90
 #, fuzzy
 msgid "Check/Update Documents"
-msgstr "National Bodies"
+msgstr "Details"
 
 #: web/Flow_TransferBackend.pm Line:55
 #, fuzzy
 msgid "Check/Update Personal Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: web/Documents.pm Line:325
 #, fuzzy
 msgid "Click here to upload file"
-msgstr "Cliquez ici pour résoudre."
+msgstr "Click here to resolve [quant2,_1,it,them]."
 
 #: web/Flow_FacilityBackend.pm Line:106
-#, fuzzy
 msgid "Complete"
-msgstr "Compétition"
+msgstr ""
 
 #: web/Flow_TransferBackend.pm Line:100
+#, fuzzy
 msgid "Confirm Transfer Fee"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Flow_TransferBackend.pm Line:80
 #, fuzzy
 msgid "Confirm Transfer Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/Documents.pm Line:138
 #: Line:145
@@ -1789,9 +1794,8 @@ msgid "DUPLICATE"
 msgstr ""
 
 #: web/Documents.pm Line:216
-#, fuzzy
 msgid "Date Uploaded"
-msgstr "Date d'ajout"
+msgstr ""
 
 #: web/Documents.pm Line:203
 #, fuzzy
@@ -1801,31 +1805,30 @@ msgstr "Payment Type"
 #: web/Flow_FacilityBackend.pm Line:81
 #, fuzzy
 msgid "Enter Additional Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/Flow_FacilityBackend.pm Line:58
 #, fuzzy
 msgid "Enter Contact Details"
-msgstr "Coordonnées"
+msgstr "Contact Details"
 
 #: web/Flow_FacilityBackend.pm Line:70
 #, fuzzy
 msgid "Enter Number of Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Flow_FacilityBackend.pm Line:46
 #, fuzzy
 msgid "Enter Venue Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/ListPersons.pm Line:49
 msgid "Entity Not Allowed To View List"
 msgstr ""
 
 #: web/Documents.pm Line:212
-#, fuzzy
 msgid "Extension Name"
-msgstr "Nom de la zone"
+msgstr ""
 
 #: web/Flow_FacilityBackend.pm Line:46
 #: Line:58
@@ -1836,7 +1839,7 @@ msgstr "Nom de la zone"
 #: Line:107
 #, fuzzy
 msgid "Facility"
-msgstr "Organisme national"
+msgstr "National Body"
 
 #: web/Flow_FacilityBackend.pm Line:893
 #, fuzzy
@@ -1850,12 +1853,11 @@ msgstr "Invalid Date"
 #: Line:651
 #, fuzzy
 msgid "Invalid Registration ID"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/ListPersons.pm Line:59
-#, fuzzy
 msgid "Invalid page requested"
-msgstr "Invalid Date"
+msgstr ""
 
 #: web/ListPersons.pm Line:293
 msgid "List of people registered directly with the Member Association"
@@ -1870,9 +1872,8 @@ msgid "List of people registered with the Club"
 msgstr ""
 
 #: web/ListPersons.pm Line:339
-#, fuzzy
 msgid "N"
-msgstr "Non"
+msgstr ""
 
 #: web/Documents.pm Line:315
 msgid "New Document"
@@ -1886,32 +1887,31 @@ msgstr "Club"
 #: web/Flow_TransferBackend.pm Line:49
 #, fuzzy
 msgid "Old Club Details"
-msgstr "Modifier les détails"
+msgstr "Other Details"
 
 #: web/Flow_TransferBackend.pm Line:99
 #, fuzzy
 msgid "Payments"
-msgstr "Voir les types"
+msgstr "Payment Type"
 
 #: web/Flow_TransferBackend.pm Line:54
 #, fuzzy
 msgid "Personal Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: web/ListPersons.pm Line:291
 #, fuzzy
 msgid "Persons in [_1]"
-msgstr "Saisons"
+msgstr "Personal Details"
 
 #: web/Flow_TransferBackend.pm Line:1301
 #, fuzzy
 msgid "Proceed to Payment and Submit to [_1]"
-msgstr "Registration Number"
+msgstr "Registration Authorisation"
 
 #: web/Flow_TransferBackend.pm Line:79
-#, fuzzy
 msgid "Registration"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/Flow_TransferBackend.pm Line:1156
 #: web/Flow_FacilityBackend.pm Line:711
@@ -1937,7 +1937,7 @@ msgstr "Field Options"
 #: web/EntityFieldObj.pm Line:113
 #, fuzzy
 msgid "Select Type of Field"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/PersonRegisterWhat.pm Line:530
 #: Line:541
@@ -1952,9 +1952,8 @@ msgid "Size"
 msgstr ""
 
 #: web/Flow_TransferBackend.pm Line:1294
-#, fuzzy
 msgid "Submit to "
-msgstr "Approbation du test"
+msgstr ""
 
 #: web/Flow_FacilityBackend.pm Line:848
 msgid "Submit to [_1]"
@@ -1970,7 +1969,7 @@ msgstr ""
 #: Line:101
 #, fuzzy
 msgid "Summary"
-msgstr "Résumé des données"
+msgstr "Summary Data"
 
 #: web/Flow_TransferBackend.pm Line:110
 msgid "Summary and Submission"
@@ -1986,9 +1985,8 @@ msgid "This type of registration is not available"
 msgstr ""
 
 #: web/PersonRegisterWhat.pm Line:399
-#, fuzzy
 msgid "This type of registration is not within the window."
-msgstr "Instructor Registration No"
+msgstr ""
 
 #: web/Flow_TransferBackend.pm Line:1402
 msgid "Transfer Submitted to MA"
@@ -2029,39 +2027,34 @@ msgid "You cannot register this combination, limit exceeded"
 msgstr ""
 
 #: web/CheckOnLogin.pm Line:123
-#, fuzzy
 msgid "You have [_1] duplicate to resolve."
-msgstr "Vous avez [quant,_1,doublon,doublons] à résoudre."
+msgstr "You have [quant,_1,duplicate,duplicates] to resolve."
 
 #: web/EntityRegistrationAllowedEdit.pm Line:227
-#, fuzzy
 msgid "Add New Registration Type"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:387
 #: Line:399
-#, fuzzy
 msgid "Add another Registration Type"
-msgstr "Coach Registration No."
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:320
-#, fuzzy
 msgid "Add new Rule"
-msgstr "Ajouter nouvelle donnée"
+msgstr ""
 
 #: web/FindPayment.pm Line:152
 msgid "Amount"
 msgstr "Amount"
 
 #: web/ReportManager.pm Line:247
-#, fuzzy
 msgid "Are you sure you want to delete this saved report?"
-msgstr "Etes-vous sûr de vouloir supprimer ce membre"
+msgstr ""
 
 #: web/FindPayment.pm Line:143
 #, fuzzy
 msgid "Bank Reference"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: web/ReportManager.pm Line:239
 msgid "Build"
@@ -2070,12 +2063,11 @@ msgstr ""
 #: web/ReportManager.pm Line:216
 #, fuzzy
 msgid "Build a Report"
-msgstr "Exécuter un rapport"
+msgstr "Run Report"
 
 #: web/HomePerson.pm Line:332
-#, fuzzy
 msgid "Change [_1] Level"
-msgstr "Niveau"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:229
 msgid "Click here"
@@ -2092,27 +2084,26 @@ msgid "Contact"
 msgstr "Contact"
 
 #: web/EntityRegistrationAllowedEdit.pm Line:314
-#, fuzzy
 msgid "Delete Rule"
-msgstr "Effacer"
+msgstr ""
 
 #: web/Entity.pm Line:337
 msgid "Details"
-msgstr "Détails"
+msgstr "Details"
 
 #: web/ReportManager.pm Line:245
 #: web/Entity.pm Line:322
 msgid "Edit"
-msgstr "Éditer"
+msgstr "Edit"
 
 #: web/GridDisplay.pm Line:432
 msgid "Filter"
-msgstr "Filtre"
+msgstr ""
 
 #: web/GridDisplay.pm Line:436
 #, fuzzy
 msgid "First"
-msgstr "Prénom"
+msgstr "First name"
 
 #: web/GridDisplay.pm Line:437
 msgid "Last"
@@ -2138,7 +2129,7 @@ msgstr "Payment Type"
 #: web/FindPayment.pm Line:139
 #, fuzzy
 msgid "Payment Reference Number"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: web/FindPayment.pm Line:156
 msgid "Payment Type"
@@ -2147,17 +2138,16 @@ msgstr "Payment Type"
 #: web/EntityRegistrationAllowedEdit.pm Line:337
 #, fuzzy
 msgid "Person Level"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: web/EntityRegistrationAllowedEdit.pm Line:329
-#, fuzzy
 msgid "Person Type"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/Entity.pm Line:426
 #: Line:489
 msgid "Phone"
-msgstr "Téléphone"
+msgstr "Phone"
 
 #: web/Flow_LoanBackend.pm Line:1385
 msgid "Player Loan Submitted to MA"
@@ -2169,68 +2159,61 @@ msgstr ""
 #: Line:1131
 #: Line:1212
 #: Line:1253
+#, fuzzy
 msgid "Player loan failed, cannot find registration."
-msgstr ""
+msgstr "Registration Authorisation"
 
 #: web/GridDisplay.pm Line:439
-#, fuzzy
 msgid "Previous"
-msgstr "Aperçu"
+msgstr ""
 
 #: web/Flow_LoanBackend.pm Line:1284
 #, fuzzy
 msgid "Proceed to Payment and Submit to Member Association"
-msgstr "Registration Number"
+msgstr "Registration Authorisation"
 
 #: web/Entity.pm Line:517
 #, fuzzy
 msgid "Regions in [_1]"
-msgstr "Régions"
+msgstr "Regions"
 
 #: web/EntityRegistrationAllowedEdit.pm Line:204
-#, fuzzy
 msgid "Registration Rule Deleted"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:232
-#, fuzzy
 msgid "Registration rule deleted"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:398
-#, fuzzy
 msgid "Registration rule deleted."
-msgstr "Registration Number"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:386
-#, fuzzy
 msgid "Registration type added successfully"
-msgstr "Record added successfully"
+msgstr ""
 
 #: web/EntityRegistrationAllowedEdit.pm Line:321
 msgid "Registrations accepted by my organisation"
 msgstr ""
 
 #: web/HomePerson.pm Line:265
-#, fuzzy
 msgid "Replace File"
-msgstr "Remplacer photo"
+msgstr ""
 
 #: web/ReportManager.pm Line:48
-#, fuzzy
 msgid "Reports Manager"
-msgstr "Directeur"
+msgstr ""
 
 #: web/ReportManager.pm Line:230
 #: Line:250
-#, fuzzy
 msgid "Run"
-msgstr "Juin"
+msgstr ""
 
 #: web/ReportManager.pm Line:217
 #, fuzzy
 msgid "Run a Report"
-msgstr "Exécuter un rapport"
+msgstr "Run Report"
 
 #: web/GridDisplay.pm Line:434
 msgid "Show _MENU_ entries"
@@ -2261,37 +2244,36 @@ msgid "Assigned To"
 msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:78
-#, fuzzy
 msgid "Change Date/Time"
-msgstr "Date"
+msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:112
+#, fuzzy
 msgid "Change Status Log"
-msgstr ""
+msgstr "Transfer"
 
 #: web/PersonRegistrationStatusChange.pm Line:95
-#, fuzzy
 msgid "Changed by Level"
-msgstr "Niveau"
+msgstr ""
 
 #: web/Flow_IntTransferReturnBackend.pm Line:100
+#, fuzzy
 msgid "Confirm Fee"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Flow_IntTransferReturnBackend.pm Line:49
 #, fuzzy
 msgid "Current Club Details"
-msgstr "Configurez les détails de l'événement"
+msgstr "Contact Details"
 
 #: web/PendingRegistrations.pm Line:235
 #, fuzzy
 msgid "Current Task"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: web/ListNotifications.pm Line:96
-#, fuzzy
 msgid "Date/Time"
-msgstr "Date"
+msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:84
 #, fuzzy
@@ -2301,20 +2283,20 @@ msgstr "Registration Number"
 #: web/Flow_IntTransferReturnBackend.pm Line:1432
 #, fuzzy
 msgid "International Transfer Return [_1]"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: web/ListNotifications.pm Line:35
-#, fuzzy
 msgid "List of Notifications"
-msgstr "Identifications"
+msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:61
 msgid "MA"
 msgstr ""
 
 #: web/Flow_IntTransferReturnBackend.pm Line:1294
+#, fuzzy
 msgid "Mark as Transferred back"
-msgstr ""
+msgstr "Transfer"
 
 #: web/PersonRegistrationStatusChange.pm Line:90
 #, fuzzy
@@ -2322,30 +2304,28 @@ msgid "New Status"
 msgstr "Status"
 
 #: web/ListNotifications.pm Line:37
-#, fuzzy
 msgid "No Notifications can be found in the database."
-msgstr "No Payment Records can be found in the database."
+msgstr ""
 
 #: web/PendingRegistrations.pm Line:380
 #, fuzzy
 msgid "No Pending Registrations"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/ListNotifications.pm Line:87
-#, fuzzy
 msgid "Notification ID"
-msgstr "Identifications"
+msgstr ""
 
 #: web/PendingRegistrations.pm Line:348
 #: Line:382
 #, fuzzy
 msgid "Pending Registrations"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/Flow_IntTransferReturnBackend.pm Line:1301
 #, fuzzy
 msgid "Proceed to Payment"
-msgstr "Voir les types"
+msgstr "Transfer"
 
 #: web/PendingRegistrations.pm Line:42
 #, fuzzy
@@ -2353,9 +2333,8 @@ msgid "Registration Detail"
 msgstr "Registration Number"
 
 #: web/PendingRegistrations.pm Line:177
-#, fuzzy
 msgid "Registration History"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:56
 msgid "Self User"
@@ -2363,9 +2342,8 @@ msgstr ""
 
 #: web/PersonRegistrationStatusChange.pm Line:52
 #: Line:62
-#, fuzzy
 msgid "System"
-msgstr "Numéro d'identification du système"
+msgstr ""
 
 #: web/Navbar.pm Line:402
 #, fuzzy
@@ -2374,59 +2352,59 @@ msgstr "Club"
 
 #: web/Navbar.pm Line:249
 #: Line:880
-#, fuzzy
 msgid "Add Club Official"
-msgstr "Official?"
+msgstr ""
 
 #: web/Navbar.pm Line:225
 #: Line:856
 #, fuzzy
 msgid "Add Coach"
-msgstr "Entraîneur?"
+msgstr "Coach"
 
 #: web/Navbar.pm Line:231
 #: Line:862
 #, fuzzy
 msgid "Add MA Official"
-msgstr "Officiel de Match?"
+msgstr "Match Official?"
 
 #: web/Navbar.pm Line:219
 #: Line:850
 #, fuzzy
 msgid "Add Player"
-msgstr "Joueur?"
+msgstr "Player"
 
 #: web/Navbar.pm Line:237
 #: Line:868
 #, fuzzy
 msgid "Add RA Official"
-msgstr "Official?"
+msgstr "Match Official?"
 
 #: web/Navbar.pm Line:255
 #: Line:886
+#, fuzzy
 msgid "Add Referee"
-msgstr ""
+msgstr "Referee"
 
 #: web/Navbar.pm Line:243
 #: Line:874
 #, fuzzy
 msgid "Add Team Official"
-msgstr "Officiel de Match?"
+msgstr "Match Official?"
 
 #: web/Navbar.pm Line:1192
 #, fuzzy
 msgid "Add Transactions"
-msgstr "Toute Organisation"
+msgstr "Update Information"
 
 #: web/Navbar.pm Line:409
 #, fuzzy
 msgid "Add Venue"
-msgstr "Site"
+msgstr "Venue 1"
 
 #: web/Navbar.pm Line:904
 #, fuzzy
 msgid "Add a Venue"
-msgstr "Site"
+msgstr "Venue 1"
 
 #: web/Navbar.pm Line:163
 #: Line:562
@@ -2437,7 +2415,7 @@ msgstr ""
 #: Line:724
 #: Line:1172
 msgid "Audit Log"
-msgstr "Journal d'Audit"
+msgstr "Audit Log"
 
 #: web/Navbar.pm Line:360
 msgid "Bank File Export"
@@ -2445,7 +2423,7 @@ msgstr ""
 
 #: web/EntityFieldsSetup.pm Line:641
 msgid "Both"
-msgstr "Les deux"
+msgstr "Both"
 
 #: web/Navbar.pm Line:295
 #: Line:761
@@ -2458,9 +2436,8 @@ msgid "Cards"
 msgstr ""
 
 #: web/Navbar.pm Line:1231
-#, fuzzy
 msgid "Cards Printed"
-msgstr "Cartes imprimées"
+msgstr "Cards Printed"
 
 #: web/Navbar.pm Line:1241
 #, fuzzy
@@ -2470,27 +2447,28 @@ msgstr "Identifications"
 #: web/Flow_BulkRenewalsBackend.pm Line:56
 #, fuzzy
 msgid "Choose Registration Type"
-msgstr "Registration Number"
+msgstr "New Registration"
 
 #: web/Navbar.pm Line:327
 #: Line:626
+#, fuzzy
 msgid "Clearances Settings"
-msgstr ""
+msgstr "Clearance Settings"
 
 #: web/EntityFieldsSetup.pm Line:311
 #, fuzzy
 msgid "Club Details"
-msgstr "Détails"
+msgstr "Details"
 
 #: web/Navbar.pm Line:961
 #, fuzzy
 msgid "Club Documents"
-msgstr "Nom du Club"
+msgstr "Details"
 
 #: web/Navbar.pm Line:946
 #, fuzzy
 msgid "Club Transactions"
-msgstr "Organisation"
+msgstr "Update Information"
 
 #: web/Navbar.pm Line:941
 msgid "Club Work Tasks"
@@ -2510,18 +2488,17 @@ msgstr ""
 #: web/Navbar.pm Line:385
 #: Line:667
 msgid "Duplicate Resolution"
-msgstr "Résolution des Doublons"
+msgstr "Duplicate Resolution"
 
 #: web/Navbar.pm Line:313
-#, fuzzy
 msgid "Field Configuration"
-msgstr "Configuration"
+msgstr ""
 
 #: web/Navbar.pm Line:439
 #: Line:819
 #, fuzzy
 msgid "Find Payment"
-msgstr "Voir les types"
+msgstr "Payment Type"
 
 #: web/Navbar.pm Line:1243
 msgid "History"
@@ -2534,9 +2511,8 @@ msgstr "Identifications"
 
 #: web/Navbar.pm Line:455
 #: Line:829
-#, fuzzy
 msgid "Invoices"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: web/Flow_BulkRenewalsBackend.pm Line:75
 msgid "License"
@@ -2550,7 +2526,7 @@ msgstr ""
 #: Line:570
 #, fuzzy
 msgid "List Persons"
-msgstr "Nom du Contact"
+msgstr "Contact Person"
 
 #: web/Navbar.pm Line:805
 msgid "List Requests"
@@ -2559,23 +2535,22 @@ msgstr ""
 #: web/Navbar.pm Line:1186
 #, fuzzy
 msgid "List Transactions"
-msgstr "Liste des rapports de paiement"
+msgstr "Update Information"
 
 #: web/Navbar.pm Line:582
 #, fuzzy
 msgid "List Venues"
-msgstr "Modifier un événement"
+msgstr "Contact Person"
 
 #: web/Navbar.pm Line:660
-#, fuzzy
 msgid "Locator"
-msgstr "Communicator"
+msgstr ""
 
 #: web/Navbar.pm Line:279
 #: Line:504
 #, fuzzy
 msgid "My Association"
-msgstr "Association"
+msgstr "Action"
 
 #: web/Navbar.pm Line:747
 #: Line:947
@@ -2593,7 +2568,7 @@ msgstr ""
 
 #: web/EntityFieldsSetup.pm Line:528
 msgid "Organisation"
-msgstr "Organisation"
+msgstr ""
 
 #: web/Navbar.pm Line:451
 #: Line:825
@@ -2602,20 +2577,18 @@ msgstr ""
 
 #: web/Navbar.pm Line:268
 #: Line:653
-#, fuzzy
 msgid "Payment Configuration"
-msgstr "Configuration"
+msgstr ""
 
 #: web/Navbar.pm Line:367
-#, fuzzy
 msgid "Payment Split Run"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/Navbar.pm Line:461
 #: Line:835
 #, fuzzy
 msgid "Payments History"
-msgstr "Payment Type"
+msgstr "Transfer"
 
 #: web/Navbar.pm Line:481
 msgid "People"
@@ -2623,14 +2596,13 @@ msgstr ""
 
 #: web/Navbar.pm Line:1166
 #: Line:1238
-#, fuzzy
 msgid "Person Dashboard"
-msgstr "Informations personnelles"
+msgstr ""
 
 #: web/Navbar.pm Line:715
 #, fuzzy
 msgid "Person Rollover"
-msgstr "Remaniement"
+msgstr "Personal Details"
 
 #: web/Flow_BulkRenewalsBackend.pm Line:65
 #, fuzzy
@@ -2638,29 +2610,26 @@ msgid "Person Selection"
 msgstr "Identifications"
 
 #: web/Navbar.pm Line:1239
-#, fuzzy
 msgid "Player Passport"
-msgstr "Their Password"
+msgstr ""
 
 #: web/Navbar.pm Line:445
-#, fuzzy
 msgid "Print Cards"
-msgstr "Member Tags"
+msgstr ""
 
 #: web/Navbar.pm Line:395
 #: Line:676
 msgid "Products"
-msgstr "Produits"
+msgstr "Products"
 
 #: web/Navbar.pm Line:470
 msgid "Regions"
-msgstr "Régions"
+msgstr "Regions"
 
 #: web/Navbar.pm Line:351
 #: Line:697
-#, fuzzy
 msgid "Registration Forms"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/Navbar.pm Line:300
 #: Line:685
@@ -2673,7 +2642,7 @@ msgstr "Registration Number"
 #: Line:576
 #: Line:967
 msgid "Reports"
-msgstr "Rapports"
+msgstr "Reports"
 
 #: web/Navbar.pm Line:795
 msgid "Request a Player loan"
@@ -2682,74 +2651,71 @@ msgstr ""
 #: web/Navbar.pm Line:843
 #, fuzzy
 msgid "Request for Person Details"
-msgstr "Modifier les détails personnels"
+msgstr "Personal Details"
 
 #: web/Navbar.pm Line:787
+#, fuzzy
 msgid "Request or start a transfer"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Navbar.pm Line:261
 #: Line:513
 #: Line:892
 #: Line:963
 msgid "Search"
-msgstr "Recherche"
+msgstr "Search"
 
 #: web/Navbar.pm Line:335
 msgid "Search ALL Online Transfers"
 msgstr ""
 
 #: web/EntityFieldsSetup.pm Line:448
-#, fuzzy
 msgid "Select Legal Entity Type"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/EntityFieldsSetup.pm Line:472
-#, fuzzy
 msgid "Select Level"
-msgstr "Niveau"
+msgstr ""
 
 #: web/Flow_BulkRenewalsBackend.pm Line:66
 #, fuzzy
 msgid "Select People to Renew"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: web/EntityFieldsSetup.pm Line:464
 #, fuzzy
 msgid "Select Sport"
-msgstr "Produits"
+msgstr "Country"
 
 #: web/EntityFieldsSetup.pm Line:440
 #, fuzzy
 msgid "Select Type of Organisation"
-msgstr "Organisation"
+msgstr "Search Again"
 
 #: web/Navbar.pm Line:469
 msgid "States"
-msgstr "Etats"
+msgstr "States"
 
 #: web/Navbar.pm Line:730
 #: Line:1183
 #: Line:1240
-#, fuzzy
 msgid "Transactions"
-msgstr "Organisation"
+msgstr ""
 
 #: web/Navbar.pm Line:1224
 #: Line:1250
+#, fuzzy
 msgid "Transfer History"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Navbar.pm Line:646
-#, fuzzy
 msgid "Transfer Person"
-msgstr "Recherche de personne"
+msgstr ""
 
 #: web/Navbar.pm Line:306
 #: Line:639
-#, fuzzy
 msgid "User Management"
-msgstr "Gestion des mots de passe"
+msgstr ""
 
 #: web/Navbar.pm Line:275
 #: Line:494
@@ -2762,27 +2728,25 @@ msgid "Zones"
 msgstr "Zones"
 
 #: web/EditMemberClubs.pm Line:457
-#, fuzzy
 msgid "Clubs Updated"
-msgstr "Fields Updated"
+msgstr ""
 
 #: web/EditMemberClubs.pm Line:231
 #, fuzzy
 msgid "Edit "
-msgstr "Éditer"
+msgstr "Edit"
 
 #: web/EditMemberClubs.pm Line:45
 msgid "FIELDS_intro"
-msgstr "Choose the options for each Member field."
+msgstr "Choose the the visibility and editing options for each of the available Member fields."
 
 #: web/PersonRegistrationFlow_Backend.pm Line:112
 msgid "New failed, existing registration found. In order to continue, a Transfer from the existing Entity must be organised or select another Level"
 msgstr ""
 
 #: web/EditMemberClubs.pm Line:264
-#, fuzzy
 msgid "Problem updating Fields"
-msgstr "Problem Updating Fields"
+msgstr ""
 
 #: web/PersonRegistrationFlow_Backend.pm Line:115
 msgid "Renewal failed, cannot find existing registration. Might have already been renewed"
@@ -2792,7 +2756,7 @@ msgstr ""
 #: Line:223
 #, fuzzy
 msgid "Save "
-msgstr "Enregistrer"
+msgstr "Status Reports"
 
 #: web/PersonRegistrationFlow_Common.pm Line:1136
 msgid " to proceed"
@@ -2816,7 +2780,7 @@ msgstr "Identifications"
 #: web/PersonFieldsSetup.pm Line:728
 #, fuzzy
 msgid "Additional Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/WorkFlow.pm Line:363
 msgid "An error has been encountered."
@@ -2830,36 +2794,36 @@ msgstr ""
 #: Line:4158
 #, fuzzy
 msgid "Approval"
-msgstr "Temps Approximatif"
+msgstr "Approvals"
 
 #: web/WorkFlow.pm Line:4936
+#, fuzzy
 msgid "Approval by Club"
-msgstr ""
+msgstr "Approvals"
 
 #: web/WorkFlow.pm Line:4944
+#, fuzzy
 msgid "Approval by Member Association"
-msgstr ""
+msgstr "Registration Authorisation"
 
 #: web/WorkFlow.pm Line:4940
-#, fuzzy
 msgid "Approval by Regional Association"
-msgstr "Actif dans l'association"
+msgstr ""
 
 #: web/WorkFlow.pm Line:3953
-#, fuzzy
 msgid "Approved"
-msgstr "Temps Approximatif"
+msgstr ""
 
 #: web/PersonCardBulk.pm Line:85
 #: Line:170
 #, fuzzy
 msgid "Bulk Card Printing"
-msgstr "Cartes imprimées"
+msgstr "Bulk Printing"
 
 #: web/PersonCardBulk.pm Line:208
 #, fuzzy
 msgid "Card Print History"
-msgstr "Cartes imprimées"
+msgstr "Transfer"
 
 #: web/PersonCertifications.pm Line:315
 #, fuzzy
@@ -2869,7 +2833,7 @@ msgstr "Record added successfully"
 #: web/PersonCertifications.pm Line:302
 #, fuzzy
 msgid "Certificate Updated Successfully"
-msgstr "La base de données a été mise à jour avec succès"
+msgstr "Record updated successfully"
 
 #: web/PersonCertifications.pm Line:124
 #, fuzzy
@@ -2890,12 +2854,11 @@ msgstr "Identifications"
 #: web/WorkFlow.pm Line:3169
 #, fuzzy
 msgid "Club Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/Products.pm Line:345
-#, fuzzy
 msgid "Copy Product"
-msgstr "Produits"
+msgstr ""
 
 #: web/Products.pm Line:341
 msgid "Created By"
@@ -2909,12 +2872,12 @@ msgstr "Identifications"
 #: web/Flow_PersonBackend.pm Line:70
 #, fuzzy
 msgid "Enter Contact Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/Flow_PersonBackend.pm Line:56
 #, fuzzy
 msgid "Enter Personal Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/FieldConfig.pm Line:435
 msgid "Fields Updated"
@@ -2937,9 +2900,8 @@ msgid "For my level"
 msgstr ""
 
 #: web/Products.pm Line:324
-#, fuzzy
 msgid "Group"
-msgstr "Groupe par"
+msgstr ""
 
 #: web/Flow_PersonBackend.pm Line:233
 msgid "Has this person already been registered?"
@@ -2976,22 +2938,22 @@ msgstr ""
 #: web/WorkFlow.pm Line:730
 #, fuzzy
 msgid "International Transfer"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: web/Flow_PersonBackend.pm Line:163
 #, fuzzy
 msgid "Invalid Renewal Details"
-msgstr "Modifier les détails personnels"
+msgstr "Personal Details"
 
 #: web/PersonFieldsSetup.pm Line:649
 #, fuzzy
 msgid "Legal Guardian"
-msgstr "Parent/Tuteur"
+msgstr "Parent/Guardian"
 
 #: web/PersonFieldsSetup.pm Line:730
 #, fuzzy
 msgid "Loan Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/WorkFlow.pm Line:3049
 #: Line:3066
@@ -3016,19 +2978,21 @@ msgstr ""
 
 #: web/WorkFlow.pm Line:4079
 #: Line:4177
+#, fuzzy
 msgid "New Club Registration - Approval"
-msgstr ""
+msgstr "New Registration"
 
 #: web/WorkFlow.pm Line:4085
 #: Line:4182
+#, fuzzy
 msgid "New Facility Registration - Approval"
-msgstr ""
+msgstr "New Registration"
 
 #: web/WorkFlow.pm Line:4046
 #: Line:4158
 #, fuzzy
 msgid "New [_1] Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/WorkFlow.pm Line:2792
 #: Line:5028
@@ -3041,12 +3005,11 @@ msgstr ""
 
 #: web/WorkFlow.pm Line:834
 msgid "No outstanding tasks"
-msgstr ""
+msgstr "No outstanding tasks"
 
 #: web/Flow_PersonBackend.pm Line:164
-#, fuzzy
 msgid "No record found."
-msgstr "Aucun résultat n'a pu être trouvé"
+msgstr ""
 
 #: web/Flow_PersonBackend.pm Line:229
 #: Line:234
@@ -3086,16 +3049,15 @@ msgstr "Identifications"
 #: web/WorkFlow.pm Line:802
 #, fuzzy
 msgid "Person Request"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: web/WorkFlow.pm Line:3973
 msgid "Player Loan - Approved"
 msgstr ""
 
 #: web/PersonRegistrationFlow_Common.pm Line:623
-#, fuzzy
 msgid "Player has been marked as Transferred Out"
-msgstr "Ce membre a été marqué comme duplicata"
+msgstr ""
 
 #: web/Flow_PersonBackend.pm Line:227
 msgid "Please check that this player has not been registered with another club?"
@@ -3110,23 +3072,23 @@ msgid "Price"
 msgstr ""
 
 #: web/PersonRegistrationFlow_Common.pm Line:70
-#, fuzzy
 msgid "Print Receipt"
-msgstr "View Receipt"
+msgstr ""
 
 #: web/FieldConfig.pm Line:114
-#, fuzzy
 msgid "Registration Form"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/Flow_PersonBackend.pm Line:1253
 #: Line:1334
+#, fuzzy
 msgid "Registration failed, cannot find registration."
-msgstr ""
+msgstr "Registration Authorisation"
 
 #: web/Flow_PersonBackend.pm Line:893
+#, fuzzy
 msgid "Registration failed, there is an active pending registration for this person. "
-msgstr ""
+msgstr "Registration Authorisation"
 
 #: web/Flow_PersonBackend.pm Line:890
 msgid "Registration failed, there is an active pending transfer request for this person. "
@@ -3178,7 +3140,7 @@ msgstr ""
 #: web/PersonFieldsSetup.pm Line:729
 #, fuzzy
 msgid "Terms and Conditions"
-msgstr "Conditions Médicales?"
+msgstr "Any Medical Conditions?"
 
 #: web/WorkFlow.pm Line:837
 msgid "The following are the outstanding tasks to be authorised"
@@ -3220,12 +3182,12 @@ msgstr ""
 #: web/PersonFieldsSetup.pm Line:731
 #, fuzzy
 msgid "Transfer Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/WorkFlow.pm Line:3180
 #, fuzzy
 msgid "Venue Registration"
-msgstr "Instructor Registration No"
+msgstr "New Registration"
 
 #: web/PersonFieldsSetup.pm Line:622
 msgid "What is your relationship to the minor you are registering?"
@@ -3244,14 +3206,12 @@ msgid "Work task notes"
 msgstr ""
 
 #: web/WorkFlow.pm Line:1932
-#, fuzzy
 msgid "Work task notes Updated"
-msgstr "Statut mis à jour"
+msgstr ""
 
 #: web/WorkFlow.pm Line:763
-#, fuzzy
 msgid "You have Duplicates to resolve"
-msgstr "Vous avez [quant,_1,doublon,doublons] à résoudre."
+msgstr ""
 
 #: web/WorkFlow.pm Line:756
 msgid "You have Transfers to view"
@@ -3342,16 +3302,19 @@ msgid "You have put this task on-hold, once the submitting RA resolves the issue
 msgstr ""
 
 #: web/WorkFlow.pm Line:4403
+#, fuzzy
 msgid "You have rejected the International Transfer Out of [_1] [_2]"
-msgstr ""
+msgstr "Transfer"
 
 #: web/WorkFlow.pm Line:4407
+#, fuzzy
 msgid "You have rejected the International Transfer Return of [_1] [_2]"
-msgstr ""
+msgstr "Transfer"
 
 #: web/WorkFlow.pm Line:4399
+#, fuzzy
 msgid "You have rejected the player loan of [_1] [_2]"
-msgstr ""
+msgstr "Transfer"
 
 #: web/WorkFlow.pm Line:4454
 msgid "You have rejected this Amendment of Person Registration."
@@ -3440,7 +3403,7 @@ msgstr ""
 #: web/PersonCertifications.pm Line:304
 #: Line:317
 msgid "or"
-msgstr "ou"
+msgstr "or"
 
 #: web/WorkFlow.pm Line:694
 msgid "with Level change from [_1] to [_2]"
@@ -3454,15 +3417,13 @@ msgstr "Amount"
 
 #: web/PayInvoice.pm Line:427
 #: Line:725
-#, fuzzy
 msgid "Comments"
-msgstr "Communicator"
+msgstr ""
 
 #: web/PayInvoice.pm Line:409
 #: Line:706
-#, fuzzy
 msgid "Date Paid"
-msgstr "Date d'ajout"
+msgstr ""
 
 #: web/RegoProducts.pm Line:389
 msgid "In order to continue, you must select the following mandatory items"
@@ -3472,13 +3433,12 @@ msgstr ""
 #: Line:597
 #, fuzzy
 msgid "Invoice Date"
-msgstr "Nombre incorrect"
+msgstr "Police Check Date"
 
 #: web/PayInvoice.pm Line:299
 #: Line:593
-#, fuzzy
 msgid "Invoice Number"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: web/PayInvoice.pm Line:309
 #: Line:602
@@ -3493,13 +3453,12 @@ msgstr ""
 #: web/PayInvoice.pm Line:389
 #: Line:689
 msgid "OR"
-msgstr "OU"
+msgstr "OR"
 
 #: web/PayInvoice.pm Line:356
 #: Line:649
-#, fuzzy
 msgid "Pay Invoices Now"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: web/PayInvoice.pm Line:318
 #: Line:611
@@ -3511,27 +3470,24 @@ msgid "Return to Transactions"
 msgstr ""
 
 #: web/Person.pm Line:1745
-#, fuzzy
 msgid "Add Registration"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/TransLog.pm Line:957
-#, fuzzy
 msgid "Add Transaction"
-msgstr "Toute Organisation"
+msgstr ""
 
 #: web/Person.pm Line:574
 msgid "Add a new document to this registration"
 msgstr ""
 
 #: web/BulkPersons.pm Line:168
-#, fuzzy
 msgid "Bulk Registration"
-msgstr "Coach Registration No."
+msgstr ""
 
 #: web/PageMain.pm Line:626
 msgid "COPYRIGHT"
-msgstr "© Copyright SportingPulse."
+msgstr "&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2014.&nbsp; All rights reserved."
 
 #: web/TransLog.pm Line:449
 msgid "Cancel Payment"
@@ -3540,16 +3496,17 @@ msgstr ""
 #: web/PersonRequest.pm Line:2795
 #, fuzzy
 msgid "Cancel Player Loan"
-msgstr "Date d'ajout"
+msgstr "Access"
 
 #: web/BulkPersons.pm Line:185
+#, fuzzy
 msgid "Check"
-msgstr ""
+msgstr "Police Check"
 
 #: web/Flow_ClubBackend.pm Line:96
 #, fuzzy
 msgid "Choose Products"
-msgstr "Produits"
+msgstr "Products"
 
 #: web/TransLog.pm Line:403
 #: Line:443
@@ -3568,9 +3525,8 @@ msgid "Date"
 msgstr "Date"
 
 #: web/TransLog.pm Line:786
-#, fuzzy
 msgid "Delete Transaction"
-msgstr "Supprimer la photo"
+msgstr ""
 
 #: web/PersonRequest.pm Line:696
 msgid "Do you have the player's International Transfer Certificate?"
@@ -3579,17 +3535,17 @@ msgstr ""
 #: web/Flow_ClubBackend.pm Line:51
 #, fuzzy
 msgid "Enter Club Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/Flow_ClubBackend.pm Line:75
 #, fuzzy
 msgid "Enter Organisation Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: web/PersonRequest.pm Line:2796
 #, fuzzy
 msgid "Error Cancelling Loan"
-msgstr "Date d'ajout"
+msgstr "Access"
 
 #: web/TransLog.pm Line:1629
 #: Line:1917
@@ -3597,17 +3553,17 @@ msgid "Gateway Text"
 msgstr ""
 
 #: web/TransLog.pm Line:165
-#, fuzzy
 msgid "Go to your Dashboard"
-msgstr "Configuration"
+msgstr ""
 
 #: web/TransLog.pm Line:166
 msgid "Hold Resolved"
 msgstr ""
 
 #: web/TransLog.pm Line:164
+#, fuzzy
 msgid "Hold on this Transaction has been resolved"
-msgstr ""
+msgstr "Registration Number"
 
 #: web/Flow_ClubBackend.pm Line:354
 msgid "Holding club already exists"
@@ -3620,17 +3576,16 @@ msgstr ""
 #: web/PersonRequest.pm Line:186
 #, fuzzy
 msgid "International Transfer Request"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: web/Flow_ClubBackend.pm Line:823
 #, fuzzy
 msgid "Invalid Club ID"
-msgstr "Nombre incorrect"
+msgstr "Invalid Date"
 
 #: web/TransLog.pm Line:470
-#, fuzzy
 msgid "Invalid Transaction"
-msgstr "Invalid Date"
+msgstr ""
 
 #: web/TransLog.pm Line:1956
 msgid "Items making up this Payment"
@@ -3645,13 +3600,12 @@ msgid "Items making up this order"
 msgstr ""
 
 #: web/TransLog.pm Line:841
-#, fuzzy
 msgid "List All Payment Records"
-msgstr "Liste des rapports de paiement"
+msgstr ""
 
 #: web/TransLog.pm Line:2169
 msgid "List of Payment Records"
-msgstr "Liste des rapports de paiement"
+msgstr "List of Payment Records"
 
 #: web/PersonRequest.pm Line:2411
 msgid "Loan End Date"
@@ -3671,14 +3625,12 @@ msgid "Member is currently registered."
 msgstr ""
 
 #: web/PageMain.pm Line:127
-#, fuzzy
 msgid "NO_BODY"
-msgstr "Attention, cela ne devrait pas se produire. Merci de contacte"
+msgstr "Oops, this shouldn't be happening. Please contact"
 
 #: web/BulkPersons.pm Line:194
-#, fuzzy
 msgid "National Num."
-msgstr "National Number"
+msgstr ""
 
 #: web/TransLog.pm Line:2170
 msgid "No Payment Records can be found in the database."
@@ -3691,7 +3643,7 @@ msgstr ""
 #: web/PersonRequest.pm Line:1061
 #, fuzzy
 msgid "No transfer history found"
-msgstr "Aucun résultat n'a pu être trouvé"
+msgstr "Transfer"
 
 #: web/TransLog.pm Line:1031
 msgid "Pay Now"
@@ -3699,14 +3651,13 @@ msgstr ""
 
 #: web/TransLog.pm Line:1674
 #: Line:1962
-#, fuzzy
 msgid "Payment For"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/TransLog.pm Line:1001
 #, fuzzy
 msgid "Payment History"
-msgstr "Payment Type"
+msgstr "Transfer"
 
 #: web/TransLog.pm Line:1721
 #, fuzzy
@@ -3716,27 +3667,25 @@ msgstr "Payment Type"
 #: web/TransLog.pm Line:1909
 #: Line:2007
 #: Line:2034
-#, fuzzy
 msgid "Payment Record"
-msgstr "Liste des rapports de paiement"
+msgstr ""
 
 #: web/TransLog.pm Line:2014
-#, fuzzy
 msgid "Payment Summary"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/TransLog.pm Line:331
-#, fuzzy
 msgid "Payments Checkout"
-msgstr "Payment Type"
+msgstr ""
 
 #: web/PersonRequest.pm Line:486
 msgid "Pending request has been found."
 msgstr ""
 
 #: web/PersonRequest.pm Line:2366
+#, fuzzy
 msgid "Person Request History"
-msgstr ""
+msgstr "Personal Details"
 
 #: web/PersonRequest.pm Line:1142
 #: Line:2320
@@ -3748,9 +3697,8 @@ msgid "Player Loan - Submitted to Current Club"
 msgstr ""
 
 #: web/TransLog.pm Line:431
-#, fuzzy
 msgid "Potential Problems"
-msgstr "Problems"
+msgstr ""
 
 #: web/TransLog.pm Line:1624
 #: Line:1912
@@ -3760,7 +3708,7 @@ msgstr ""
 #: web/TransLog.pm Line:696
 #, fuzzy
 msgid "Receipt Reference"
-msgstr "Liste des rapports de paiement"
+msgstr "Position"
 
 #: web/PersonRequest.pm Line:1063
 msgid "Records found"
@@ -3769,30 +3717,28 @@ msgstr ""
 #: web/TransLog.pm Line:2172
 #: Line:2255
 msgid "Ref. No."
-msgstr "N° de référence"
+msgstr "Ref. No."
 
 #: web/Person.pm Line:303
-#, fuzzy
 msgid "Registered To"
-msgstr "Deregistered"
+msgstr ""
 
 #: web/Person.pm Line:579
-#, fuzzy
 msgid "Registration Documents"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/PersonRequest.pm Line:930
+#, fuzzy
 msgid "Request Access (Add Role) - Submitted to Current Club"
-msgstr ""
+msgstr "Access"
 
 #: web/PersonRequest.pm Line:563
 msgid "Request Access cannot continue until re-approved by MA."
 msgstr ""
 
 #: web/PersonRequest.pm Line:109
-#, fuzzy
 msgid "Request Access to Person Details"
-msgstr "Modifier les détails personnels"
+msgstr ""
 
 #: web/PersonRequest.pm Line:1075
 msgid "Request From"
@@ -3824,17 +3770,17 @@ msgstr ""
 #: web/PersonRequest.pm Line:980
 #: Line:1049
 #: Line:2353
+#, fuzzy
 msgid "Requested"
-msgstr ""
+msgstr "Access"
 
 #: web/PersonRequest.pm Line:1020
 msgid "Requests"
 msgstr ""
 
 #: web/TransLog.pm Line:772
-#, fuzzy
 msgid "Resolve Hold"
-msgstr "Résoudre les Doublons"
+msgstr ""
 
 #: web/TransLog.pm Line:1714
 msgid "Resolve Hold as Failed"
@@ -3866,7 +3812,7 @@ msgstr ""
 #: web/PersonRequest.pm Line:289
 #, fuzzy
 msgid "Result"
-msgstr "Résultats de la recherche"
+msgstr "Search Results"
 
 #: web/TransLog.pm Line:404
 msgid "Review the payment details below, then click Confirm Payment or Cancel Payment"
@@ -3875,25 +3821,25 @@ msgstr ""
 #: web/PersonRequest.pm Line:312
 #, fuzzy
 msgid "Search Result"
-msgstr "Résultats de la recherche"
+msgstr "Search Results"
 
 #: web/TransLog.pm Line:658
-#, fuzzy
 msgid "Select"
-msgstr "Sélections"
+msgstr ""
 
 #: web/PersonRequest.pm Line:2391
 #, fuzzy
 msgid "Source Club"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: web/PersonRequest.pm Line:2162
 msgid "Submit"
 msgstr ""
 
 #: web/PersonRequest.pm Line:2422
+#, fuzzy
 msgid "TMS Reference"
-msgstr ""
+msgstr "Referee"
 
 #: web/PersonRequest.pm Line:1095
 #, fuzzy
@@ -3934,9 +3880,8 @@ msgstr ""
 #: web/TransLog.pm Line:1677
 #: Line:1965
 #: Line:2127
-#, fuzzy
 msgid "Total Amount"
-msgstr "Amount"
+msgstr ""
 
 #: web/TransLog.pm Line:673
 #: Line:1672
@@ -3955,9 +3900,8 @@ msgid "Valid To"
 msgstr ""
 
 #: web/TransLog.pm Line:765
-#, fuzzy
 msgid "View Payments"
-msgstr "Voir les types"
+msgstr ""
 
 #: web/TransLog.pm Line:766
 #: Line:2175
@@ -3967,7 +3911,7 @@ msgstr "View Receipt"
 #: web/PersonRequest.pm Line:489
 #, fuzzy
 msgid "View pending"
-msgstr "View Type"
+msgstr "Descending"
 
 #: web/PersonRequest.pm Line:1483
 msgid "You have [_1] the [_2] of [_3] [_4]."
@@ -3988,36 +3932,31 @@ msgstr ""
 #: web/Person.pm Line:447
 #, fuzzy
 msgid "for"
-msgstr "ou"
+msgstr "or"
 
 #: web/Person.pm Line:447
 msgid "in"
-msgstr "dans"
+msgstr "in"
 
 #: web/TransLog.pm Line:245
-#, fuzzy
 msgid "is not a valid Amount"
-msgstr "is not a valid date"
+msgstr ""
 
 #: web/TransLog.pm Line:256
-#, fuzzy
 msgid "is not valid for Date Paid"
-msgstr "is not a valid date"
+msgstr ""
 
 #: web/ListTransactions.pm Line:36
-#, fuzzy
 msgid "Add a Transaction"
-msgstr "Toute Organisation"
+msgstr ""
 
 #: web/ListTransactions.pm Line:37
-#, fuzzy
 msgid "Amount Due"
-msgstr "Amount"
+msgstr ""
 
 #: web/ListTransactions.pm Line:38
-#, fuzzy
 msgid "Amount Paid"
-msgstr "Amount"
+msgstr ""
 
 #: web/Payments.pm Line:662
 msgid "Congratulations your payment has been successful"
@@ -4026,29 +3965,26 @@ msgstr ""
 #: web/PersonRegistrationDetail.pm Line:368
 #, fuzzy
 msgid "Date Registration Added"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/ListTransactions.pm Line:129
 msgid "End Date"
 msgstr ""
 
 #: web/ListTransactions.pm Line:109
-#, fuzzy
 msgid "Item Name"
-msgstr "Team Name"
+msgstr ""
 
 #: web/ListTransactions.pm Line:40
-#, fuzzy
 msgid "List of Transactions"
-msgstr "Liste des rapports de paiement"
+msgstr ""
 
 #: web/ListTransactions.pm Line:42
-#, fuzzy
 msgid "No Transactions can be found in the database."
-msgstr "No Payment Records can be found in the database."
+msgstr ""
 
 msgid "Player and Player's Parents moved to [_1] for reasons not linked to football"
-msgstr ""
+msgstr "Player and Player's Parents moved to [_1] for reasons not linked to soccer"
 
 #: web/MinorProtection.pm Line:24
 msgid "Player lives no further than 50km from the national border and the club with which the player wishes to be registered is also within 50km from the national border."
@@ -4065,25 +4001,23 @@ msgstr ""
 #: web/PersonRegistrationDetail.pm Line:352
 #, fuzzy
 msgid "Problem Resolution"
-msgstr "Résolution des Doublons"
+msgstr "Duplicate Resolution"
 
 #: web/ListTransactions.pm Line:43
 msgid "Qty"
 msgstr ""
 
 #: web/PersonRegistrationDetail.pm Line:190
-#, fuzzy
 msgid "Record updated successfully"
-msgstr "[_1] a été a mis à jour avec succès"
+msgstr "Record updated successfully"
 
 #: web/PersonRegistrationDetail.pm Line:319
-#, fuzzy
 msgid "Registration Type"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/RecordTypeFilter.pm Line:83
 msgid "Showing"
-msgstr "Monter"
+msgstr ""
 
 #: web/ListTransactions.pm Line:125
 msgid "Start Date"
@@ -4110,12 +4044,14 @@ msgid "We Accept"
 msgstr ""
 
 #: web/Payments.pm Line:672
+#, fuzzy
 msgid "We are sorry, there was a problem with your payment."
-msgstr ""
+msgstr "There was a problem changing the welcome message"
 
 #: web/PersonRegistrationDetail.pm Line:394
+#, fuzzy
 msgid "Work Task Log"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Payments.pm Line:668
 msgid "Your payment has been put on Hold"
@@ -4146,7 +4082,7 @@ msgstr "Invalid Date"
 #: web/PersonEntity.pm Line:175
 #, fuzzy
 msgid "Add Person Entity"
-msgstr "Rechercher une entité"
+msgstr "Search Entity"
 
 #: web/EntityFields.pm Line:268
 #, fuzzy
@@ -4164,7 +4100,7 @@ msgstr ""
 #: web/Club.pm Line:440
 #, fuzzy
 msgid "Country of Organisation"
-msgstr "Toute Organisation"
+msgstr "Registration Authorisation"
 
 #: web/Club.pm Line:345
 #, fuzzy
@@ -4174,12 +4110,12 @@ msgstr "Entity ID"
 #: web/EntityFields.pm Line:252
 #, fuzzy
 msgid "Field ID"
-msgstr "Domaine"
+msgstr "Other Fields"
 
 #: web/EntityFields.pm Line:259
 #, fuzzy
 msgid "Field Name"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: web/EntityFields.pm Line:255
 #, fuzzy
@@ -4193,7 +4129,7 @@ msgstr "Field Options"
 
 #: web/AuditLog.pm Line:114
 msgid "I cannot find any records of changes"
-msgstr "Il n'y a pas de rapport des modifications"
+msgstr "I cannot find any records of changes"
 
 #: web/Club.pm Line:275
 #, fuzzy
@@ -4203,12 +4139,12 @@ msgstr "International Zone"
 #: web/Club.pm Line:282
 #, fuzzy
 msgid "International Organisation Short Name"
-msgstr "Organisation"
+msgstr "International Zone"
 
 #: web/Flow_IntTransferOutBackend.pm Line:1430
 #, fuzzy
 msgid "International Transfer Out [_1]"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: web/Club.pm Line:448
 msgid "Language the name is written in"
@@ -4219,23 +4155,23 @@ msgid "Length of Field"
 msgstr ""
 
 #: web/Flow_IntTransferOutBackend.pm Line:1292
+#, fuzzy
 msgid "Mark as Transferred Out"
-msgstr ""
+msgstr "Transfer"
 
 #: web/Club.pm Line:515
-#, fuzzy
 msgid "Notifications"
-msgstr "Identifications"
+msgstr ""
 
 #: web/Club.pm Line:417
 #, fuzzy
 msgid "State of Organisation"
-msgstr "Organisation"
+msgstr "Search Again"
 
 #: web/Club.pm Line:425
 #, fuzzy
 msgid "Town of Organisation"
-msgstr "Toute Organisation"
+msgstr "Registration Authorisation"
 
 #: web/EntityFields.pm Line:265
 msgid "Type of Field"
@@ -4244,7 +4180,7 @@ msgstr ""
 #: web/Club.pm Line:501
 #, fuzzy
 msgid "Web"
-msgstr "Févr"
+msgstr "Feb"
 
 #: web/Club.pm Line:524
 msgid "Which of the following are appropriate to your club?"
@@ -4253,7 +4189,7 @@ msgstr ""
 #: web/EntityFields.pm Line:276
 #, fuzzy
 msgid "Width of Field"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Transactions.pm Line:373
 msgid "Amount Already Paid via Part Payments"
@@ -4264,13 +4200,12 @@ msgid "Click to View Part Payment form"
 msgstr ""
 
 #: web/Transactions.pm Line:338
-#, fuzzy
 msgid "Delivered"
-msgstr "Deregistered"
+msgstr ""
 
 #: web/Transactions.pm Line:479
 msgid "Edit Details"
-msgstr "Modifier les détails"
+msgstr ""
 
 #: web/Transactions.pm Line:110
 msgid "Error with Payment"
@@ -4298,17 +4233,14 @@ msgid "Paid ?"
 msgstr ""
 
 #: web/Transactions.pm Line:351
-#, fuzzy
 msgid "Part Payment for"
-msgstr "Liste des rapports de paiement"
+msgstr ""
 
 #: web/Transactions.pm Line:411
-#, fuzzy
 msgid "Product"
-msgstr "Produits"
+msgstr ""
 
 #: web/Transactions.pm Line:456
-#, fuzzy
 msgid "Record added successfully"
 msgstr "Record added successfully"
 
@@ -4321,9 +4253,8 @@ msgid "Request for Person Details Search"
 msgstr ""
 
 #: web/Transactions.pm Line:100
-#, fuzzy
 msgid "Return to Invoices"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: web/Transactions.pm Line:453
 #: Line:457
@@ -4331,14 +4262,12 @@ msgid "Return to Transaction"
 msgstr ""
 
 #: web/Transactions.pm Line:416
-#, fuzzy
 msgid "Select Product"
-msgstr "Produits"
+msgstr ""
 
 #: web/Transactions.pm Line:407
-#, fuzzy
 msgid "Select Registration"
-msgstr "Coach Registration No."
+msgstr ""
 
 #: web/Transactions.pm Line:110
 msgid "There was an error processing the payment.  Please try again."
@@ -4347,7 +4276,7 @@ msgstr ""
 #: web/Transactions.pm Line:185
 #, fuzzy
 msgid "Transaction deleted"
-msgstr "Organisation"
+msgstr "National Number"
 
 #: web/Transactions.pm Line:185
 #, fuzzy
@@ -4357,17 +4286,15 @@ msgstr "Registration Number"
 #: web/Transactions.pm Line:426
 #, fuzzy
 msgid "Update Transaction"
-msgstr "Toute Organisation"
+msgstr "Update Information"
 
 #: web/user/Login.pm Line:38
-#, fuzzy
 msgid "You must enter a password"
-msgstr "Vous devez entrer un numéro"
+msgstr ""
 
 #: web/user/Login.pm Line:35
-#, fuzzy
 msgid "You must enter an username address"
-msgstr "Vous devez entrer un numéro"
+msgstr ""
 
 #: web/user/Login.pm Line:173
 msgid "Your user account has been deleted."
@@ -4389,21 +4316,21 @@ msgstr ""
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1971
 #, fuzzy
 msgid "Affiliations"
-msgstr "Associations"
+msgstr "Action"
 
 #: web/Reports/ReportAdvanced.pm Line:337
 msgid "All Records"
-msgstr "Tous les dossiers"
+msgstr "All Records"
 
 #: web/Reports/ReportAdvanced.pm Line:367
 msgid "Ascending"
-msgstr "Ascendant"
+msgstr "Ascending"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1610
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1585
 #, fuzzy
 msgid "Bank Reference Number"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:733
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:707
@@ -4442,9 +4369,8 @@ msgid "Certification Types"
 msgstr "Identification Type"
 
 #: web/Reports/ReportAdvanced.pm Line:434
-#, fuzzy
 msgid "Choose how you want to receive the data from this report."
-msgstr "Choisissez ce que vous souhaitez imprimer en vrac à partir des options ci-dessous."
+msgstr ""
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:443
 #, fuzzy
@@ -4459,17 +4385,16 @@ msgstr "Date"
 
 #: web/Reports/ReportAdvanced.pm Line:368
 msgid "Descending"
-msgstr "Descendant"
+msgstr "Descending"
 
 #: web/Reports/ReportAdvanced.pm Line:263
 #: Line:437
 msgid "Display"
-msgstr "Affichage"
+msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:446
-#, fuzzy
 msgid "Email Address"
-msgstr "Adresse 1"
+msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:445
 msgid "Email the report in a format suitable to be imported into another product."
@@ -4489,17 +4414,17 @@ msgstr "Entity ID"
 
 #: web/Reports/ReportAdvanced.pm Line:261
 msgid "Filter Only"
-msgstr "Filtre uniquement"
+msgstr "Filter Only"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1995
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1969
 #, fuzzy
 msgid "Financial"
-msgstr "Financial?"
+msgstr "Access"
 
 #: web/Reports/ReportAdvanced.pm Line:412
 msgid "Group By"
-msgstr "Groupe par"
+msgstr ""
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1994
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1968
@@ -4526,11 +4451,11 @@ msgstr ""
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1972
 #, fuzzy
 msgid "Member Records"
-msgstr "Rapports du membre"
+msgstr "Member Reports"
 
 #: web/Reports/ReportAdvanced.pm Line:423
 msgid "No Grouping"
-msgstr "Pas de regroupement"
+msgstr ""
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:482
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:477
@@ -4554,12 +4479,11 @@ msgstr ""
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1970
 #, fuzzy
 msgid "Other Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Reports/ReportAdvanced.pm Line:433
-#, fuzzy
 msgid "Output"
-msgstr "Rapport de sortie"
+msgstr ""
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1628
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1603
@@ -4571,7 +4495,7 @@ msgstr "Payment Type"
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1712
 #, fuzzy
 msgid "Payment Record Notes"
-msgstr "Liste des rapports de paiement"
+msgstr "List of Payment Records"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:465
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:462
@@ -4587,33 +4511,34 @@ msgstr "Payment Type"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1381
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1355
+#, fuzzy
 msgid "Photo Present?"
-msgstr "Photo inclues?"
+msgstr "President"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1546
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1520
 #, fuzzy
 msgid "Product Group"
-msgstr "Produits"
+msgstr "Products"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1520
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1494
 #, fuzzy
 msgid "Product Reporting"
-msgstr "Produits"
+msgstr "Product Blog"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1556
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1530
 #, fuzzy
 msgid "Product Type"
-msgstr "Produits"
+msgstr "Products"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1427
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1401
 #: web/Reports/ReportAdvanced_Club.pm Line:81
 #, fuzzy
 msgid "Region Name"
-msgstr "Nom de la zone"
+msgstr "Region"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:409
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:404
@@ -4623,23 +4548,21 @@ msgstr "Registration Number"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1992
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1966
-#, fuzzy
 msgid "Registrations"
-msgstr "Registration Number"
+msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:265
 msgid "Remove"
 msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:366
-#, fuzzy
 msgid "Secondary sort by"
-msgstr "Tri secondaire par"
+msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:500
 #, fuzzy
 msgid "Selected Fields"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1683
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1657
@@ -4649,50 +4572,49 @@ msgstr "Payment Type"
 
 #: web/Reports/ReportAdvanced.pm Line:347
 msgid "Show"
-msgstr "Montrer"
+msgstr "Show"
 
 #: web/Reports/ReportAdvanced.pm Line:365
-#, fuzzy
 msgid "Sort by"
-msgstr "Trier par"
+msgstr ""
 
 #: web/Reports/ReportAdvanced.pm Line:335
 msgid "Summary Data"
-msgstr "Résumé des données"
+msgstr "Summary Data"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1660
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1634
 #, fuzzy
 msgid "Transaction Date"
-msgstr "Organisation"
+msgstr "Personal Details"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1511
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1485
 #, fuzzy
 msgid "Transaction ID"
-msgstr "Organisation"
+msgstr "Personal Details"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1729
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1703
 #, fuzzy
 msgid "Transaction Notes"
-msgstr "Organisation"
+msgstr "National Number"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:1718
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:1692
 #, fuzzy
 msgid "Transaction Status"
-msgstr "Organisation"
+msgstr "Personal Details"
 
 #: web/Reports/ReportAdvanced.pm Line:331
 msgid "Unique Records Only"
-msgstr "Données uniques seulement"
+msgstr "Unique Records Only"
 
 #: web/Reports/ReportAdvanced_BelowPeople.pm Line:220
 #: web/Reports/ReportAdvanced_MyPeople.pm Line:221
 #, fuzzy
 msgid "Year of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: web/registration/Flow_SelfRegExtraProduct.pm Line:533
 msgid " link to go back to the product/license listing"
@@ -4701,12 +4623,12 @@ msgstr ""
 #: web/registration/AccountActivation.pm Line:25
 #, fuzzy
 msgid "Account Activation"
-msgstr "Association"
+msgstr "Action"
 
 #: web/registration/OldSystemAccounts.pm Line:80
 #, fuzzy
 msgid "Account linked successfully"
-msgstr "[_1] a été a mis à jour avec succès"
+msgstr "Record updated successfully"
 
 #: web/registration/AccountProfile.pm Line:96
 msgid "All fields must be entered"
@@ -4714,7 +4636,7 @@ msgstr ""
 
 #: web/registration/SelfUserWorkFlow.pm Line:63
 msgid "An invalid Action Code has been passed to me."
-msgstr "Une action Code non valide a été effectuée."
+msgstr "An invalid Action Code has been passed to me."
 
 #: web/registration/Flow_SelfRegExtraProduct.pm Line:533
 msgid "Back"
@@ -4737,14 +4659,13 @@ msgid "Contact details successfully updated."
 msgstr ""
 
 #: web/registration/user/ForgottenPassword.pm Line:91
-#, fuzzy
 msgid "Forgotten Password"
-msgstr "Configuration"
+msgstr ""
 
 #: web/registration/Flow_SelfRegExtraProduct.pm Line:231
 #, fuzzy
 msgid "Invalid Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/registration/OldSystemAccounts.pm Line:71
 #, fuzzy
@@ -4788,20 +4709,18 @@ msgid "Please select from the list of Clubs"
 msgstr ""
 
 #: web/registration/user/ForgottenPassword.pm Line:59
-#, fuzzy
 msgid "Proceed to the login page"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: web/registration/SelfUserTransfer.pm Line:74
 #: Line:136
-#, fuzzy
 msgid "Return to your Dashboard"
-msgstr "Configuration"
+msgstr ""
 
 #: web/registration/SelfUserWorkFlow.pm Line:250
 #, fuzzy
 msgid "Self Registration Work Tasks"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: web/registration/user/ForgottenPassword.pm Line:41
 msgid "Sorry. The email address you have provided does not exist in our system."
@@ -4810,7 +4729,7 @@ msgstr ""
 #: web/registration/SelfUserTransfer.pm Line:55
 #, fuzzy
 msgid "Start Transfer"
-msgstr "Start Date"
+msgstr "Transfer"
 
 #: web/registration/OldSystemAccounts.pm Line:59
 msgid "The person you are trying to link is an adult and there is already an adult linked to this account"
@@ -4829,9 +4748,8 @@ msgid "We can't seem to find your old account"
 msgstr ""
 
 #: web/registration/user/SelfUserLogin.pm Line:35
-#, fuzzy
 msgid "You must enter an email address"
-msgstr "Vous devez entrer un numéro"
+msgstr ""
 
 #: web/registration/OldSystemAccounts.pm Line:29
 msgid "You must supply both credentials to link to your old system account"
@@ -4872,13 +4790,13 @@ msgstr "Custom Fields"
 #: templates/user/loginerror.templ Line:4
 #, fuzzy
 msgid "Click here to try again"
-msgstr "Cliquez ici pour résoudre."
+msgstr "Click here to resolve [quant2,_1,it,them]."
 
 #: templates/entity/required_docs.templ Line:36
 #: Line:123
 #, fuzzy
 msgid "Click here to update this file"
-msgstr "Cliquez ici pour résoudre."
+msgstr "Click here to resolve [quant2,_1,it,them]."
 
 #: templates/entity/venue_fields.templ Line:128
 #: Line:139
@@ -4907,39 +4825,36 @@ msgstr ""
 
 #: templates/user/globalnav.templ Line:19
 msgid "Help"
-msgstr "Aide"
+msgstr "Help"
 
 #: templates/user/globalnav.templ Line:66
 #, fuzzy
 msgid "Help Desk"
-msgstr "Aide"
+msgstr "Help"
 
 #: templates/user/update_password_msg.templ Line:9
 msgid "Login"
-msgstr "Connexion"
+msgstr "Login"
 
 #: templates/user/globalnav.templ Line:23
 msgid "Logout"
-msgstr "Déconnexion"
+msgstr "Logout"
 
 #: templates/entity/summarypanel.templ Line:3
 msgid "MA venue ID"
 msgstr ""
 
 #: templates/user/globalnav.templ Line:40
-#, fuzzy
 msgid "Member Association"
-msgstr "Association"
+msgstr ""
 
 #: templates/user/modify_user_password.templ Line:10
-#, fuzzy
 msgid "New Password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/entity/auditlog.templ Line:31
-#, fuzzy
 msgid "No Record Found"
-msgstr "Aucune photo trouvée"
+msgstr ""
 
 #: templates/entity/required_docs.templ Line:174
 msgid "No documents required for this registration, click"
@@ -4977,9 +4892,8 @@ msgid "Required Venue Documents"
 msgstr ""
 
 #: templates/user/modify_user_password.templ Line:15
-#, fuzzy
 msgid "Retype Password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/entity/venue_fields.templ Line:30
 msgid "Successfully updated."
@@ -4999,23 +4913,20 @@ msgid "To delete click 'Submit', to cancel, click 'Close'"
 msgstr ""
 
 #: templates/user/modify_user_password.templ Line:20
-#, fuzzy
 msgid "Update Password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/entity/required_docs.templ Line:39
 #: Line:44
 #: Line:126
 #: Line:131
-#, fuzzy
 msgid "Upload"
-msgstr "Téléchargé"
+msgstr ""
 
 #: templates/entity/required_docs.templ Line:36
 #: Line:123
-#, fuzzy
 msgid "Uploaded"
-msgstr "Téléchargé"
+msgstr ""
 
 #: templates/entity/complete.templ Line:17
 msgid "View all currently submitted registrations"
@@ -5024,12 +4935,12 @@ msgstr ""
 #: templates/user/globalnav.templ Line:49
 #: Line:62
 msgid "Website"
-msgstr "Site internet"
+msgstr "Website"
 
 #: templates/user/globalnav.templ Line:16
 #: Line:17
 msgid "Welcome"
-msgstr "Bienvenue"
+msgstr "Welcome"
 
 #: templates/user/url_link_reminder.templ Line:4
 msgid "You have requested for a new password."
@@ -5045,9 +4956,8 @@ msgstr ""
 
 #: templates/user/modify_user_password.templ Line:45
 #: Line:49
-#, fuzzy
 msgid "must be at least 6 characters long"
-msgstr "must be [_1] characters long"
+msgstr ""
 
 #: templates/entity/required_docs.templ Line:174
 msgid "to proceed"
@@ -5064,7 +4974,7 @@ msgstr ""
 #: templates/user/loginform.templ Line:10
 #: templates/user/signup.templ Line:30
 msgid "Password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/user/signup.templ Line:71
 msgid "Please enter your Family Name"
@@ -5075,9 +4985,8 @@ msgid "Please enter your First Name"
 msgstr ""
 
 #: templates/user/signup.templ Line:33
-#, fuzzy
 msgid "Re-enter Password"
-msgstr "Their Password"
+msgstr ""
 
 #: templates/user/loginform.templ Line:13
 msgid "Remember me on this computer"
@@ -5098,7 +5007,7 @@ msgstr ""
 #: templates/user/levelNavigation.templ Line:3
 #, fuzzy
 msgid "View as"
-msgstr "Vue"
+msgstr "View"
 
 #: templates/user/signupfinish.templ Line:15
 msgid "We've sent you an email to welcome you to the system."
@@ -5131,17 +5040,19 @@ msgid "Advanced People (My level)"
 msgstr ""
 
 #: templates/translation/outstanding.templ Line:36
+#, fuzzy
 msgid "Advanced Transfers Report"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/flow/default.templ Line:63
+#, fuzzy
 msgid "Cancel"
-msgstr ""
+msgstr "Access"
 
 #: templates/translation/outstanding.templ Line:22
 #, fuzzy
 msgid "Coach Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/translation/outstanding.templ Line:27
 msgid "DOB (YYMMDD)"
@@ -5159,17 +5070,17 @@ msgstr "Field Options"
 #: templates/flow/facility_summary.templ Line:54
 #, fuzzy
 msgid "Field name"
-msgstr "Nom de famille"
+msgstr "Family name"
 
 #: templates/flow/facility_summary.templ Line:53
 #, fuzzy
 msgid "Field number"
-msgstr "Nombre incorrect"
+msgstr "Offline Number"
 
 #: templates/translation/outstanding.templ Line:31
 #, fuzzy
 msgid "Finance"
-msgstr "Financial?"
+msgstr "Access"
 
 #: templates/flow/facility_summary.templ Line:13
 msgid "Language"
@@ -5183,41 +5094,40 @@ msgstr "Identification Number"
 #: templates/flow/facility_fields_grid.templ Line:11
 #, fuzzy
 msgid "Length of Field (m)"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: templates/translation/outstanding.templ Line:24
 #, fuzzy
 msgid "MA Official Registration"
-msgstr "Match Official Registration No."
+msgstr "New Registration"
 
 #: templates/translation/outstanding.templ Line:19
 #, fuzzy
 msgid "National Body"
-msgstr "National Team"
+msgstr "National Body"
 
 #: templates/flow/club_summary.templ Line:38
 #, fuzzy
 msgid "Organisation Details"
-msgstr "Organisation"
+msgstr "Personal Details"
 
 #: templates/flow/club_summary.templ Line:13
 msgid "Organisation dissolution date"
 msgstr ""
 
 #: templates/flow/club_summary.templ Line:12
-#, fuzzy
 msgid "Organisation foundation date"
-msgstr "Organisation"
+msgstr ""
 
 #: templates/flow/club_summary.templ Line:10
 #, fuzzy
 msgid "Organisation name"
-msgstr "Organisation"
+msgstr "Registration Number"
 
 #: templates/flow/club_summary.templ Line:41
 #, fuzzy
 msgid "Organisation type"
-msgstr "Organisation"
+msgstr "Identification Type"
 
 #: templates/translation/outstanding.templ Line:50
 msgid "PERSON REQUEST ACCESS ACCEPTED:"
@@ -5278,12 +5188,12 @@ msgstr ""
 #: templates/flow/club_summary.templ Line:81
 #, fuzzy
 msgid "Payment Method"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: templates/flow/club_summary.templ Line:77
 #, fuzzy
 msgid "Payment Options"
-msgstr "Options de l'événement"
+msgstr "Save Options"
 
 #: templates/flow/facility_summary.templ Line:35
 #, fuzzy
@@ -5293,12 +5203,12 @@ msgstr "Offline Number"
 #: templates/flow/loan.templ Line:85
 #, fuzzy
 msgid "Player Loan Status: Released"
-msgstr "Rapports des statuts"
+msgstr "Status Reports"
 
 #: templates/translation/outstanding.templ Line:21
 #, fuzzy
 msgid "Player Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/flow/loan.templ Line:8
 #: templates/flow/transfer.templ
@@ -5311,22 +5221,22 @@ msgstr "Position"
 
 #: templates/flow/facility_summary.templ Line:32
 msgid "Postal Code"
-msgstr "Code postal"
+msgstr "Postal Code"
 
 #: templates/translation/outstanding.templ Line:23
 #, fuzzy
 msgid "Referee Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/flow/transfer.templ Line:85
 #, fuzzy
 msgid "Released"
-msgstr "Décédé?"
+msgstr "Deceased?"
 
 #: templates/translation/outstanding.templ Line:20
 #, fuzzy
 msgid "Run Report"
-msgstr "Exécuter un rapport"
+msgstr "Run Report"
 
 #: templates/flow/default.templ Line:66
 msgid "Save and Exit"
@@ -5351,33 +5261,36 @@ msgstr ""
 #: templates/translation/outstanding.templ Line:25
 #, fuzzy
 msgid "Social Security Number"
-msgstr "Loyalty Number"
+msgstr "National Number"
 
 #: templates/team/team_staff.templ Line:28
 #, fuzzy
 msgid "Staff Member"
-msgstr "Modifier membres"
+msgstr "Member"
 
 #: templates/flow/flow_cancelsave.templ Line:20
+#, fuzzy
 msgid "This registration has been cancelled"
-msgstr ""
+msgstr "Registration Number"
 
 #: templates/flow/flow_cancelsave.templ Line:15
+#, fuzzy
 msgid "This registration has been saved"
-msgstr ""
+msgstr "Registration Number"
 
 #: templates/translation/outstanding.templ Line:37
 #, fuzzy
 msgid "Transactions (My People)"
-msgstr "Organisation"
+msgstr "National Number"
 
 #: templates/flow/transfer.templ Line:85
 msgid "Transfer Status"
 msgstr ""
 
 #: templates/translation/outstanding.templ Line:35
+#, fuzzy
 msgid "Transfers Below Report"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/flow/club_summary.templ Line:42
 msgid "Type of Legal entity"
@@ -5386,7 +5299,7 @@ msgstr ""
 #: templates/flow/facility_summary.templ Line:12
 #, fuzzy
 msgid "Venue Short Name"
-msgstr "Nom du site"
+msgstr "Sport Name"
 
 #: templates/translation/outstanding.templ Line:44
 msgid "WORK TASK ADDED:"
@@ -5415,12 +5328,11 @@ msgstr ""
 #: templates/flow/facility_fields_grid.templ Line:12
 #, fuzzy
 msgid "Width of Field (m)"
-msgstr "Autres domaines"
+msgstr "Other Fields"
 
 #: templates/registration/what.templ Line:75
-#, fuzzy
 msgid "Age group"
-msgstr "Groupe d'Âge"
+msgstr ""
 
 #: templates/registration/sr_account_activation_result.templ Line:3
 msgid "An error has been encountered while activating your account. Please check your email for the correct link."
@@ -5431,9 +5343,8 @@ msgid "An invoice for this registration has been created.  You can find all your
 msgstr ""
 
 #: templates/registration/completebulk.templ Line:4
-#, fuzzy
 msgid "Bulk Registration is complete"
-msgstr "Registration Number"
+msgstr ""
 
 #: templates/registration/certificate_flow_backend.templ Line:10
 #, fuzzy
@@ -5445,13 +5356,12 @@ msgid "Check the box against the items you would like to select"
 msgstr ""
 
 #: templates/registration/error.templ Line:2
-#, fuzzy
 msgid "Click here to select new combination"
-msgstr "Cliquez ici pour résoudre."
+msgstr ""
 
 #: templates/registration/playerpassport.templ Line:10
 msgid "Club Name"
-msgstr "Nom du Club"
+msgstr "Club Name"
 
 #: templates/registration/products.templ Line:22
 msgid "Cost"
@@ -5464,12 +5374,11 @@ msgstr ""
 #: templates/registration/certificate_flow_backend.templ Line:45
 #, fuzzy
 msgid "Date Valid Until"
-msgstr "Date Registered Until"
+msgstr "Date Suspended Until"
 
 #: templates/registration/playerpassport.templ Line:9
-#, fuzzy
 msgid "End"
-msgstr "Janv"
+msgstr ""
 
 #: templates/registration/certifications.templ Line:2
 #, fuzzy
@@ -5489,13 +5398,13 @@ msgid "Login to continue"
 msgstr ""
 
 #: templates/registration/summary.templ Line:13
+#, fuzzy
 msgid "Maiden Name"
-msgstr "Nom de jeune fille"
+msgstr "Maiden name"
 
 #: templates/registration/what.templ Line:79
-#, fuzzy
 msgid "Nature of Registration"
-msgstr "Instructor Registration No"
+msgstr ""
 
 #: templates/registration/certificate_flow_backend.templ Line:66
 #, fuzzy
@@ -5509,7 +5418,7 @@ msgstr ""
 #: templates/registration/summary.templ Line:7
 #, fuzzy
 msgid "Personal Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: templates/registration/bulkpersons.templ Line:1
 msgid "Please select the people you wish to register from the list below and click on the update button to commit your change."
@@ -5525,7 +5434,7 @@ msgstr "Deregistered"
 #: templates/registration/summarybulk.templ Line:35
 #, fuzzy
 msgid "Register to"
-msgstr "Date Registered Until"
+msgstr "New Registration"
 
 #: templates/registration/summary.templ Line:46
 #: templates/registration/summarybulk.templ Line:32
@@ -5541,21 +5450,19 @@ msgstr "Registration Number"
 #: templates/registration/what.templ Line:42
 #, fuzzy
 msgid "Reset Registration"
-msgstr "Instructor Registration No"
+msgstr "New Registration"
 
 #: templates/registration/completebulk.templ Line:34
-#, fuzzy
 msgid "Return to Bulk Renewals"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: templates/registration/entityselect.templ Line:7
 msgid "SEARCH/FIND A CLUB"
 msgstr ""
 
 #: templates/registration/person_flow_manual_pay.templ Line:6
-#, fuzzy
 msgid "Select Payment Type"
-msgstr "Payment Type"
+msgstr ""
 
 #: templates/registration/playerpassport.templ Line:8
 #, fuzzy
@@ -5567,9 +5474,8 @@ msgid "Sub Role"
 msgstr ""
 
 #: templates/registration/summary.templ Line:103
-#, fuzzy
 msgid "Submit for approval"
-msgstr "Approbation du test"
+msgstr ""
 
 #: templates/registration/completebulk.templ Line:11
 msgid "We would like to remind you that the Member Association will not approve the renewals until payment is completed."
@@ -5611,7 +5517,7 @@ msgstr ""
 #: templates/selfrego/choosenproducts.templ Line:2
 #, fuzzy
 msgid "Additional Products Transaction"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: templates/registration/product_flow_backend.templ Line:39
 msgid "After you submit the registration to the [_1], the system will connect you to the payment portal"
@@ -5622,24 +5528,23 @@ msgid "After you submit the registration to the [_1], the system will create an 
 msgstr ""
 
 #: templates/registration/document_flow_backend.templ Line:90
-#, fuzzy
 msgid "Are you sure you want to cancel this upload?"
-msgstr "Etes-vous sûr de vouloir supprimer ce membre"
+msgstr ""
 
 #: templates/registration/whatbulk.templ Line:7
 #, fuzzy
 msgid "Bulk Renewal Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/cardprint/batchoptions.templ Line:7
 #, fuzzy
 msgid "Cancel Batch"
-msgstr "Date d'ajout"
+msgstr "Access"
 
 #: templates/registration/document_flow_backend.templ Line:89
 #, fuzzy
 msgid "Cancel Upload"
-msgstr "Date d'ajout"
+msgstr "Access"
 
 #: templates/cardprint/history.templ Line:5
 msgid "Card"
@@ -5648,7 +5553,7 @@ msgstr ""
 #: templates/cardprint/bulkoptions.templ Line:8
 #, fuzzy
 msgid "Card to print"
-msgstr "Cartes imprimées"
+msgstr "Cards Printed"
 
 #: templates/cardprint/history.templ Line:24
 msgid "Choose the card to reprint"
@@ -5671,21 +5576,21 @@ msgstr ""
 #: Line:213
 #, fuzzy
 msgid "Cropping Complete"
-msgstr "Compétition"
+msgstr "Type"
 
 #: templates/cardprint/history.templ Line:6
 #, fuzzy
 msgid "Date Printed"
-msgstr "Date d'ajout"
+msgstr "Cards Printed"
 
 #: templates/cardprint/bulkoptions.templ Line:51
 msgid "Default"
-msgstr "Par défaut"
+msgstr ""
 
 #: templates/registration/whatbulk.templ Line:47
 #, fuzzy
 msgid "Family Name starting with"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: templates/cardprint/cards/generic_plastic_card.templ Line:112
 #, fuzzy
@@ -5693,9 +5598,8 @@ msgid "From"
 msgstr "Date"
 
 #: templates/cardprint/bulkoptions.templ Line:72
-#, fuzzy
 msgid "Generate Print Batch"
-msgstr "Imprimer Générer vrac"
+msgstr ""
 
 #: templates/cardprint/history.templ Line:34
 #, fuzzy
@@ -5705,7 +5609,7 @@ msgstr "View Receipt"
 #: templates/cardprint/batchoptions.templ Line:16
 #, fuzzy
 msgid "Mark as Printed"
-msgstr "Marquer comme en double"
+msgstr "Cards Printed"
 
 #: templates/cardprint/bulkoptions.templ Line:59
 msgid "Maximum number to print"
@@ -5734,12 +5638,12 @@ msgstr ""
 #: templates/cardprint/bulkoptions.templ Line:48
 #, fuzzy
 msgid "Print Language"
-msgstr "Nom préféré"
+msgstr "Preferred name"
 
 #: templates/registration/complete.templ Line:65
 #, fuzzy
 msgid "Register another Person"
-msgstr "Registration Number"
+msgstr "Registration Authorisation"
 
 #: templates/registration/complete.templ Line:63
 #, fuzzy
@@ -5757,32 +5661,30 @@ msgstr ""
 #: templates/cardprint/history.templ Line:22
 #, fuzzy
 msgid "Request a Reprint "
-msgstr "Exécuter un rapport"
+msgstr "Run Report"
 
 #: templates/registration/document_flow_backend.templ Line:10
+#, fuzzy
 msgid "Required Documents"
-msgstr ""
+msgstr "Add Document"
 
 #: templates/registration/document_flow_backend.templ Line:290
-#, fuzzy
 msgid "Rotate Left"
-msgstr "Tourner à gauche à 90 degrés"
+msgstr ""
 
 #: templates/registration/document_flow_backend.templ Line:293
-#, fuzzy
 msgid "Rotate Right"
-msgstr "Tourner à droite à 90 degrés"
+msgstr ""
 
 #: templates/registration/document_flow_backend.templ Line:283
-#, fuzzy
 msgid "Save and Close"
-msgstr "Save Tags"
+msgstr ""
 
 #: templates/registration/complete_sr.templ Line:21
 #: templates/registration/complete.templ Line:22
 #, fuzzy
 msgid "Status Change"
-msgstr "Changement en vrac"
+msgstr "Bulk Change"
 
 #: templates/registration/complete_sr.templ Line:14
 #: templates/registration/complete.templ Line:15
@@ -5804,7 +5706,7 @@ msgstr ""
 #: templates/cardprint/batchoptions.templ Line:12
 #, fuzzy
 msgid "View Cards"
-msgstr "Vue"
+msgstr "View"
 
 #: templates/cardprint/bulkoptions.templ Line:3
 msgid "We could not find any cards to print that match your crtieria."
@@ -5836,7 +5738,7 @@ msgstr ""
 #: templates/registration/complete.templ Line:22
 #, fuzzy
 msgid "approval"
-msgstr "Temps Approximatif"
+msgstr "Approvals"
 
 #: templates/selfrego/home.templ Line:20
 msgid "A minor in my care"
@@ -5851,13 +5753,13 @@ msgstr "Action"
 #: templates/selfrego/accordion.templ Line:101
 #, fuzzy
 msgid "Add Coach Role"
-msgstr "Entraîneur?"
+msgstr "Coach"
 
 #: templates/selfrego/accordion.templ Line:94
 #: Line:98
 #, fuzzy
 msgid "Add Player Role"
-msgstr "Joueur?"
+msgstr "Player"
 
 #: templates/selfrego/accordion.templ Line:83
 msgid "Add Product/Licence"
@@ -5866,7 +5768,7 @@ msgstr ""
 #: templates/selfrego/accordion.templ Line:104
 #, fuzzy
 msgid "Add Referee Role"
-msgstr "Ajouter nouvelle donnée"
+msgstr "Referee"
 
 #: templates/selfrego/home.templ Line:8
 msgid "Add an additional person?"
@@ -5893,12 +5795,12 @@ msgstr ""
 #: templates/selfrego/user/signup.templ Line:45
 #, fuzzy
 msgid "Choose a password"
-msgstr "Vous devez entrer un numéro"
+msgstr "Choose a Sport"
 
 #: templates/viewer/viewer.templ Line:36
 #, fuzzy
 msgid "Click here to download the file"
-msgstr "Cliquez ici pour résoudre."
+msgstr "Click here to resolve [quant2,_1,it,them]."
 
 #: templates/selfrego/user/profile.templ Line:55
 #: templates/selfrego/user/signup.templ
@@ -5918,20 +5820,21 @@ msgstr ""
 #: templates/selfrego/transfer_init.templ Line:74
 #, fuzzy
 msgid "Current Club"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: templates/selfrego/accordion.templ Line:33
 msgid "DOB"
 msgstr ""
 
 #: templates/viewer/viewer.templ Line:46
+#, fuzzy
 msgid "Download the file"
-msgstr ""
+msgstr "Click here to resolve [quant2,_1,it,them]."
 
 #: templates/selfrego/user/forgot_password_form.templ Line:13
 #, fuzzy
 msgid "Email Sent"
-msgstr "E-mail 2"
+msgstr "Email 2"
 
 #: templates/selfrego/user/signup.templ Line:23
 #, fuzzy
@@ -5943,9 +5846,8 @@ msgid "Fill in your email address below and press the 'Remind Me' button.  We wi
 msgstr ""
 
 #: templates/selfrego/user/login.templ Line:16
-#, fuzzy
 msgid "Forgot your password?"
-msgstr "Configuration"
+msgstr ""
 
 #: templates/viewer/viewer.templ Line:11
 msgid "ID"
@@ -5958,17 +5860,16 @@ msgstr ""
 #: templates/selfrego/home.templ Line:65
 #, fuzzy
 msgid "Link Account"
-msgstr "Détails du compte en banque"
+msgstr "Accounts"
 
 #: templates/selfrego/accordion.templ Line:18
-#, fuzzy
 msgid "Member Detail Summary"
-msgstr "Résumé des évènements du membre"
+msgstr ""
 
 #: templates/selfrego/accordion.templ Line:26
 #, fuzzy
 msgid "Member ID"
-msgstr "Membre"
+msgstr "Member"
 
 #: templates/selfrego/home.templ Line:16
 msgid "Myself"
@@ -5976,9 +5877,8 @@ msgstr ""
 
 #: templates/selfrego/user/profile.templ Line:48
 #: Line:50
-#, fuzzy
 msgid "New password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/selfrego/user/profile.templ Line:51
 #: templates/selfrego/user/signup.templ
@@ -5988,12 +5888,11 @@ msgstr ""
 #: templates/selfrego/accordion.templ Line:44
 #, fuzzy
 msgid "Period"
-msgstr "Produits"
+msgstr "Identifications"
 
 #: templates/selfrego/transfer_init.templ Line:129
-#, fuzzy
 msgid "Please add notes"
-msgstr "S'il vous plaît être patient"
+msgstr ""
 
 #: templates/selfrego/selfrego_add_product_complete.templ Line:15
 msgid "Please refer to the 'Transactions' tab to review all of your transactions."
@@ -6001,9 +5900,8 @@ msgstr ""
 
 #: templates/selfrego/user/profile.templ Line:61
 #: Line:63
-#, fuzzy
 msgid "Re-enter new password"
-msgstr "Their Password"
+msgstr ""
 
 #: templates/selfrego/accordion.templ Line:14
 #, fuzzy
@@ -6015,56 +5913,56 @@ msgid "Remind Me"
 msgstr ""
 
 #: templates/selfrego/accordion.templ Line:72
+#, fuzzy
 msgid "Renew"
-msgstr ""
+msgstr "Renewal"
 
 #: templates/selfrego/transfer_init.templ Line:91
 #, fuzzy
 msgid "Request notes"
-msgstr "Modifier les détails"
+msgstr "Personal Details"
 
 #: templates/selfrego/user/profile.templ Line:126
 #, fuzzy
 msgid "Return to dashboard"
-msgstr "Configuration"
+msgstr "New Registration"
 
 #: templates/selfrego/user/forgot_password_form.templ Line:36
-#, fuzzy
 msgid "Return to login"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: templates/selfrego/user/signupfinish.templ Line:18
-#, fuzzy
 msgid "Return to login page"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: templates/selfrego/user/signup.templ Line:19
-#, fuzzy
 msgid "Return to signup page"
-msgstr "Nombre incorrect"
+msgstr ""
 
 #: templates/selfrego/worktasks.templ Line:104
+#, fuzzy
 msgid "Review Player loan of"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/selfrego/worktasks.templ Line:92
+#, fuzzy
 msgid "Review Transfer of"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/selfrego/transfer_init.templ Line:82
 #, fuzzy
 msgid "Select Club"
-msgstr "Pays"
+msgstr "Country"
 
 #: templates/selfrego/home.templ Line:1
 #, fuzzy
 msgid "Self Registration Dashboard"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/selfrego/user/login.templ Line:9
 #, fuzzy
 msgid "Sign into Self Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/selfrego/worktasks.templ Line:36
 #: Line:42
@@ -6088,22 +5986,22 @@ msgstr ""
 #: templates/selfrego/transfer_init.templ Line:13
 #, fuzzy
 msgid "Transfer Details"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: templates/selfrego/transfer_init.templ Line:80
 #, fuzzy
 msgid "Transfer To"
-msgstr "Recherche de personne"
+msgstr "Transfer"
 
 #: templates/selfrego/accordion.templ Line:42
 #, fuzzy
 msgid "Type/Level"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/selfrego/home.templ Line:3
 #, fuzzy
 msgid "Update Profile"
-msgstr "Mettre à jour"
+msgstr "Update Club"
 
 #: templates/selfrego/user/profile.templ Line:16
 #, fuzzy
@@ -6131,12 +6029,11 @@ msgstr ""
 #: templates/selfrego/user/login.templ Line:6
 #, fuzzy
 msgid "Welcome..."
-msgstr "Bienvenue"
+msgstr "Welcome"
 
 #: templates/selfrego/home.templ Line:32
-#, fuzzy
 msgid "What type of registration do you want?"
-msgstr "Instructor Registration No"
+msgstr ""
 
 #: templates/selfrego/home.templ Line:10
 msgid "Who are you registering for?"
@@ -6177,14 +6074,12 @@ msgid "must be at least 8 characters long"
 msgstr "must be [_1] characters long"
 
 #: templates/selfrego/user/signup.templ Line:50
-#, fuzzy
 msgid "password"
-msgstr "Mot de Passe"
+msgstr ""
 
 #: templates/selfrego/user/signup.templ Line:64
-#, fuzzy
 msgid "re-enter password"
-msgstr "Their Password"
+msgstr ""
 
 #: templates/selfrego/accordion.templ Line:56
 #, fuzzy
@@ -6194,18 +6089,18 @@ msgstr "Invalid Date"
 #: templates/personrequest/transfer/int_current_club_view.templ Line:113
 #, fuzzy
 msgid "Additional Comments"
-msgstr "Contacts Supplémentaires "
+msgstr "Additional Contacts"
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:139
 #: templates/personrequest/transfer/oldclubdetails.templ Line:23
-#, fuzzy
 msgid "Address"
-msgstr "Adresse 1"
+msgstr ""
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:166
 #: Line:191
+#, fuzzy
 msgid "Approve transfer"
-msgstr ""
+msgstr "Approvals"
 
 #: templates/reports/reportoptions_header.templ Line:2
 msgid "Back to Configure"
@@ -6214,7 +6109,7 @@ msgstr ""
 #: templates/reports/default_adv.templ Line:28
 #, fuzzy
 msgid "Count"
-msgstr "Pays"
+msgstr "Country"
 
 #: templates/reports/reportoptions_header.templ Line:5
 #: templates/reports/default_adv.templ Line:14
@@ -6225,7 +6120,7 @@ msgstr ""
 #: Line:123
 #, fuzzy
 msgid "New Club Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/transfer/search_result.templ Line:78
 msgid "No entries to show"
@@ -6238,7 +6133,7 @@ msgstr ""
 #: templates/personrequest/transfer/int_current_club_view.templ Line:9
 #, fuzzy
 msgid "Player Details"
-msgstr "Autres détails"
+msgstr "Other Details"
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:6
 msgid "Please approve or reject the request."
@@ -6257,12 +6152,13 @@ msgstr ""
 #: templates/personrequest/transfer/int_current_club_view.templ Line:44
 #, fuzzy
 msgid "Region of Birth"
-msgstr "Date de naissance"
+msgstr "Date of Birth"
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:169
 #: Line:196
+#, fuzzy
 msgid "Reject transfer"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/reports/reportoptions_header.templ Line:25
 msgid "Replace Existing Report"
@@ -6274,12 +6170,12 @@ msgstr ""
 #: templates/reports/default.templ Line:33
 #, fuzzy
 msgid "Report Run"
-msgstr "Rapports"
+msgstr "Reports"
 
 #: templates/personrequest/history.templ Line:31
 #, fuzzy
 msgid "Request Added"
-msgstr "Date d'ajout"
+msgstr "Access"
 
 #: templates/personrequest/history.templ Line:30
 msgid "Request Notes"
@@ -6296,19 +6192,21 @@ msgstr ""
 #: templates/personrequest/history.templ Line:22
 #, fuzzy
 msgid "Request approval status"
-msgstr "Approbation du test"
+msgstr "Approvals"
 
 #: templates/personrequest/history.templ Line:10
 msgid "Request from"
 msgstr ""
 
 #: templates/personrequest/history.templ Line:18
+#, fuzzy
 msgid "Request response"
-msgstr ""
+msgstr "Access"
 
 #: templates/personrequest/history.templ Line:6
+#, fuzzy
 msgid "Request to"
-msgstr ""
+msgstr "Personal Details"
 
 #: templates/personrequest/history.templ Line:32
 #, fuzzy
@@ -6318,17 +6216,17 @@ msgstr "Response Code"
 #: templates/reports/reportoptions_header.templ Line:6
 #, fuzzy
 msgid "Save Report"
-msgstr "Rappeler rapport"
+msgstr "Status Reports"
 
 #: templates/reports/reportoptions_header.templ Line:10
 #, fuzzy
 msgid "Save the report"
-msgstr "Rappeler rapport"
+msgstr "Status Reports"
 
 #: templates/personrequest/transfer/search_result.templ Line:15
 #, fuzzy
 msgid "Search MA ID"
-msgstr "Chercher à nouveau"
+msgstr "Search Again"
 
 #: templates/personrequest/transfer/search_result.templ Line:18
 #, fuzzy
@@ -6338,12 +6236,12 @@ msgstr "School Name"
 #: templates/personrequest/transfer/search_result.templ Line:21
 #, fuzzy
 msgid "Search Organisation"
-msgstr "Organisation"
+msgstr "Search Again"
 
 #: templates/personrequest/transfer/search_result.templ Line:33
 #, fuzzy
 msgid "Sort"
-msgstr "Trier par"
+msgstr "Sort By"
 
 #: templates/reports/email_confirmation.templ Line:8
 msgid "The attached file is a comma seperated text file that can be opened in most spreadsheet applications (including Microsoft Excel)"
@@ -6365,17 +6263,19 @@ msgid "Too many records"
 msgstr ""
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:210
+#, fuzzy
 msgid "Transfer rejected"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/int_current_club_view.templ Line:97
+#, fuzzy
 msgid "Transferring to"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/history.templ Line:33
 #, fuzzy
 msgid "Updated"
-msgstr "Mettre à jour"
+msgstr "Update"
 
 #: templates/personrequest/transfer/search_result.templ Line:63
 #, fuzzy
@@ -6425,8 +6325,9 @@ msgid "rows"
 msgstr ""
 
 #: templates/personrequest/transfer/view.templ Line:148
+#, fuzzy
 msgid "Accept"
-msgstr ""
+msgstr "Access"
 
 #: templates/personrequest/transfer/view.templ Line:10
 msgid "By approving you are giving access to all of"
@@ -6443,36 +6344,37 @@ msgstr ""
 
 #: templates/personrequest/transfer/int_holding_club_view.templ Line:218
 #: templates/personrequest/transfer/new_club_view.templ Line:224
+#, fuzzy
 msgid "Continue Transfer"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/access/personregistration_summary.templ Line:31
 #, fuzzy
 msgid "Current Registrations"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/personrequest/access/personregistration_summary.templ Line:36
 #, fuzzy
 msgid "Current Sport"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: templates/personrequest/transfer/search_form.templ Line:211
 #: templates/personrequest/transfer/int_search_form.templ Line:193
 #, fuzzy
 msgid "Current club(s)"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: templates/personrequest/transfer/search_form.templ Line:217
 #: templates/personrequest/transfer/int_search_form.templ Line:199
 #, fuzzy
 msgid "Current registration(s)"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/personrequest/transfer/search_form.templ Line:223
 #: templates/personrequest/transfer/int_search_form.templ Line:205
 #, fuzzy
 msgid "Current sport(s)"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: templates/personrequest/transfer/view.templ Line:153
 msgid "Deny"
@@ -6490,13 +6392,13 @@ msgstr ""
 #: templates/personrequest/transfer/search_form.templ Line:33
 #, fuzzy
 msgid "International Transfer In"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: templates/personrequest/transfer/search_form.templ Line:193
 #: templates/personrequest/transfer/int_search_form.templ Line:175
 #, fuzzy
 msgid "Last Name"
-msgstr "Prénom"
+msgstr "First Name"
 
 #: templates/personrequest/transfer/new_club_view.templ Line:9
 msgid "Member Association for final approval."
@@ -6504,9 +6406,8 @@ msgstr ""
 
 #: templates/personrequest/transfer/search_form.templ Line:163
 #: templates/personrequest/transfer/int_search_form.templ Line:145
-#, fuzzy
 msgid "No result found for keyword"
-msgstr "Aucun résultat n'a pu être trouvé"
+msgstr ""
 
 #: templates/personrequest/access/personregistration_summary.templ Line:116
 msgid "Please add notes."
@@ -6548,7 +6449,7 @@ msgstr "Registration Number"
 #: templates/personrequest/access/personregistration_summary.templ Line:64
 #, fuzzy
 msgid "Request Access (Add Role) notes"
-msgstr "Approbation du test"
+msgstr "Access"
 
 #: templates/personrequest/access/request_cancelled.templ Line:5
 msgid "Request Access: Cancelled"
@@ -6562,12 +6463,12 @@ msgstr ""
 #: templates/personrequest/transfer/itr_search_result.templ Line:55
 #, fuzzy
 msgid "Request is subject for approval"
-msgstr "Approbation du test"
+msgstr "Registration Number"
 
 #: templates/personrequest/transfer/itr_search_result.templ Line:53
 #, fuzzy
 msgid "Request sent"
-msgstr "Modifier les détails"
+msgstr "Personal Details"
 
 #: templates/personrequest/transfer/search_form.templ Line:174
 #: templates/personrequest/transfer/selection.templ Line:25
@@ -6584,12 +6485,12 @@ msgstr ""
 #: templates/personrequest/transfer/int_search_form.templ Line:32
 #, fuzzy
 msgid "Transfer Out"
-msgstr "Their Details"
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/int_search_form.templ Line:33
 #, fuzzy
 msgid "Transfer Return"
-msgstr "Recherche de personne"
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/search_form.templ Line:182
 #: templates/personrequest/transfer/int_search_form.templ Line:164
@@ -6604,18 +6505,21 @@ msgstr ""
 
 #: templates/personrequest/transfer/int_holding_club_view.templ Line:238
 #: templates/personrequest/transfer/new_club_view.templ Line:244
+#, fuzzy
 msgid "Transfer cancelled"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/search_form.templ Line:205
 #: templates/personrequest/transfer/int_search_form.templ Line:187
+#, fuzzy
 msgid "Transfer to club"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/search_form.templ Line:29
 #: templates/personrequest/transfer/int_search_form.templ
+#, fuzzy
 msgid "Transfer type"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/transfer/return_complete.templ Line:17
 #: templates/personrequest/transfer/out_complete.templ
@@ -6633,26 +6537,28 @@ msgid "has released"
 msgstr ""
 
 #: templates/personrequest/access/current_club_view.templ Line:165
+#, fuzzy
 msgid "Approve access"
-msgstr ""
+msgstr "Approvals"
 
 #: templates/personrequest/loan/search_form.templ Line:195
 #, fuzzy
 msgid "Borrowing Club"
-msgstr "Niveau actuel"
+msgstr "Current Level"
 
 #: templates/personrequest/access/current_club_view.templ Line:13
 msgid "By approving you are giving access to all of the details of [_1] [_2] to [_3]"
 msgstr ""
 
 #: templates/personrequest/access/requesting_club_view.templ Line:193
+#, fuzzy
 msgid "Cancel Access"
-msgstr ""
+msgstr "Access"
 
 #: templates/personrequest/generic/search_form.templ Line:213
 #, fuzzy
 msgid "Current Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/personrequest/generic/itc_confirmation.templ Line:2
 msgid "ITC Request submitted to MA"
@@ -6661,30 +6567,30 @@ msgstr ""
 #: templates/personrequest/loan/lendingclubdetails.templ Line:4
 #, fuzzy
 msgid "Lending Club Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:20
 #: templates/personrequest/access/current_club_view.templ Line:19
 #, fuzzy
 msgid "Member Details"
-msgstr "Autres détails"
+msgstr "Other Details"
 
 #: templates/personrequest/access/view.templ Line:40
 #: Line:182
 #, fuzzy
 msgid "Person Registration Status"
-msgstr "Statut de l’association"
+msgstr "New Registration"
 
 #: templates/personrequest/access/view.templ Line:65
 #: Line:212
 #, fuzzy
 msgid "Person Status"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/loan/search_form.templ Line:9
 #, fuzzy
 msgid "Player Loan Details"
-msgstr "Autres détails"
+msgstr "Other Details"
 
 #: templates/personrequest/loan/search_form.templ Line:172
 #, fuzzy
@@ -6694,15 +6600,17 @@ msgstr "Payment Type"
 #: templates/personrequest/loan/search_form.templ Line:19
 #, fuzzy
 msgid "Player Loan type"
-msgstr "Joueur?"
+msgstr "Player"
 
 #: templates/personrequest/loan/request_cancelled.templ Line:5
+#, fuzzy
 msgid "Player Loan: Cancelled"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/loan/request_denied.templ Line:5
+#, fuzzy
 msgid "Player Loan: Rejected"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:13
 msgid "Please continue with the Add Role process and submit to the Member Association for final approval."
@@ -6723,7 +6631,7 @@ msgstr ""
 #: templates/personrequest/access/current_club_view.templ Line:210
 #, fuzzy
 msgid "Request Access Rejected"
-msgstr "Modifier les détails personnels"
+msgstr "Access"
 
 #: templates/personrequest/access/requesting_club_view.templ Line:234
 #: templates/personrequest/access/request_accepted.templ Line:5
@@ -6738,12 +6646,12 @@ msgstr ""
 #: templates/personrequest/access/current_club_view.templ Line:103
 #, fuzzy
 msgid "Request Details"
-msgstr "Modifier les détails"
+msgstr "Personal Details"
 
 #: templates/personrequest/loan/search_form.templ Line:228
 #, fuzzy
 msgid "Request Player Loan Notes"
-msgstr "Modifier les détails personnels"
+msgstr "Personal Details"
 
 #: templates/personrequest/access/view.templ Line:32
 #: Line:172
@@ -6766,13 +6674,13 @@ msgstr ""
 #: templates/personrequest/loan/search_result.templ Line:59
 #, fuzzy
 msgid "Request for Player Loan sent to Club"
-msgstr "Modifier les détails personnels"
+msgstr "Personal Details"
 
 #: templates/personrequest/access/current_club_view.templ Line:20
 #: Line:121
 #, fuzzy
 msgid "Requesting Club Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/access/view.templ Line:36
 #: Line:177
@@ -6783,7 +6691,7 @@ msgstr "Response Code"
 #: templates/personrequest/generic/reg_summary.templ Line:2
 #, fuzzy
 msgid "Review Role Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/generic/completed.templ Line:11
 msgid "The [_1] [_2] has been sent to [_3]"
@@ -6797,7 +6705,7 @@ msgstr ""
 #: templates/personrequest/generic/search_form.templ Line:201
 #, fuzzy
 msgid "Transfer to Club"
-msgstr "Their Details"
+msgstr "Transfer"
 
 #: templates/personrequest/generic/itc_confirmation.templ Line:19
 #, fuzzy
@@ -6813,13 +6721,14 @@ msgid "[_1] has requested data access for [_2] [_3]"
 msgstr ""
 
 #: templates/personrequest/loan/current_club_view.templ Line:186
+#, fuzzy
 msgid "Approve player loan"
-msgstr ""
+msgstr "Approvals"
 
 #: templates/personrequest/loan/current_club_view.templ Line:16
 #, fuzzy
 msgid "Borrowing Club Details"
-msgstr "Configurez les détails de l'événement"
+msgstr "Contact Details"
 
 #: templates/personrequest/loan/current_club_view.templ Line:10
 msgid "By approving, you are giving access to all details of [_1] [_2] to [_3]."
@@ -6832,7 +6741,7 @@ msgstr ""
 #: templates/personrequest/loan/current_club_view.templ Line:103
 #, fuzzy
 msgid "Lending to"
-msgstr "Ascendant"
+msgstr "Ascending"
 
 #: templates/personrequest/loan/new_club_view.templ Line:155
 #: templates/personrequest/loan/current_club_view.templ Line:123
@@ -6843,12 +6752,11 @@ msgstr ""
 #: templates/personrequest/loan/current_club_view.templ Line:119
 #, fuzzy
 msgid "Loan Start"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/search/wrapper.templ Line:8
-#, fuzzy
 msgid "No result found"
-msgstr "Aucun résultat n'a pu être trouvé"
+msgstr ""
 
 #: templates/txn_receipt/fnswreceipt.templ Line:83
 #: templates/txn_receipt/receiptbody.templ Line:53
@@ -6859,20 +6767,22 @@ msgstr "Payment Type"
 #: templates/search/form.templ Line:5
 #, fuzzy
 msgid "Person Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/personrequest/loan/current_club_view.templ Line:199
 #, fuzzy
 msgid "Player Loan Status"
-msgstr "Autres détails"
+msgstr "Other Details"
 
 #: templates/personrequest/loan/new_club_view.templ Line:258
+#, fuzzy
 msgid "Player Loan cancelled"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/loan/current_club_view.templ Line:230
+#, fuzzy
 msgid "Player Loan rejected"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/personrequest/loan/new_club_view.templ Line:5
 msgid "Please continue the player loan process."
@@ -6899,13 +6809,13 @@ msgstr "View Receipt"
 
 #: templates/personrequest/loan/current_club_view.templ Line:189
 #: Line:216
+#, fuzzy
 msgid "Reject player loan"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/search/grid/personregistration.templ Line:64
-#, fuzzy
 msgid "Request Access for approval"
-msgstr "Approbation du test"
+msgstr ""
 
 #: templates/search/grid/personregistration.templ Line:62
 msgid "Request Access sent to Club"
@@ -6920,8 +6830,9 @@ msgid "To add a role to a person not at your club, search below"
 msgstr ""
 
 #: templates/personrequest/loan/current_club_view.templ Line:6
+#, fuzzy
 msgid "[_1] has requested a player loan for [_2] [_3]."
-msgstr ""
+msgstr "Transfer"
 
 #: templates/emails/payments/payment_receipt.templ Line:81
 #, fuzzy
@@ -6930,12 +6841,11 @@ msgstr "Payment Type"
 
 #: templates/search/grid/people.templ Line:7
 msgid "Date Added"
-msgstr "Date d'ajout"
+msgstr "Date Added"
 
 #: templates/emails/payments/payment_receipt.templ Line:64
-#, fuzzy
 msgid "Date Purchased"
-msgstr "Date d'ajout"
+msgstr ""
 
 #: templates/emails/registration/activate.templ Line:5
 #: templates/emails/registration/passwordreset.templ
@@ -6945,7 +6855,7 @@ msgstr ""
 #: templates/emails/payments/payment_receipt.templ Line:18
 #, fuzzy
 msgid "Payment Confirmation"
-msgstr "Configuration"
+msgstr "Save Options"
 
 #: templates/emails/registration/activate.templ Line:9
 msgid "Please click"
@@ -6996,7 +6906,7 @@ msgstr ""
 
 #, fuzzy
 msgid "Club's Name"
-msgstr "Nom du Club"
+msgstr "Club Name"
 
 #: templates/emails/notification/personrequest/html/requestinttransferreturn_rejected.templ
 #: Line:9
@@ -7015,17 +6925,16 @@ msgstr "Club"
 
 #: templates/emails/notification/personrequest/html/requestaccess_cancelled.templ
 #: Line:24
-#, fuzzy
 msgid "Originator"
-msgstr "Photo Originale"
+msgstr ""
 
 #, fuzzy
 msgid "Player's Data"
-msgstr "Joueur?"
+msgstr "Player"
 
 #, fuzzy
 msgid "Player's ID"
-msgstr "Joueur?"
+msgstr "Player"
 
 #: templates/emails/notification/personrequest/html/requestinttransferout_completed.templ
 #: Line:24
@@ -7054,7 +6963,7 @@ msgstr ""
 #: templates/emails/notification/personrequest/html/requestinttransferreturn_sent.templ
 #, fuzzy
 msgid "Reason"
-msgstr "Saison"
+msgstr "Season"
 
 #: templates/emails/notification/personrequest/html/requestinttransferout_autoapproved.templ
 #: Line:29
@@ -7158,7 +7067,7 @@ msgstr ""
 #: Line:9
 #, fuzzy
 msgid "Request Access Completed"
-msgstr "Approbation du test"
+msgstr "Access"
 
 #: templates/emails/notification/personrequest/html/requestaccess_sent.templ
 #: Line:9
@@ -7210,14 +7119,14 @@ msgstr ""
 #: templates/emails/notification/workflow/html/wftask_added.templ
 #, fuzzy
 msgid "Facility/Venue Name"
-msgstr "Nom du site"
+msgstr "Family Name"
 
 #: templates/emails/notification/personrequest/html/requestloan_completed.templ
 #: Line:24
 #: templates/emails/notification/personrequest/html/requestloan_rejected.templ
 #, fuzzy
 msgid "Lending Club"
-msgstr "Ascendant"
+msgstr "Club"
 
 #: templates/emails/notification/workflow/html/wftask_approved.templ Line:9
 msgid "The following task has been APPROVED. This email is for notification only, no further action is required."
@@ -7271,12 +7180,12 @@ msgstr "Amount"
 #: templates/payment/pay_invoice_payment_error.templ Line:19
 #, fuzzy
 msgid "Association Name"
-msgstr "Nom de l'Association"
+msgstr "Action"
 
 #: templates/payment/search_payments.templ Line:3
 #, fuzzy
 msgid "Find a Payment"
-msgstr "Voir les types"
+msgstr "Transfer"
 
 #: templates/payment/pay_invoice_payment_error.templ Line:9
 #, fuzzy
@@ -7286,7 +7195,7 @@ msgstr "Response Code"
 #: templates/payment/invoicetemplate.templ Line:47
 #, fuzzy
 msgid "Invoice No."
-msgstr "Nombre incorrect"
+msgstr "Police Check Date"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:73
 #, fuzzy
@@ -7315,7 +7224,7 @@ msgstr "Payment Type"
 #: templates/payment/search_payments.templ Line:7
 #, fuzzy
 msgid "Payment or Bank Reference number"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: templates/payment/search_payments.templ Line:5
 msgid "Please enter the Payment Reference number of Bank Reference number for payment you wish to find."
@@ -7343,42 +7252,41 @@ msgid "See below for details, please close this window and click Pay Now to try 
 msgstr ""
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:63
-#, fuzzy
 msgid "Select Age Level"
-msgstr "Niveau"
+msgstr ""
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:75
 #, fuzzy
 msgid "Select Period"
-msgstr "Produits"
+msgstr "Identifications"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:51
 #, fuzzy
 msgid "Select Person Level"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:24
 #, fuzzy
 msgid "Select Person Type"
-msgstr "Payment Type"
+msgstr "Country"
 
 #: templates/payment/payment_failure.templ Line:2
 #: templates/payment/payment_error.templ Line:11
+#, fuzzy
 msgid "There was an Error with your Payment."
-msgstr ""
+msgstr "There was a problem changing the welcome message"
 
 #: templates/payment/bulk_invoice_query_fields.templ Line:17
 #, fuzzy
 msgid "Transaction Details"
-msgstr "Organisation"
+msgstr "Personal Details"
 
 #: templates/mapfinder/searchresults_default_2014.templ Line:128
 #: templates/mapfinder/searchresults_default.templ Line:127
 #: templates/mapfinder/searchresults_afl9s.templ Line:167
 #: templates/mapfinder/searchresults_soccer.templ Line:126
-#, fuzzy
 msgid "More Information"
-msgstr "Mettre à jour les Informations"
+msgstr ""
 
 #: templates/mapfinder/searchresults_afl9s.templ Line:168
 msgid "Register Your Team Now"
@@ -7389,8 +7297,9 @@ msgid "      Loan - Valid to "
 msgstr ""
 
 #: templates/dashboards/personregistration.templ Line:232
+#, fuzzy
 msgid "Approving Entity"
-msgstr ""
+msgstr "Search Entity"
 
 #: templates/dashboards/personregistration.templ Line:14
 msgid "Loan - Valid to "
@@ -7411,7 +7320,7 @@ msgstr ""
 #: templates/dashboards/personregistration.templ Line:90
 #, fuzzy
 msgid "Registered To (International Name)"
-msgstr "Date Registered Until"
+msgstr "International"
 
 #: templates/dashboards/personregistration.templ Line:11
 #, fuzzy
@@ -7421,7 +7330,7 @@ msgstr "Deregistered"
 #: templates/dashboards/personregistration.templ Line:214
 #, fuzzy
 msgid "Renew Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/personregistration.templ Line:74
 msgid "Verified"
@@ -7432,23 +7341,23 @@ msgid "View Available Program Details"
 msgstr ""
 
 #: templates/dashboards/personregistration.templ Line:30
+#, fuzzy
 msgid "Work task history"
-msgstr ""
+msgstr "Transfer"
 
 #: templates/dashboards/person.templ Line:154
 #, fuzzy
 msgid "Add New Role"
-msgstr "Ajouter nouvelle donnée"
+msgstr "Add new record"
 
 #: templates/dashboards/worktasks.templ Line:72
-#, fuzzy
 msgid "All tasks"
-msgstr "Toutes saisons"
+msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:316
 #, fuzzy
 msgid "Amendment of Person Details"
-msgstr "Modifier les détails personnels"
+msgstr "Personal Details"
 
 #: templates/dashboards/personstatus.templ Line:77
 #: Line:79
@@ -7458,51 +7367,50 @@ msgstr ""
 #: templates/workflow/view/club.templ Line:39
 #, fuzzy
 msgid "Club Information"
-msgstr "Mettre à jour les Informations"
+msgstr "Update Information"
 
 #: templates/dashboards/club.templ Line:29
-#, fuzzy
 msgid "Contacts"
-msgstr "Contact"
+msgstr ""
 
 #: templates/dashboards/personstatus.templ Line:70
 #: Line:72
 msgid "Defaulter"
-msgstr "Defaulter"
+msgstr ""
 
 #: templates/workflow/view/document_upload.templ Line:8
 #, fuzzy
 msgid "Document description"
-msgstr "Association"
+msgstr "Position"
 
 #: templates/dashboards/personstatus.templ Line:140
 #: Line:190
-#, fuzzy
 msgid "Edit Registration"
-msgstr "Coach Registration No."
+msgstr ""
 
 #: templates/dashboards/person.templ Line:15
 #, fuzzy
 msgid "Family Name (Latin Characters)"
-msgstr "Nom de famille"
+msgstr "Family Name"
 
 #: templates/dashboards/person.templ Line:27
 msgid "First name (Latin Characters)"
 msgstr ""
 
 #: templates/dashboards/person.templ Line:101
+#, fuzzy
 msgid "Home Phone"
-msgstr "Téléphone à la maison"
+msgstr "Phone"
 
 #: templates/workflow/view/personregistration.templ Line:306
 #, fuzzy
 msgid "International Loan Details"
-msgstr "International Zones"
+msgstr "International Regions"
 
 #: templates/workflow/view/personregistration.templ Line:327
 #, fuzzy
 msgid "International Transfer Details"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: templates/workflow/view/personregistration.templ Line:209
 #, fuzzy
@@ -7512,24 +7420,25 @@ msgstr "Last Updated"
 #: templates/dashboards/worktasks.templ Line:54
 #, fuzzy
 msgid "Latest"
-msgstr "Etats"
+msgstr "States"
 
 #: templates/workflow/view/loan.templ Line:171
 #, fuzzy
 msgid "Lending To"
-msgstr "Ascendant"
+msgstr "Ascending"
 
 #: templates/workflow/view/loan.templ Line:203
 #: templates/workflow/view/personregistration.templ Line:346
 #: templates/workflow/view/club.templ Line:234
 #, fuzzy
 msgid "License and Payment Details"
-msgstr "Liste des rapports de paiement"
+msgstr "List of Payment Records"
 
 #: templates/dashboards/worktasks.templ Line:262
 #: Line:274
+#, fuzzy
 msgid "List Pending Registrations"
-msgstr ""
+msgstr "New Registration"
 
 #: templates/workflow/view/personregistration.templ Line:308
 #, fuzzy
@@ -7538,12 +7447,11 @@ msgstr "Club"
 
 #: templates/dashboards/person.templ Line:160
 msgid "Mark as Duplicate"
-msgstr "Marquer comme en double"
+msgstr ""
 
 #: templates/dashboards/person.templ Line:165
-#, fuzzy
 msgid "Member Cards"
-msgstr "Member Tags"
+msgstr ""
 
 #: templates/workflow/view/personregistration.templ Line:195
 msgid "Minor Protection"
@@ -7551,53 +7459,54 @@ msgstr ""
 
 #: templates/dashboards/person.templ Line:108
 msgid "Mobile"
-msgstr "Portable"
+msgstr "Mobile"
 
 #: templates/dashboards/worktasks.templ Line:310
 #, fuzzy
 msgid "New Club Official Registration"
-msgstr "Match Official Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:306
 #, fuzzy
 msgid "New Club Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:307
 #: Line:351
 #, fuzzy
 msgid "New Coach Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:308
 #: Line:352
 #, fuzzy
 msgid "New Facility Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:311
 #, fuzzy
 msgid "New MA Official Registration"
-msgstr "Match Official Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:305
 #, fuzzy
 msgid "New Player Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:304
+#, fuzzy
 msgid "New Referee Registration"
-msgstr ""
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:242
 #, fuzzy
 msgid "New Registrations"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:309
 #, fuzzy
 msgid "New Team Official Registration"
-msgstr "Match Official Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:73
 msgid "New task"
@@ -7607,42 +7516,37 @@ msgstr ""
 #: Line:25
 #: Line:40
 #: Line:54
-#, fuzzy
 msgid "Not Registered"
-msgstr "Dernière Date Enregistrée"
+msgstr ""
 
 #: templates/dashboards/personstatus.templ Line:13
 #: Line:27
 #: Line:42
 #: Line:56
-#, fuzzy
 msgid "Not Registered and Inactive"
-msgstr "Date Registered Until"
+msgstr ""
 
 #: templates/dashboards/personstatus.templ Line:197
-#, fuzzy
 msgid "Other Clubs"
-msgstr "Autres domaines"
+msgstr ""
 
 #: templates/dashboards/person.templ Line:136
 msgid "Other Details"
-msgstr "Autres détails"
+msgstr "Other Details"
 
 #: templates/dashboards/personstatus.templ Line:108
 #: Line:127
 #: Line:158
 #: Line:177
-#, fuzzy
 msgid "Other1"
-msgstr "Autre code"
+msgstr ""
 
 #: templates/dashboards/personstatus.templ Line:109
 #: Line:128
 #: Line:159
 #: Line:178
-#, fuzzy
 msgid "Other2"
-msgstr "Autre code"
+msgstr ""
 
 #: templates/workflow/view/personregistration.templ Line:264
 msgid "Person Role"
@@ -7655,26 +7559,24 @@ msgstr ""
 #: templates/workflow/history.templ Line:10
 #, fuzzy
 msgid "Problem Resolution Entity"
-msgstr "Problème mise à jour le statut"
+msgstr "Duplicate Resolution"
 
 #: templates/dashboards/worktasks.templ Line:258
 #: Line:268
-#, fuzzy
 msgid "Quick Links"
-msgstr "Lien rapide pour enregistrer"
+msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:280
 #, fuzzy
 msgid "Quick Search"
-msgstr "Recherche"
+msgstr "Search"
 
 #: templates/dashboards/personstatus.templ Line:136
 #: Line:138
 #: Line:186
 #: Line:188
-#, fuzzy
 msgid "Register"
-msgstr "Deregistered"
+msgstr ""
 
 #: templates/workflow/view/personregistration.templ Line:235
 #, fuzzy
@@ -7690,9 +7592,8 @@ msgstr "Registration Number"
 #: Line:20
 #: Line:35
 #: Line:49
-#, fuzzy
 msgid "Registered but Inactive"
-msgstr "Date Registered Until"
+msgstr ""
 
 #: templates/workflow/view/loan.templ Line:50
 #, fuzzy
@@ -7713,23 +7614,27 @@ msgstr "Registration Number"
 #: Line:353
 #, fuzzy
 msgid "Renewal of Coach Registration"
-msgstr "Coach Registration No."
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:313
+#, fuzzy
 msgid "Renewal of Player Registration"
-msgstr ""
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:314
+#, fuzzy
 msgid "Renewal of Referee Registration"
-msgstr ""
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:243
+#, fuzzy
 msgid "Renewals"
-msgstr ""
+msgstr "Renewal"
 
 #: templates/dashboards/worktasks.templ Line:245
+#, fuzzy
 msgid "Request Access"
-msgstr ""
+msgstr "Access"
 
 #: templates/dashboards/worktasks.templ Line:261
 #: Line:272
@@ -7739,16 +7644,17 @@ msgstr ""
 #: templates/club/required_docs.templ Line:3
 #, fuzzy
 msgid "Required Club Documents"
-msgstr "Nom du Club"
+msgstr "Add Document"
 
 #: templates/dashboards/worktasks.templ Line:260
+#, fuzzy
 msgid "Start a New Player Registration"
-msgstr ""
+msgstr "New Registration"
 
 #: templates/dashboards/worktasks.templ Line:270
 #, fuzzy
 msgid "Start a New Registration"
-msgstr "Instructor Registration No"
+msgstr "New Registration"
 
 #: templates/workflow/view/personregistration.templ Line:202
 #, fuzzy
@@ -7759,7 +7665,7 @@ msgstr "Date Suspended Until"
 #: Line:333
 #, fuzzy
 msgid "TMS Reference Number"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: templates/dashboards/worktasks.templ Line:301
 #: Line:348
@@ -7782,9 +7688,8 @@ msgid "Toggle navigation"
 msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:250
-#, fuzzy
 msgid "Total Task Active"
-msgstr "Coach Active?"
+msgstr ""
 
 #: templates/dashboards/worktasks.templ Line:251
 msgid "Total Task On Hold"
@@ -7824,7 +7729,7 @@ msgstr ""
 #: templates/workflow/generic/hold_reject_taskscreen.templ Line:13
 #, fuzzy
 msgid "Approval Status"
-msgstr "Attribution des statuts approuvés"
+msgstr "Approvals"
 
 #: templates/workflow/generic/notes.templ Line:12
 msgid "Date/Time Resolved"
@@ -7833,12 +7738,12 @@ msgstr ""
 #: templates/workflow/view/venue.templ Line:155
 #, fuzzy
 msgid "Fax Number"
-msgstr "Loyalty Number"
+msgstr "Passport Number"
 
 #: templates/workflow/result/club.templ Line:31
 #, fuzzy
 msgid "Foundation Date"
-msgstr "Application Date"
+msgstr "Action"
 
 #: templates/workflow/result/venue.templ Line:23
 #: templates/workflow/result/person.templ Line:16
@@ -7853,12 +7758,12 @@ msgstr ""
 #: templates/workflow/generic/document.templ Line:10
 #, fuzzy
 msgid "Person Documents"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/workflow/summary/personregistration.templ Line:61
 #, fuzzy
 msgid "Player TMS Reference"
-msgstr "Liste des rapports de paiement"
+msgstr "Payment Type"
 
 #: templates/workflow/generic/actions.templ Line:64
 msgid "Please enter Work task notes"
@@ -7875,7 +7780,7 @@ msgstr ""
 #: templates/workflow/result/venue.templ Line:16
 #, fuzzy
 msgid "Short Name"
-msgstr "School Name"
+msgstr "Sport Name"
 
 #: templates/workflow/view/transfer.templ Line:59
 msgid "Summary Clubs transfer"
@@ -7903,7 +7808,7 @@ msgstr ""
 #: templates/workflow/generic/payment.templ Line:13
 #, fuzzy
 msgid "Total Cost"
-msgstr "Code postal"
+msgstr "Postal Code"
 
 #: templates/workflow/result/page.templ Line:8
 msgid "Upload Profile Image"
@@ -7951,12 +7856,12 @@ msgstr "Registration Number"
 #: templates/person/renewal_roledetails.templ Line:2
 #, fuzzy
 msgid "Review Role Renewal Details"
-msgstr "Informations personnelles"
+msgstr "Personal Details"
 
 #: templates/workflow/summary/inttransfer.templ Line:13
 #, fuzzy
 msgid "The following International Transfer Out has been"
-msgstr "Their Details"
+msgstr "Other Details"
 
 #: templates/workflow/summary/transfer.templ Line:13
 msgid "The following transfer has been"
@@ -7967,129 +7872,38 @@ msgid "This request has been approved."
 msgstr ""
 
 #: templates/workflow/summary/transfer.templ Line:35
+#, fuzzy
 msgid "Transfer fee"
-msgstr ""
-
-#, fuzzy
-#~ msgid "Edit Logo"
-#~ msgstr "Journal d'Audit"
-
-#, fuzzy
-#~ msgid "Logo Updated"
-#~ msgstr "Last Updated"
-
-#, fuzzy
-#~ msgid "Update Logo"
-#~ msgstr "Mettre à jour"
+msgstr "Transfer"
 
 #, fuzzy
 #~ msgid "Release Notes"
-#~ msgstr "Notes médicales"
+#~ msgstr "Response Code"
 
 #~ msgid "Edit Welcome Message"
-#~ msgstr "Editer le message de bienvenue"
+#~ msgstr "Edit Welcome Message"
 
 #~ msgid "There was a problem changing the welcome message"
-#~ msgstr "Il y avait un problème modifiant le Message de Bienvenue"
-
-#~ msgid "WELCOME"
-#~ msgstr "<p"
+#~ msgstr "There was a problem changing the welcome message"
 
 #~ msgid "Welcome Message Updated"
-#~ msgstr "Le Message de Bienvenue a été mis à jour"
-
-#~ msgid "Add Photo"
-#~ msgstr "Ajouter une photo"
-
-#~ msgid "Approx. Time"
-#~ msgstr "Temps Approximatif"
-
-#~ msgid "Cable"
-#~ msgstr "Câble"
-
-#~ msgid "Connection"
-#~ msgstr "Connexion"
-
-#~ msgid "Delete Photo"
-#~ msgstr "Supprimer la photo"
-
-#~ msgid "Modify Photo"
-#~ msgstr "Modifier Photo"
-
-#~ msgid "No Photo Found"
-#~ msgstr "Aucune photo trouvée"
-
-#~ msgid "Original Photo"
-#~ msgstr "Photo Originale"
-
-#~ msgid "Please be Patient"
-#~ msgstr "S'il vous plaît être patient"
-
-#~ msgid "Preview"
-#~ msgstr "Aperçu"
-
-#~ msgid "Replace Photo"
-#~ msgstr "Remplacer photo"
-
-#, fuzzy
-#~ msgid "Save Photo"
-#~ msgstr "Remplacer photo"
-
-#~ msgid "The estimated time to upload a 400Kb image is"
-#~ msgstr "Le temps estimé pour télécharger une image 400Kb est"
-
-#~ msgid "Under 1 minute"
-#~ msgstr "Moins de 1 minute"
-
-#~ msgid "Uploading"
-#~ msgstr "Téléchargé"
-
-#~ msgid "minutes"
-#~ msgstr "minutes"
-
-#, fuzzy
-#~ msgid "Edit Photo"
-#~ msgstr "Ajouter une photo"
-
-#, fuzzy
-#~ msgid "Pending Registration"
-#~ msgstr "Coach Registration No."
-
-#, fuzzy
-#~ msgid "Configure Dashboard"
-#~ msgstr "Configuration"
-
-#, fuzzy
-#~ msgid "Dashboard Updated"
-#~ msgstr "Last Updated"
-
-#, fuzzy
-#~ msgid "There was a problem updating your Dashboard"
-#~ msgstr "Il y avait un problème modifiant le Message de Bienvenue"
-
-#, fuzzy
-#~ msgid "Choose competition"
-#~ msgstr "Compétition"
+#~ msgstr "Welcome Message Updated"
 
 #, fuzzy
 #~ msgid "Choose form"
-#~ msgstr "Choisissez"
+#~ msgstr "Choose a Sport"
 
 #, fuzzy
 #~ msgid "Choose season"
-#~ msgstr "Aucune saison"
-
-#, fuzzy
-#~ msgid "and"
-#~ msgstr "Janv"
+#~ msgstr "Choose a Sport"
 
 #, fuzzy
 #~ msgid "details to"
-#~ msgstr "Détails"
+#~ msgstr "Details"
 
 #, fuzzy
 #~ msgid "details."
-#~ msgstr "Détails"
+#~ msgstr "Details"
 
 #, fuzzy
 #~ msgid "player details to"
@@ -8097,39 +7911,27 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Borrowing club"
-#~ msgstr "Niveau actuel"
+#~ msgstr "Current Level"
 
 #, fuzzy
 #~ msgid "Player Loan Status: Requested"
-#~ msgstr "Rapports des statuts"
+#~ msgstr "Status Reports"
 
 #, fuzzy
 #~ msgid "Status: Requested"
-#~ msgstr "Rapports des statuts"
+#~ msgstr "Status Reports"
 
 #, fuzzy
 #~ msgid "This type of registration is not available."
-#~ msgstr "Instructor Registration No"
-
-#, fuzzy
-#~ msgid "Change you password with "
-#~ msgstr "Configuration"
-
-#, fuzzy
-#~ msgid "new password"
-#~ msgstr "Mot de Passe"
-
-#, fuzzy
-#~ msgid "re-enter new password"
-#~ msgstr "Their Password"
+#~ msgstr "Registration Number"
 
 #, fuzzy
 #~ msgid "Level:"
-#~ msgstr "Niveau"
+#~ msgstr "Level"
 
 #, fuzzy
 #~ msgid "Register to:"
-#~ msgstr "Date Registered Until"
+#~ msgstr "New Registration"
 
 #, fuzzy
 #~ msgid "Sport:"
@@ -8137,7 +7939,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Member ID:"
-#~ msgstr "Membre"
+#~ msgstr "Member"
 
 #, fuzzy
 #~ msgid "Player Loan End Date:"
@@ -8145,7 +7947,7 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Player Loan Source Club:"
-#~ msgstr "Joueur dans<br>le le Club?"
+#~ msgstr "Club"
 
 #, fuzzy
 #~ msgid "Player Loan Start Date:"
@@ -8153,766 +7955,549 @@ msgstr ""
 
 #, fuzzy
 #~ msgid "Organization"
-#~ msgstr "Organisation"
+#~ msgstr "Options"
 
 #, fuzzy
 #~ msgid "Transaction History"
-#~ msgstr "Organisation"
+#~ msgstr "Transfer"
+
+#, fuzzy
+#~ msgid "Beginning Of Registration"
+#~ msgstr "New Registration"
 
 #, fuzzy
 #~ msgid "End of Registration"
-#~ msgstr "Coach Registration No."
+#~ msgstr "New Registration"
 
 #, fuzzy
 #~ msgid "Registration Member Association"
+#~ msgstr "Registration Authorisation"
+
+#, fuzzy
+#~ msgid "Registering Parent Firstname"
+#~ msgstr "Registration Number"
+
+#, fuzzy
+#~ msgid "Registering Parent Surname"
 #~ msgstr "Registration Number"
 
 #~ msgid "HTMLFORM_INTROTEXT"
 #~ msgstr "auto"
 
-#~ msgid "Club Id"
-#~ msgstr "le Club Id"
+#, fuzzy
+#~ msgid "Notification Toggle"
+#~ msgstr "Identification Type"
 
-#~ msgid "Colours"
-#~ msgstr "Couleurs"
+#~ msgid "Access"
+#~ msgstr "Access"
 
-#~ msgid "Secretary"
-#~ msgstr "Secrétaire"
+#~ msgid "Added By"
+#~ msgstr "Added By"
 
-#~ msgid "EXPORT_WARNING"
+#~ msgid "No entries match your Search criteria. Please try again"
+#~ msgstr "No entries match your Search criteria. Please try again"
+
+#~ msgid "Search Again"
+#~ msgstr "Search Again"
+
+#~ msgid "Search Entity"
+#~ msgstr "Search Entity"
+
+#~ msgid "Search Results"
+#~ msgstr "Search Results"
+
+#~ msgid "Search found the following results"
+#~ msgstr "Search found the following results"
+
+#~ msgid "Search using the options below"
+#~ msgstr "Search using the options below"
+
+#~ msgid "Season"
+#~ msgstr "Season"
+
+#~ msgid "Seasons"
+#~ msgstr "Seasons"
+
+#~ msgid "You have entered an Invalid Date of birth"
+#~ msgstr "You have entered an Invalid Date of birth"
+
+#~ msgid "Modify Member List"
+#~ msgstr "Modify Member List"
+
+#~ msgid "Allow Parent Body"
+#~ msgstr "Allow Parent Body"
+
+#~ msgid "Custom Fields"
+#~ msgstr "Custom Fields"
+
+#~ msgid "Manage Lookup Information"
+#~ msgstr "Manage Lookup Information"
+
+#~ msgid "Member Tags"
+#~ msgstr "Member Tags"
+
+#, fuzzy
+#~ msgid "Member Types"
+#~ msgstr "Member Tags"
+
+#~ msgid "Permissions Updated"
+#~ msgstr "Permissions Updated"
+
+#~ msgid "REPORT_INTRO_DESC_TEXT"
 #~ msgstr ""
-#~ "Cette option a un ensemble déterminé de domaines qu'elle exporte, mais le"
+#~ "<p>There are two types of reports present in the system. </"
+#~ "p><br><ol><li><b>Quick Reports</b> - Indicated by the 'Run' button, they "
+#~ "are predefined and allow you a quick look at your data.<br></"
+#~ "li><li><b>Advanced Reports</b> - Indicated by the 'Configure' button, "
+#~ "they allow you to define which fields you want to display and add custom "
+#~ "filters to your report.<br></li></ol>"
 
-#~ msgid "Copy"
-#~ msgstr "Copier"
+#~ msgid "REPORT_INTRO_TEXT"
+#~ msgstr "<p>"
 
-#~ msgid "Club Season Summary"
-#~ msgstr "Résumé Saison Club"
+#~ msgid ""
+#~ "These configuration options allow you to modify the data and behaviour of "
+#~ "the system."
+#~ msgstr ""
+#~ "These configuration options allow you to modify the data and behaviour of "
+#~ "the system."
+
+#~ msgid "Not Available"
+#~ msgstr "Not Available"
+
+#~ msgid "Your login session has expired"
+#~ msgstr "Your login session has expired"
+
+#~ msgid "Compulsory"
+#~ msgstr "Compulsory"
+
+#~ msgid "Editable"
+#~ msgstr "Editable"
 
 #~ msgid "Hidden"
 #~ msgstr "Hidden"
 
-#~ msgid "No Limit"
-#~ msgstr "Aucune limite"
+#~ msgid "Add $txt_Clr Settings"
+#~ msgstr "Add Clearance Settings"
 
-#~ msgid "Courses"
-#~ msgstr "Cours"
+#~ msgid "Date Last Registered"
+#~ msgstr "Date Last Registered"
 
-#~ msgid "Phone 2"
-#~ msgstr "Téléphone 2"
+#, fuzzy
+#~ msgid "Person level"
+#~ msgstr "Personal Details"
+
+#, fuzzy
+#~ msgid "You must enter a valid team code"
+#~ msgstr "You have entered an Invalid Date of birth"
+
+#, fuzzy
+#~ msgid "Address 1:"
+#~ msgstr "Address Line 1"
+
+#, fuzzy
+#~ msgid "Address 2:"
+#~ msgstr "Address Line 2"
+
+#, fuzzy
+#~ msgid "Contact details"
+#~ msgstr "Contact Details"
+
+#, fuzzy
+#~ msgid "Click here to upload this file"
+#~ msgstr "Click here to resolve [quant2,_1,it,them]."
+
+#, fuzzy
+#~ msgid "Address1"
+#~ msgstr "Address Line 1"
+
+#, fuzzy
+#~ msgid "Address2"
+#~ msgstr "Address Line 2"
+
+#, fuzzy
+#~ msgid "Amendment: Pending"
+#~ msgstr "Amendment"
+
+#, fuzzy
+#~ msgid "Club name:"
+#~ msgstr "Club Name"
+
+#, fuzzy
+#~ msgid "Contact person:"
+#~ msgstr "Contact Person"
+
+#, fuzzy
+#~ msgid "Email:"
+#~ msgstr "Email"
+
+#, fuzzy
+#~ msgid "Venue name:"
+#~ msgstr "Venue 1"
+
+#, fuzzy
+#~ msgid "Website:"
+#~ msgstr "Website"
+
+#, fuzzy
+#~ msgid "There was a problem linking your membership record"
+#~ msgstr "There was a problem changing the welcome message"
+
+#, fuzzy
+#~ msgid "Contact person"
+#~ msgstr "Contact Person"
+
+#, fuzzy
+#~ msgid "Link Member"
+#~ msgstr "Member"
+
+#, fuzzy
+#~ msgid "intCertificationTypeID"
+#~ msgstr "Identification Type"
+
+#, fuzzy
+#~ msgid "strContactCity"
+#~ msgstr "Contact"
+
+#, fuzzy
+#~ msgid "strGender"
+#~ msgstr "Gender"
+
+#, fuzzy
+#~ msgid "strISONationality"
+#~ msgstr "Passport Nationality"
+
+#, fuzzy
+#~ msgid "strMANotes"
+#~ msgstr "Notes"
+
+#, fuzzy
+#~ msgid "strPlaceOfBirth"
+#~ msgstr "Place (Town) of Birth"
+
+#, fuzzy
+#~ msgid "strRegionOfBirth"
+#~ msgstr "Date of Birth"
+
+#~ msgid "Club Id"
+#~ msgstr "Club Id"
+
+#~ msgid "Problems"
+#~ msgstr "Problems"
+
+#~ msgid "Weight"
+#~ msgstr "Weight"
+
+#~ msgid "The list is limited to the first [_1] entries."
+#~ msgstr "The list is limited to the first [_1] entries."
+
+#~ msgid "CHOOSE_HOW_REPORTS"
+#~ msgstr "Choose how you want to receive the data from this report."
+
+#~ msgid "City of Residence"
+#~ msgstr "City of Residence"
+
+#~ msgid "Player Age Group"
+#~ msgstr "Player Age Group"
+
+#~ msgid "Choose an option from the list below"
+#~ msgstr "Choose an option from the list below"
+
+#~ msgid "Any Allergies"
+#~ msgstr "Any Allergies"
 
 #~ msgid "Title of Contact 3"
-#~ msgstr "Titre du Contact 3"
+#~ msgstr "Title of Contact 3"
 
-#~ msgid "State Team Supported"
-#~ msgstr "State Team Supported"
+#~ msgid "cannot have spaces"
+#~ msgstr "cannot have spaces"
 
-#~ msgid "Limit"
-#~ msgstr "Limite"
+#~ msgid "Database Error in Addition"
+#~ msgstr "Database Error in Addition"
 
-#~ msgid "REPORT_INTRO_DESC_TEXT"
-#~ msgstr "<p>Il existe deux types de rapports présents dans le système.</p"
+#~ msgid "This is the list of the last 20 changes peformed."
+#~ msgstr "This is the list of the last 20 changes peformed."
 
-#~ msgid "Home Venue Post Code"
-#~ msgstr "Code postal du Lieu de domicile"
+#~ msgid "Consent Forms"
+#~ msgstr "Consent Forms"
+
+#~ msgid "Contact Person 3"
+#~ msgstr "Contact Person 3"
+
+#~ msgid "Sub Category"
+#~ msgstr "Sub Category"
+
+#~ msgid "Problem Updating Fields"
+#~ msgstr "Problem Updating Fields"
+
+#~ msgid "Parent/Guardian 1 Phone"
+#~ msgstr "Parent/Guardian 1 Phone"
+
+#~ msgid "Nickname"
+#~ msgstr "Nickname"
+
+#~ msgid "AUTO_INTROTEXT"
+#~ msgstr ""
+#~ "To modify this information change the information in the boxes below and "
+#~ "whe"
+
+#~ msgid "Select your report type below."
+#~ msgstr "Select your report type below."
+
+#~ msgid "Abbreviation"
+#~ msgstr "Abbreviation"
+
+#~ msgid "Secondary Sort By"
+#~ msgstr "Secondary Sort By"
+
+#~ msgid "Hair Colour"
+#~ msgstr "Hair Colour"
+
+#~ msgid "Ethnicity"
+#~ msgstr "Ethnicity"
+
+#~ msgid "Height"
+#~ msgstr "Height"
+
+#~ msgid "No Limit"
+#~ msgstr "No Limit"
 
 #~ msgid ""
 #~ "Please enter your username and password below and then press the Sign in "
 #~ "button."
 #~ msgstr ""
-#~ "Merci d'entrer vos nom d'utilisateur et mot de passe ci-dessous et "
-#~ "d'appuyer sur le bouton Connexion."
+#~ "Please enter your username and password below and then press the Sign in "
+#~ "button."
 
-#~ msgid "Alternate Uniform Number Colour"
-#~ msgstr "Alterner nombre de couleur uniforme"
-
-#~ msgid "Date First Registered"
-#~ msgstr "Date First Registered"
-
-#~ msgid "Allergies?"
-#~ msgstr "Allergies?"
-
-#~ msgid "Eye Colour"
-#~ msgstr "Couleur des yeux"
-
-#~ msgid "Alternate Uniform Number"
-#~ msgstr "Alternate Uniform Number"
+#~ msgid "Member Types: Official"
+#~ msgstr "Member Types: Official"
 
 #~ msgid "None Available"
-#~ msgstr "Aucun disponible"
+#~ msgstr "None Available"
 
-#~ msgid "Exclude from Club Championships"
-#~ msgstr "Exclude from Club Championships"
-
-#~ msgid "Phone 3"
-#~ msgstr "Téléphone 3"
-
-#~ msgid "Parent/Guardian 1 Phone"
-#~ msgstr "Parent/Guardian 1 Phone"
-
-#~ msgid "Unknown export format"
-#~ msgstr "Format d'exportation Inconnue"
-
-#~ msgid "Event Number"
-#~ msgstr "Numéro d'événement"
-
-#~ msgid "Modify Member List"
-#~ msgstr "Modifier la liste des membres"
-
-#~ msgid "Association Season Member Package"
-#~ msgstr "Paquet membres de l'Association saison"
-
-#~ msgid "Not Equals"
-#~ msgstr "Pas Égal"
-
-#~ msgid "Member marked as a duplicate"
-#~ msgstr "Membre marqué comme duplicata"
-
-#~ msgid "No Data to Export"
-#~ msgstr "Aucune donnée à l'exportation"
-
-#~ msgid "Title of Contact 2"
-#~ msgstr "Titre du Contact 2"
-
-#~ msgid "Is Blank"
-#~ msgstr "Vide"
-
-#~ msgid "MARK_AS_DUPLICATE_WARNING"
-#~ msgstr "NOTER: Seuls marquer le [_1] supplémentaire, pas le [_1] vous croye"
-
-#~ msgid "MODIFY_PHOTO_FORM_HEADER"
-#~ msgstr "<p"
-
-#~ msgid "Season Match Official Financial?"
-#~ msgstr "Season Match Official Financial?"
-
-#~ msgid "Members"
-#~ msgstr "Membres"
-
-#~ msgid "EVENTCOPY_info"
+#~ msgid "CHOOSE_AND_REPORT"
 #~ msgstr ""
-#~ "Cette option permet la copie d'un jeu d'informations d'un tiers évènemen"
-
-#~ msgid "Jumper Numbers"
-#~ msgstr "Jumper Numbers"
-
-#~ msgid "is not less than [_1]"
-#~ msgstr "is not less than [_1]"
-
-#~ msgid "Allow Clubs to"
-#~ msgstr "Allow Clubs to"
-
-#~ msgid "Is Not Blank"
-#~ msgstr "Pas Vide"
-
-#~ msgid "Medical"
-#~ msgstr "Médical"
-
-#~ msgid "This will assign the status to all matching records"
-#~ msgstr "Cela affectera l'état de tous les enregistrements correspondants"
-
-#~ msgid "Database Home"
-#~ msgstr "Accueil de la base de données"
-
-#~ msgid "Parent/Guardian 1 Firstname"
-#~ msgstr "Parent/Guardian 1 Firstname"
-
-#~ msgid "MARK_AS_DUPLICATE_INSTRUCTIONS"
-#~ msgstr "<p"
-
-#~ msgid "Place (Town) of Birth"
-#~ msgstr "Lieu (Ville) de naissance"
-
-#~ msgid "Less Than"
-#~ msgstr "Moins Que"
-
-#~ msgid "Add Season Club Record"
-#~ msgstr "Add Season Club Record"
-
-#~ msgid "Match Official in<br>Club?"
-#~ msgstr "Match Officiel dans<br>le Club?"
-
-#~ msgid "Salutation"
-#~ msgstr "Salutations"
-
-#~ msgid "CHOOSE_EXPORT_FORMAT"
-#~ msgstr "Choisissez le format d'exportation que vous souhaitez utilise"
-
-#~ msgid "Delete Member"
-#~ msgstr "Supprimer membres"
-
-#~ msgid "City of Residence"
-#~ msgstr "Ville de résidence"
-
-#~ msgid "Include All records in Rollover"
-#~ msgstr "Inclus tous les rapports dans le remaniement"
-
-#~ msgid "Work Phone"
-#~ msgstr "Téléphone au travail"
-
-#~ msgid "Maximum no. of rows to display"
-#~ msgstr "Nombre maximum de lignes à afficher"
-
-#~ msgid "REPORT_INTRO_TEXT"
-#~ msgstr "<p"
-
-#~ msgid "Club Season Member Package"
-#~ msgstr "Paquet membre du Club Saison"
-
-#~ msgid "Allow Teams to"
-#~ msgstr "Allow Teams to"
-
-#~ msgid "Veteran?"
-#~ msgstr "Veteran?"
-
-#~ msgid "Select a Status to Assign"
-#~ msgstr "Sélectionnez un statut à attribuer"
-
-#~ msgid "Member Financial Balance"
-#~ msgstr "Member Financial Balance"
-
-#~ msgid "Team Passwords"
-#~ msgstr "Team Passwords"
-
-#~ msgid "Health Care Number"
-#~ msgstr "Health Care Number"
-
-#~ msgid "Choose an option from the list below"
-#~ msgstr "Choose an option from the list below"
-
-#~ msgid "Member Summary Reports"
-#~ msgstr "Résumé des rapports du membre"
-
-#~ msgid "School Suburb "
-#~ msgstr "School Suburb "
-
-#~ msgid "Mobile Phone"
-#~ msgstr "Téléphone portable"
-
-#~ msgid "ENTER_USER_PASSWORD"
-#~ msgstr ""
-#~ "Merci d'entrer vos nom d'utilisateur et mot de passe ci-dessous et "
-#~ "d'appuye"
-
-#~ msgid "Player Active?"
-#~ msgstr "Player Active?"
-
-#~ msgid "Active?"
-#~ msgstr "Actif?"
-
-#~ msgid "Surname"
-#~ msgstr "Nom de Famille"
-
-#~ msgid "Season Player Financial?"
-#~ msgstr "Season Player Financial?"
-
-#~ msgid "Competitions"
-#~ msgstr "Compétitions"
-
-#~ msgid "Update Permissions"
-#~ msgstr "Update Permissions"
-
-#~ msgid "Save Report as"
-#~ msgstr "Rappelez-vous le rapport comme"
-
-#~ msgid "Parent/Guardian 1 Surname"
-#~ msgstr "Parent/Guardian 1 Surname"
-
-#~ msgid "No entries match your Search criteria. Please try again"
-#~ msgstr ""
-#~ "Aucune entrée ne correspond aux critères de recherche. S'il vous plaît "
-#~ "essayez de nouveau."
-
-#~ msgid "President"
-#~ msgstr "Président"
-
-#~ msgid "Any (or No) Sport"
-#~ msgstr "Tous les Sports (ou pas)"
-
-#~ msgid "Suburb"
-#~ msgstr "Banlieue/Quartier"
-
-#~ msgid "To resolve this duplicate click"
-#~ msgstr "Pour résoudre ce double exemplaire cliquez sur"
-
-#~ msgid "Update Member"
-#~ msgstr "Mise à jour Membre"
-
-#~ msgid "Middle Name"
-#~ msgstr "Deuxième prénom"
-
-#~ msgid "on your Accreditation pass"
-#~ msgstr "sur votre accréditation passer"
+#~ "Choose which fields you want on your report and any filters you wish to "
+#~ "apply"
 
 #~ msgid "Parent/Guardian 1 Email"
 #~ msgstr "Parent/Guardian 1 Email"
 
-#~ msgid "Season Coach Financial?"
-#~ msgstr "Season Coach Financial?"
-
-#~ msgid "Season Player?"
-#~ msgstr "Season Player?"
-
-#~ msgid "Parent/Guardian 2 Assistance Area"
-#~ msgstr "Parent/Guardian 2 Assistance Area"
-
-#~ msgid "Select your report type below."
-#~ msgstr "Sélectionnez votre type de rapport ci-dessous"
-
-#~ msgid "Invalid or Blank Email Address"
-#~ msgstr "Blancs ou Nuls Adresse Email"
-
-#~ msgid "Member Number"
-#~ msgstr "Numéro de membre"
-
-#~ msgid "BULK_PRINT_BUTTON_INFO"
+#~ msgid "ENTER_USER_PASSWORD"
 #~ msgstr ""
-#~ "Appuyez sur la <b> '[_1]' </b> bouton pour générer une liste de passages "
+#~ "Please enter your username and password below and then press the '[_1]"
 
-#~ msgid "Name (or part of name)"
-#~ msgstr "Nom (ou partie du nom)"
+#~ msgid "Statistics"
+#~ msgstr "Statistics"
 
-#~ msgid "Occupation"
-#~ msgstr "Occupation"
-
-#~ msgid "Copy Event Details"
-#~ msgstr "Copier les détails de l'évènement"
-
-#~ msgid "Permissions Updated"
-#~ msgstr "Permissions Updated"
-
-#~ msgid "Allow Medical Treatment"
-#~ msgstr "Allow Medical Treatment"
-
-#~ msgid "Information to copy"
-#~ msgstr "Information à copier"
-
-#~ msgid "System developed and powered by [_1]."
-#~ msgstr "Système développé et propulsé par [_1]."
-
-#~ msgid "Update status required for pass printing"
-#~ msgstr "Mettre à jour les statuts requis l'impression d'une accréditation"
-
-#~ msgid "Their Member Types"
-#~ msgstr "Their Member Types"
-
-#~ msgid "Abbreviation"
-#~ msgstr "Abréviation"
-
-#~ msgid "Incorporation Number"
-#~ msgstr "Numéro d'Incorporation"
-
-#~ msgid "Title of Contact"
-#~ msgstr "Titre du Contact"
-
-#~ msgid "Sportzware Membership Login Page"
-#~ msgstr "Page de connexion à Sportzware Membership"
-
-#~ msgid "Update Club"
-#~ msgstr "Update Club"
-
-#~ msgid "Services"
-#~ msgstr "Services"
-
-#~ msgid "Add Season Record"
-#~ msgstr "Add Season Record"
-
-#~ msgid "Update Welcome Message"
-#~ msgstr "Mettre à jour le Message de Bienvenue"
-
-#~ msgid "To Season"
-#~ msgstr "Prendre en compte la saison"
-
-#~ msgid "ADV_REPORT_INTRO"
-#~ msgstr "<p"
-
-#~ msgid "Venue Code"
-#~ msgstr "Code du site"
-
-#~ msgid "Contact Person 3"
-#~ msgstr "Nom du Contact 3"
-
-#~ msgid "Tags Updated"
-#~ msgstr "Tags Updated"
-
-#~ msgid "Business Number"
-#~ msgstr "Numéro d'affaires"
-
-#~ msgid "Contact Email 3"
-#~ msgstr "Contact e-mail 3"
-
-#~ msgid "Zone Code"
-#~ msgstr "Code de la zone"
-
-#~ msgid "Fill in the appropriate filter boxes below to search."
-#~ msgstr ""
-#~ "Remplissez les cases appropriées ci-dessous pour filtrer la recherche."
-
-#~ msgid "Contact Email 2"
-#~ msgstr "Contact e-mail 2"
-
-#~ msgid "Saved Reports"
-#~ msgstr "Rapports rappeler"
-
-#~ msgid "Season Participating?"
-#~ msgstr "Season Participating?"
-
-#~ msgid "Permissions"
-#~ msgstr "Permissions"
-
-#~ msgid "Member Types"
-#~ msgstr "Member Types"
-
-#~ msgid "UPLOAD_PHOTO_FORM_TEXT"
-#~ msgstr "<p"
-
-#~ msgid "Full Season Summary"
-#~ msgstr "Résumé de la saison complète"
-
-#~ msgid "Accreditation Bulk Print"
-#~ msgstr "Impression en vrac d'accréditation"
-
-#~ msgid "Bulk Printing"
-#~ msgstr "Impression en vrac"
-
-#~ msgid "Home Venue Suburb"
-#~ msgstr "Banlieue/Quartier du Lieu de domicile"
-
-#~ msgid "Normal (Tab Delimited)"
-#~ msgstr "Normal (délimité par des tabulations)"
-
-#~ msgid "Include Club Records in Rollover"
-#~ msgstr "Inclus les rapports des clubs dans le remaniement"
-
-#~ msgid "is not less than or equal to [_1]"
-#~ msgstr "is not less than or equal to [_1]"
-
-#~ msgid "Passport Expiry"
-#~ msgstr "Date d'expiration du passeport"
-
-#~ msgid "Alternate Uniform Bottom Colour"
-#~ msgstr "Alterner couleur basse uniforme"
-
-#~ msgid "Database Error in Addition"
-#~ msgstr "Database Error in Addition"
-
-#~ msgid "Allow Parent Body"
-#~ msgstr "Allow Parent Body"
-
-#~ msgid "Departure Date"
-#~ msgstr "Date de départ"
-
-#~ msgid "There are no available Tags to assign"
-#~ msgstr "There are no available Tags to assign"
-
-#~ msgid "Click to Open/Close Group"
-#~ msgstr "Cliquez pour ouvrir/fermer le groupe"
-
-#~ msgid "Player Age Group"
-#~ msgstr "Groupe d'Âge Joueur"
-
-#~ msgid "Season Coach?"
-#~ msgstr "Season Coach?"
-
-#~ msgid "CHOOSE_HOW_REPORTS"
-#~ msgstr ""
-#~ "Choisissez comment vous souhaitez recevoir les données de ce rapport"
-
-#~ msgid "Search using the options below"
-#~ msgstr "Recherche en utilisant les options ci-dessous"
-
-#~ msgid "International Regions"
-#~ msgstr "International Regions"
-
-#~ msgid "Alternate Uniform Top Colour"
-#~ msgstr "Alterner couleur haute uniforme"
-
-#~ msgid "Player in<br>Association?"
-#~ msgstr "Joueur dans<br>l'Association?"
-
-#~ msgid "TO_UPD_WELCOME"
-#~ msgstr "<p"
-
-#~ msgid "Editable"
-#~ msgstr "Editable"
-
-#~ msgid "Address Line 2"
-#~ msgstr "Adresse Ligne 2"
-
-#~ msgid "Arrival Date"
-#~ msgstr "Date d'arrivée"
-
-#~ msgid "Accreditation Provider"
-#~ msgstr "Accreditation Provider"
-
-#~ msgid "Age Groups"
-#~ msgstr "Groupes d'âge"
-
-#~ msgid "Area of Expertise"
-#~ msgstr "Domaine d'expertise"
-
-#~ msgid "Place of Birth"
-#~ msgstr "Lieu de naissance"
-
-#~ msgid "All the filters are additive."
-#~ msgstr "Tous les filtres sont additifs."
-
-#~ msgid ""
-#~ "These configuration options allow you to modify the data and behaviour of "
-#~ "the system."
-#~ msgstr ""
-#~ "These configuration options allow you to modify the data and behaviour of "
-#~ "the system."
+#~ msgid "Email Address of the Organiser"
+#~ msgstr "Email Address of the Organiser"
 
 #~ msgid "cannot contain HTML"
 #~ msgstr "cannot contain HTML"
 
-#~ msgid "Season Member Package"
-#~ msgstr "Paquet membre de la Saison"
+#~ msgid "ROWS_FOUND"
+#~ msgstr "[_1] rows found"
 
-#~ msgid "PERMISSIONS_intro"
+#~ msgid "Business Number"
+#~ msgstr "Business Number"
+
+#~ msgid "MARK_AS_DUPLICATE_WARNING"
 #~ msgstr ""
-#~ "Choose the options below to set the permissions various users have to "
-#~ "perform tasks in the database. When you have selected the permissions "
-#~ "press the <b>'Update Permissions'</b> button to save your settings. "
-#~ "<br><b>NB.</b> The permissions only apply to the Members/Club/Teams that "
-#~ "the user has access to already.  It does not convey extra permissions."
+#~ "NOTE: Only mark the extra [_1], not the [_1] you believe may be the "
+#~ "original"
 
-#~ msgid "Upload Photo"
-#~ msgstr "Envoyer la photo"
+#~ msgid "is not less than or equal to [_1]"
+#~ msgstr "is not less than or equal to [_1]"
 
-#~ msgid "Height"
-#~ msgstr "Taille"
+#~ msgid "Update Welcome Message"
+#~ msgstr "Update Welcome Message"
 
-#~ msgid "This member has been associated with the following tags."
-#~ msgstr "This member has been associated with the following tags."
-
-#~ msgid "Compulsory"
-#~ msgstr "Compulsory"
-
-#~ msgid "Make selected members Active in Association during Rollover"
+#~ msgid "TO_UPD_WELCOME"
 #~ msgstr ""
-#~ "Sélectionner les members actifs en association pendant le remaniement"
+#~ "<p>To update the welcome message to display when you log in, fill in the "
+#~ "box and press the <b>[_1]</b> button.</p>"
 
-#~ msgid "Athletics Associations"
-#~ msgstr "Associations d'athlétisme"
+#~ msgid "Click to Open/Close Group"
+#~ msgstr "Click to Open/Close Group"
 
-#~ msgid "Junior?"
-#~ msgstr "Junior?"
+#~ msgid "UPLOAD_PHOTO_FORM_TEXT"
+#~ msgstr "<p"
 
-#~ msgid "From here you can login to your Sportzware Membership online system."
-#~ msgstr ""
-#~ "D'ici vous pouvez vous connecter via votre code d'accès Sportzware en "
-#~ "ligne."
-
-#~ msgid "How did you find out about us?"
-#~ msgstr "How did you find out about us?"
-
-#~ msgid "Name (or part of)"
-#~ msgstr "Nom (ou partie)"
-
-#~ msgid "Database Error in Update"
-#~ msgstr "Database Error in Update"
+#~ msgid "Home Venue Post Code"
+#~ msgstr "Home Venue Post Code"
 
 #~ msgid "Member Sport Detail Reports"
-#~ msgstr "Rapports des détails sportifs du membre"
+#~ msgstr "Member Sport Detail Reports"
 
-#~ msgid "Nickname"
-#~ msgstr "Surnom"
+#~ msgid "MODIFY_PHOTO_FORM_HEADER"
+#~ msgstr "<p"
 
-#~ msgid "Season Match Official?"
-#~ msgstr "Season Match Official?"
+#~ msgid "There are no available Tags to assign"
+#~ msgstr "There are no available Tags to assign"
 
-#~ msgid "Generic (Tab Delimited)"
-#~ msgstr "Générique (délimité par des tabulations)"
+#~ msgid "Medical Notes"
+#~ msgstr "Medical Notes"
 
-#~ msgid "Phone (Home)"
-#~ msgstr "Téléphone (Domicile)"
+#~ msgid "Reset"
+#~ msgstr "Reset"
 
-#~ msgid "Any Category"
-#~ msgstr "Toute Catégorie"
+#~ msgid "Ask for Job Title"
+#~ msgstr "Ask for Job Title"
 
-#~ msgid "CHOOSE_AND_REPORT"
-#~ msgstr ""
-#~ "Choisissez les champs que vous voulez sur votre rapport et les filtres qu"
+#~ msgid "Secretary"
+#~ msgstr "Secretary"
 
-#~ msgid "Equals"
-#~ msgstr "Egal"
+#~ msgid "Active?"
+#~ msgstr "Active?"
 
-#~ msgid "Not Available"
-#~ msgstr "Non disponible"
-
-#~ msgid "Any Medical Conditions?"
-#~ msgstr "Conditions Médicales?"
-
-#~ msgid "Welcome Message"
-#~ msgstr "Message de Bienvenue"
-
-#~ msgid "Problem Updating Permissions"
-#~ msgstr "Problem Updating Permissions"
-
-#~ msgid "Member Financial?"
-#~ msgstr "Member Financial?"
-
-#~ msgid "Date Created Online"
-#~ msgstr "Date Created Online"
-
-#~ msgid "Career Games"
-#~ msgstr "Career Games"
-
-#~ msgid "Ethnicity"
-#~ msgstr "Ethnie"
-
-#~ msgid "Show Members for Rollover"
-#~ msgstr "Montrer les membres pour un remaniement"
-
-#~ msgid "ROWS_FOUND"
-#~ msgstr "[_1] rangées trouvées"
-
-#~ msgid "Contact Phone 3"
-#~ msgstr "Contact Phone 3"
-
-#~ msgid "Association Season Summary"
-#~ msgstr "Résumé de la saison Association"
-
-#~ msgid "Upload Photos"
-#~ msgstr "Télécharger des photos"
-
-#~ msgid "Senior?"
-#~ msgstr "Senior?"
-
-#~ msgid "Between"
-#~ msgstr "Entre"
-
-#~ msgid "Error Sending Mail"
-#~ msgstr "Erreur envoi de courrier électronique"
-
-#~ msgid "Match Official Active?"
-#~ msgstr "Match Official Active?"
-
-#~ msgid "Home Venue Address"
-#~ msgstr "Adresse du lieu de domicile"
-
-#~ msgid "The list is limited to the first [_1] entries."
-#~ msgstr "La liste est limitée aux [_1] premières entrées."
-
-#~ msgid "All Age Groups"
-#~ msgstr "Toutes les catégories d’âge"
-
-#~ msgid "Compulsory Field"
-#~ msgstr "Compulsory Field"
-
-#~ msgid "Contact Person 2"
-#~ msgstr "Nom du Contact 2"
-
-#~ msgid "is not more than or equal to [_1]"
-#~ msgstr "is not more than or equal to [_1]"
-
-#~ msgid "No Tags Found"
-#~ msgstr "No Tags Found"
-
-#~ msgid "Any Allergies"
-#~ msgstr "Allergies"
-
-#~ msgid "Home Venue Name"
-#~ msgstr "Nom du lieu de domicile"
-
-#~ msgid "Last Recorded Game"
-#~ msgstr "Last Recorded Game"
-
-#~ msgid "Username/Code"
-#~ msgstr "Nom d'utilisateur/code"
-
-#~ msgid "Parent/Guardian 1 Assistance Area"
-#~ msgstr "Parent/Guardian 1 Assistance Area"
+#~ msgid "Sportzware Membership Login Page"
+#~ msgstr "Sportzware Membership Login Page"
 
 #~ msgid "DISPLAY_REPORT"
-#~ msgstr "Ouvrez l'état pour l'affichage sur l'écran"
+#~ msgstr "Open the report for viewing on the screen"
 
-#~ msgid "Coach in<br>Association?"
-#~ msgstr "Entraîneur<br>en Association?"
+#~ msgid "Contact Phone 2"
+#~ msgstr "Contact Phone 2"
 
-#~ msgid "Weight"
-#~ msgstr "Poids"
-
-#~ msgid "Accreditation Category"
-#~ msgstr "Catégorie d'accréditation"
-
-#~ msgid "School Grade"
-#~ msgstr "School Grade"
-
-#~ msgid "More Than"
-#~ msgstr "Plus Que"
+#~ msgid "Name (or part of name)"
+#~ msgstr "Name (or part of name)"
 
 #~ msgid "ROLLOVER_INSTRUCTIONS"
 #~ msgstr "<p"
 
-#~ msgid "Teams"
-#~ msgstr "Equipes"
+#~ msgid "[_1] updated successfully"
+#~ msgstr "[_1] updated successfully"
 
-#~ msgid "cannot have spaces"
-#~ msgstr "cannot have spaces"
+#~ msgid "Age Groups"
+#~ msgstr "Age Groups"
 
-#~ msgid "This is the list of the last 20 changes peformed."
-#~ msgstr "This is the list of the last 20 changes peformed."
+#~ msgid "Phone 3"
+#~ msgstr "Phone 3"
+
+#~ msgid "Member Number"
+#~ msgstr "Member Number"
+
+#~ msgid "Health Care Number"
+#~ msgstr "Health Care Number"
+
+#~ msgid "Parent/Guardian 1 Firstname"
+#~ msgstr "Parent/Guardian 1 Firstname"
+
+#~ msgid "Occupation"
+#~ msgstr "Occupation"
+
+#~ msgid "Salutation"
+#~ msgstr "Salutation"
+
+#~ msgid "Age Group"
+#~ msgstr "Age Group"
+
+#~ msgid "Contact Email 3"
+#~ msgstr "Contact Email 3"
+
+#~ msgid "is not more than or equal to [_1]"
+#~ msgstr "is not more than or equal to [_1]"
+
+#~ msgid "Welcome Message"
+#~ msgstr "Welcome Message"
+
+#~ msgid "Maximum no. of rows to display"
+#~ msgstr "Maximum no. of rows to display"
+
+#~ msgid "Contact Email 2"
+#~ msgstr "Contact Email 2"
+
+#~ msgid "Database Error in Update"
+#~ msgstr "Database Error in Update"
+
+#~ msgid "Phone (Home)"
+#~ msgstr "Phone (Home)"
+
+#~ msgid "No Clubs of this status can be found in the database."
+#~ msgstr "No Clubs of this status can be found in the database."
+
+#~ msgid "Compulsory Field"
+#~ msgstr "Compulsory Field"
+
+#~ msgid "This will assign the status to all matching records"
+#~ msgstr "This will assign the status to all matching records"
+
+#~ msgid "Title of Contact 2"
+#~ msgstr "Title of Contact 2"
+
+#~ msgid "Tags Updated"
+#~ msgstr "Tags Updated"
+
+#~ msgid "TO_UPD_DASHBOARD"
+#~ msgstr ""
+#~ "<p>Choose what data you want to display in each dashboard item.</"
+#~ "p><p>Click <b>Update</b> to save.</p>"
+
+#~ msgid "EXPORT_WARNING"
+#~ msgstr ""
+#~ "This option has a specified set of fields that it exports, however "
+#~ "filters ar"
+
+#~ msgid "Incorporation Number"
+#~ msgstr "Incorporation Number"
+
+#~ msgid "Suburb"
+#~ msgstr "Suburb"
+
+#~ msgid "Phone 2"
+#~ msgstr "Phone 2"
+
+#~ msgid "is not a valid number"
+#~ msgstr "is not a valid number"
+
+#~ msgid "Name (or part of)"
+#~ msgstr "Name (or part of)"
+
+#~ msgid "DATA_EXPORT_EMAIL_PROMPT"
+#~ msgstr ""
+#~ "The data will be emailed as an attachment to an email address. Enter the "
+#~ "email"
+
+#~ msgid "Date Created Online"
+#~ msgstr "Date Created Online"
+
+#~ msgid "Title of Contact"
+#~ msgstr "Title of Contact"
+
+#~ msgid "Fill in the appropriate filter boxes below to search."
+#~ msgstr "Fill in the appropriate filter boxes below to search."
+
+#~ msgid "Database Home"
+#~ msgstr "Database Home"
+
+#~ msgid "Problem Updating Permissions"
+#~ msgstr "Problem Updating Permissions"
+
+#~ msgid "Parent/Guardian 1 Surname"
+#~ msgstr "Parent/Guardian 1 Surname"
+
+#~ msgid "Eye Colour"
+#~ msgstr "Eye Colour"
+
+#~ msgid "MARK_AS_DUPLICATE_INSTRUCTIONS"
+#~ msgstr "<p"
 
 #~ msgid "EMAIL_REPORT"
-#~ msgstr "E-mail du rapport dans un format adapté à être importé dans un autr"
-
-#~ msgid "Hair Colour"
-#~ msgstr "Couleur des cheveux"
-
-#~ msgid "You have entered an Invalid Date of birth"
-#~ msgstr "La date de naissance entrée n'est pas valide"
-
-#~ msgid "Association Summary"
-#~ msgstr "Résumé des associations"
-
-#~ msgid "Like"
-#~ msgstr "Ressemble"
-
-#~ msgid "Signature Sighted"
-#~ msgstr "Signature Voyants"
-
-#~ msgid "Accreditation Result"
-#~ msgstr "Accreditation Result"
-
-#~ msgid "Choose the options below to set up your event"
-#~ msgstr "Choisissez les options ci-dessous pour configurer votre événement :"
-
-#~ msgid "Reset"
-#~ msgstr "Réinitialiser"
-
-#~ msgid "Search found the following results"
-#~ msgstr "La recherche a trouvé les résultats suivants"
-
-#~ msgid "Manage Lookup Information"
-#~ msgstr "Manage Lookup Information"
-
-#~ msgid "No Age Group"
-#~ msgstr "Aucune catégorie d’âge"
-
-#~ msgid "Re-Accreditation"
-#~ msgstr "Re-Accreditation"
-
-#~ msgid "Accreditation"
-#~ msgstr "Accréditation"
-
-#~ msgid "Mark Member as Duplicate"
-#~ msgstr "Marquer membre comme un doublon"
-
-#~ msgid "Ask for Photo?"
-#~ msgstr "Demander pour la photo"
-
-#~ msgid "Address Line 1"
-#~ msgstr "Adresse Ligne 1"
-
-#~ msgid "Fitness Tests"
-#~ msgstr "Tests Sportifs"
-
-#~ msgid "Coach in<br>Club?"
-#~ msgstr "Entraîneur dans<br>le Club?"
-
-#~ msgid "AUTO_INTROTEXT"
 #~ msgstr ""
-#~ "Modifier les données dans les cases ci-dessous tel que requis. Lorsqu"
+#~ "Email the report in a format suitable to be imported into another product"
+
+#~ msgid "Limit"
+#~ msgstr "Limit"
+
+#~ msgid "is not less than [_1]"
+#~ msgstr "is not less than [_1]"
+
+#~ msgid "Contact Person 2"
+#~ msgstr "Contact Person 2"
+
+#~ msgid "Senior"
+#~ msgstr "Senior"
+
+#~ msgid "Youth"
+#~ msgstr "Youth"
