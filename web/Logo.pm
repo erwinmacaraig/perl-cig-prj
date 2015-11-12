@@ -1,8 +1,8 @@
 package Logo;
 require Exporter;
 @ISA =  qw(Exporter);
-@EXPORT = qw(convertToLogo getLogo getLogoData);
-@EXPORT_OK = qw(convertToLogo getLogo getLogoData);
+@EXPORT = qw(convertToLogo getLogo getLogoData showLogo);
+@EXPORT_OK = qw(convertToLogo getLogo getLogoData showLogo);
 
 use strict;
 use lib "..",".";
@@ -13,6 +13,9 @@ use Utils;
 use S3Upload;
 
 #functions
+sub showLogo    {
+    return '';
+}
 
 sub getLogo {
     my (
