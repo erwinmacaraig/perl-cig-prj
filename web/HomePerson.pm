@@ -351,6 +351,10 @@ sub showPersonHome	{
             $rego->{'renew_link'} = '';
             $rego->{'changelevel_link'} = '';
         }
+        if ($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE)    {
+            $rego->{'renew_link'} = '';
+        }
+            
 
     }
 	
