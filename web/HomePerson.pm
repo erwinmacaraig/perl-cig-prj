@@ -351,7 +351,7 @@ sub showPersonHome	{
             $rego->{'renew_link'} = '';
             $rego->{'changelevel_link'} = '';
         }
-        if ($rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE)    {
+        if ($rego->{'intNationalPeriodID'} == $nationalPeriodID and $rego->{'intIsLoanedOut'} == 0 and $rego->{'strStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE)    {
             $rego->{'renew_link'} = '';
         }
             
