@@ -55,7 +55,7 @@ sub main {
       close (FILE);
   }
 
-  my $size = $dref->{'intBytes'} || 0;
+  my $size = $dref->{'intBytes'} || length($file) || 0;
   my $contenttype ='';
   my $ext = $dref->{'strExtension'} || '';
   my $origfilename = $dref->{'strOrigFilename'} || '';
