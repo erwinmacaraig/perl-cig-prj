@@ -185,12 +185,16 @@ sub displayOptions {
     }
     if($options->{'fieldtype'} eq 'dropdown') {
                         my $f1 = drop_down(
-                                'f_'.$field_name.'_1',$options->{'dropdownoptions'}, 
+                                'f_'.$field_name.'_1',
+                                $options->{'dropdownoptions'}, 
                                 $options->{'dropdownorder'}, 
                                 $def_val1, 
                                 $options->{'size'} || 1, 
                                 $options->{'multiple'} || 0,
                                 '',
+                                '',
+                                '',
+                                $self->{'Lang'},
                         );
       $linestr.=qq[<div id="d1_$prefix$field_name" style="display:$displ_1;">$f1</div>];
       $linestr.=qq[<div id="d2_$prefix$field_name" style="display:$displ_2;"></div>];
