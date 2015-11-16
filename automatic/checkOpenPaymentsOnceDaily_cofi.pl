@@ -81,10 +81,10 @@ print STDERR "IN checkOpenPayments\n";
         WHERE
             TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
-	    	AND  TL.intSentToGateway = 1 
+		    AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
             AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
-            AND TL.intCheckOnceDaily = 0
+            AND TL.intCheckOnceDaily = 1
     ];
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
@@ -140,13 +140,19 @@ print STDERR "IN checkOpenPayments\n";
         my $retval = $res->content() || '';
 #print STDERR Dumper(\%APIResponse);
 #print STDERR "--- $retval\n";
-	next if $retval =~/error/;
-	next if $retval !~/status/;
+	#next if $retval =~/error/;
+	#next if $retval !~/status/; 
+	#my $dataIN= XMLin($retval);
 
-
-        #my $dataIN= XMLin($retval);
-	my $dataIN= XMLin($retval);
-
+    my $dataIN= {};
+    if ($retval =~/error/)  {
+        $dataIN->{'status'} = 1;
+print STDERR "IN HERE for $logID\n";
+    }
+    else    {
+	    next if $retval !~/status/; 
+        $dataIN= XMLin($retval);
+    }
         #print STDERR Dumper($dataIN);
         
         $APIResponse{'STATUS'} = $dataIN->{'status'}; 
