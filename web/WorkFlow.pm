@@ -783,6 +783,8 @@ sub listTasks {
                 or ($request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED and $entityID == $request->{'intRequestToEntityID'})
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_HOLD
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_REJECTED
             );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
