@@ -1784,7 +1784,9 @@ sub checkForOutstandingTasks {
                 $qNP->execute($personRegistrationID);
                 my $activeNP = $qNP->fetchrow_array() || 0;
                 my $newStatus = $activeNP ? $Defs::PERSONREGO_STATUS_ACTIVE : $Defs::PERSONREGO_STATUS_PASSIVE;
-
+                if ($Data->{'SystemConfig'}{'WFApproval_ACTIVE'})   {
+                    $newStatus = $Defs::PERSONREGO_STATUS_ACTIVE;
+                }
 
                 my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
