@@ -1771,6 +1771,20 @@ sub checkForOutstandingTasks {
         }
 
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+                my $stNP = qq[
+                    SELECT
+                        IF((NP.intCurrentNew=1 or NP.intCurrentRenewal=1 or NP.intCurrentTransfer=1 or NP.dtFrom>NOW() or (NP.dtFrom<NOW() and NP.dtTo>NOW())), 1, 0) as ActiveStatus
+                    FROM
+                        tblPersonRegistration_$Data->{'Realm'} as PR
+                        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+                    WHERE
+                        PR.intPersonRegistrationID = ?
+                ];
+                my $qNP= $Data->{'db'}->prepare($stNP);
+                $qNP->execute($personRegistrationID);
+                my $activeNP = $qNP->fetchrow_array() || 0;
+                my $newStatus = $activeNP ? $Defs::PERSONREGO_STATUS_ACTIVE : $Defs::PERSONREGO_STATUS_PASSIVE;
+
 
                 my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
@@ -1781,7 +1795,7 @@ sub checkForOutstandingTasks {
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
                     SET
-	            	    PR.strStatus = 'ACTIVE',
+	            	    PR.strStatus = ?,
                         PR.intCurrent=1,
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
@@ -1797,6 +1811,7 @@ sub checkForOutstandingTasks {
 
 		        $q = $db->prepare($st);
 		        $q->execute(
+                    $newStatus,
 		       		$personRegistrationID
 		  			);
 	        	$rc = 1;	# All registration tasks have been completed
@@ -1841,7 +1856,7 @@ sub checkForOutstandingTasks {
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
                 if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
-                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $Defs::PERSONREGO_STATUS_ACTIVE);
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $newStatus);
                 }
            ##############################################################################################################
         }
