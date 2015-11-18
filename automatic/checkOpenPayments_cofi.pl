@@ -79,11 +79,12 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-        TL.intStatus IN (0,3)
+            TL.intStatus IN (0,3)
             AND PC.strGatewayCode = 'checkoutfi'
-		AND  TL.intSentToGateway = 1 
+	    	AND  TL.intSentToGateway = 1 
             AND TL.intPaymentGatewayResponded = 0
             AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
+            AND TL.intCheckOnceDaily = 0
     ];
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
@@ -137,8 +138,8 @@ print STDERR "IN checkOpenPayments\n";
         my $ua = LWP::UserAgent->new();
         my $res= $ua->request($req);
         my $retval = $res->content() || '';
-print STDERR Dumper(\%APIResponse);
-print STDERR "--- $retval\n";
+#print STDERR Dumper(\%APIResponse);
+#print STDERR "--- $retval\n";
 	next if $retval =~/error/;
 	next if $retval !~/status/;
 

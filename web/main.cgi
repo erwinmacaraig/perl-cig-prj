@@ -74,6 +74,7 @@ use PersonRequest;
 use Log;
 use Data::Dumper;
 use ListAuditLog;
+use PersonCardBulk;
 
 use PaymentDisplay_LoggedOff;
 main();
@@ -274,9 +275,8 @@ sub main {
     elsif ( $action =~ /^PSR/ ) {
         ( $resultHTML, $pageHeading ) = handlePaymentSplitRun( $action, \%Data );
     }
-    elsif ( $action =~ /^MEMCARD_/ ) {
-        my $ID = getID( \%clientValues );
-        ( $resultHTML, $pageHeading ) = handleMemberCard( $action, \%Data, $client, $ID, $typeID );
+    elsif ( $action =~ /^PCARD_/ ) {
+        ( $resultHTML, $pageHeading ) = handlePersonCardBulk( $action, \%Data);
     }
     elsif ( $action =~ /^RFR_/ ) {
         ( $resultHTML, $pageHeading ) = handleFormReplication( $action, \%Data );
