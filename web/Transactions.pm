@@ -331,6 +331,8 @@ sub displayTransaction	{
     my $PaymentStatus_readonly = 0;
     $PaymentStatus_readonly =1 if ($dref->{'intStatus'} == $Defs::TXN_HOLD);
     $PaymentStatus_readonly =1 if ($dref->{'intStatus'} == $Defs::TXN_CANCELLED);
+    $PaymentStatus_readonly =1 if ($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL);
+
 	my %FieldDefs = (
 		TXN => {
 			fields => {
