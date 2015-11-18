@@ -1015,6 +1015,7 @@ sub listRequests {
     my ($Data,$personID) = @_;
     $personID ||= 0;
 
+    my $lang = $Data->{'lang'};
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
     my $title = $Data->{'lang'}->txt('Requests');
@@ -1047,7 +1048,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
-            sport => $Defs::sportType{$request->{'strSport'}} || '',
+            sport => $lang->txt($Defs::sportType{$request->{'strSport'}}) || '',
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
             Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},

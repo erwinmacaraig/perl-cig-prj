@@ -3008,3 +3008,8 @@ header .navbar-brand {
     overflow:auto;
     border:1px solid #ddd;
 }
+.summaryPanel .person-photo img{
+    border:1px solid #acacac;
+    max-width:155px;
+    max-height:200px;
+}

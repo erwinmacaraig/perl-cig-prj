@@ -760,6 +760,7 @@ sub getRegistrationData	{
                 existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
                 AND existprq.intPersonID= pr.intPersonID
                 AND existprq.strRequestType = 'LOAN'
+                AND existprq.strRequestStatus IN ('PENDING', 'COMPLETED')
             )
             LEFT JOIN tblEntity eprq ON (
                 eprq.intEntityID = prq.intRequestToEntityID

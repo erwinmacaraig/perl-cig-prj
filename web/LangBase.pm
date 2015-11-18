@@ -94,3 +94,6 @@ package LangBase::zh_cn;
 use base qw(Locale::Maketext::Gettext);
 return 1;
 
+package LangBase::en_ca;
+use base qw(Locale::Maketext::Gettext);
+return 1;
