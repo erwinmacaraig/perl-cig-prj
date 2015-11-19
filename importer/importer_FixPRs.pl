@@ -25,7 +25,7 @@ sub main	{
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    my $maxNPID = 41 ; #2014
+    my $maxNPID = 42 ; #2015
     
     $db->do(qq[UPDATE tblPersonRegistration_1 as PR INNER JOIN tblPersonRequest as PRQ ON (PRQ.intPersonID=PR.intPersonID) SET PR.dtTo = PRQ.dtLoanTo WHERE strRequestType ='LOAN' AND PR.dtTo = '0000-00-00']);
     my $st = qq[
