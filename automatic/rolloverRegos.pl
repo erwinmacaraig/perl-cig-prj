@@ -39,11 +39,13 @@ sub rolloverRegoRecords {
     return if (!$npID or !$realmID);
 
     my $stUPD = qq[
-        UPDATE tblPersonRegistration_1
+        UPDATE tblPersonRegistration_1 as PR
+            INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         SET 
-            strOldStatus='ACTIVE', 
-            strStatus='PASSIVE'
-        WHERE intPersonRegistrationID = ?
+            PR.strOldStatus='ACTIVE', 
+            PR.strStatus='PASSIVE',
+            PR.dtTo = IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo)
+        WHERE PR.intPersonRegistrationID = ?
         LIMIT 1
     ];
     my $qUPD = $db->prepare($stUPD);
