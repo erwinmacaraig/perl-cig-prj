@@ -48,6 +48,46 @@
                 <div class="col-md-9"><input type="text" max-size="20" name = "d_surname" id="l_surname"></div>
             </div>
         [% END %]
+        [% IF SystemConfig.BulkRenewalsYOBFilter %]
+            <div class="form-group" id = "l_row_yobfrom">
+                <label class="col-md-3 control-label txtright" for="l_yobfrom">[% Lang.txt('Year of Birth From') %]</label>
+                <div class="col-md-9">
+                    <select name="d_yobfrom">
+                        <option selected value=''></option>
+                        [% yearCounter = 1920 %]
+                        [% WHILE yearCounter < 2015 %] 
+                            <option value="[% yearCounter %]">[% yearCounter %]</option>
+                            [% yearCounter = yearCounter + 1 %]
+                        [% END %]
+                    </select>
+                </div>
+            </div>
+            <div class="form-group" id = "l_row_yobto">
+                <label class="col-md-3 control-label txtright" for="l_yobto">[% Lang.txt('Year of Birth To') %]</label>
+                <div class="col-md-9">
+                    <select name="d_yobto">
+                        <option selected value=''></option>
+                        [% yearCounter = 1920 %]
+                        [% WHILE yearCounter < 2015 %] 
+                            <option value="[% yearCounter %]">[% yearCounter %]</option>
+                            [% yearCounter = yearCounter + 1 %]
+                        [% END %]
+                    </select>
+                </div>
+            </div>
+        [% END %]
+        [% IF SystemConfig.BulkRenewalsGenderFilter %]
+            <div class="form-group" id = "l_row_gender">
+                <label class="col-md-3 control-label txtright" for="l_gender">[% Lang.txt('Gender') %]</label>
+                <div class="col-md-9">
+                    <select name='d_gender'>
+                        <option selected value="ALL">[% Lang.txt('Both') %]</option>
+                        <option value="1">[% Lang.txt('Male') %]</option>
+                        <option value="2">[% Lang.txt('Female') %]</option>
+                    </select>
+                </div>
+            </div>
+        [% END %]
     </fieldset>
     </div>
     <input type = "hidden" name = "existingReg" value = "[% existingReg %]">
