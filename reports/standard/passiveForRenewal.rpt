@@ -1,0 +1,82 @@
+{
+	SQL => qq[
+
+SELECT DISTINCT
+    P.strNationalNum, 
+    P.strLocalFirstname, 
+    P.strLocalSurname, 
+    P.strLatinFirstname, 
+    P.strLatinSurname, 
+    P.dtDOB, 
+    P.strEmail,
+    CASE intGender
+        WHEN '1' THEN 'Male'
+        WHEN '2' THEN 'Female'
+        ELSE ''
+    END as Gender,
+    CASE PR.strPersonType
+        WHEN 'PLAYER' THEN 'Player'
+        WHEN 'COACH' THEN 'Coach'
+        WHEN 'REFEREE' THEN 'Referee'
+        WHEN 'MAOFFICIAL' THEN 'MA Official'
+        WHEN 'RAOFFICIAL' THEN 'RA Official'
+        WHEN 'CLUBOFFICIAL' THEN 'Club Official'
+        WHEN 'TEANOFFICIAL' THEN 'Club Official'
+        ELSE ''
+    END as PersonType,
+    CASE PR.strPersonLevel
+        WHEN 'PROFESSIONAL' THEN 'Professional'
+        WHEN 'AMATEUR' THEN 'Amateur'
+        WHEN 'HOBBY' THEN 'Hobby'
+        WHEN 'AMATEUR_U_C' THEN 'Amateur (Under Contract)'
+        ELSE ''
+    END as PersonLevel,
+    CASE PR.strSport
+        WHEN 'FOOTBALL' THEN 'Football'
+        WHEN 'FUTSAL' THEN 'Futsal'
+        WHEN 'WOMENSFOOTBALL' THEN 'Womens Football'
+        WHEN 'BEACHSOCCER' THEN 'Beach Soccer'
+        ELSE ''
+    END as Sport,
+    PR.strPersonType,
+    NP.strNationalPeriodName 
+FROM 
+    tblPerson as P 
+        INNER JOIN tblPersonRegistration_1 as PR 
+            ON (PR.intPersonID=P.intPersonID) 
+        INNER JOIN tblNationalPeriod as NP 
+            ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
+        INNER JOIN tblEntity as E 
+            ON (E.intEntityID=PR.intEntityID) 
+WHERE 
+    P.intRealmID = ###REALMID###
+    AND PR.intEntityID = ###CLUBID###
+    AND PR.strStatus='PASSIVE' 
+    AND P.strStatus IN ('REGISTERED')
+    AND PR.intOnLoan=0
+    AND P.strNationalNum <> ''
+    AND NP.intRenewal=0
+	],
+	StatsReport => 0,
+	ReportEntity => 100,
+	ReportLevel => 0,
+	Template => 'default',
+	DistinctValues => 1,
+	Labels => [
+		['strNationalNum','MA ID'],
+		['strLocalFirstname','First Name'],
+		['strLocalSurname','Family Name'],
+		['strLatinFirstname','International First Name'],
+		['strLatinSurname','International Family Name'],
+		['dtDOB','Date of Birth'],
+        ['Gender','Gender','string','translate'],
+        ['PersonType','Role','string','translate'],
+        ['PersonLevel','Level','string','translate'],
+        ['Sport','Sport','string','translate'],
+		['strNationalPeriodName','Period Name'],
+	],
+	Sort => [
+		['strLocalSurname','ASC','string'],
+		['strLocalFirstname','ASC','string'],
+	],
+}
