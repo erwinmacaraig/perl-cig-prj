@@ -38,16 +38,17 @@ SELECT DISTINCT
         WHEN 'BEACHSOCCER' THEN 'Beach Soccer'
         ELSE ''
     END as Sport,
-    PR.strPersonType,
+    ETR.strEntityRoleName,
     NP.strNationalPeriodName 
 FROM 
     tblPerson as P 
-        INNER JOIN tblPersonRegistration_1 as PR 
-            ON (PR.intPersonID=P.intPersonID) 
-        INNER JOIN tblNationalPeriod as NP 
-            ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
-        INNER JOIN tblEntity as E 
-            ON (E.intEntityID=PR.intEntityID) 
+        INNER JOIN tblPersonRegistration_1 as PR ON (PR.intPersonID=P.intPersonID) 
+        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID=PR.intNationalPeriodID) 
+        INNER JOIN tblEntity as E ON (E.intEntityID=PR.intEntityID) 
+        LEFT JOIN tblEntityTypeRoles as ETR ON (
+            ETR.strPersonType = PR.strPersonType 
+            AND ETR.strEntityRoleKey = PR.strPersonEntityRole
+        )
 WHERE 
     P.intRealmID = ###REALMID###
     AND PR.intEntityID = ###CLUBID###
@@ -55,7 +56,7 @@ WHERE
     AND P.strStatus IN ('REGISTERED')
     AND PR.intOnLoan=0
     AND P.strNationalNum <> ''
-    AND NP.intRenewal=0
+    AND NP.intCurrentRenewal=0
 	],
 	StatsReport => 0,
 	ReportEntity => 100,
@@ -71,6 +72,7 @@ WHERE
 		['dtDOB','Date of Birth'],
         ['Gender','Gender','string','translate'],
         ['PersonType','Role','string','translate'],
+        ['strEntityRoleName','Sub-Role','string','translate'],
         ['PersonLevel','Level','string','translate'],
         ['Sport','Sport','string','translate'],
 		['strNationalPeriodName','Period Name'],
