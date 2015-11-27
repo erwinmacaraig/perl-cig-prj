@@ -123,7 +123,7 @@ sub linkOtherDocuments {
         my $qinupl = $db->prepare($inupl);
         $qinupl->execute(
             0,
-            $doctype{$dtype} || 0,
+            $Defs::UPLOADFILETYPE_DOC,
             1, #PERSON_LEVEL
             $qgetpref->{'intPersonID'} || 0,
             100, #MA level
@@ -208,7 +208,7 @@ sub linkPhotoDocuments {
     }
 
     my $dst = qq[
-        SELECT * FROM tmpImportedDocuments WHERE strType = 'PHOTO' AND strPersonCode = '529';
+        SELECT * FROM tmpImportedDocuments WHERE strType = 'PHOTO';
     ];
 
     my $qst = $db->prepare($dst) or query_error($dst);
