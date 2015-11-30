@@ -20,7 +20,7 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='People.csv';
+    my $infile1='GHA_TEST_people.txt';
 
     importPersonFile($db, $countOnly, 'PEOPLE', $infile1);
 

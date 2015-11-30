@@ -91,6 +91,7 @@ sub insertPersonRegoRecord {
 
     my $stINS = qq[
         INSERT INTO tblPersonRegistration_1 (
+            intOriginLevel,
             intRealmID,
             dtAdded,
             dtApproved,
@@ -118,6 +119,7 @@ sub insertPersonRegoRecord {
             tmpdtPaid
         )
         VALUES (
+            100,
             1,
             NOW(),
             NOW(),
@@ -153,6 +155,11 @@ sub insertPersonRegoRecord {
         $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
     }
+    if ($maCode eq 'GHA')   {
+    #    $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
+        $orderBy = qq[ ORDER BY dtFrom ASC, dtTo ASC];
+    #    $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
+    }
 
     my $st = qq[
         SELECT
@@ -162,13 +169,14 @@ sub insertPersonRegoRecord {
             tmpPersonRego
         $orderBy
     ];
-print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
+#print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\n\n\n";
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute();
     my %existingRecord;
 
     while (my $dref= $qry->fetchrow_hashref())    {
         #next if (! $dref->{'intPersonID'} or ! $dref->{'intEntityID'} or ! $dref->{'intNationalPeriodID'});
+        $dref->{'strRegoNature'} = uc($dref->{'strRegoNature'});
 
         my $dtFrom = $dref->{'dtFrom'};
         my $dtTo   = $dref->{'dtTo'};
@@ -176,11 +184,15 @@ print "\n WARNING: INSERT HAS BEEN LIMITED FOR TEST -- PLEASE REMOVE WHEN READY\
         my $isLoanedOut= 0; 
         my $status = $dref->{'strStatus'};
 
-        if ($dref->{'isLoan'} eq 'YES')    {
+        if ($dref->{'strRegoNature'} eq 'LOAN' or $dref->{'isLoan'} eq 'YES')    {
         #$status eq 'ONLOAN' and 
             $onLoan = 1;
-            $dtTo = $dref->{'dtTransferred'};
+            #$dtTo = $dref->{'dtTransferred'};
             $status = 'PASSIVE'; ## We need to set current ones to active in import_loans script
+        }
+        if (uc($dref->{'strRegoNature'}) eq 'BACK LOAN')    {
+            $isLoanedOut=1;
+            $dref->{'strRegoNature'} = 'NEW';
         }
         if ($dref->{'dtTransferred'} and $dref->{'dtTransferred'} ne '0000-00-00')  {
             $dtTo = $dref->{'dtTransferred'};
@@ -421,7 +433,8 @@ while (<INFILE>)	{
 	$line=~s///g;
 	#$line=~s/,/\-/g;
 	$line=~s/"//g;
-	my @fields=split /;/,$line;
+	#my @fields=split /;/,$line;
+	my @fields=split /\t/,$line;
 
     #:PersonCode;OrganisationCode;Status;RegistrationNature;PersonType;Role;Level;Sport;AgeLevel;DateFrom;DateTo;Transferred;IsLoan;NationalSeason;ProductCode;Amount;IsPaid;PaymentReference
     if ($maCode eq 'HKG')   {
@@ -506,7 +519,7 @@ while (<INFILE>)	{
 
         ## Update field mapping for HKG 
     }
-    else    {
+    elsif ($maCode eq 'FIN')   {
         ## Finland at moment
     	$parts{'PERSONCODE'} = $fields[0] || '';
 	    $parts{'ENTITYCODE'} = $fields[1] || '';
@@ -544,6 +557,46 @@ while (<INFILE>)	{
         $parts{'CERTIFICATIONS'} = '';
         
     }
+    elsif ($maCode eq 'GHA')    {
+        ## Finland at moment
+    	$parts{'PERSONCODE'} = $fields[0] || '';
+	    $parts{'ENTITYCODE'} = $fields[1] || '';
+	    $parts{'STATUS'} = uc($fields[2]) || '';
+	    $parts{'REGNATURE'} = uc($fields[3]) || '';
+	    $parts{'PERSONTYPE'} = uc($fields[4]) || '';
+	    $parts{'PERSONROLE'} = uc($fields[5]) || '';
+	    $parts{'PERSONLEVEL'} = uc($fields[6]) || '';
+	    $parts{'SPORT'} = uc($fields[7]) || '';
+	    $parts{'AGELEVEL'} = uc($fields[8]) || 'ADULT';
+	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
+	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
+	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
+	    $parts{'NATIONALPERIODID'} = 0;
+	    $parts{'PRODUCTCODE'} = $fields[12] || '';
+	    $parts{'CLIENTPRIMPORTCODE'} = $fields[16] || '';
+
+	    $parts{'ISLOAN'} = '';
+	    $parts{'ISLOAN'} = 1 if ($parts{'REGNATURE'} eq "LOAN");
+	    $parts{'DATETRANSFERRED'} = '0000-00-00';
+	    $parts{'PRODUCTAMOUNT'} = 0;
+	    $parts{'ISPAID'} = '';
+	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
+	    $parts{'DATEPAID'} = '';
+        
+        $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
+        $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
+        $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
+        if ($parts{'PERSONTYPE'} eq 'MATCH OFFICIAL')    {
+            $parts{'PERSONTYPE'} = 'MAOFFICIAL';
+        }
+        if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+
+        $parts{'CERTIFICATIONS'} = '';
+        
+    }
 	if ($countOnly)	{
 		$insCount++;
 		next;
@@ -551,8 +604,8 @@ while (<INFILE>)	{
 
 	my $st = qq[
 		INSERT INTO tmpPersonRego
-		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, intNationalPeriodID, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid, strCertifications)
-        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+		(strFileType, strPersonCode, strEntityCode, strStatus, strRegoNature, strPersonType, strPersonRole, strPersonLevel, strSport, strAgeLevel, dtFrom, dtTo, dtTransferred, isLoan, strNationalPeriodCode, intNationalPeriodID, strProductCode, curProductAmount, strPaid, strTransactionNo, dtPaid, strCertifications, strClientPRImportCode)
+        VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 	];
 	my $query = $db->prepare($st) or query_error($st);
  	$query->execute(
@@ -577,7 +630,8 @@ while (<INFILE>)	{
         $parts{'ISPAID'},
         $parts{'TRANSACTIONNO'},
         $parts{'DATEPAID'},
-        $parts{'CERTIFICATIONS'}
+        $parts{'CERTIFICATIONS'},
+        $parts{'CLIENTPRIMPORTCODE'}
     ) or print "ERROR";
 }
 

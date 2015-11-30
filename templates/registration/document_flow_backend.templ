@@ -13,7 +13,7 @@
 	<div class="document-notes">
 		<table class="table documents-table">
 			[% index = 0 %]
-			[% FOREACH doc IN documents %]
+			[% FOREACH doc IN documents %] 
 			[% index = index + 1 %]
 				<tr>
 					<td>
@@ -78,7 +78,7 @@
                         </div>
                         [% END %]
 						<script>
-							var doc;
+							var doc[% doc.ID %];
 							Dropzone.options.myRegoDoc[% doc.ID %] = {
                                 dictFallbackMessage: '',
                                 [% IF doc.intFileID %]
@@ -95,25 +95,30 @@
                                 acceptedFiles: 'image/jpg,image/jpeg,image/png',
 [% END %]
 								init: function(){
+
 									this.on("success", function(file, response) {
-										doc = response;		
+										doc[% doc.ID %] = response;	
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);								
+
 									});								
 									this.on("removedfile", function(file, response){
-										var fObject = JSON.parse(doc);
+										var fObject = JSON.parse(doc[% doc.ID %]);
+										console.log(fObject.f);
 										\$.ajax({
 											type: 'POST',
 											url: '[% url %]/deleteregofile.cgi',
 											data: "f="+fObject.f + "&doctypeID="+fObject.docTypeID + "&rID="+fObject.regoID + "&client=[% client %]"
+
 										}).done(function()    {
                                         });
                                         jQuery('#crop-data-row-' + fObject.docTypeID).hide();
                                         jQuery('.crop-preview-' + docType).html('');
+
 									});
 									this.on("canceled", function(file, response){
 										jQuery(".dropzone.dz-started").removeClass('dz-started')
@@ -231,16 +236,17 @@
 [% END %]
 								init: function(){
 									this.on("success", function(file, response) {
-										doc = response;	
+										doc[% doc.ID %] = response;
 										var fObject = JSON.parse(doc);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
 										console.log(doc);	
+
 									});								
 									this.on("removedfile", function(file, response){
-										var fObject = JSON.parse(doc);
+										var fObject = JSON.parse(doc[% doc.ID %]);
 										\$.ajax({
 											type: 'POST',
 											url: '[% url %]/deleteregofile.cgi',
