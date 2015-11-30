@@ -48,10 +48,13 @@ sub bulkPersonRollover {
         $surnameFilter = qq[ AND P.strLocalSurname LIKE '$surname%'];
     }
     my $yobFilter = '';
+    $yobfrom = '' if ($yobfrom !~ /\d+/);
     if ($yobfrom)   {
         $yobFilter.= qq[ AND YEAR(P.dtDOB) >= $yobfrom ];
     }
+    $yobto = '' if ($yobto !~ /\d+/);
     if ($yobto)   {
+print STDERR "OK: $yobto\n";
         $yobFilter.= qq[ AND YEAR(P.dtDOB) <= $yobto ];
     }
     my $genderFilter = '';
