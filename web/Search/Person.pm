@@ -453,6 +453,7 @@ sub getPlayerLoan {
             WHERE
                 intPersonID IN ($person_list)
                 AND intEntityID = $filters->{'club'}
+                AND strStatus != 'INPROGRESS'
             ORDER BY
                 intPersonID, dtFrom DESC, dtTo DESC
         ];
@@ -462,6 +463,7 @@ sub getPlayerLoan {
         $precheck->execute();
 
         while(my $pdref = $precheck->fetchrow_hashref()) {
+            next if(!$pdref->{'strSport'});
             next if($personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}});
 
             #we're only interested in the status of the registration per person per sport
@@ -470,8 +472,15 @@ sub getPlayerLoan {
             $personRegMapping{$pdref->{'intPersonID'}}{$pdref->{'strSport'}} = $pdref->{'strStatus'};
         }
 
+        # get person ids currently not registered to searching club, then push to includePersonList
+
+        my @registeredToRequestor = ( keys %personRegMapping );
+        my %diff;
+        @diff{ @registeredToRequestor } = ();;
+        my @notregisteredToRequestor = grep !exists($diff{$_}), @persons;
+
         my $flag = 0;
-        my @includePersonList = ();
+        my @includePersonList;
         my $valid_person_list;
 
         if(scalar(%personRegMapping)) {
@@ -487,6 +496,7 @@ sub getPlayerLoan {
                 $flag = 0;
             }
 
+            push(@includePersonList, @notregisteredToRequestor);
             $valid_person_list = join(',', @includePersonList);
         }
         else {
@@ -494,7 +504,6 @@ sub getPlayerLoan {
         }
 
         return if(!$valid_person_list or $valid_person_list eq '');
-
 
 
         my $allowedPeriods = $self->getData()->{'SystemConfig'}{'loan_newLoanAllowedPeriods'};

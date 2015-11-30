@@ -133,6 +133,7 @@ sub rolloverExistingPersonRegistrations {
     foreach my $rego (@{$regs_ref})  {
         next if ($rego->{'intPersonRegistrationID'} == $personRegistrationID);
         my $oldStatus = $rego->{'strStatus'};
+        my $originaldtTo = $rego->{'dtTo_'};
 
         my $thisRego = $rego;
         $thisRego->{'intCurrent'} = 0;
@@ -140,7 +141,12 @@ sub rolloverExistingPersonRegistrations {
         my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
-        $thisRego->{'dtTo'} = "$Year-$Month-$Day";
+        $Day = sprintf("%02s", $Day);
+        $Month= sprintf("%02s", $Month);
+        my $dtNow = "$Year$Month$Day";
+        if (! $originaldtTo or $originaldtTo eq "00000000" or $originaldtTo > $dtNow) {
+            $thisRego->{'dtTo'} = "$Year-$Month-$Day";
+        }
         
         addPersonRegistrationStatusChangeLog($Data, $rego->{'intPersonRegistrationID'}, $oldStatus, $Defs::PERSONREGO_STATUS_ROLLED_OVER);
         updatePersonRegistration($Data, $personID, $rego->{'intPersonRegistrationID'}, $thisRego, 0);
@@ -311,7 +317,7 @@ sub checkRenewalRegoOK  {
         \%Reg
     );
     my @statusNOTIN = ();
-    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE);
+    @statusNOTIN = ($Defs::PERSONREGO_STATUS_INPROGRESS, $Defs::PERSONREGO_STATUS_REJECTED, $Defs::PERSONREGO_STATUS_PASSIVE, $Defs::PERSONREGO_STATUS_DELETED);
 
     %Reg=();
     %Reg = (
@@ -754,6 +760,7 @@ sub getRegistrationData	{
                 existprq.intExistingPersonRegistrationID = pr.intPersonRegistrationID
                 AND existprq.intPersonID= pr.intPersonID
                 AND existprq.strRequestType = 'LOAN'
+                AND existprq.strRequestStatus IN ('PENDING', 'COMPLETED')
             )
             LEFT JOIN tblEntity eprq ON (
                 eprq.intEntityID = prq.intRequestToEntityID
@@ -1212,7 +1219,7 @@ sub getRegistrationDetail {
 #
 sub hasPendingRegistration {
     my ($Data, $personID, $sport, $existingRegos) = @_;
-    if(scalar @{$existingRegos}){
+    if(1==2 and scalar @{$existingRegos}){
         my $count = 0;
         my %renewalCtrlForRego = ();
         foreach my $rego (@{$existingRegos}){

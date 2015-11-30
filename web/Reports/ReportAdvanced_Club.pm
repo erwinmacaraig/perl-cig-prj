@@ -52,8 +52,8 @@ sub _getConfiguration {
             strLatinShortName => [ "Short Name (International)", { displaytype => 'text', fieldtype   => 'text', active => 1, allowsort   => 1, dbfield => "E.strLatinShortName",} ],
             strMAID=> [ "$Data->{'LevelNames'}{$Defs::LEVEL_CLUB} No", { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strMAID",} ],
             strContact=> [ 'Contact', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strContact",} ],
-            strAddress1 => [ 'Address Line 1', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress1",} ],
-            strAddress2 => [ 'Address Line 2', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "Address2",} ],
+            strAddress => [ 'Address Line 1', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress",} ],
+            strAddress2 => [ 'Address Line 2', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strAddress2",} ],
             strCity => [ 'City', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strCity",} ],
             strState => [ 'State', { displaytype   => 'text', fieldtype     => 'text', allowsort     => 1, allowgrouping => 1, dbfield => "E.strState",} ],
 
@@ -69,7 +69,7 @@ sub _getConfiguration {
             strDiscipline=> [ 'Sport', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::entitySportType, translate => 1, dbfield => "E.strDiscipline",} ],
             strOrganisationLevel=> [ 'Level', { displaytype => 'lookup', fieldtype => 'dropdown', dropdownoptions => \%Defs::organisationLevel, translate => 1,dbfield => "E.strOrganisationLevel",} ],
 
-            strPostalCode => [ 'Postal Code', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "strPostalCode",} ],
+            strPostalCode => [ 'Postal Code', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield => "E.strPostalCode",} ],
             strPhone => [ 'Phone', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strPhone', } ],
             strFax => [ 'Fax', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strFax', } ],
             strEmail => [ 'Email', { displaytype => 'text', fieldtype   => 'text', allowsort   => 1, dbfield     => 'E.strEmail', } ],
@@ -111,7 +111,7 @@ sub _getConfiguration {
                 strDiscipline
                 strOrganisationLevel
               strContact
-              strAddress1
+              strAddress
               strAddress2
               strCity
               strState

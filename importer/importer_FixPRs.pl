@@ -25,8 +25,9 @@ sub main	{
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
-    my $maxNPID = 119 ; #2014
+    my $maxNPID = 42 ; #2015
     
+    $db->do(qq[UPDATE tblPersonRegistration_1 as PR INNER JOIN tblPersonRequest as PRQ ON (PRQ.intPersonID=PR.intPersonID) SET PR.dtTo = PRQ.dtLoanTo WHERE strRequestType ='LOAN' AND PR.dtTo = '0000-00-00']);
     my $st = qq[
         SELECT
             *
@@ -44,6 +45,7 @@ sub main	{
     my $stTSNF = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="TRANSFERRED",
             dtTo = ?
         WHERE
@@ -58,6 +60,7 @@ sub main	{
     my $stLEVEL = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="ROLLED_OVER",
             dtTo = ?
         WHERE
@@ -73,6 +76,7 @@ sub main	{
     my $stROLLOVER = qq[
         UPDATE tblPersonRegistration_$Data{'Realm'}
         SET 
+            strOldStatus=strStatus,
             strStatus="ROLLED_OVER"
         WHERE
             intPersonID=?
@@ -111,16 +115,21 @@ sub main	{
 
     ## Now set rest to PASSIVE
     my $stPASSIVE = qq[
-        UPDATE tblPersonRegistration_$Data{'Realm'}
+        UPDATE tblPersonRegistration_$Data{'Realm'} as PR
+            LEFT JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
         SET 
-            strStatus="PASSIVE"
+            PR.strOldStatus=PR.strStatus,
+            PR.strStatus="PASSIVE"
         WHERE
-            intNationalPeriodID <= ?
-            AND strStatus IN ("ACTIVE")
+            NP.intCurrentNew=0 
+            AND NP.intCurrentRenewal=0 
+            AND PR.strStatus IN ("ACTIVE")
     ];
     my $qryPASSIVE= $db->prepare($stPASSIVE);
-    $qryPASSIVE->execute($maxNPID);
+    #$qryPASSIVE->execute($maxNPID);
+    $qryPASSIVE->execute();
 
+    $db->do(qq[UPDATE tblPersonRegistration_1 as PR INNER JOIN tblPersonRequest as PRQ ON (PRQ.intPersonID=PR.intPersonID) SET PR.dtTo = PRQ.dtLoanTo WHERE strRequestType ='LOAN' AND PR.dtTo = '0000-00-00']);
 
 print "PR RECORDS DONE\n";
 }

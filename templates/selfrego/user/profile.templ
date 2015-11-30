@@ -13,7 +13,7 @@
     
 [% IF !PasswordOnly %]
 <div>
-<h3>[% Lang.txt('Update your details') %]</h3>
+<h3 class="selfRegSubHead">[% Lang.txt('Update your details') %]</h3>
  <form id = "update-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
         <label class="col-md-2" for="email">[% Lang.txt('Email') %]</label>
@@ -42,7 +42,7 @@
 [% END %]
 
 <div>
-    <h3>[% Lang.txt('Change your password') %]</h3>
+    <h3 class="selfRegSubHead">[% Lang.txt('Change your password') %]</h3>
     <form id = "updatepw-form" action = "[% BaseURL %]/registration/" method ="POST">
     <div class = "form-group">
         <label class="col-md-2" for="password">[% Lang.txt('New password') %]</label>

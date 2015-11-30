@@ -61,7 +61,9 @@ use PersonCertifications;
 use EntitySummaryPanel;
 use PersonEntity;
 use PersonUtils;
+use PersonCard;
 use PersonUserAccess;
+use Logo;
 
 use SphinxUpdate;
 use InstanceOf;
@@ -110,13 +112,29 @@ sub checkRulePaymentFlagActions {
     while (my $dref = $q->fetchrow_hashref())   {
         if ($dref->{'intAutoActivateOnPayment'} == 1)   {
             if ($personRegistrationID)  {
+                my $stNP = qq[
+                    SELECT 
+                        IF((NP.intCurrentNew=1 or NP.intCurrentRenewal=1 or NP.intCurrentTransfer=1 or NP.dtFrom>NOW() or (NP.dtFrom<NOW() and NP.dtTo>NOW())), 1, 0) as ActiveStatus
+                    FROM 
+                        tblPersonRegistration_$Data->{'Realm'} as PR
+                        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+                    WHERE
+                        PR.intPersonID = ?
+                        AND PR.intEntityID = ?
+                        AND PR.intPersonRegistrationID = ?
+                ];
+                my $qNP= $Data->{'db'}->prepare($stNP);
+                $qNP->execute($personID, $entityID, $personRegistrationID);
+                my $activeNP = $qNP->fetchrow_array() || 0;
+                my $newStatus = $activeNP ? $Defs::PERSONREGO_STATUS_ACTIVE : $Defs::PERSONREGO_STATUS_PASSIVE;
+
                 my $stUPD = qq[
                     UPDATE tblPersonRegistration_$Data->{'Realm'}
                     SET 
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
                         dtFrom = IF(strRegistrationNature IN ('TRANSFER','DOMESTIC_LOAN','INTERNATIONAL_LOAN'),dtFrom, NOW()),
-                        strStatus = 'ACTIVE', 
+                        strStatus = ?,
                         intWasActivatedByPayment = 1
                     WHERE 
                         intPersonID = ?
@@ -129,9 +147,9 @@ sub checkRulePaymentFlagActions {
                         AND intPaymentRequired=0
                 ];
                 my $qUPD= $Data->{'db'}->prepare($stUPD);
-                $qUPD->execute($personID, $entityID, $personRegistrationID);
+                $qUPD->execute($newStatus, $personID, $entityID, $personRegistrationID);
 
-                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $Defs::PERSONREGO_STATUS_ACTIVE, -1)
+                addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $Defs::PERSONREGO_STATUS_PENDING, $newStatus, -1)
             }
             if (! $personRegistrationID and $entityID)  {
                 my $stUPD = qq[
@@ -765,6 +783,8 @@ sub listTasks {
                 or ($request->{'strRequestResponse'} eq $Defs::PERSON_REQUEST_STATUS_ACCEPTED and $entityID == $request->{'intRequestToEntityID'})
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_PENDING
                 or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_HOLD
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_ACTIVE
+                or $request->{'personRegoStatus'} eq $Defs::PERSONREGO_STATUS_REJECTED
             );
             $rowCount++;
             my $name = formatPersonName($Data, $request->{'strLocalFirstname'}, $request->{'strLocalSurname'}, $request->{'intGender'});
@@ -1060,6 +1080,7 @@ sub addWorkFlowTasks {
 			r.strTaskStatus,
 			r.intProblemResolutionEntityLevel,
 			pr.intPersonID,
+            r.intEntityLevel,
 			pr.intPersonRegistrationID,
 			pr.intEntityID as RegoEntity,
 			pr.intCreatedByUserID,
@@ -1098,6 +1119,7 @@ sub addWorkFlowTasks {
                 (r.intUsingPersonLevelChangeFilter = 1 AND r.intPersonLevelChange = pr.intPersonLevelChanged)
             )
 		];
+
 	    $q = $db->prepare($st);
 	    $itc ||= 0;
   	    $q->execute($itc, $personRegistrationID, $Data->{'Realm'}, $Data->{'RealmSubType'}, $originLevel, $regNature);
@@ -1174,6 +1196,8 @@ sub addWorkFlowTasks {
     
     my $emailNotification = new EmailNotifications::WorkFlow();
 	
+    my $activeRuleSkipped = 0;
+    my @Tasks=();
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
 			
@@ -1189,6 +1213,29 @@ sub addWorkFlowTasks {
                 $emailNotification->setFromEntityID($problemEntityID);
             }
 
+            if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeEntityLevel'}) {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intEntityLevel'});
+            }
+            if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeMA'}) {
+                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, 100);
+            }
+            #if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToClub'}) {
+            #    $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, 3);
+            #}
+    
+            if ($Data->{'SystemConfig'}{'allowRuleSkip'})   {
+                if (! $approvalEntityID)    {
+                    $activeRuleSkipped = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE);
+                    next;
+                }
+                if ($activeRuleSkipped)   {
+                    $activeRuleSkipped = 0;
+                    $dref->{'strTaskStatus'}  = $Defs::WF_TASK_STATUS_ACTIVE;
+                }
+            }
+                
+                
+                
             next if (! $approvalEntityID and ! $problemEntityID);
             print STDERR "^^^^^^^^^^^^^^^^^^^^^^^^^^^RULE ADDED WAS " . $dref->{'intWFRuleID'} . "\n\n\n";
             
@@ -1209,7 +1256,9 @@ sub addWorkFlowTasks {
                 $dref->{'intPersonRegistrationID'},
                 $dref->{'DocumentID'}
             );			
-            my $task = getTask($Data, $qINS->{mysql_insertid});
+            my $tID = $qINS->{mysql_insertid};
+            push @Tasks, $tID;
+            my $task = getTask($Data, $tID);
 			
             my ($workTaskType, $workTaskRule) = getWorkTaskType($Data, $task);
             if($dref->{'intInternationalLoan'} and $dref->{'intNewBaseRecord'}){
@@ -1249,28 +1298,50 @@ sub addWorkFlowTasks {
 	if ($q->errstr) {
 		return $q->errstr . '<br>' . $st
 	}
-	$st = qq[
-		INSERT IGNORE INTO tblWFTaskPreReq (
-			intWFTaskID,
-			intWFRuleID,
-			intPreReqWFRuleID
-		)
-		SELECT
-			t.intWFTaskID,
-			t.intWFRuleID,
-			rpr.intPreReqWFRuleID
-		FROM tblWFTask AS t
-		INNER JOIN tblWFRulePreReq AS rpr
-			ON t.intWFRuleID = rpr.intWFRuleID
-		WHERE t.intPersonRegistrationID = ?
-		];
+    if (scalar @Tasks)  {
+        my $taskWHERE = '';
+        foreach my $tID (@Tasks)    {
+            $taskWHERE .= "," if ($taskWHERE);
+            $taskWHERE .= qq[$tID];
+        }
+        $st = qq[
+            INSERT IGNORE INTO tblWFTaskPreReq (
+                intWFTaskID,
+                intWFRuleID,
+                intPreReqWFRuleID
+            )
+            SELECT
+                t.intWFTaskID,
+                t.intWFRuleID,
+                rpr.intPreReqWFRuleID
+            FROM tblWFTask AS t
+            INNER JOIN tblWFRulePreReq AS rpr ON (
+                t.intWFRuleID = rpr.intWFRuleID
+            )
+            INNER JOIN tblWFTask as task1 ON (
+                task1.intWFRuleID = rpr.intPreReqWFRuleID
+                AND task1.intWFTaskID IN ($taskWHERE)
+            )
+            WHERE 
+                t.intWFTaskID IN ($taskWHERE)
+                AND t.intEntityID = ?
+                AND t.intPersonID = ?
+                AND t.intPersonRegistrationID = ?
+            ];
 
-  	$q = $db->prepare($st);
-  	$q->execute($personRegistrationID);
+            if ($taskWHERE) {
+                $q = $db->prepare($st);
+                $q->execute(
+                    $entityID,
+                    $personID,
+                    $personRegistrationID
+                );
 
-	if ($q->errstr) {
-		return $q->errstr . '<br>' . $st;
-	}
+                if ($q->errstr) {
+                    return $q->errstr . '<br>' . $st;
+                }
+            }
+    }
 
 	my $rc = checkForOutstandingTasks($Data, $ruleFor, '', $entityID, $personID, $personRegistrationID, $documentID);
 
@@ -1692,14 +1763,30 @@ sub checkForOutstandingTasks {
                     );
                 }
                 my $personObject = getInstanceOf($Data, 'person',$personID);
-
                 updateSphinx($db,$Data->{'cache'}, 'Person','update',$personObject);
                 auditLog($personID, $Data, 'Person Registered', 'Person');
+                logCardPrintRequest($Data, $personID,$personRegistrationID);
 
         	#}
         }
 
         if ($ruleFor eq 'REGO' and $personRegistrationID and !$rowCount) {
+                my $stNP = qq[
+                    SELECT
+                        IF((NP.intCurrentNew=1 or NP.intCurrentRenewal=1 or NP.intCurrentTransfer=1 or NP.dtFrom>NOW() or (NP.dtFrom<NOW() and NP.dtTo>NOW())), 1, 0) as ActiveStatus
+                    FROM
+                        tblPersonRegistration_$Data->{'Realm'} as PR
+                        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+                    WHERE
+                        PR.intPersonRegistrationID = ?
+                ];
+                my $qNP= $Data->{'db'}->prepare($stNP);
+                $qNP->execute($personRegistrationID);
+                my $activeNP = $qNP->fetchrow_array() || 0;
+                my $newStatus = $activeNP ? $Defs::PERSONREGO_STATUS_ACTIVE : $Defs::PERSONREGO_STATUS_PASSIVE;
+                if ($Data->{'SystemConfig'}{'WFApproval_ACTIVE'})   {
+                    $newStatus = $Defs::PERSONREGO_STATUS_ACTIVE;
+                }
 
                 my $regoref = getPersonRegistrationStatus($Data, $personRegistrationID);
                 ## Handle intPaymentRequired ?  What abotu $0 products
@@ -1710,7 +1797,7 @@ sub checkForOutstandingTasks {
 	            $st = qq[
 	            	UPDATE tblPersonRegistration_$Data->{'Realm'} as PR
                     SET
-	            	    PR.strStatus = 'ACTIVE',
+	            	    PR.strStatus = ?,
                         PR.intCurrent=1,
                         dtLastUpdated=NOW(),
                         dtApproved=NOW(),
@@ -1726,6 +1813,7 @@ sub checkForOutstandingTasks {
 
 		        $q = $db->prepare($st);
 		        $q->execute(
+                    $newStatus,
 		       		$personRegistrationID
 		  			);
 	        	$rc = 1;	# All registration tasks have been completed
@@ -1770,7 +1858,7 @@ sub checkForOutstandingTasks {
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
                 if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
-                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $Defs::PERSONREGO_STATUS_ACTIVE);
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $newStatus);
                 }
            ##############################################################################################################
         }
@@ -2027,8 +2115,6 @@ sub updateTaskNotes {
         #PersonSummary => personSummaryPanel($Data, $personID) || '',
     );
 
-warn("OO");
-
     $TemplateData{'Notifications'}{'actionResult'} = "ID: $WFTaskID " . $Data->{'lang'}->txt("Work Flow task updated.");
 
 	my $body = runTemplate(
@@ -2148,6 +2234,9 @@ sub verifyDocument {
 			$documentStatus,
         	$documentID
     	);		
+        if($documentStatus eq 'APPROVED')   {
+            handleIfLogo($Data, $documentID);
+        }
 	}
 
 }
@@ -5080,6 +5169,38 @@ sub getInitialTaskAssignee {
         my $dref = $q->fetchrow_hashref();
         return ($Defs::initialTaskAssignee{$dref->{'intApprovalEntityLevel'} || 100}, $dref);
     }
+}
+
+sub handleIfLogo    {
+    my ($Data, $fileID) = @_;
+
+    my $statement=qq[
+        SELECT 
+            intEntityLevel,
+            intEntityID,
+            intPersonID
+        FROM 
+            tblDocuments AS D
+            INNER JOIN tblDocumentType AS DT
+                ON D.intDocumentTypeID = DT.intDocumentTypeID
+        WHERE 
+            intUploadFileID = ?
+            AND strApprovalStatus = 'APPROVED'
+            AND intEntityImage = 1
+    ];
+    my $db = $Data->{'db'};
+    my $query = $db->prepare($statement);
+    $query->execute($fileID);
+    my $dref =$query->fetchrow_hashref();
+    if($dref and $dref->{'intEntityLevel'}) {
+        convertToLogo(
+            $Data,
+            $dref->{'intEntityLevel'},
+            $dref->{'intPersonID'} || $dref->{'intEntityID'},
+            $fileID,
+        );
+    }
+    return 1;
 }
 
 1;

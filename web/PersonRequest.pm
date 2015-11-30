@@ -76,6 +76,7 @@ sub handlePersonRequest {
             $TemplateData{'Lang'} = $Data->{'lang'};
             $TemplateData{'client'} = $Data->{'client'};
             $TemplateData{'target'} = $Data->{'target'};
+            $TemplateData{'SystemConfig'} = $Data->{'SystemConfig'};
             #$TemplateData{'transferTypeOption'} = $transferTypeOption;
             #$TemplateData{'script'} = qq[
             #    <script>
@@ -130,6 +131,7 @@ sub handlePersonRequest {
             $TemplateData{'Lang'} = $Data->{'lang'};
             $TemplateData{'client'} = $Data->{'client'};
             $TemplateData{'target'} = $Data->{'target'};
+            $TemplateData{'SystemConfig'} = $Data->{'SystemConfig'};
 
             $body = runTemplate(
                 $Data,
@@ -252,6 +254,7 @@ sub listPeople {
         'client' => $Data->{'client'},
         'target' => $Data->{'target'},
         'search_keyword' => $searchKeyword,
+        'SystemConfig' => $Data->{'SystemConfig'},
     );
 
     $sphinx->SetServer($Defs::Sphinx_Host, $Defs::Sphinx_Port);
@@ -1012,6 +1015,7 @@ sub listRequests {
     my ($Data,$personID) = @_;
     $personID ||= 0;
 
+    my $lang = $Data->{'lang'};
 	my $entityID = getID($Data->{'clientValues'}, $Data->{'clientValues'}{'currentLevel'});
     my $client = setClient( $Data->{'clientValues'} ) || '';
     my $title = $Data->{'lang'}->txt('Requests');
@@ -1044,7 +1048,7 @@ sub listRequests {
             requestTo => $request->{'requestTo'} || '',
             requestType => $Defs::personRequest{$request->{'strRequestType'}},
             requestResponse => $Defs::personRequestResponse{$request->{'strRequestResponse'}} || $Data->{'lang'}->txt('Requested'),
-            sport => $Defs::sportType{$request->{'strSport'}} || '',
+            sport => $lang->txt($Defs::sportType{$request->{'strSport'}}) || '',
             SelectLink => "$Data->{'target'}?client=$client&amp;a=PRA_VR&rid=$request->{'intPersonRequestID'}",
             Date => $Data->{'l10n'}{'date'}->TZformat($request->{'tTimeStamp'},'MEDIUM','SHORT') || $Data->{'l10n'}{'date'}->TZformat($request->{'dtDateRequest'},'MEDIUM','SHORT') || '',
             Name => $request->{'strLocalFirstname'} . ' ' . $request->{'strLocalSurname'},
@@ -2647,7 +2651,7 @@ sub deactivatePlayerLoan {
         INNER JOIN
             tblPersonRequest PRQ  ON (PRQ.intPersonRequestID = PR.intPersonRequestID and PRQ.intPersonID = PR.intPersonID)
         WHERE
-            PRQ.intPersonRequestID = ($idset)
+            PRQ.intPersonRequestID IN ($idset)
     ];
 
     my $qprevs = $db->prepare($pstu) or query_error($pstu);

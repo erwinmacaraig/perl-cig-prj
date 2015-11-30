@@ -7,6 +7,8 @@ CREATE TABLE tblDocumentType (
     intActive TINYINT default 1,
     strLockAtLevel varchar(15) DEFAULT '',
     strActionPending varchar(30) default '',
+    intImageCrop TINYINT default 0,
+    intEntityImage TINYINT default 0,
   PRIMARY KEY (intDocumentTypeID),
     KEY index_realm(intRealmID)
 ) DEFAULT CHARSET=utf8;

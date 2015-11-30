@@ -10,6 +10,7 @@ require Exporter;
 @EXPORT_OK = qw(txt_field drop_down getDBdrop_down getDBdrop_down_Ref checkbox get_drop_down_list);
 
 use strict;
+use Lang;
 
 #Last Modified: 19/08/2004
 
@@ -22,8 +23,9 @@ sub txt_field {
 
 
 sub drop_down { 
-  my ($name, $options_ref, $order_ref, $default, $size, $multi, $otherstyle, $class, $required)=@_;
+  my ($name, $options_ref, $order_ref, $default, $size, $multi, $otherstyle, $class, $required, $lang)=@_;
   return '' if(!$name or !$options_ref);
+
   if(!defined $default) {$default=''; }
 	$otherstyle ||= '';
 	$multi||='';
@@ -39,6 +41,7 @@ sub drop_down {
   }
   
   my $subBody='';
+  my $display_name;
   for my $val (@{$order_ref}) {
     my $selected='';
 		if(ref $default)	{
@@ -49,7 +52,10 @@ sub drop_down {
 		else	{
 			$selected = 'SELECTED' if $val eq $default;
 		}
-    $subBody .= qq[ <option $selected value="$val">$options_ref->{$val}</option>];
+
+        $display_name = ($lang) ? $lang->txt($options_ref->{$val}) : $options_ref->{$val};
+
+    $subBody .= qq[ <option $selected value="$val">$display_name</option>];
   }
 
 	$multi=' multiple ' if $multi;

@@ -72,6 +72,16 @@ sub listPersonAuditLog    {
         SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
         FROM
             tblAuditLog as AL
+        WHERE
+            AL.intEntityID=?
+            AND AL.strSection IN ("Person Registration")
+            AND AL.strType  = 'Update Person Registration'
+    )
+UNION ALL
+     (
+        SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
             INNER JOIN tblPersonRegistration_1 as PR ON (
                 PR.intPersonRegistrationID=AL.intID
                 AND AL.strSection="Person Registration"
@@ -79,9 +89,8 @@ sub listPersonAuditLog    {
         WHERE
             PR.intPersonID=?
             AND AL.strSection NOT IN ('Person Entity')
-            AND (
-                AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
-            )
+            AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
+            AND AL.strType != 'Update Person Registration'
     )
 UNION ALL
     (
@@ -121,6 +130,7 @@ UNION ALL
     ];
 	my $sth = $Data->{'db'}->prepare($query);
 	$sth->execute(
+        $personID,
         $personID,
         $personID,
         $personID,

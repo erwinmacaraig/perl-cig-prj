@@ -38,11 +38,22 @@ sub getRegoProducts {
     $hideTotal ||= 0;
     my $currencySymbol = $Data->{'SystemConfig'}{'DollarSymbol'} || "\$";
     $incExisting ||= 0; ## Set to 1 to include existing in-cart items that aren't paid for the member
+    my @empty_products = ();
 
     $multipersonType ||= ''; 
     my $cl  = setClient($Data->{'clientValues'});
 
     my $regoProducts = getAllRegoProducts($Data, $entityID, $regoID, $personID, $incExisting, $products);
+
+    if(ref $regoProducts eq 'ARRAY') {
+        return (\@empty_products) if (!scalar(@{$regoProducts}) and $returnItems);
+        return '' if (!scalar(@{$regoProducts}) and !$returnItems);
+    }
+
+    if(ref $regoProducts eq 'HASH') {
+        return (\@empty_products) if (!scalar(%{$regoProducts}) and $returnItems);
+        return '' if (!scalar(%{$regoProducts}) and !$returnItems);
+    }
 
     my $productAttributes = Products::getFormProductAttributes($Data, $products) || {};
 

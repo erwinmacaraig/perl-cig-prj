@@ -40,9 +40,23 @@ sub bulkPersonRollover {
     my $realmID = $Data->{'Realm'};
 
     my $surname = param('d_surname') || '';
+    my $yobfrom= param('d_yobfrom') || '';
+    my $yobto = param('d_yobto') || '';
+    my $gender= param('d_gender') || '';
     my $surnameFilter = '';
     if ($surname)   {
         $surnameFilter = qq[ AND P.strLocalSurname LIKE '$surname%'];
+    }
+    my $yobFilter = '';
+    if ($yobfrom)   {
+        $yobFilter.= qq[ AND YEAR(P.dtDOB) >= $yobfrom ];
+    }
+    if ($yobto)   {
+        $yobFilter.= qq[ AND YEAR(P.dtDOB) <= $yobto ];
+    }
+    my $genderFilter = '';
+    if ($gender and $gender =~ /1|2/)   {
+        $genderFilter = qq[ AND P.intGender = $gender ];
     }
     my $maxCount = $Data->{'SystemConfig'}{'BulkRenewalsMaxCount'} || 100000;
 
@@ -113,6 +127,7 @@ sub bulkPersonRollover {
                 existprq.intPersonID= PR.intPersonID
                 AND existprq.intExistingPersonRegistrationID = PR.intPersonRegistrationID
                 AND existprq.strRequestType = 'LOAN'
+                AND existprq.strRequestStatus IN ('PENDING', 'COMPLETED')
             )
         WHERE 
             P.strStatus NOT IN ("$Defs::PERSON_STATUS_DELETED", "$Defs::PERSON_STATUS_SUSPENDED")
@@ -125,6 +140,8 @@ sub bulkPersonRollover {
                 OR (PR.intOnLoan = 1 AND prq.intOpenLoan= 1)
             )
             $surnameFilter
+            $yobFilter
+            $genderFilter
                 
         ORDER BY strLocalSurname, strLocalFirstname
     ];
