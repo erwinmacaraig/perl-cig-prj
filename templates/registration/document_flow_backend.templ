@@ -98,12 +98,12 @@
 
 									this.on("success", function(file, response) {
 										doc[% doc.ID %] = response;	
-										var fObject = JSON.parse(doc);
+										var fObject = JSON.parse(doc[% doc.ID %]);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
-										console.log(doc);								
+										console.log(doc[% doc.ID %]);								
 
 									});								
 									this.on("removedfile", function(file, response){
@@ -237,12 +237,12 @@
 								init: function(){
 									this.on("success", function(file, response) {
 										doc[% doc.ID %] = response;
-										var fObject = JSON.parse(doc);
+										var fObject = JSON.parse(doc[% doc.ID %]);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
-										console.log(doc);	
+										console.log(doc[% doc.ID %]);	
 
 									});								
 									this.on("removedfile", function(file, response){
