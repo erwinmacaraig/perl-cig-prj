@@ -345,6 +345,7 @@ sub getPreviousRegos {
             A.intSelfUserID = ?
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'PENDING', 'HOLD')
         ORDER BY 
+            PR.intPersonID,
             intMinor ASC,
             NP.dtTo DESC,
             dtApproved DESC, 
