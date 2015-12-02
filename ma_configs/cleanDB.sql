@@ -1,4 +1,4 @@
-#DELETE FROM tblEntity WHERE intEntityID<>1;
+#DELETE FROM tblEntity WHERE intEntityLevel<>100;
 #DELETE FROM tblEntityLinks;
 #DELETE FROM tblTempEntityStructure;
 #DELETE FROM tblTempTreeStructure;
