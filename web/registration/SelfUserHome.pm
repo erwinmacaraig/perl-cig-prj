@@ -346,6 +346,7 @@ sub getPreviousRegos {
             AND PR.strStatus IN ('ACTIVE', 'PASSIVE', 'PENDING', 'HOLD')
         ORDER BY 
             intMinor ASC,
+            NP.dtTo DESC,
             dtApproved DESC, 
             dtAdded DESC
     ];
@@ -376,15 +377,22 @@ sub getPreviousRegos {
                
             };
         } 
-        if(!exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}){
-            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}} = {
-                regoID => $dref->{'intPersonRegistrationID'},
-                enableRenewButton => 1,
-                nature => $dref->{'strRegistrationNature'},
-            };
+            #($dref->{'strPersonType'} ne 'PLAYER' and !exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'}}
+        if(!exists $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'}. $dref->{'strPersonLevel'}})
+        {
+                $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'}} = {
+                    regoID => $dref->{'intPersonRegistrationID'},
+                    enableRenewButton => 1,
+                    nature => $dref->{'strRegistrationNature'},
+                };
+                #$renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}} = {
+                #    regoID => $dref->{'intPersonRegistrationID'},
+                #    enableRenewButton => 1,
+                #    nature => $dref->{'strRegistrationNature'},
+                #};
         }        
         else{
-            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'} . $dref->{'strAgeLevel'}}{'enableRenewButton'} = 0;
+            $renewLinks{$dref->{'strPersonType'} . $dref->{'strSport'} . $dref->{'strPersonLevel'}}{'enableRenewButton'} = 0;
         }
         my $type = $dref->{'intMinor'} ? 'minor' : 'adult';
         $found{$type} = 1;
@@ -437,8 +445,8 @@ sub getPreviousRegos {
     #do some processing with regards to displaying renewal button    
     foreach my $person (@people){
         foreach my $r (@{$regos{$person->{'intPersonID'}}}){
-            #if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} == $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
-            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} != $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
+            if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'}}{'regoID'} != $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'}}{'enableRenewButton'} == 0) ){
+            #if( (exists $renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'regoID'} != $r->{'intPersonRegistrationID'}) && ($renewLinks{$r->{'strPersonType'} .$r->{'strSport'} . $r->{'strPersonLevel'} . $r->{'strAgeLevel'}}{'enableRenewButton'} == 0) ){
                     $r->{'renewlink'} = '';
             }
         }
