@@ -2,7 +2,7 @@
 #DELETE FROM tblEntityLinks;
 #DELETE FROM tblTempEntityStructure;
 #DELETE FROM tblTempTreeStructure;
-#DELETE FROM tblEntityFields;
+DELETE FROM tblEntityFields;
 
 DELETE FROM tblUser;
 DELETE FROM tblUserAuth;
