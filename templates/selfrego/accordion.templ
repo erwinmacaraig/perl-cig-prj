@@ -48,7 +48,7 @@
                                     </thead>
                                 [% FOREACH rego IN  PreviousRegistrations %]
                                     <tr>
-                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]
+                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRoleName %] ([% Lang.txt(rego.strPersonEntityRoleName) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]
                                         [% IF rego.strSportType %] <br /> [% Lang.txt(rego.strSportType) %] [% END %]
                                         </td>
                                         <td>[% rego.EntityName %]</td>
