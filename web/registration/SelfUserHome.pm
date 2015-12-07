@@ -208,7 +208,7 @@ my ($Data, $previousRegos) = @_;
 				Sport => $Defs::sportType{$regoDetail->{'strSport'}},
 				PersonType => $Defs::personType{$regoDetail->{'strPersonType'}},
 				PersonEntityRole => $regoDetail->{'strPersonEntityRole'},
-				PersonEntityRoleName => $regoDetail->{'strEntityRoleName'},
+				EntityRoleName => $regoDetail->{'EntityRoleName'},
 				PersonLevel => $Defs::personLevel{$regoDetail->{'strPersonLevel'}},
 				AgeLevel => $Defs::ageLevel{$regoDetail->{'strAgeLevel'}},
 				NPdtFrom => $regoDetail->{'NPdtFrom'},
@@ -319,7 +319,7 @@ sub getPreviousRegos {
             prq.dtLoanTo,
             prq.intOpenLoan,
             E.intIsInternationalTransfer,
-            ETR.strEntityRoleName,
+            ETR.strEntityRoleName as EntityRoleName,
             existprq.intOpenLoan as existOpenLoan
         FROM
             tblSelfUserAuth AS A
