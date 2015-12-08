@@ -46,7 +46,6 @@ sub rolloverRegoRecords {
             PR.strStatus='PASSIVE',
             PR.dtTo = IF(PR.dtTo = '0000-00-00' or PR.dtTo IS NULL or PR.dtTo = '', NP.dtTo, PR.dtTo)
         WHERE PR.intPersonRegistrationID = ?
-        LIMIT 1
     ];
     my $qUPD = $db->prepare($stUPD);
 
@@ -58,7 +57,6 @@ sub rolloverRegoRecords {
         WHERE
             intNationalPeriodID = ?
             AND strStatus='ACTIVE'
-        LIMIT 1
     ];
     my $q = $db->prepare($st);
     $q->execute($npID);
