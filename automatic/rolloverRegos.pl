@@ -23,11 +23,11 @@ sub main {
     my $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_1'} || 0;
     rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
-    $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_2'} || 0;
-    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
+    #$npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_2'} || 0;
+    #rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
-    $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_3'} || 0;
-    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
+    #$npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_3'} || 0;
+    #rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
 
 }
