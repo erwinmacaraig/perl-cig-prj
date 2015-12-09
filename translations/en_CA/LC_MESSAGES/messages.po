@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-11-13 14:07+0800\n"
+"POT-Creation-Date: 2015-11-27 12:36+0800\n"
 "PO-Revision-Date: \n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -1288,11 +1288,6 @@ msgstr "Yes"
 #: Defs::LevelNames
 msgid "Zone"
 msgstr "Zone"
-
-#: Defs::paymentTypes
-#: Defs::manualPaymentTypes
-msgid "[none]"
-msgstr ""
 
 #: web/paytry.cgi Line:269
 #, fuzzy
@@ -3492,7 +3487,7 @@ msgstr "&copy;&nbsp; Copyright SportingPulse International Pty Ltd &nbsp;2014.&n
 msgid "Cancel Payment"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2795
+#: web/PersonRequest.pm Line:2796
 #, fuzzy
 msgid "Cancel Player Loan"
 msgstr "Access"
@@ -3519,7 +3514,7 @@ msgstr ""
 #: web/TransLog.pm Line:2168
 #: Line:2279
 #: web/Person.pm Line:339
-#: web/PersonRequest.pm Line:1091
+#: web/PersonRequest.pm Line:1092
 msgid "Date"
 msgstr "Date"
 
@@ -3541,7 +3536,7 @@ msgstr "Update Information"
 msgid "Enter Organisation Information"
 msgstr "Update Information"
 
-#: web/PersonRequest.pm Line:2796
+#: web/PersonRequest.pm Line:2797
 #, fuzzy
 msgid "Error Cancelling Loan"
 msgstr "Access"
@@ -3568,7 +3563,7 @@ msgstr "Registration Number"
 msgid "Holding club already exists"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2286
+#: web/PersonRequest.pm Line:2287
 msgid "International Transfer Certificate request has been sent"
 msgstr ""
 
@@ -3606,16 +3601,16 @@ msgstr ""
 msgid "List of Payment Records"
 msgstr "List of Payment Records"
 
-#: web/PersonRequest.pm Line:2411
+#: web/PersonRequest.pm Line:2412
 msgid "Loan End Date"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2400
+#: web/PersonRequest.pm Line:2401
 #, fuzzy
 msgid "Loan Start Date"
 msgstr "Start Date"
 
-#: web/PersonRequest.pm Line:1067
+#: web/PersonRequest.pm Line:1068
 msgid "MA ID"
 msgstr ""
 
@@ -3639,7 +3634,7 @@ msgstr "No Payment Records can be found in the database."
 msgid "No records were found with this filter"
 msgstr ""
 
-#: web/PersonRequest.pm Line:1061
+#: web/PersonRequest.pm Line:1062
 #, fuzzy
 msgid "No transfer history found"
 msgstr "Transfer"
@@ -3681,13 +3676,13 @@ msgstr ""
 msgid "Pending request has been found."
 msgstr ""
 
-#: web/PersonRequest.pm Line:2366
+#: web/PersonRequest.pm Line:2367
 #, fuzzy
 msgid "Person Request History"
 msgstr "Personal Details"
 
-#: web/PersonRequest.pm Line:1142
-#: Line:2320
+#: web/PersonRequest.pm Line:1143
+#: Line:2321
 msgid "Person Request not found."
 msgstr ""
 
@@ -3709,7 +3704,7 @@ msgstr ""
 msgid "Receipt Reference"
 msgstr "Position"
 
-#: web/PersonRequest.pm Line:1063
+#: web/PersonRequest.pm Line:1064
 msgid "Records found"
 msgstr ""
 
@@ -3739,11 +3734,11 @@ msgstr ""
 msgid "Request Access to Person Details"
 msgstr ""
 
-#: web/PersonRequest.pm Line:1075
+#: web/PersonRequest.pm Line:1076
 msgid "Request From"
 msgstr ""
 
-#: web/PersonRequest.pm Line:1079
+#: web/PersonRequest.pm Line:1080
 msgid "Request To"
 msgstr ""
 
@@ -3752,9 +3747,9 @@ msgstr ""
 msgid "Request a Transfer - Submitted to Current Club"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2167
-#: Line:2201
-#: Line:2227
+#: web/PersonRequest.pm Line:2168
+#: Line:2202
+#: Line:2228
 msgid "Request for an International Transfer Certificate"
 msgstr ""
 
@@ -3767,13 +3762,13 @@ msgid "Request/Initiate a Transfer"
 msgstr ""
 
 #: web/PersonRequest.pm Line:980
-#: Line:1049
-#: Line:2353
+#: Line:1050
+#: Line:2354
 #, fuzzy
 msgid "Requested"
 msgstr "Access"
 
-#: web/PersonRequest.pm Line:1020
+#: web/PersonRequest.pm Line:1021
 msgid "Requests"
 msgstr ""
 
@@ -3799,12 +3794,12 @@ msgstr "Payment Type"
 msgid "Response Code"
 msgstr "Response Code"
 
-#: web/PersonRequest.pm Line:1087
+#: web/PersonRequest.pm Line:1088
 #, fuzzy
 msgid "Response Status"
 msgstr "Response Code"
 
-#: web/PersonRequest.pm Line:1473
+#: web/PersonRequest.pm Line:1474
 msgid "Response has been submitted already."
 msgstr ""
 
@@ -3826,21 +3821,21 @@ msgstr "Search Results"
 msgid "Select"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2391
+#: web/PersonRequest.pm Line:2392
 #, fuzzy
 msgid "Source Club"
 msgstr "Current Level"
 
-#: web/PersonRequest.pm Line:2162
+#: web/PersonRequest.pm Line:2163
 msgid "Submit"
 msgstr ""
 
-#: web/PersonRequest.pm Line:2422
+#: web/PersonRequest.pm Line:2423
 #, fuzzy
 msgid "TMS Reference"
 msgstr "Referee"
 
-#: web/PersonRequest.pm Line:1095
+#: web/PersonRequest.pm Line:1096
 #, fuzzy
 msgid "Task Type"
 msgstr "Type"
@@ -3912,11 +3907,11 @@ msgstr "View Receipt"
 msgid "View pending"
 msgstr "Descending"
 
-#: web/PersonRequest.pm Line:1483
+#: web/PersonRequest.pm Line:1484
 msgid "You have [_1] the [_2] of [_3] [_4]."
 msgstr ""
 
-#: web/PersonRequest.pm Line:1491
+#: web/PersonRequest.pm Line:1492
 msgid "You will be notified once the transfer is effective and approved by "
 msgstr ""
 
@@ -4317,11 +4312,11 @@ msgstr ""
 msgid "Affiliations"
 msgstr "Action"
 
-#: web/Reports/ReportAdvanced.pm Line:337
+#: web/Reports/ReportAdvanced.pm Line:341
 msgid "All Records"
 msgstr "All Records"
 
-#: web/Reports/ReportAdvanced.pm Line:367
+#: web/Reports/ReportAdvanced.pm Line:371
 msgid "Ascending"
 msgstr "Ascending"
 
@@ -4367,7 +4362,7 @@ msgstr "Birth Certificate Number"
 msgid "Certification Types"
 msgstr "Identification Type"
 
-#: web/Reports/ReportAdvanced.pm Line:434
+#: web/Reports/ReportAdvanced.pm Line:438
 msgid "Choose how you want to receive the data from this report."
 msgstr ""
 
@@ -4382,20 +4377,20 @@ msgstr "Date"
 msgid "Date To"
 msgstr "Date"
 
-#: web/Reports/ReportAdvanced.pm Line:368
+#: web/Reports/ReportAdvanced.pm Line:372
 msgid "Descending"
 msgstr "Descending"
 
-#: web/Reports/ReportAdvanced.pm Line:263
-#: Line:437
+#: web/Reports/ReportAdvanced.pm Line:267
+#: Line:441
 msgid "Display"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:446
+#: web/Reports/ReportAdvanced.pm Line:450
 msgid "Email Address"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:445
+#: web/Reports/ReportAdvanced.pm Line:449
 msgid "Email the report in a format suitable to be imported into another product."
 msgstr ""
 
@@ -4411,7 +4406,7 @@ msgstr "Entity ID"
 msgid "Entity Short Name"
 msgstr "Entity ID"
 
-#: web/Reports/ReportAdvanced.pm Line:261
+#: web/Reports/ReportAdvanced.pm Line:265
 msgid "Filter Only"
 msgstr "Filter Only"
 
@@ -4421,7 +4416,7 @@ msgstr "Filter Only"
 msgid "Financial"
 msgstr "Access"
 
-#: web/Reports/ReportAdvanced.pm Line:412
+#: web/Reports/ReportAdvanced.pm Line:416
 msgid "Group By"
 msgstr ""
 
@@ -4452,7 +4447,7 @@ msgstr ""
 msgid "Member Records"
 msgstr "Member Reports"
 
-#: web/Reports/ReportAdvanced.pm Line:423
+#: web/Reports/ReportAdvanced.pm Line:427
 msgid "No Grouping"
 msgstr ""
 
@@ -4461,11 +4456,11 @@ msgstr ""
 msgid "On Loan ?"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:439
+#: web/Reports/ReportAdvanced.pm Line:443
 msgid "Open the report for viewing on the screen."
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:346
+#: web/Reports/ReportAdvanced.pm Line:350
 msgid "Options"
 msgstr "Options"
 
@@ -4480,7 +4475,7 @@ msgstr ""
 msgid "Other Fields"
 msgstr "Other Fields"
 
-#: web/Reports/ReportAdvanced.pm Line:433
+#: web/Reports/ReportAdvanced.pm Line:437
 msgid "Output"
 msgstr ""
 
@@ -4550,15 +4545,15 @@ msgstr "Registration Number"
 msgid "Registrations"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:265
+#: web/Reports/ReportAdvanced.pm Line:269
 msgid "Remove"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:366
+#: web/Reports/ReportAdvanced.pm Line:370
 msgid "Secondary sort by"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:500
+#: web/Reports/ReportAdvanced.pm Line:504
 #, fuzzy
 msgid "Selected Fields"
 msgstr "Other Fields"
@@ -4569,15 +4564,15 @@ msgstr "Other Fields"
 msgid "Settlement Date"
 msgstr "Payment Type"
 
-#: web/Reports/ReportAdvanced.pm Line:347
+#: web/Reports/ReportAdvanced.pm Line:351
 msgid "Show"
 msgstr "Show"
 
-#: web/Reports/ReportAdvanced.pm Line:365
+#: web/Reports/ReportAdvanced.pm Line:369
 msgid "Sort by"
 msgstr ""
 
-#: web/Reports/ReportAdvanced.pm Line:335
+#: web/Reports/ReportAdvanced.pm Line:339
 msgid "Summary Data"
 msgstr "Summary Data"
 
@@ -4605,7 +4600,7 @@ msgstr "National Number"
 msgid "Transaction Status"
 msgstr "Personal Details"
 
-#: web/Reports/ReportAdvanced.pm Line:331
+#: web/Reports/ReportAdvanced.pm Line:335
 msgid "Unique Records Only"
 msgstr "Unique Records Only"
 

@@ -48,7 +48,7 @@
                                     </thead>
                                 [% FOREACH rego IN  PreviousRegistrations %]
                                     <tr>
-                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.strPersonEntityRole %] ([% Lang.txt(rego.strPersonEntityRole) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]
+                                        <td class = "">[% Lang.txt(rego.strPersonTypeName) %] [% IF rego.EntityRoleName %] ([% Lang.txt(rego.EntityRoleName) %])[% END %][% IF rego.strPersonLevel %] ([% Lang.txt(rego.strPersonLevelName) %])[% END %]
                                         [% IF rego.strSportType %] <br /> [% Lang.txt(rego.strSportType) %] [% END %]
                                         </td>
                                         <td>[% rego.EntityName %]</td>
@@ -102,6 +102,12 @@
                                     [% END %]
                                     [% IF selfRegoMatrixOptions.REFEREE %]
                                         <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=REFEREE" class = "btn-inside-panels">[% Lang.txt('Add Referee Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.TEAMOFFICIAL %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=TEAMOFFICIAL" class = "btn-inside-panels">[% Lang.txt('Add Team Official Role') %]</a><br>
+                                    [% END %]
+                                    [% IF selfRegoMatrixOptions.CLUBOFFICIAL %]
+                                        <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;pID=[% person.intPersonID %]&amp;dtype=CLUBOFFICIAL" class = "btn-inside-panels">[% Lang.txt('Add Club Official Role') %]</a><br>
                                     [% END %]
                                 [% END %]
                             </div><!-- end selfreg-actions -->

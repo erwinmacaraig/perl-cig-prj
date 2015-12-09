@@ -34,7 +34,7 @@ sub main	{
             $infile1 = 'tblPersonRegistration2.txt';
         }
         else {
-            $infile1 = 'PeopleRegistrationsCombined.csv';
+            $infile1 = 'GHA_TEST_regos.txt';
         }
     }
 

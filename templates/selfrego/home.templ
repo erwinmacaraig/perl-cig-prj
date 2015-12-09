@@ -40,6 +40,12 @@
         [% IF selfRegoMatrixOptions.REFEREE %]
             <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=REFEREE" class = "btn-main">[% Lang.txt('Referee') %]</a><br>
         [% END %]
+        [% IF selfRegoMatrixOptions.TEAMOFFICIAL %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=TEAMOFFICIAL" class = "btn-main">[% Lang.txt('Team Official') %]</a><br>
+        [% END %]
+        [% IF selfRegoMatrixOptions.CLUBOFFICIAL %]
+            <a href = "?a=REG_NEW&amp;srp=[% srp %]&amp;dtype=CLUBOFFICIAL" class = "btn-main">[% Lang.txt('Club Official') %]</a><br>
+        [% END %]
          </div>
     </div>
 [% END %]
