@@ -29,6 +29,7 @@ CREATE TABLE tmpPersonRego (
     strTransactionNo varchar(30) default '',
     dtPaid date,
     strCertifications varchar(100) default '',
+    strClientPRImportCode varchar(100) default '',
     
     PRIMARY KEY (intID),
     INDEX index_strFileType (strFileType),

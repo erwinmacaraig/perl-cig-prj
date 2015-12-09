@@ -89,6 +89,7 @@ sub insertPersonRecord {
             ?,
             ?,
             ?,
+            ?,
             ?
         )
     ];
@@ -115,10 +116,12 @@ sub insertPersonRecord {
             $otherIdentifierType = 0; ## Needs work from tmpPerspn.strIdentifierType
             $localLang = 0; ## Needs work from tmpPerson.strLocalLanguage
         }
+        $otherIdentifierType = 558018 if ($dref->{'strIdentifierType'} eq 'NATIONALIDNUMBER');
+        $otherIdentifierType = 558019 if ($dref->{'strIdentifierType'} eq 'PASSPORT');
 
         
         $qryINS->execute(
-            $dref->{'intID'},
+            $dref->{'strPersonCode'},
             $dref->{'strNationalNum'},
             $status,
             $dref->{'strLocalFirstname'},
@@ -178,45 +181,45 @@ while (<INFILE>)	{
 	$line=~s///g;
 	#$line=~s/,/\-/g;
 	$line=~s/"//g;
-	my @fields=split /;/,$line;
+	#my @fields=split /;/,$line;
+	my @fields=split /\t/,$line;
 
-    if ($maCode eq 'HKG')   {
+    if ($maCode eq 'GHA')   {
         ## Update field mapping for HKG 
-    }
-    else    {
-        ## Finland at moment
 #SystemID;PalloID;Status;LocalFirstName;LocalLastName;LocalPreviousLastName;LocalLanguageCode;PreferedName;LatinFirstName;LatinLastName;LatinPreviousLastName;DateOfBirth;Gender;Nationality;CountryOfBirth;RegionOfBirth;PlaceOfBirth;Fax;Phone;Address1;Address2;PostalCode;Town;Suburb;Email;Identifier;IdentifierType;CountryIssued;DateFrom;DateTo
 
     	$parts{'PERSONCODE'} = $fields[0] || '';
-    	$parts{'NATIONALNUM'} = $fields[1] || '';
-	    $parts{'STATUS'} = $fields[2] || '';
-	    $parts{'LOCALFIRSTNAME'} = $fields[3] || '';
-	    $parts{'LOCALSURNAME'} = $fields[4] || '';
-	    $parts{'LOCALMAIDENNAME'} = $fields[5] || '';
-	    $parts{'LOCALLANGUAGE'} = $fields[6] || '';
-	    $parts{'PREFERREDNAME'} = $fields[7] || '';  ## Don't think we use it
-	    $parts{'INTFIRSTNAME'} = $fields[8] || '';
-	    $parts{'INTSURNAME'} = $fields[9] || '';
-	    $parts{'INTMAIDENNAME'} = $fields[10] || ''; ## Not ued
-	    $parts{'DOB'} = $fields[11] || '0000-00-00';
-	    $parts{'GENDER'} = $fields[12] || '';
-	    $parts{'ISO_NATIONALITY'} = $fields[13] || ''; 
-	    $parts{'ISO_COUNTRYOFBIRTH'} = $fields[14] || ''; 
-	    $parts{'REGIONOFBIRTH'} = $fields[15] || ''; 
-	    $parts{'PLACEOFBIRTH'} = $fields[16] || ''; 
-	    $parts{'FAX'} = $fields[17] || ''; 
-	    $parts{'PHONE'} = $fields[18] || ''; 
-	    $parts{'ADDRESS1'} = $fields[19] || ''; 
-	    $parts{'ADDRESS2'} = $fields[20] || ''; 
-	    $parts{'POSTALCODE'} = $fields[21] || ''; 
-	    $parts{'TOWN'} = $fields[22] || ''; 
-	    $parts{'SUBURB'} = $fields[23] || ''; 
-	    $parts{'EMAIL'} = $fields[24] || ''; 
-	    $parts{'OTHERIDENTIFIER'} = $fields[25] || ''; 
-	    $parts{'OTHERIDENTIFIERTYPE'} = $fields[26] || ''; 
-	    $parts{'OTHERIDENTIFIERCOUNTRY'} = $fields[27] || ''; 
-	    $parts{'OTHERIDENTIFIER_dtFROM'} = $fields[28] || '0000-00-00'; 
-	    $parts{'OTHERIDENTIFIER_dtTO'} = $fields[29] || '0000-00-00'; 
+	    $parts{'STATUS'} = $fields[1] || '';
+        $parts{'STATUS'} = 'REGISTERED';
+	    $parts{'LOCALFIRSTNAME'} = $fields[2] || '';
+	    $parts{'LOCALSURNAME'} = $fields[3] || '';
+	    $parts{'LOCALLANGUAGE'} = 1; #$fields[4] || '';
+	    $parts{'PREFERREDNAME'} = $fields[5] || '';  ## Don't think we use it
+	    $parts{'INTFIRSTNAME'} = $fields[6] || '';
+	    $parts{'INTSURNAME'} = $fields[7] || '';
+	    $parts{'DOB'} = $fields[8] || '0000-00-00';
+	    $parts{'GENDER'} = uc($fields[9]) || '';
+	    $parts{'ISO_NATIONALITY'} = $fields[10] || ''; 
+	    $parts{'ISO_COUNTRYOFBIRTH'} = $fields[11] || ''; 
+	    $parts{'REGIONOFBIRTH'} = $fields[12] || ''; 
+	    $parts{'PLACEOFBIRTH'} = $fields[13] || ''; 
+	    $parts{'FAX'} = $fields[14] || ''; 
+	    $parts{'PHONE'} = $fields[15] || ''; 
+	    $parts{'ADDRESS1'} = $fields[16] || ''; 
+	    $parts{'ADDRESS2'} = $fields[17] || ''; 
+	    $parts{'POSTALCODE'} = $fields[18] || ''; 
+	    $parts{'SUBURB'} = $fields[19] || ''; 
+	    $parts{'TOWN'} = $fields[20] || ''; 
+	    $parts{'EMAIL'} = $fields[21] || ''; 
+	    $parts{'OTHERIDENTIFIER'} = $fields[22] || ''; 
+	    $parts{'OTHERIDENTIFIERTYPE'} = $fields[23] || ''; 
+	    $parts{'OTHERIDENTIFIERCOUNTRY'} = $fields[24] || ''; 
+
+	    $parts{'OTHERIDENTIFIER_dtFROM'} = '0000-00-00'; 
+	    $parts{'OTHERIDENTIFIER_dtTO'} = '0000-00-00'; 
+	    $parts{'LOCALMAIDENNAME'} = '';
+	    $parts{'INTMAIDENNAME'} = ''; 
+    	$parts{'NATIONALNUM'} = '';
         
     }
 	if ($countOnly)	{
@@ -257,6 +260,8 @@ while (<INFILE>)	{
             dtIdentifierTo
         )
         VALUES (
+            ?,
+            ?,
             ?,
             ?,
             ?,
