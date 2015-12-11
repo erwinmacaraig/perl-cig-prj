@@ -63,7 +63,7 @@ sub setProcessOrder {
             'action' => 'select_regos',
             'function' => 'display_regos',
             'label'  => $lang->txt('Select Previous Registrations'),
-            'title'  => $lang->txt('Select Previous Registrations to copy'),
+            'title'  => $lang->txt('Select Previous Registrations to move'),
         },
         {
             'action' => 'sru',
