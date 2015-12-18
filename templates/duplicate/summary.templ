@@ -25,25 +25,29 @@
 				    <h4>[% Lang.txt('Registrations to Move') %]</h4>
 				    <div class="read-only-text clearfix">
             [% IF registrations.size %]
-                <table>
-                    <tr>
-                        <td>[% NationalNumName %]</td>
-                        <td>[% Lang.txt('Status') %]</td>
-                        <td>[% Lang.txt('Person Type') %]</td>
-                        <td>[% Lang.txt('Level') %]</td>
-                        <td>[% Lang.txt('Sport') %]</td>
-                        <td>[% Lang.txt('Move Documents') %]</td>
-                    </tr>
-                    [% FOREACH r = registrations %]
+                <table class="table res-table">
+                    <thead>
                         <tr>
-                            <td>[% r.strNationalPeriodName %]</td>
-                            <td>[% r.Status %]</td>
-                            <td>[% r.PersonType %]</td>
-                            <td>[% r.PersonLevel %]</td>
-                            <td>[% r.Sport %]</td>
-                            <td>[% r.moveDocuments %]</td>
+                            <th>[% NationalNumName %]</th>
+                            <th>[% Lang.txt('Status') %]</th>
+                            <th>[% Lang.txt('Person Type') %]</th>
+                            <th>[% Lang.txt('Level') %]</th>
+                            <th>[% Lang.txt('Sport') %]</th>
+                            <th>[% Lang.txt('Move Documents') %]</th>
                         </tr>
-                    [% END %]
+                    </thead>
+                    <tbody>
+                        [% FOREACH r = registrations %]
+                            <tr>
+                                <td>[% r.strNationalPeriodName %]</td>
+                                <td>[% r.Status %]</td>
+                                <td>[% r.PersonType %]</td>
+                                <td>[% r.PersonLevel %]</td>
+                                <td>[% r.Sport %]</td>
+                                <td>[% r.moveDocuments %]</td>
+                            </tr>
+                        [% END %]
+                    </tbody>
                 </table>
             [% END %]
 					    <a href="[% changelink %]&amp;rfp=select_regos" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
