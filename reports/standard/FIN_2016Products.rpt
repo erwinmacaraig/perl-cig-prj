@@ -1,10 +1,12 @@
 {
 	SQL => qq[
 
-(SELECT Region.strLocalName as RegionName, P.strName as ProductName, P.strProductType, P.curDefaultAmount, SUM(T.intQty) as SumQty, SUM(T.curAmount) as SumAmt FROM tblPersonRegistration_1 as PR INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) INNER JOIN tblTransactions as T ON (PR.intPersonRegistrationID = T.intPersonRegistrationID) INNER JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID) INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID) INNER JOIN tblTempEntityStructure as TS ON (intParentLevel=20 and TS.intChildID = PR.intEntityID) INNER JOIN tblEntity as Region ON (Region.intEntityID= intParentID AND intParentLevel=20) WHERE T.intStatus=1 AND P.intProductNationalPeriodID=121 AND PR.intNationalPeriodID=121 GROUP BY RegionName, P.intProductID)
+SELECT RegionName, ProductID, ProductName, ProductType, DefaultAmount, SUM(intQty) as SumQty, SUM(curAmount) as SumAmt FROM
+(SELECT Region.strLocalName as RegionName, T.intProductID as ProductID, P.strName as ProductName, P.strProductType as ProductType, P.curDefaultAmount as DefaultAmount, T.intQty, T.curAmount FROM tblPersonRegistration_1 as PR INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) INNER JOIN tblTransactions as T ON (PR.intPersonRegistrationID = T.intPersonRegistrationID) INNER JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID) INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID) INNER JOIN tblTempEntityStructure as TS ON (intParentLevel=20 and TS.intChildID = PR.intEntityID) INNER JOIN tblEntity as Region ON (Region.intEntityID= intParentID AND intParentLevel=20) WHERE T.intStatus=1 AND P.intProductNationalPeriodID=121 AND PR.intNationalPeriodID=121
 UNION ALL
-(SELECT Region.strLocalName as RegionName, P.strName as ProductName, P.strProductType, P.curDefaultAmount, SUM(T.intQty) as SumQty, SUM(T.curAmount) as SumAmt FROM tblPersonRegistration_1 as PR INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) INNER JOIN tblTransactions as T ON (PR.intPersonRegistrationID = T.intPersonRegistrationID) INNER JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID) INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID) INNER JOIN tblTempEntityStructure as TS ON (intChildLevel=20 and TS.intChildID = PR.intEntityID) INNER JOIN tblEntity as Region ON (Region.intEntityID= intChildID AND intChildLevel=20) WHERE T.intStatus=1 AND P.intProductNationalPeriodID=121 AND PR.intNationalPeriodID=121 GROUP BY RegionName, P.intProductID)
-
+SELECT Region.strLocalName as RegionName, T.intProductID as ProductID, P.strName as ProductName, P.strProductType as ProductType, P.curDefaultAmount as DefaultAmount, T.intQty, T.curAmount FROM tblPersonRegistration_1 as PR INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID) INNER JOIN tblTransactions as T ON (PR.intPersonRegistrationID = T.intPersonRegistrationID) INNER JOIN tblTransLog as TL ON (TL.intLogID = T.intTransLogID) INNER JOIN tblProducts as P ON (P.intProductID=T.intProductID) INNER JOIN tblTempEntityStructure as TS ON (intChildLevel=20 and TS.intChildID = PR.intEntityID) INNER JOIN tblEntity as Region ON (Region.intEntityID= intChildID AND intChildLevel=20) WHERE T.intStatus=1 AND P.intProductNationalPeriodID=121 AND PR.intNationalPeriodID=121
+)
+x GROUP BY RegionName, ProductID
 
 	],
 	StatsReport => 0,
@@ -15,14 +17,14 @@ UNION ALL
 	Labels => [
 		['RegionName','Region'],
 		['ProductName','Product'],
-		['strProductType','Product Type'],
-		['curDefaultAmount','Product Cost'],
+		['ProductType','Product Type'],
+		['DefaultAmount','Product Cost'],
 		['SumQty','Quantity Purchased'],
 		['SumAmt','Total'],
 	],
 	Sort => [
 		['RegionName','ASC','string'],
-		['strProductType','ASC','string'],
+		['ProductType','ASC','string'],
 		['ProductName','ASC','string'],
 	],
 }
