@@ -22,6 +22,7 @@ UNION ALL
 	],
 	Sort => [
 		['RegionName','ASC','string'],
+		['strProductType','ASC','string'],
 		['ProductName','ASC','string'],
 	],
 }
