@@ -96,7 +96,6 @@ sub create_batch{
     my $limit = param('limit') || 10;
     if($limit !~/^\d+$/)   { $limit = 10; }
 
-    my $batchID = newBatchID($Data, $cardID, $lang);
     my $cardInfo = getCardInfo($Data, $cardID);
     my $cardTypes = join("','",@{$cardInfo->{'types'}});
 
@@ -142,6 +141,7 @@ sub create_batch{
     $q->finish();
     my $ids = join(',',@ids);
     if($ids)    {
+        my $batchID = newBatchID($Data, $cardID, $lang);
         $st = qq[
             UPDATE tblPersonCardPrint AS PCP
             SET PCP.intBatchID = ?
@@ -152,9 +152,10 @@ sub create_batch{
         $q = $Data->{'db'}->prepare($st);
         $q->execute($batchID);
         $q->finish();
+        return $batchID;
     }
+    return -1;
 
-    return $batchID;
 }
 
 sub show_batch_options   {
