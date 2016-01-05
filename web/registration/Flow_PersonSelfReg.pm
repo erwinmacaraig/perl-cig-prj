@@ -88,7 +88,7 @@ sub setProcessOrder {
             'label'  => 'Certifications',
             'fieldset'  => 'certifications',
             'title'  => "$regname - Enter Certifications",
-            'NoNav' => $dtype eq 'PLAYER' ? 1 : 0,
+            'NoNav' => ($dtype eq 'PLAYER' or $dtype eq 'TEAMOFFICIAL' or $dtype eq 'CLUBOFFICIAL') ? 1 : 0,
         },
         {
             'action' => 'pcert',
