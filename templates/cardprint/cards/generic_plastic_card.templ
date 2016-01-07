@@ -67,6 +67,11 @@
         display: table-cell;
         height:100px;
     }
+    .card-backsig {
+        height: 60px;
+        top:280px;
+        position: absolute;
+    }
 </style>
     [% FOREACH p = cardData %]
 <div class = "cardblock">
@@ -104,6 +109,7 @@
         <img src = "images/cards/ghana.png" class = "card-bgimg">
         <div class = "card-terms">
             <p>[% Data.SystemConfig.PersonCardTerms %]</p>
+            <img src = "images/cards/GHA_signature.png" class = "card-backsig">
         </div>
         <div class = "card-back-bottom-data">
         [% FOREACH r = p.registrations %]
