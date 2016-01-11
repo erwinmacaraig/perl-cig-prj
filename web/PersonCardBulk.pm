@@ -111,6 +111,9 @@ sub create_batch{
         ];
         push @values, $personLevel;
     }
+    if($personType)    {
+        $cardTypes = $personType;
+    }
     push @values, $cardID;
     my $st = qq[
         SELECT
