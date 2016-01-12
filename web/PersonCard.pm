@@ -58,13 +58,14 @@ sub getExistingBatchID {
     my $id = getID($Data->{'clientValues'}, $level || 0);
 	my $st = qq[ 
         SELECT
-            intPersonCardBatchID
+            MAX(intPersonCardBatchID)
         FROM
             tblPersonCardBatch
         WHERE
             intEntityTypeID = ?
             AND intEntityID = ?
             AND intStatus = 0
+            LIMIT 1
     ];
 	my $q = $Data->{'db'}->prepare($st);
 	$q->execute($level, $id);

@@ -90,13 +90,12 @@ sub create_batch{
 	my ($Data) = @_;
 
     my $cardID = param('cardID') || 0;
-    my $personType = param('pType') || '';
+    my $personType = param('ptype') || '';
     my $personLevel = param('pLevel') || '';
     my $lang = param('lang') || '';
     my $limit = param('limit') || 10;
     if($limit !~/^\d+$/)   { $limit = 10; }
 
-    my $batchID = newBatchID($Data, $cardID, $lang);
     my $cardInfo = getCardInfo($Data, $cardID);
     my $cardTypes = join("','",@{$cardInfo->{'types'}});
 
@@ -111,6 +110,9 @@ sub create_batch{
             AND PR.strPersonLevel = ? 
         ];
         push @values, $personLevel;
+    }
+    if($personType)    {
+        $cardTypes = $personType;
     }
     push @values, $cardID;
     my $st = qq[
@@ -142,6 +144,7 @@ sub create_batch{
     $q->finish();
     my $ids = join(',',@ids);
     if($ids)    {
+        my $batchID = newBatchID($Data, $cardID, $lang);
         $st = qq[
             UPDATE tblPersonCardPrint AS PCP
             SET PCP.intBatchID = ?
@@ -152,9 +155,10 @@ sub create_batch{
         $q = $Data->{'db'}->prepare($st);
         $q->execute($batchID);
         $q->finish();
+        return $batchID;
     }
+    return -1;
 
-    return $batchID;
 }
 
 sub show_batch_options   {
