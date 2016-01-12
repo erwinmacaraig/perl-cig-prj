@@ -90,7 +90,7 @@ sub create_batch{
 	my ($Data) = @_;
 
     my $cardID = param('cardID') || 0;
-    my $personType = param('pType') || '';
+    my $personType = param('ptype') || '';
     my $personLevel = param('pLevel') || '';
     my $lang = param('lang') || '';
     my $limit = param('limit') || 10;
