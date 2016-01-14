@@ -1171,9 +1171,11 @@ sub displayRegoFlowProductsBulk {
     my ($Data, $regoID, $client, $entityRegisteringForLevel, $originLevel, $rego_ref, $entityID, $personID, $hidden_ref) = @_;
     my $lang=$Data->{'lang'};
 
+print STDERR "--- IN displayRegoFlowProductsBulk\n";
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
     my $pref = Person::loadPersonDetails($Data, $personID);
     $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
+print STDERR "--- STILL 2IN displayRegoFlowProductsBulk\n";
     my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
@@ -1223,6 +1225,7 @@ sub displayRegoFlowProductsBulk {
     );
     my $pagedata = runTemplate($Data, \%PageData, 'registration/product_flow_backend.templ') || '';
 
+print STDERR "--- FINISHING displayRegoFlowProductsBulk\n";
     return $pagedata;
 }
  
