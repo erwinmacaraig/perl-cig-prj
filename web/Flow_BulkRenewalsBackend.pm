@@ -112,6 +112,7 @@ sub process_person_select   {
     my $rolloverIDs = $self->{'RunParams'}{'roIds'};
     $self->addCarryField('rolloverIDs',$rolloverIDs);
     
+print STDERR "ALL GOOD IN process_person_select\n";
     return ('',1);
 }
 
@@ -285,6 +286,7 @@ sub display_products {
     my $lang = $self->{'Lang'};
 
 
+print STDERR "STARTING display_products\n";
 		 
     my $bulk_ref = {
             personType => $personType,
@@ -304,6 +306,7 @@ sub display_products {
 
     my $content= displayRegoFlowProductsBulk($self->{'Data'}, 0, $client, $entityLevel, $originLevel, $bulk_ref, $entityID, 0, \%Hidden);
     if (! $content) {
+print STDERR "NO CONTENT in display_products\n";
 	$self->setCurrentProcessIndex('summ');
 	return ('',2);
     }
@@ -319,6 +322,7 @@ sub display_products {
     );
     my $pagedata = $self->display(\%PageData);
 
+print STDERR "FINISHING display_products\n";
     return ($pagedata,0);
 
 }
