@@ -17,7 +17,14 @@ sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
 print STDERR "RI -- STARTING\n";
 
+    my $IDFor = $Rego_ref->{'intPersonID'};
+    my $TableType = " AND TP.intTableType = $Defs::LEVEL_PERSON";
+    if ($ruleFor eq 'ENTITY')   {
+        $IDFor = $entityID;
+        $TableType = '';
+    }  
 
+    $Rego_ref->{'BulkRenewal'} ||= 0;
 
     my $entityLevel_sent = $entityLevel;
     my $regNature_sent = $regNature;
@@ -94,6 +101,7 @@ print STDERR "RI -- STARTING\n";
     #}
  
     my $locale = $Data->{'lang'}->getLocale();
+print STDERR "ABOUT TO RUN RI SQL\n";
     my $st = qq[
    SELECT 
             RI.intID,
@@ -128,7 +136,7 @@ strItemType
                 AND LT_D.intID = D.intDocumentTypeID
                 AND LT_D.strLocale = '$locale'
             )
-            LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
+            LEFT JOIN tblTransactions as TP ON (TP.intID = ? AND TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ? $TableType)
         WHERE
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
@@ -153,9 +161,91 @@ strItemType
                 OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
             )
       ]; 
+    
+    if (defined $Rego_ref->{'BulkRenewal'} and $Rego_ref->{'BulkRenewal'} == 1) {
+    print STDERR "IN THIS SQL FOR BulkRenewal\n";
+        $st = qq[
+   SELECT 
+            RI.intID,
+            RI.intRequired,
+            RI.intUseExistingThisEntity,
+            RI.intUseExistingAnyEntity,
+            COALESCE (LT_D.strString1,D.strDocumentName) as strDocumentName,
+            D.strDocumentFor,
+			COALESCE(LT_D.strNote,D.strDescription) AS strDescription,
+			D.intImageCrop,
+            COALESCE (LT_P.strString1,P.strName) as strProductName,
+            COALESCE(LT_P.strString2,P.strDisplayName) as strProductDisplayName,
+            0 as intTransactionID,
+            RI.intItemUsingActiveFilter,
+            RI.strItemActiveFilterPeriods,
+            RI.intItemActive,
+            RI.intItemUsingPaidProductFilter,
+            RI.strItemActiveFilterPaidProducts,
+            RI.intItemPaidProducts,
+strItemType
+        FROM
+            tblRegistrationItem as RI
+            LEFT JOIN tblDocumentType as D ON (intDocumentTypeID = RI.intID and strItemType='DOCUMENT')
+            LEFT JOIN tblProducts as P ON (P.intProductID= RI.intID and strItemType='PRODUCT')
+            LEFT JOIN tblLocalTranslations AS LT_P ON (
+                LT_P.strType = 'PRODUCT'
+                AND LT_P.intID = P.intProductID
+                AND LT_P.strLocale = '$locale'
+            )
+            LEFT JOIN tblLocalTranslations AS LT_D ON (
+                LT_D.strType = 'DOCUMENT'
+                AND LT_D.intID = D.intDocumentTypeID
+                AND LT_D.strLocale = '$locale'
+            )
+        WHERE
+            RI.intRealmID = ?
+            AND RI.intSubRealmID IN (0, ?)
+            AND RI.strRuleFor = ?
+            AND RI.intOriginLevel IN (99, ?)
+	    AND RI.strRegistrationNature IN (?, ?)
+            AND RI.strEntityType IN ('', ?)
+            AND RI.intEntityLevel IN (0, 99, ?)
+	    AND RI.strPersonType IN ('', ?)
+	    AND RI.strPersonLevel IN ('', ?)
+        AND RI.strPersonEntityRole IN ('', ?)
+	    AND RI.strSport IN ('', ?)
+	    AND RI.strAgeLevel IN ('', ?)
+        AND RI.strItemType = ? 
+        AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = ?)
+        AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = ?)
+	AND (RI.intItemUsingITCFilter =0
+                OR (RI.intItemUsingITCFilter = 1 AND RI.intItemNeededITC = ?)
+            )
+      ]; 
+    
+    }
    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
-    $q->execute(
+    if (defined $Rego_ref->{'BulkRenewal'} and $Rego_ref->{'BulkRenewal'} == 1) {
+        $q->execute(
+	        $Data->{'Realm'}, 
+	        $Data->{'RealmSubType'}, 
+	        $ruleFor,
+	        $originLevel,
+		$regNature,
+		$regNature2,
+	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+	        $entityLevel,
+		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+	        $itemType, 
+                $Rego_ref->{'InternationalTransfer'} || 0,
+                $Rego_ref->{'InternationalLoan'} || 0,
+		$itc
+        ) or query_error($st); 
+    }
+    else    {
+        $q->execute(
+            $IDFor,
 	        $Rego_ref->{'intPersonRegistrationID'} || '',
 	        $Data->{'Realm'}, 
 	        $Data->{'RealmSubType'}, 
@@ -179,6 +269,9 @@ strItemType
                 $Rego_ref->{'InternationalLoan'} || 0,
 		$itc
     ) or query_error($st); 
+    }
+
+
 
     	
     my @values = (); 
