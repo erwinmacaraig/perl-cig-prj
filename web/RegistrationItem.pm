@@ -17,6 +17,13 @@ sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
 print STDERR "RI -- STARTING\n";
 
+    my $IDFor = $Rego_ref->{'intPersonID'};
+    my $TableType = " AND TP.intTableType = $Defs::LEVEL_PERSON";
+    if ($ruleFor eq 'ENTITY')   {
+        $IDFor = $entityID;
+        $TableType = '';
+    }  
+
     $Rego_ref->{'BulkRenewal'} ||= 0;
 
     my $entityLevel_sent = $entityLevel;
@@ -129,7 +136,7 @@ strItemType
                 AND LT_D.intID = D.intDocumentTypeID
                 AND LT_D.strLocale = '$locale'
             )
-            LEFT JOIN tblTransactions as TP ON (TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ?)
+            LEFT JOIN tblTransactions as TP ON (TP.intID = ? AND TP.intProductID = P.intProductID and TP.intPersonRegistrationID = ? $TableType)
         WHERE
             RI.intRealmID = ?
             AND RI.intSubRealmID IN (0, ?)
@@ -156,7 +163,7 @@ strItemType
       ]; 
     
     if (defined $Rego_ref->{'BulkRenewal'} and $Rego_ref->{'BulkRenewal'} == 1) {
-
+    print STDERR "IN THIS SQL FOR BulkRenewal\n";
         $st = qq[
    SELECT 
             RI.intID,
@@ -205,10 +212,6 @@ strItemType
 	    AND RI.strSport IN ('', ?)
 	    AND RI.strAgeLevel IN ('', ?)
         AND RI.strItemType = ? 
-        AND (RI.strISOCountry_IN ='' OR RI.strISOCountry_IN IS NULL OR RI.strISOCountry_IN LIKE CONCAT('%|',?,'|%'))
-        AND (RI.strISOCountry_NOTIN ='' OR RI.strISOCountry_NOTIN IS NULL OR RI.strISOCountry_NOTIN NOT LIKE CONCAT('%|',?,'|%'))        
-        AND (RI.intFilterFromAge = 0 OR RI.intFilterFromAge <= ?)
-        AND (RI.intFilterToAge = 0 OR RI.intFilterToAge >= ?)
         AND (RI.intItemForInternationalTransfer = 0 OR RI.intItemForInternationalTransfer = ?)
         AND (RI.intItemForInternationalLoan = 0 OR RI.intItemForInternationalLoan = ?)
 	AND (RI.intItemUsingITCFilter =0
@@ -219,7 +222,30 @@ strItemType
     }
    
     my $q = $Data->{'db'}->prepare($st) or query_error($st);
-    $q->execute(
+    if (defined $Rego_ref->{'BulkRenewal'} and $Rego_ref->{'BulkRenewal'} == 1) {
+        $q->execute(
+	        $Data->{'Realm'}, 
+	        $Data->{'RealmSubType'}, 
+	        $ruleFor,
+	        $originLevel,
+		$regNature,
+		$regNature2,
+	        $Rego_ref->{'strEntityType'} || $Rego_ref->{'entityType'} || '',
+	        $entityLevel,
+		$Rego_ref->{'strPersonType'} || $Rego_ref->{'personType'} || '',
+		$Rego_ref->{'strPersonLevel'} || $Rego_ref->{'personLevel'} || '',
+		$Rego_ref->{'strPersonEntityRole'} || $Rego_ref->{'personEntityRole'} || '',
+		$Rego_ref->{'strSport'} || $Rego_ref->{'sport'} || '',
+		$Rego_ref->{'strAgeLevel'} || $Rego_ref->{'ageLevel'} || '',
+	        $itemType, 
+                $Rego_ref->{'InternationalTransfer'} || 0,
+                $Rego_ref->{'InternationalLoan'} || 0,
+		$itc
+        ) or query_error($st); 
+    }
+    else    {
+        $q->execute(
+            $IDFor,
 	        $Rego_ref->{'intPersonRegistrationID'} || '',
 	        $Data->{'Realm'}, 
 	        $Data->{'RealmSubType'}, 
@@ -243,6 +269,9 @@ strItemType
                 $Rego_ref->{'InternationalLoan'} || 0,
 		$itc
     ) or query_error($st); 
+    }
+
+
 
     	
     my @values = (); 
