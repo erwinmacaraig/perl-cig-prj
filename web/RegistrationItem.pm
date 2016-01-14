@@ -15,6 +15,7 @@ use Data::Dumper;
  
 sub getRegistrationItems    {
     my($Data, $ruleFor, $itemType, $originLevel, $regNature, $entityID, $entityLevel, $multiPersonType, $Rego_ref, $documentFor) = @_; 
+print STDERR "RI -- STARTING\n";
 
 
 
@@ -243,6 +244,7 @@ strItemType
        
         push @Items, \%Item;
     }
+print STDERR "RI -- DONE\n";
     return \@Items;
 
 }
