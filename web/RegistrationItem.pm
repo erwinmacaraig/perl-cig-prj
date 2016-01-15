@@ -299,7 +299,7 @@ strItemType
         #next if($dref->{'strDocumentFor'} eq 'TRANSFERITC' and !$Rego_ref->{'InternationalTransfer'});
 
         ## Lets see if the person was active in the appropriate periods
-        if ($itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
+        if ($Rego_ref->{'intPersonID'} && $itemType eq 'PRODUCT' && $Data->{'SystemConfig'}{$sysConfigActiveFilter} && $dref->{'intItemUsingActiveFilter'})    {
             if (! defined $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}})   {
                 $ActiveFilter_ref->{$dref->{'strItemActiveFilterPeriods'}} ||= 0; # was outside of if
             }
