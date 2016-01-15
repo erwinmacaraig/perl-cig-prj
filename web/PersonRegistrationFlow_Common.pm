@@ -1173,9 +1173,11 @@ sub displayRegoFlowProductsBulk {
 
 print STDERR "--- IN displayRegoFlowProductsBulk\n";
     my $url = $Data->{'target'}."?client=$client&amp;a=PREGF_PU&amp;rID=$regoID";
-    my $pref = Person::loadPersonDetails($Data, $personID);
-    $rego_ref->{'Nationality'} = $pref->{'strISONationality'};
+    #my $pref = Person::loadPersonDetails($Data, $personID);
+    $rego_ref->{'Nationality'} = ''; #$pref->{'strISONationality'};
 print STDERR "--- STILL 2IN displayRegoFlowProductsBulk\n";
+    $rego_ref->{'intPersonID'} = 0;
+    $rego_ref->{'BulkRenewal'} = 1;
     my $CheckProducts = getRegistrationItems(
         $Data,
         'REGO',
