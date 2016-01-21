@@ -18,12 +18,14 @@ use strict;
 my $client = param('client') || 0; 
 my $amount = param('amount') || 0;
 my $db=connectDB();
-my %Data=();
-$Data{'db'}=$db;
+my %Data = (
+    db => $db,
+    Realm => 1,
+);
 
 my %clientValues = getClient($client);
 $Data{'clientValues'} = \%clientValues;
-( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
+#( $Data{'Realm'}, $Data{'RealmSubType'} ) = getRealm( \%Data );
 $Data{'SystemConfig'} = getSystemConfig( \%Data );
 my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
 $Data{'lang'} = $lang;
