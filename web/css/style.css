@@ -2307,6 +2307,10 @@ body {
   font-size:10px;
   text-transform: uppercase;
   font-family: 'noto_sansregular';
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width:  35%;
+  white-space: nowrap;
 }
 
 .nav_session_levels, .nav_session_levelsmobile {
