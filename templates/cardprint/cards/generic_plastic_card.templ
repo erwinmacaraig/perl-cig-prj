@@ -18,7 +18,9 @@
         height:116px;
         float:left;
         margin-left:6px;
-        border: solid #000 1px;
+        border: solid #1c4531 3px;
+        border-radius:8px;
+        overflow: hidden;
     }
     .card-photo img{
         width: 100%;
@@ -27,6 +29,12 @@
         float:left;
         width:210px;
         margin-left:6px;
+    }
+    .card-front {
+        background: url("images/cards/ghana_bg.png");
+        background-size:100%;
+        background-repeat:no-repeat;
+
     }
     .card-front, .card-back {
         clear:both;
@@ -76,9 +84,9 @@
     [% FOREACH p = cardData %]
 <div class = "cardblock">
     <div class = "card-front">
-        <img src = "images/cards/ghana.png" class = "card-bgimg">
+        <!--img src = "images/cards/ghana.png" class = "card-bgimg"-->
         <div class = "card-header">
-            [% maName %]
+            <!--[% maName %] -->
         </div><!-- end cardheader -->
         <div class = "card-body">
             <div class = "card-photo">[% IF p.photo %]<img src = "[% p.photo %]">[% END %]</div>
@@ -106,7 +114,7 @@
         </div><!-- end card-body-->
     </div><!-- end card-front -->
     <div class = "card-back">
-        <img src = "images/cards/ghana.png" class = "card-bgimg">
+        <!--img src = "images/cards/ghana.png" class = "card-bgimg"-->
         <div class = "card-terms">
             <p>[% Data.SystemConfig.PersonCardTerms %]</p>
             <img src = "images/cards/ghana_signature.png" class = "card-backsig">
