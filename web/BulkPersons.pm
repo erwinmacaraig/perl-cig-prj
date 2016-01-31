@@ -187,7 +187,7 @@ print STDERR "OK: $yobto\n";
     return $count if($countOnly);
     my $title = $Data->{'lang'}->txt('Bulk Registration');
     if ($count > $maxCount) {
-        my $errMsg = $Data->{'lang'}->txt("Too many records returned - You must enter a Family Name filter");
+        my $errMsg = $Data->{'lang'}->txt("Too many records returned - You must enter additional filters");
         $body = qq[
             <div class="alert">
                 <div>
