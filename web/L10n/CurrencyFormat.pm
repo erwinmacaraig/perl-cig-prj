@@ -2,6 +2,7 @@ package L10n::CurrencyFormat;
 
 use strict;
 use Locale::Currency::Format;
+use Data::Dumper;
 
 sub new {
 
@@ -51,6 +52,7 @@ sub format {
 
     if($self->{'CustomFormat'}) {
         currency_set($self->{'CurrencyCode'}, $self->{'CustomFormat'}, FMT_COMMON);
+        $format = FMT_COMMON;
     }
     return currency_format($self->{'CurrencyCode'},$value, $format);
 }
