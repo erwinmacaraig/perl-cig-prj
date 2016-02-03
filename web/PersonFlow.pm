@@ -15,7 +15,6 @@ use PersonRegistration;
 
 sub handlePersonFlow {
     my ($action, $Data, $paramRef) = @_;
-print STDERR "ACTION $action\n";
 
     $paramRef ||= undef;
     my $body = '';
