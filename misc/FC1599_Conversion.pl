@@ -56,8 +56,17 @@ sub migrateRecords{
     my $tmpTable = '';
     my $tmpTableSELECT = '';
     if ($useTempTable)  {
-        $tmpTableSELECT = qq[ tmpI.intEntityID as tmpToEntityID, ];
-        $tmpTable = qq[ INNER JOIN tmpIntTransferMigrate as tmpI ON (tmpI.intPersonRegistrationID = PR.intPersonRegistrationID) ];
+        $tmpTableSELECT = qq[ 
+            tmpI.intLastEntityID as tmpToEntityID, 
+            tmpI.strType,
+        ];
+        $tmpTable = qq[ 
+            INNER JOIN tmpIntTransferMigrate as tmpI ON (
+                tmpI.intPersonID = PR.intPersonID 
+                AND tmpI.intPersonRegistrationID = PR.intPersonRegistrationID
+                AND tmpI.strType='OUT'
+            ) 
+        ];
 ## Does this require OUT as a string parameter ?
     }
 
