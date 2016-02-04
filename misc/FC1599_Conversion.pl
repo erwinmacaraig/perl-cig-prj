@@ -52,14 +52,25 @@ sub migrateRecords{
     my ($Data, $holdingClubID) = @_;
     my $db = $Data->{'db'};
 
+    my $useTempTable = $Data->{'SystemConfig'}{'1599_tmpTable'} || 0;
+    my $tmpTable = '';
+    my $tmpTableSELECT = '';
+    if ($useTempTable)  {
+        $tmpTableSELECT = qq[ tmpI.intEntityID as tmpToEntityID, ];
+        $tmpTable = qq[ INNER JOIN tmpIntTransferMigrate as tmpI ON (tmpI.intPersonRegistrationID = PR.intPersonRegistrationID) ];
+## Does this require OUT as a string parameter ?
+    }
+
     my $st = qq[
         SELECT
             PR.*,
             intExistingPersonRegistrationID,
+            $tmpTableSELECT
             intRequestToEntityID
         FROM
             tblPersonRegistration_1 as PR
             LEFT JOIN tblPersonRequest as PersonReq ON (PersonReq.intPersonRequestID = PR.intPersonRequestID and PR.intPersonID=PersonReq.intPersonID)
+            $tmpTable
         WHERE
             PR.intEntityID = ?
             AND PR.strPersonType= 'PLAYER'
@@ -183,6 +194,7 @@ print " I HAVE REMOVED TEMP IS NULL CHECK\n";
     my $qryINSPQ= $db->prepare($stINSPQ);
     while (my $dref = $qry->fetchrow_hashref()) {
         if (! $dref->{'intPersonRequestID'})    {
+            my $tmpEntityID = $dref->{'tmpToEntityID'} || 0;
             $qryINSPQ->execute(
                 $dref->{'intPersonID'},
                 0, #$dref->{'intPersonRegistrationID'}, 
@@ -191,7 +203,7 @@ print " I HAVE REMOVED TEMP IS NULL CHECK\n";
                 $dref->{'strPersonLevel'},
                 $dref->{'strPersonLevel'},
                 $holdingClubID,
-                $holdingClubID,
+                $tmpEntityID || $holdingClubID,
                 'COMPLETED'
             );
             $dref->{'intPersonRequestID'} = $qryINSPQ->{mysql_insertid} || 0;
