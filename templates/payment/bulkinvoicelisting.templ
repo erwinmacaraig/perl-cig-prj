@@ -1,15 +1,44 @@
 <!-- <p>[% Lang.txt('Please select the people you wish to register from the list below and click on the update button to commit your change') %].</p> -->
 
 	<script type="text/javascript">
-		var clicked;
-		function AsubmitForm(){
-			document.payform.action = clicked;
-			//check if there is a transaction
-			return true;  
-		}
+            jQuery().ready(function() {
+                    var table;
+                    if(jQuery.fn.dataTable.isDataTable('#grid')){
+                        table = jQuery('#grid').DataTable();
+                    }
+                    else {
+                        table = jQuery('#grid').DataTable();
+                    }
+                    jQuery('#grid').on('change','.paytxn_chk',function(){     
+                    var cells = table.cells( ).nodes();
+                    var IDs = [];  
+                    var n = jQuery(cells).find(':checkbox');        
+                    update_selected();      
+                    jQuery.each(n, function(key, value){
+                        if(jQuery(value).prop('checked')){
+                                var v = jQuery(this).attr('id');
+                                IDs.push(v);                                
+                        }                       
+                    });     
+                    jQuery('#txnIds').val(IDs.join(':'));
+                    });
+                
+        
+            function update_selected()    {
+                var changedIDs = [];  
+                        jQuery('.paytxn_chk:checked').each(function()  {
+                        var v = jQuery(this).attr('id');
+                        changedIDs.push(v);    
+                });
+                jQuery('#txnIdsPrev').val(changedIDs.join(':'));
+            }         
+                });
 	</script>
-    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action="main.cgi"> 
-	[% grid %]   
+    <form name="payform" method="POST" onsubmit="document.payform.action = clicked;" action="paytry.cgi"> 
+	[% grid %] 
+	
+    <input type="hidden" name="txnIdsPrev" value="" id="txnIdsPrev" />
+    <input type="hidden" name="txnIds" value="" id="txnIds" />
     <input type="hidden" name="a" value="[% nextAction %]">
     <input type="hidden" name="client" value="[% client %]">
 
