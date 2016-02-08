@@ -170,6 +170,7 @@ sub migrateRecords{
             strNewPersonLevel,
             intRequestFromEntityID,
             intRequestToEntityID,
+            strRequestResponse,
             strRequestStatus    
         )
         VALUES (
@@ -228,6 +229,7 @@ print STDERR "LAST ENTITYID WAS: $tmpEntityID\n";
                 $dref->{'strPersonLevel'},
                 $holdingClubID,
                 $tmpEntityID || $holdingClubID,
+                'ACCEPTED',
                 'COMPLETED'
             );
             $dref->{'intPersonRequestID'} = $qryINSPQ->{mysql_insertid} || 0;
