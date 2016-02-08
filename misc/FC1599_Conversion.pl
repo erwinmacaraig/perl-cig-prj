@@ -23,15 +23,7 @@ sub main    {
     $Data{'RealmSubType'} = 0;
     $Data{'SystemConfig'}=getSystemConfig(\%Data);
     
-    my $st = qq[
-        SELECT
-            intEntityID
-        FROM
-            tblEntity
-        WHERE
-            intIsInternationalTransfer =1
-    ];
-    
+    my $st = qq[ SELECT intEntityID FROM tblEntity WHERE intIsInternationalTransfer =1 ];
     my $qry= $db->prepare($st);
     $qry->execute();
 
@@ -43,9 +35,6 @@ sub main    {
     else    {
         print STDERR "Need Holding Club ID\n";
     }
-
-
-
 }
 
 sub migrateRecords{
