@@ -52,7 +52,7 @@ sub migrateRecords{
     my ($Data, $holdingClubID) = @_;
     my $db = $Data->{'db'};
 
-    my $useTempTable = $Data->{'SystemConfig'}{'1599_tmpTable'} || 0;
+    my $useTempTable = 1; #$Data->{'SystemConfig'}{'1599_tmpTable'} || 0;
     my $tmpTable = '';
     my $tmpTableSELECT = '';
     if ($useTempTable)  {
