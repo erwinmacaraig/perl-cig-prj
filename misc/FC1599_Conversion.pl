@@ -185,6 +185,7 @@ sub migrateRecords{
             ?,
             ?,
             ?,
+            ?,
             ?
         )
     ];
