@@ -258,7 +258,8 @@ $(document).ready(function(){
     $(".document-upload").insertAfter($("fieldset").first());
 
      $(document).on("change", "input.paytxn_chk", function(){
-		var totalamount = 0;
+		//var totalamount = 0;
+                var totalamount = parseFloat($("#id_total").val());
 		$("#l_intAmount").val('');
 		$("#block-manualpay").css('display','none');
 		var client = $('#clientstr').val();
@@ -284,7 +285,9 @@ $(document).ready(function(){
 					data:"amount=" + totalamount + "&client="+ client 			
 				}).done(
 					function(formattedamount){
-					$("#manualsum").html(formattedamount);				
+                                        $("#id_total").val(totalamount);
+					$("#manualsum").html(formattedamount);                                      
+                                        
 					}
 				);
 				//
