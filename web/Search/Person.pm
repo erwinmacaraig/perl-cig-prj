@@ -1075,7 +1075,7 @@ sub getIntTransferReturn {
                 it.intPersonID IN ($person_list)
                 AND it.intTransferReturn = 0
                 AND PR.strRegistrationNature IN ('INT_TRANSFER_OUT')
-                AND PR.strStatus IN ('ACTIVE')
+                AND PR.strStatus IN ('ACTIVE', 'PASSIVE')
             ORDER BY
                 it.intPersonID
         ];
