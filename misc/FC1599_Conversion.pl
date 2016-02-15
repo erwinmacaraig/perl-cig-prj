@@ -88,6 +88,7 @@ sub migrateRecords{
     my $stINS_IntTransfer= qq[
         INSERT IGNORE INTO tblIntTransfer
         (
+            intTransferReturn,
             intOldEntityID,
             intPersonRequestID,
             intPersonID,
@@ -102,6 +103,7 @@ sub migrateRecords{
             strOutNotes
         )
         VALUES (
+            0,
             ?,
             ?,
             ?,
