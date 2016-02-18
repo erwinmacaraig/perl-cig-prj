@@ -66,3 +66,4 @@ FROM
         WHERE
             tblPerson.strStatus = 'REGISTERED'  AND PR.strPersonType IN('PLAYER', 'REFEREE', 'COACH','CLUBOFFICIAL', 'TEAMOFFICIAL', 'MAOFFICIAL', 'RAOFFICIAL')  AND  PR.strStatus = 'ACTIVE'
             AND TempEnt.intParentID = 1
+GROUP BY PR.intPersonRegistrationID
