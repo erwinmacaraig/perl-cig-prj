@@ -324,8 +324,11 @@ sub display {
       $templateData->{'PageTitle'} = $self->title();
   }
   $templateData->{'AllowSaveState'} ||= $self->{'AllowSaveState'} || 0;
+  if(exists($templateData->{'AllowSaveStateOverride'})) {
+    $templateData->{'AllowSaveState'} = $self->{'AllowSaveStateOverride'};
+  }
   $templateData->{'ContinueButtonText'} ||= 'Continue';
-  $templateData->{'CancelButtonURL'} = $self->{'Target'}."?rfp=_cancel&amp;".$self->stringifyURLCarryField();
+  $templateData->{'CancelButtonURL'} ||= $self->{'Target'}."?rfp=_cancel&amp;".$self->stringifyURLCarryField();
   $templateData->{'SaveButtonURL'} = $self->{'Target'}."?rfp=_save&amp;".$self->stringifyURLCarryField();
   if($self->isLastPage() and $self->{'AllowSaveState'}) {
       $templateData->{'CancelButtonURL'} = '';
