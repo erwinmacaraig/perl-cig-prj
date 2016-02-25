@@ -1224,7 +1224,7 @@ sub getPersonMenuData {
                  url => $baseurl."a=P_CLR",
             };
         }
-        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
+        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL and $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_DUPLICATE and $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_DELETED)    {
             $menuoptions{'dup'} = {
                     name => $lang->txt('Mark as Duplicate'),
                  url => $baseurl."a=P_DUP_",
