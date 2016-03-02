@@ -31,12 +31,16 @@ sub linkOldAccount{
     if($userID) {
         my $st = qq[
             SELECT
-                intPersonID
+                P.intPersonID
             FROM 
-                tblOldSystemAccounts
+                tblOldSystemAccounts as OSA
+                INNER JOIN tblPerson as P ON (
+                    P.intPersonID = OSA.intPersonID
+                )
             WHERE
-                strUsername = ?
-                AND strPassword = ?
+                OSA.strUsername = ?
+                AND OSA.strPassword = ?
+                AND P.strStatus NOT IN ('DUPLICATE', 'REJECTED', 'INPROGRESS')
 
         ];
         my $q = $Data->{'db'}->prepare($st);

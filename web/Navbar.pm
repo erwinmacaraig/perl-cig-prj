@@ -1225,6 +1225,19 @@ sub getPersonMenuData {
                  url => $baseurl."a=P_CLR",
             };
         }
+        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL and $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_DUPLICATE and $personObj->getValue('strStatus') ne $Defs::PERSON_STATUS_DELETED)    {
+            $menuoptions{'dup'} = {
+                    name => $lang->txt('Mark as Duplicate'),
+                 url => $baseurl."a=P_DUP_",
+            };
+        }
+        if($SystemConfig->{'AllowDuplicateMarking'} and $Data->{'clientValues'}{'authLevel'}>= $Defs::LEVEL_NATIONAL)    {
+            $menuoptions{'duphistory'} = {
+                    name => $lang->txt('Duplicate Merging History'),
+                 url => $baseurl."a=P_DUPH_",
+            };
+        }
+
     }
     if ($SystemConfig->{'AllowCardPrinting'}) {
 		$menuoptions{'cards'} = { 
@@ -1243,9 +1256,11 @@ sub getPersonMenuData {
         [ $lang->txt('History'), 'menu',[
             'regos',
             'clr',
-            'auditlog'
+            'auditlog',
+            'duphistory'
         ]],
         [ $lang->txt('Documents'), 'menu','docs'],
+        [ $lang->txt('Mark as Duplicate'), 'menu','dup'],
     );
         #[ $lang->txt('Transfer History'), 'menu','clr'],
     #    [ $lang->txt('System'), 'system',[

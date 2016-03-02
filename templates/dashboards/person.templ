@@ -1,4 +1,7 @@
 <div class="member-home-page">
+    [% IF Details.Status == "DUPLICATE" %]
+        <h3 class="pageHeading">[% Lang.txt("Person is marked as a Duplicate") %]</h3>
+    [% END %]
     <h3 class="pageHeading">[% Name %]</h3>
 	<div class="col-md-3 col-md-push-9">
         [% SummaryPanel %]
