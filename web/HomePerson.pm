@@ -84,7 +84,6 @@ sub showPersonHome	{
 
     my $c = Countries::getISOCountriesHash();
     
-    print STDERR "SSSSSSS: $personObj->getValue('strStatus')\n";
 	my %TemplateData = (
         Lang => $Data->{'lang'},
 		Name => $name,

@@ -475,7 +475,6 @@ sub display_summary {
 }
 
 sub FinaliseDuplicateFlow   {
-
     my ($Data, $personID, $parentPersonID, $regosToCopy, $docsToCopy) = @_;
 
     $personID ||= 0;
@@ -590,6 +589,7 @@ sub FinaliseDuplicateFlow   {
         #}
     }    
     {
+        $Data->{'cache'}->delete('swm','PersonObj-'.$personID) if $Data->{'cache'};
         my $personObject = getInstanceOf($Data, 'person',$personID);
         updateSphinx($Data->{'db'},$Data->{'cache'}, 'Person','update',$personObject);
         auditLog($personID, $Data, 'Person Marked as Duplicate', 'Person');
