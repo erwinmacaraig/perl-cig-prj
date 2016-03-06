@@ -68,6 +68,17 @@ sub listPersonAuditLog    {
     
 	];
     $query = qq[
+        (
+        SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
+        FROM
+            tblAuditLog as AL
+        WHERE
+            AL.intEntityID=18
+            AND AL.strSection IN ("Person Registration")
+            AND AL.strType  LIKE 'Update Person Registration%'
+            AND AL.intEntityTypeID=-1
+    )
+UNION ALL
     (
         SELECT DISTINCT AL.strUsername, AL.strType, AL.strSection, AL.strLocalName, AL.dtUpdated
         FROM
@@ -75,7 +86,8 @@ sub listPersonAuditLog    {
         WHERE
             AL.intEntityID=?
             AND AL.strSection IN ("Person Registration")
-            AND AL.strType  = 'Update Person Registration'
+            AND AL.strType  LIKE 'Update Person Registration%'
+            AND AL.intEntityTypeID>=0
     )
 UNION ALL
      (
@@ -90,7 +102,7 @@ UNION ALL
             PR.intPersonID=?
             AND AL.strSection NOT IN ('Person Entity')
             AND AL.strSection IN ("Player Passport", "PERSON", "Person", "Person Registration")
-            AND AL.strType != 'Update Person Registration'
+            AND AL.strType NOT LIKE 'Update Person Registration%'
     )
 UNION ALL
     (
