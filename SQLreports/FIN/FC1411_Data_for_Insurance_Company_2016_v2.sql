@@ -7,7 +7,7 @@ SELECT
     intTransactionID, 
     tblRegion.strLocalName AS strRegionName, 
     IF(intGender=1, 'Male', IF(intGender=2, 'Female', '')) as gender,
-    CASE TX.intStatus
+	CASE TX.intStatus
                 WHEN '1' THEN 'Paid'
                 WHEN '0' THEN 'Unpaid'
                 WHEN '3' THEN 'On Hold'
@@ -15,7 +15,7 @@ SELECT
                 WHEN '-1' THEN 'Error'
                 ELSE ''
             END as TransStatus,
-    CASE PR.strPersonType
+	CASE PR.strPersonType
                 WHEN 'PLAYER' THEN 'Player'
                 WHEN 'COACH' THEN 'Coach'
                 WHEN 'REFEREE' THEN 'Referee'
