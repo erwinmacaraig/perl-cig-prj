@@ -69,7 +69,6 @@ SELECT
         WHERE
             tblPerson.strStatus = 'REGISTERED'   
             AND P.strProductType='Insurance' 
-            AND TX.intStatus = '1'  
             AND PR.intNationalPeriodID = 121
             AND TempEnt.intParentID = 1
 
