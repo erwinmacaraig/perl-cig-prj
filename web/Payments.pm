@@ -626,9 +626,10 @@ sub displayPaymentLaterResult        {
 }
 
 sub displayPaymentResult        {
-    my ($Data, $intLogID, $external, $msg) = @_;
+    my ($Data, $intLogID, $external, $msg, $minsValidFor) = @_;
 	$external ||= 0;
 	$msg ||= '';
+    $minsValidFor ||= 0;
 	my $client=setClient($Data->{'clientValues'}) || '';
 	my $db = $Data->{'db'};
     $intLogID ||= 0;
@@ -641,6 +642,9 @@ sub displayPaymentResult        {
         WHERE TL.intLogID = $intLogID
             AND TL.intAmount > 0
     ];
+    if ($minsValidFor and $minsValidFor > 0)  {
+        $st .= qq[ AND TL.dtLog >= DATE_ADD(NOW(), INTERVAL -$minsValidFor MINUTE)];
+    }
     my $qry = $db->prepare($st) or query_error($st);
     $qry->execute or query_error($st);
     my $transref = $qry->fetchrow_hashref();
