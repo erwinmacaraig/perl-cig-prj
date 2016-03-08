@@ -1792,6 +1792,7 @@ sub viewTransLog	{
              T.intQty,
              T.curAmount,
              T.intTableType,
+             T.intID,
              I.strInvoiceNumber,
              T.intStatus,
              P.curPriceTax,
@@ -1971,8 +1972,12 @@ sub viewTransLog	{
 	my $thisassoc=0;
 	$thisassoc=1 if ($TLref->{intEntityPaymentID} == $Data->{'clientValues'}{'assocID'});
     my $otherTransLogCount = 0;
+    my @intIDs = ();
 	while (my $dref = $qry_trans->fetchrow_hashref())	{
 		$count++;
+        if(! grep /$dref->{'intID'}/,@intIDs){
+            push @intIDs,$dref->{'intID'};
+        }
         my $paymentFor = '';
         $paymentFor = qq[$dref->{strLocalSurname}, $dref->{strLocalFirstName}] if ($dref->{intTableType} == $Defs::LEVEL_PERSON);
         $paymentFor = qq[$dref->{EntityName}] if ($dref->{intTableType} == $Defs::LEVEL_CLUB);
@@ -2028,8 +2033,10 @@ sub viewTransLog	{
 		)
 		) 
 		or  $orderAmount ==0;
-  $chgoptions = '' if $Data->{'ReadOnlyLogin'};
-  $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
+    $chgoptions = '' if $Data->{'ReadOnlyLogin'};
+    my $receiptLink = "printreceipt.cgi?client=$client&ids=$intTransLogID&pID=" . join(",",@intIDs);
+    $body .= qq[ <br><a href="$receiptLink" target="receipt">]. $Data->{'lang'}->txt('Print Receipt') .qq[</a><br>];
+    $chgoptions=qq[<div class="changeoptions">$chgoptions</div>] if $chgoptions;
 
 	return ($body, $chgoptions.$lang->txt("Payment Record"));
 
