@@ -88,12 +88,11 @@ $Data{'db'}=$db;
             LEFT JOIN tblTempEntityStructure as TES ON (
                 TES.intChildID = PR.intEntityID 
                 AND TES.intParentLevel = $Data{'clientValues'}{'authLevel'} 
-                AND TES.intPrimary=1
             ) 
         ];
         $stWHERE = qq[ AND (
             TES.intParentID = $authID
-            OR (PRE.intEntityID = $authID)
+            OR PRE.intEntityID = $authID
         )
         ];
     }
