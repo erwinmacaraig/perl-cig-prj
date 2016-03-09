@@ -1,0 +1,80 @@
+[% IF Navigation %]
+<div class = "col-md-12"><h2 class="main-heading">[% PageTitle %]</h2></div>
+
+[% END %]
+
+[% IF processStatus == 1 %]
+<div class = "col-md-12"><h2 class="main-heading">[% Title %]</h2></div>
+[% END %]
+
+[% IF Errors.size %]
+<div class="col-md-12">
+	<div class="alert">
+		<div>
+			<span class="fa fa-exclamation"></span>
+			[% FOREACH error IN Errors %]
+			<p>[% error %]</p>
+			[% END %]
+		</div>
+	</div>
+</div>
+[% END %]
+
+<div class="[% IF processStatus == 1 %]col-md-12[% ELSE %]col-md-9[% END %]">
+    [% Navigation %]
+    <div class = "tab-content transfertabs">
+        <div class = "active tab-pane [% IF processStatus == 1 %]transferCompleteDisplay[% END %]">
+        [% Documents %]
+            <form action = "[% Target %]" method = "POST" id = "[% FormID or 'flowFormID' %]">
+                
+                [% IF processStatus == 1 %]
+                <div class="container">
+                    <div class="row">
+                [% END %]
+
+                        [% TextTop %]
+                
+                        [% IF Content %]
+                            [% Content %]
+                        [% END %]
+                        
+                        <div class = "button-row">
+                            <div class="txtright">
+                                [% IF FlowNextAction %]
+                                    <input type = "hidden" name ="rfp" value ="[% FlowNextAction %]">
+                                [% END %]
+
+                                [% HiddenFields %]
+
+                                [% IF !NoBackButton and BackButtonURL %]
+                                    <a href = "[% BackButtonURL %]" id = "flow-btn-back" class = "[% IF processStatus == 1 %]nudge[% END %]">[% IF BackButtonText %][% Lang.txt(BackButtonText) %][% ELSE %][% Lang.txt('Back') %][% END %]</a>
+                                [% END %]
+
+                                [% IF !NoContinueButton %]
+                                    <input id = "flow-btn-continue" type = "submit" value = " [% Lang.txt(ContinueButtonText) %] "  class = "btn-main btn-proceed" style="border: 0px">
+                                [% END %]
+                            </div>
+                        </div>
+                
+                [% IF processStatus == 1 %]    
+                    </div>
+                </div>
+                [% END %]
+
+            </form>
+        </div>
+    </div>
+</div>
+[% IF FlowSummary or FlowSummaryContent %]
+<div class="col-md-3">
+    [% IF FlowSummaryContent %]
+        [% FlowSummaryContent %]
+    [% ELSE %]
+        [% FStemplate = FlowSummaryTemplate or 'flow/flow_summary.templ' %]
+        [% INCLUDE $FStemplate %]
+    [% END %]
+        <div class="transfer-pending">[% Lang.txt('Transfer Status') %] : [% Lang.txt('Released') %]</div>
+</div>
+[% END %]
+<br/>
+[% TextBottom %]
