@@ -71,3 +71,4 @@ SELECT
             AND P.strProductType='Insurance' 
             AND PR.intNationalPeriodID = 121
             AND TempEnt.intParentID = 1
+            AND P.intProductNationalPeriodID= 121
