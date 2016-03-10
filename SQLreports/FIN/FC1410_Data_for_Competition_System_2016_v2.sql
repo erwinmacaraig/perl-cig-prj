@@ -52,7 +52,7 @@ SELECT
                 AND TX.intTableType =1 
                 AND TX.intPersonRegistrationID = PR.intPersonRegistrationID
             ) 
-            LEFT JOIN tblProducts as P ON (P.intProductID=TX.intProductID and P.strProductType LIKE '%pass')
+            LEFT JOIN tblProducts as P ON (P.intProductID=TX.intProductID and P.strProductType LIKE '%pass' and P.intProductNationalPeriodID = 121)
             LEFT JOIN tblTempEntityStructure as TempEnt ON (TempEnt.intChildID=PR.intEntityID)
         WHERE
             PR.strPersonType = 'PLAYER'  AND  PR.strStatus = 'ACTIVE'  AND  PR.intNationalPeriodID = '121'
