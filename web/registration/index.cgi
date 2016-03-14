@@ -63,6 +63,7 @@ sub main {
     my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
     $Data{'lang'} = $lang;
     initLocalisation(\%Data);
+    updateSystemConfigTranslation(\%Data);
 
     # DO DATABASE THINGS
     my $DataAccess_ref = getDataAccess( \%Data );

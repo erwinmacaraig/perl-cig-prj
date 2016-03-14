@@ -66,6 +66,7 @@ use PersonRequest;
 use BulkPersons;
 use PersonLanguages;
 use ListAuditLog;
+use DuplicateFlow;
 
 sub handlePerson {
     my ( $action, $Data, $personID ) = @_;
@@ -169,6 +170,10 @@ sub handlePerson {
         ($resultHTML , $title)= personRegistrationsHistory( $Data, $personID ) ;
         $title = $lang->txt('Registration History');
     }
+    elsif ( $action =~ /P_DUPH/ ) {
+        ($resultHTML , $title)= personDupMergingHistory( $Data, $personID ) ;
+        $title = $lang->txt('Duplicate Merging History');
+    }
     elsif ( $action eq 'P_REGO' ) {
         my $entityID = getLastEntityID($Data->{'clientValues'});
         my $prID = safe_param( 'prID', 'number' );
@@ -227,7 +232,121 @@ sub listPlayerPassport {
 	 return ($resultHTML, $title);
 }
 
+sub personDupMergingHistory {
 
+
+    my ($Data, $personID) = @_;
+
+    my $FieldLabels   = FieldLabels::getFieldLabels( $Data, $Defs::LEVEL_PERSON );
+    my $natnumname = $Data->{'SystemConfig'}{'NationalNumName'} || 'National Number';
+    my $lang = $Data->{'lang'};
+
+    my $st = qq[
+        SELECT
+            PD.intChildPersonID,
+            P.strNationalNum,
+            P.strLocalFirstname,
+            P.strLocalSurname,
+            P.strLatinFirstname,
+            P.strLatinSurname,
+            P.dtDOB,
+            PD.dtUpdated
+        FROM
+            tblPersonDuplicates as PD
+            INNER JOIN tblPerson as P ON (
+                P.intPersonID = PD.intChildPersonID
+            )
+        WHERE PD.intParentPersonID = ?
+    ];
+            
+	my $qry = $Data->{'db'}->prepare($st); 
+    $qry->execute($personID);
+    
+    my %RegFilters=();
+    my @rowdata = ();
+    my $results = 0;
+    my $client           = setClient( $Data->{'clientValues'} ) || '';
+   
+    my %tempClientValues = getClient($client);
+    $tempClientValues{currentLevel} = $Defs::LEVEL_PERSON;
+    while (my $rego = $qry->fetchrow_hashref()) {
+      $results=1;
+      $tempClientValues{personID} = $rego->{intChildPersonID};
+        my $tempClient = setClient(\%tempClientValues);
+      push @rowdata, {
+        id => $rego->{'intChildPersonID'} || 0,
+        NationalNum=> $rego->{'strNationalNum'} || '',
+        LocalFirstname=> $rego->{'strLocalFirstname'} || '',
+        LocalSurname=> $rego->{'strLocalSurname'} || '',
+        LatinFirstname=> $rego->{'strLatinFirstname'} || '',
+        LatinSurname=> $rego->{'strLatinSurname'} || '',
+        dtUpdated=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtUpdated'},'MEDIUM','SHORT') || '',
+        dtUpdated_RAW=> $rego->{'dtUpdated'} || '',
+        dob=> $Data->{'l10n'}{'date'}->TZformat($rego->{'dtDOB'},'MEDIUM',''),
+        dob_RAW => $rego->{'dtDOB'},
+        SelectLink => "$Data->{'target'}?client=$tempClient&amp;a=P_HOME",
+      };
+    }
+
+    my $addlink='';
+    my $title=$lang->txt('Duplicate Merging History');
+    my @headers = (
+        {
+            name  => $Data->{'lang'}->txt($natnumname),
+            field => 'NationalNum',
+        },
+        {
+            name  => $FieldLabels->{'strLocalFirstname'},
+            field => 'LocalFirstname',
+        },
+        {
+            name  => $FieldLabels->{'strLocalSurname'},
+            field  => 'LocalSurname',
+            width  => 30,
+        },
+        {
+            name  => $FieldLabels->{'strLatinFirstname'},
+            field => 'LatinFirstname',
+        },
+        {
+            name  => $FieldLabels->{'strLatinSurname'},
+            field  => 'LatinSurname',
+            width  => 30,
+        },
+
+        {
+            name  => $FieldLabels->{'dtDOB'},
+            field  => 'dob',
+            width  => 30,
+        },
+        {
+            name  => $Data->{'lang'}->txt('Date Merged'),
+            field => 'dtUpdated',
+            sortdata => 'dtUpdated_RAW',
+            defaultShow => 1,
+        },
+        {
+            type  => 'Selector',
+            field => 'SelectLink',
+        },
+    );
+
+    my $grid  = showGrid(
+        Data    => $Data,
+        columns => \@headers,
+        rowdata => \@rowdata,
+        gridid  => 'grid',
+        width   => '100%',
+    );
+
+    my $resultHTML = qq[
+        <div class="clearfix">
+            $grid
+        </div>
+    ];
+
+    return ($resultHTML,$title);
+}
 sub personRegistrationsHistory   {
 
 
@@ -2117,50 +2236,9 @@ sub PersonDupl {
 
     $personID ||= 0;
     return '' if !$personID;
-    return '' if !DuplicatesUtils::isCheckDupl($Data);
+    my ( $resultHTML, $pageHeading ) = handleDuplicateFlow($action, $Data, $personID);
+    return $resultHTML;
 
-    if ( $action eq 'P_DUP_S' ) {
-        my $st = qq[
-			UPDATE tblPerson
-			SET intSystemStatus = $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
-			WHERE intPersonID = $personID
-			LIMIT 1
-		];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute;
-        my $msg = qq[
-			<p class="OKmsg">$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} has been marked as a duplicate</p>
-		];
-        if ( $Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_ASSOC ) {
-            my $client = setClient( $Data->{'clientValues'} ) || '';
-            my $dupllink = "$Data->{'target'}?client=$client&amp;a=DUPL_L";
-            $msg .= qq[<p>To resolve this duplicate click <a href="$dupllink">Resolve Duplicates</a>.</p>];
-        }
-        auditLog( $personID, $Data, 'Mark as Duplicates', 'Duplicates' );
-        return ( $msg, "$Data->{'LevelNames'}{$Defs::LEVEL_PERSON} marked as a duplicate" );
-    }
-    else {
-        my $client = setClient( $Data->{'clientValues'} ) || '';
-        my $st = qq[SELECT * FROM tblPerson WHERE intPersonID = $personID];
-        my $query = $Data->{'db'}->prepare($st);
-        $query->execute;
-        my $dref = $query->fetchrow_hashref();
-
-        my $msg = qq[
-			<form action="$Data->{'target'}" method="POST" style="float:left;" onsubmit="document.getElementById('btnsubmit').disabled=true;return true;">
-				<p>If you believe the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} named below is a possible duplicate, click the <b>'Mark as Duplicate'</b> button.  </p>
-
-		<p>This will mark this $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} as a duplicate for your $Data->{'LevelNames'}{$Defs::LEVEL_ASSOC} to verify and resolve.</p>
-			<p> <b>$dref->{strLocalFirstname} $dref->{strLocalSurname}</b></p>
-			<p>
-				<span class="warningmsg">NOTE: Only mark the duplicate $Data->{'LevelNames'}{$Defs::LEVEL_PERSON}, not the $Data->{'LevelNames'}{$Defs::LEVEL_PERSON} you believe may be the original</span>.</p><br><br>
-				<input type="hidden" name="a" value="P_DUP_S">
-				<input type="hidden" name="client" value="$client">
-				<input type="submit" value="Mark as Duplicate" id="btnsubmit" name="btnsubmit"  class="btn-main">
-			</form>
-		];
-        return ( $msg, 'Mark as Duplicate' );
-    }
 }
 
 sub check_valid_date {
