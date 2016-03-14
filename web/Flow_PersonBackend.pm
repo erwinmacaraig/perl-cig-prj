@@ -309,6 +309,30 @@ sub validate_core_details    {
         $self->decrementCurrentProcessIndex();
         return ('',2);
     }
+    if(
+        $self->{'SystemConfig'}{'CheckDuplicateNationalGovID'}
+    )   {
+            my $error = checkDuplicateNationalGovID($self->{'Data'},$id, $userData);
+            if($error)  {
+                my %PageData = (
+                    HiddenFields => $self->stringifyCarryField(),
+                    Target => $self->{'Data'}{'target'},
+                    Errors => $self->{'RunDetails'}{'Errors'} || [],
+                    Content => $error,
+                    PageTitle => $lang->txt('Duplicate Person'),
+                    TextTop => '',
+                    TextBottom => '',
+                    NoContinueButton => 1,
+                    NoBackButton => 1,
+                    Navigation => ' ',
+                    AllowSaveStateOverride => 0,
+                );
+                my $pagedata = $self->display(\%PageData);
+                $self->clearState();
+                $self->cancelFlow();
+                return ($pagedata,0);
+            }
+    }
 
     my $newreg = $id ? 0 : 1;
     my $personObj = new PersonObj(db => $self->{'db'}, ID => $id, cache => $self->{'Data'}{'cache'});
@@ -1742,6 +1766,8 @@ sub deleteExistingReg {
             TX.intPersonRegistrationID = ?
             AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount>0))
             AND TL.intRealmID = ?
+            AND TL.intSentToGateway = 0
+            AND TX.intSentToGateway = 0
     ];
     my $q = $self->{'Data'}->{'db'}->prepare($st);
     $q->execute($regoID, $realmID);

@@ -442,7 +442,7 @@ sub pageForm    {
     my($title, $body, $clientValues_ref,$client, $Data, $templatefile) = @_;
     $title ||= '';
     $templatefile ||= 'main.templ';
-    $body||= textMessage("Oops !<br> This shouldn't be happening!<br> Please contact <a href=\"mailto:info\@sportingpulse.com\">info\@sportingpulse.com</a>");
+    $body||= textMessage("Invalid URL parameters");
  $Data->{'TagManager'}='';#getTagManager($Data);
 
     my ($html_head, $page_header, $page_navigator, $paypal, $powered) = getPageCustomization($Data);

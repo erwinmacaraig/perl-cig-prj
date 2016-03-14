@@ -27,7 +27,7 @@ sub paymentDisplay_LoggedOff    {
 
     #PageMain::pageMain("TITLE", '', $paybody, \%clientValues, $client, $Data );
     my $title = $Data->{'lang'}->txt("Payment Summary");
-    my ($payStatus, $paybody) = Payments::displayPaymentResult($Data, $Data->{'ptry'});
+    my ($payStatus, $paybody) = Payments::displayPaymentResult($Data, $Data->{'ptry'}, 0,'', 10);
     #PageMain::pageMain($title, '', $paybody, undef, '', $Data );
     PageMain::pageForm($title, $paybody, undef, '', $Data );
     return;

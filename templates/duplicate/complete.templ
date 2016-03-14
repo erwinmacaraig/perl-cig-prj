@@ -1,0 +1,41 @@
+<div class="container">
+    <div class="row">
+        <div class="col-md-3 reg-complete-summary-left-bar">
+            [% PersonSummaryPanel %]
+        </div>
+        <div class="col-md-9  result-message">
+            <h3 class="panel-header"><b>[% Lang.txt("Duplicate Marking") %]</b></h3>
+            <div class="panel-body">
+                <div class="reg-complete-wrapper">
+                    <p class="reg-complete-text">[% Lang.txt(ConfirmationHeader) %]</p>
+                        <h4>[% Lang.txt('Person has been marked as a duplicate of') %]</h4>
+                        <p>
+                            [% parentPerson.MAID %]<br>
+                            [% parentPerson.Name %]<br>
+                            [% parentPerson.Familyname %]<br>
+                            [% IF parentPerson.LatinName %]
+                                [% parentPerson.LatinName %]<br>
+                            [% END %]
+                            [% IF parentPerson.LatinFamilyname %]
+                                [% parentPerson.LatinFamilyname %]<br>
+                            [% END %]
+                    </p>
+                </div>
+            </div>
+
+            <div class="button-row">
+                <ul class="row-btn-complete">
+                    <li>
+                        [% IF originLevel == 3 %]
+                            <a href="[% url %]/[% target %]?client=[% client %]&amp;a=WF_" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                        [% ELSIF originLevel == 20 %]
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                        [% ELSIF originLevel == 100 %]
+                            <a href="[% url %]/[% target %]?client=[% originClient %]&amp;a=E_HOME" class="btn-main">[% Lang.txt("Go to your dashboard") %]</a>
+                        [% END %]
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

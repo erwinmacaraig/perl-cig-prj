@@ -20,6 +20,7 @@ require Exporter;
     checkUploadedRegoDocuments
     getRegoTXNDetails
     displaySelfRegoAddProductComplete
+    checkDuplicateNationalGovID
 );
 
 use strict;
@@ -63,12 +64,14 @@ sub displayRegoFlowCompleteBulk {
     my $payStatus = 0;
     my $logID = param('tl') || 0;
 	my $intID = param('rolloverIDs') || 0;
+    
     ($payStatus, $paymentResult) = displayPaymentResult($Data, $logID, 1, '');
-	my $receiptLink = qq[printreceipt.cgi?client=$client&ids=$logID&pID=$intID];
-	$paymentResult .= qq[
-	<div class="row">
-         <div class="col-md-12"><a href="$receiptLink" target="receipt">] . $Data->{'lang'}->txt('Print Receipt') . qq[</a></div>
-    </div>];
+    my $personID = $intID =~ s/|/,/g;
+	my $receiptLink = qq[printreceipt.cgi?client=$client&ids=$logID&pID=$personID];
+	#$paymentResult .= qq[
+	#<div class="row">
+    #     <div class="col-md-12"><a href="$receiptLink" target="receipt">] . $Data->{'lang'}->txt('Print Receipt') . qq[</a></div>
+    #</div>];
      $payMethod = '' if (!$amountDue and $payStatus == -1);
 
     my $maObj = getInstanceOf($Data, 'national');
@@ -1677,6 +1680,49 @@ sub displaySelfRegoAddProductComplete {
     return ($body, $gateways);
 }
 
+
+
+sub checkDuplicateNationalGovID  {
+    my($Data, $id, $userData, $selfReg) = @_;
+
+    my $field = $Data->{'SystemConfig'}{'CheckDuplicateNationalGovID'} || '';
+    return '' if !$field;
+    my $fieldVal = $userData->{$field} || '';
+    return '' if !$fieldVal;
+    $id ||= 0;
+
+    my $st = qq[
+        SELECT tblPerson.intPersonID
+        FROM tblPerson
+        WHERE  
+            tblPerson.intRealmID = ? 
+            AND tblPerson.intSystemStatus <> ?
+            AND tblPerson.$field = ?
+            AND tblPerson.intPersonId <> ?
+        LIMIT 1
+    ];
+    my @st_fields = (
+        $Data->{'Realm'},
+        $Defs::PERSONSTATUS_DELETED,
+        $fieldVal,
+        $id,
+    );
+    my $q = $Data->{'db'}->prepare($st);
+    $q->execute(@st_fields);
+    my $dupl = $q->fetchrow_array;
+    $q->finish();
+    $dupl ||= 0;
+    if(!$dupl)  { return ''; }
+    my $error = '';
+    if($selfReg) {
+        $error = $Data->{'SystemConfig'}{'CheckDuplicateNationalGovIDMessageSelfReg'} || '';
+    } 
+    else    {
+        $error = $Data->{'SystemConfig'}{'CheckDuplicateNationalGovIDMessage'} || '';
+    }
+    $error ||= 'Duplicate Government ID Number';
+    return $error;
+}
 
 
 1;

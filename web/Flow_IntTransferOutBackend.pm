@@ -1616,6 +1616,8 @@ sub deleteExistingReg {
             TX.intPersonRegistrationID = ?
             AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount>0))
             AND TL.intRealmID = ?
+            AND TL.intSentToGateway = 0
+            AND TX.intSentToGateway = 0
     ];
     my $q = $self->{'Data'}->{'db'}->prepare($st);
     $q->execute($regoID, $realmID);
@@ -1628,6 +1630,7 @@ sub deleteExistingReg {
             AND (intStatus = 0 OR (intStatus=1 AND curAmount = 0))
             AND intRealmID = ?
             AND intID = ?
+            AND intSentToGateway = 0
     ];
     $q = $self->{'Data'}->{'db'}->prepare($st);
     $q->execute($regoID, $realmID, $personID);

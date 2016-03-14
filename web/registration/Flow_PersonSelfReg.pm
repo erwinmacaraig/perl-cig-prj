@@ -253,6 +253,31 @@ sub validate_core_details    {
         }
     }
     my $lang = $self->{'Data'}{'lang'};
+    if(
+        $self->{'SystemConfig'}{'CheckDuplicateNationalGovID'}
+    )   {
+            my $error = checkDuplicateNationalGovID($self->{'Data'},$id, $userData,1);
+            if($error)  {
+                my %PageData = (
+                    HiddenFields => $self->stringifyCarryField(),
+                    Target => $self->{'Data'}{'target'},
+                    Errors => $self->{'RunDetails'}{'Errors'} || [],
+                    Content => $error,
+                    PageTitle => $lang->txt('Duplicate Person'),
+                    TextTop => '',
+                    TextBottom => '',
+                    NoContinueButton => 1,
+                    NoBackButton => 1,
+                    Navigation => ' ',
+                    AllowSaveStateOverride => 0,
+                );
+                my $pagedata = $self->display(\%PageData);
+                $self->clearState();
+                $self->cancelFlow();
+                return ($pagedata,0);
+            }
+    }
+
     if(!scalar(@{$self->{'RunDetails'}{'Errors'}})) {
         if(!$id and isPossibleDuplicate($self->{'Data'}, $userData) and !$self->{'RunParams'}{'bd'})    {
             my $msg = $lang->txt('This person is a possible duplicate.');

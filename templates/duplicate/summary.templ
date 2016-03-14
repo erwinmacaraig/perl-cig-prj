@@ -1,0 +1,58 @@
+[% USE Dumper %]
+<h3 class="panel-header"><b>[% Lang.txt('Summary') %]</b></h3>
+	<div class="panel-body summary-page">
+		<div class="document-upload summary">
+			<div class="col-md-6">
+				<div class="read-only personal-information">
+				    <h4>[% Lang.txt('Parent Record Information') %]</h4>
+				    <div class="read-only-text clearfix">
+                        <p>We want to mark Person as a duplicate of 
+                            <ul>
+					    	    <li><span class="details-left">[% NationalNumName %]:</span> <span class="detail-value">[% IF parentPerson.MAID %] [% parentPerson.MAID %] [% ELSE %] - [% END %]</span></li>
+					    	    <li><span class="details-left">[% Lang.txt("Family Name") %]:</span> <span class="detail-value">[% IF parentPerson.Familyname %] [% parentPerson.Familyname %] [% ELSE %] - [% END %]</span></li>
+					    	    <li><span class="details-left">[% Lang.txt("First Name") %]:</span> <span class="detail-value">[% IF parentPerson.Name %] [% parentPerson.Name %] [% ELSE %] - [% END %]</span></li>
+					    	    <li><span class="details-left">[% Lang.txt("Family Name (Latin Characters)") %]:</span> <span class="detail-value">[% IF parentPerson.LatinFamilyname %] [% parentPerson.LatinFamilyname %] [% ELSE %] - [% END %]</span></li>
+					    	    <li><span class="details-left">[% Lang.txt("First Name (Latin Characters)") %]:</span> <span class="detail-value">[% IF parentPerson.LatinName %] [% parentPerson.LatinName %] [% ELSE %] - [% END %]</span></li>
+                                <li><span class="details-left">[% Lang.txt("Date of Birth") %]:</span> <span class="detail-value">[% IF parentPerson.DOB %] [% DateFormat.format(parentPerson.DOB,'MEDIUM') %] [% ELSE %] - [% END %]</span></li>
+                            </ul>
+					    <ul>
+					    <a href="[% changelink %]&amp;rfp=findparent" class="link-edit pull-right">[% Lang.txt('Change') %]</a>
+				    </div>
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="read-only registration-details">
+				    <h4>[% Lang.txt('Registrations to Move') %]</h4>
+				    <div class="read-only-text clearfix">
+            [% IF registrations.size %]
+                <table class="table res-table">
+                    <thead>
+                        <tr>
+                            <th>[% NationalNumName %]</th>
+                            <th>[% Lang.txt('Status') %]</th>
+                            <th>[% Lang.txt('Person Type') %]</th>
+                            <th>[% Lang.txt('Level') %]</th>
+                            <th>[% Lang.txt('Sport') %]</th>
+                            <th>[% Lang.txt('Move Documents') %]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        [% FOREACH r = registrations %]
+                            <tr>
+                                <td>[% r.strNationalPeriodName %]</td>
+                                <td>[% r.Status %]</td>
+                                <td>[% r.PersonType %]</td>
+                                <td>[% r.PersonLevel %]</td>
+                                <td>[% r.Sport %]</td>
+                                <td>[% r.moveDocuments %]</td>
+                            </tr>
+                        [% END %]
+                    </tbody>
+                </table>
+            [% END %]
+					    <a href="[% changelink %]&amp;rfp=select_regos" class="link-edit pull-right">[% Lang.txt('Edit') %]</a>
+				    </div>
+				</div>
+			</div>
+	</div>
+</div>
