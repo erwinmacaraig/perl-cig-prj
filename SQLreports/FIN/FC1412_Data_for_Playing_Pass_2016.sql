@@ -59,4 +59,7 @@ FROM
             LEFT JOIN tblTempEntityStructure as TempEnt ON (TempEnt.intChildID=PR.intEntityID)
         WHERE
             tblPerson.strStatus = 'REGISTERED'  AND PR.strPersonType = 'PLAYER'  AND  PR.strStatus = 'ACTIVE'
-            AND TempEnt.intParentID = 1
+            AND (
+                TempEnt.intParentID = 1
+                OR E.intEntityLevel=100
+            )
