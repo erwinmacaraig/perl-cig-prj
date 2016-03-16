@@ -151,14 +151,13 @@ sub showPersonHome	{
 		my @alldocs = ();
 		my $fileID = 0;
 		my $doc;
-		my $viewLink;
-		my $replaceLink;
-		my $addLink; 
+		        my @regoworktasks = ();
 		my $displayView = 0;
 		my $displayAdd = 0;
 		my $displayReplace = 0;
-
-        my @regoworktasks = ();
+            my $viewLink;
+		    my $replaceLink;
+		    my $addLink; 
         #push @regoworktask
 #BAFF
 	    my @validdocsforallrego = ();
@@ -217,9 +216,13 @@ sub showPersonHome	{
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
 		foreach $doc (@{$rego->{'documents'}}) {			
+            $viewLink = ''; 
+            $replaceLink = '';
+            $addLink = ''; 
 			$displayAdd = 0;
 			$fileID = 0;
 			$displayView  = 0;			
+			$displayReplace= 0;			
 			$status = $doc->{'strApprovalStatus'};
 			if(!$doc->{'strApprovalStatus'}){ 			  
 				if(!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){  
