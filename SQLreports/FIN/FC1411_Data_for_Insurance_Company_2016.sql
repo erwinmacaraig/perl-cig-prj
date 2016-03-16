@@ -58,4 +58,7 @@ SELECT
             LEFT JOIN tblTempEntityStructure as TempEnt ON (TempEnt.intChildID=PR.intEntityID)
         WHERE
              tblPerson.strStatus = 'REGISTERED'   AND  PR.strStatus = 'ACTIVE'  AND ( TX.intProductID = '227'  OR  TX.intProductID = '228'  OR  TX.intProductID = '229'  OR  TX.intProductID = '230'  OR  TX.intProductID = '231'  OR  TX.intProductID = '232'  OR  TX.intProductID = '233'  OR  TX.intProductID = '234'  OR  TX.intProductID = '235'  OR  TX.intProductID = '236'  OR  TX.intProductID = '225'  OR  TX.intProductID = '237'  OR  TX.intProductID = '238'  OR  TX.intProductID = '239'  OR  TX.intProductID = '240'  OR  TX.intProductID = '241' ) AND  TX.intStatus = '1'  AND  TX.dtEnd >= '2016-12-31 00:00:00'  AND TX.dtEnd <= '2016-12-31 23:59:59'
-            AND TempEnt.intParentID = 1
+            AND (
+                TempEnt.intParentID = 1
+                OR E.intEntityLevel=100
+            )
