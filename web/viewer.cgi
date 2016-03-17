@@ -104,8 +104,8 @@ sub main	{
             'PNG' => 'image',
         );
         $dref->{'doctype'} = $types{$extension} || 'file';
-        $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'} . '&chk='.$check;
-        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?chk='.$check.'&client='.$client.'&amp;f=' . $dref->{'intFileID'});
+        $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'} . '&amp;chk='.$check;
+        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?chk='.$check.'&amp;client='.$client.'&amp;f=' . $dref->{'intFileID'});
     }
 
     if($dref->{'intEntityTypeID'} == 1)  {
