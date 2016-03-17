@@ -89,7 +89,7 @@ sub getUploadedFiles	{
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
-
+          my $parentCheck= authstring($dref->{'intFileID'});
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 		my $sth = $Data->{'db'}->prepare($st);
 		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
@@ -97,10 +97,11 @@ sub getUploadedFiles	{
 		#check if strLockLevel is empty which means world access to the file
 #        if($dref->{'strLockAtLevel'} eq '' || $data->{'intUseExistingThisEntity'} || $data->{'intUseExistingAnyEntity'} ||$dref->{'owner'} == $currLoginID){
 			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
+            $url .= "&chk=". $parentCheck;
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
-            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
     #}
 
         if($dref->{'strLockAtLevel'})   {

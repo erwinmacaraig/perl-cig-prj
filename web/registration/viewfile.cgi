@@ -22,6 +22,14 @@ sub main {
   my $client = param('client') || '';
   my $fileID = param('f') || 0;
   my $download = param('d') || 0;
+  my $check= param('chk') || 0;
+
+  my $checkhash = authstring($fileID);
+  if ($check ne $checkhash) {
+    print "ERROR";
+    return;
+  }
+
                                                                                                         
   my %Data=();
   $fileID =~ /^(\d+)$/;
