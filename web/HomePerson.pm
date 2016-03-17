@@ -151,14 +151,13 @@ sub showPersonHome	{
 		my @alldocs = ();
 		my $fileID = 0;
 		my $doc;
-		my $viewLink;
-		my $replaceLink;
-		my $addLink; 
+		        my @regoworktasks = ();
 		my $displayView = 0;
 		my $displayAdd = 0;
 		my $displayReplace = 0;
-
-        my @regoworktasks = ();
+            my $viewLink;
+		    my $replaceLink;
+		    my $addLink; 
         #push @regoworktask
 #BAFF
 	    my @validdocsforallrego = ();
@@ -217,9 +216,13 @@ sub showPersonHome	{
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
 		foreach $doc (@{$rego->{'documents'}}) {			
+            $viewLink = ''; 
+            $replaceLink = '';
+            $addLink = ''; 
 			$displayAdd = 0;
 			$fileID = 0;
 			$displayView  = 0;			
+			$displayReplace= 0;			
 			$status = $doc->{'strApprovalStatus'};
 			if(!$doc->{'strApprovalStatus'}){ 			  
 				if(!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){  
@@ -251,10 +254,10 @@ sub showPersonHome	{
 
 		my $parameters = qq[&amp;client=$clm&doctype=$doc->{'intDocumentTypeID'}&pID=$personID&regoID=$rego->{'intPersonRegistrationID'}&nff=1];
 		
-
+        my $parentCheck= authstring($fileID);
 		if($fileID) {
 			$displayView = 1;
-            $viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
+            $viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];
         }
 		$replaceLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="replaceFile($fileID,'$parameters','$documentName','');return false;">]. $Data->{'lang'}->txt('Replace') . q[</a></span>];
 		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$documentName','');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
