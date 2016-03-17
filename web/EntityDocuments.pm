@@ -18,7 +18,6 @@ use UploadFiles;
 use FormHelpers; 
 use GridDisplay;
 use Data::Dumper;
-use MD5;
 
 sub handle_entity_documents{ 
 	my($action, $Data, $entityID, $typeID, $doc_for)=@_; 
@@ -78,10 +77,7 @@ sub list_entity_docs{
         $dref->{'ApprovalStatus'} = $Defs::DocumentStatus{$dref->{'strApprovalStatus'}} || '';
 		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
     	#check if strLockLevel is empty which means world access to the file
-          my $m = new MD5;
-        $m->reset();
-        $m->add($dref->{'intFileID'});
-          my $parentCheck= uc($m->hexdigest());
+        my $parentCheck= authstring($dref->{'intFileID'});
     	if($dref->{'strLockAtLevel'} eq ''){
     		 $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
     		#$replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>]; 

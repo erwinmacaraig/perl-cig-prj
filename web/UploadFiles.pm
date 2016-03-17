@@ -17,7 +17,6 @@ use Reg_common;
 use Data::Dumper;
 use InstanceOf;
 use S3Upload;
-use MD5;
 
 my $File_MaxSize = 25*1024*1024; #25Mb;
 
@@ -90,10 +89,7 @@ sub getUploadedFiles	{
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
-        my $m = new MD5;
-        $m->reset();
-        $m->add($dref->{'intFileID'});
-          my $parentCheck= uc($m->hexdigest());
+          my $parentCheck= authstring($dref->{'intFileID'});
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 		my $sth = $Data->{'db'}->prepare($st);
 		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});

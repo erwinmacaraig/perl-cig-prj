@@ -254,11 +254,7 @@ sub showPersonHome	{
 
 		my $parameters = qq[&amp;client=$clm&doctype=$doc->{'intDocumentTypeID'}&pID=$personID&regoID=$rego->{'intPersonRegistrationID'}&nff=1];
 		
-
-        my $m = new MD5;
-        $m->reset();
-        $m->add($fileID);
-          my $parentCheck= uc($m->hexdigest());
+        my $parentCheck= authstring($fileID);
 		if($fileID) {
 			$displayView = 1;
             $viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$clm&amp;a=view&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];

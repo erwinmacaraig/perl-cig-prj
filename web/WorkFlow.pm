@@ -72,7 +72,6 @@ use PersonLanguages;
 use GatewayProcess;
 
 use PersonRegistrationStatusChange;
-use MD5;
 
 sub checkRulePaymentFlagActions {
 
@@ -3678,10 +3677,7 @@ sub populateDocumentViewData {
             $action = "review" if($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1);
 
 			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
-             my $m = new MD5;
-        $m->reset();
-        $m->add($fileID);
-          my $parentCheck= uc($m->hexdigest());
+          my $parentCheck= authstring($fileID);
 			$parameters .= qq[&regoID=$registrationID&chk=$parentCheck] if($registrationID); 
 			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
            	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
