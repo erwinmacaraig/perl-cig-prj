@@ -74,6 +74,7 @@ if($uploaded_filename ne ''){
 	
 	
 	$other_person_info{'f'} = $fileID;  
+	$other_person_info{'chk'} = authstring($fileID);  
     if($fromURL)    {
         my $cgi = new CGI;
         print $cgi->redirect($fromURL);
