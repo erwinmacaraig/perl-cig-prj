@@ -22,7 +22,18 @@ sub main {
   my $client = param('client') || '';
   my $fileID = param('f') || 0;
   my $download = param('d') || 0;
+  my $check= param('chk') || 0;
                                                                                                         
+  my $m = new MD5;
+  $m->reset();
+  $m->add($fileID);
+  my $parentCheck= uc($m->hexdigest());
+    print STDERR "$check | $parentCheck\n";
+    if ($check ne $parentCheck) {
+        print "ERROR";
+    return;
+    }
+
   my %Data=();
   $fileID =~ /^(\d+)$/;
   $fileID = $1;	

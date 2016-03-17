@@ -17,6 +17,7 @@ use Reg_common;
 use Data::Dumper;
 use InstanceOf;
 use S3Upload;
+use MD5;
 
 my $File_MaxSize = 25*1024*1024; #25Mb;
 
@@ -89,7 +90,10 @@ sub getUploadedFiles	{
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
-
+        my $m = new MD5;
+        $m->reset();
+        $m->add($dref->{'intFileID'});
+          my $parentCheck= uc($m->hexdigest());
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
 		my $sth = $Data->{'db'}->prepare($st);
 		$sth->execute($dref->{'intDocumentTypeID'}, $Data->{'Realm'});
@@ -100,7 +104,7 @@ sub getUploadedFiles	{
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
-            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+            $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
     #}
 
         if($dref->{'strLockAtLevel'})   {
