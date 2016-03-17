@@ -107,7 +107,7 @@ sub main	{
         );
         $dref->{'doctype'} = $types{$extension} || 'file';
         $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'}. '&chk='.$check;
-        $dref->{'fileURLescape'} = escape($Defs::base_url.'/registration/viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'}). '&chk='.$check;
+        $dref->{'fileURLescape'} = escape($Defs::base_url.'/registration/viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'}. '&amp;chk='.$check);
     }
 
     if($dref->{'intEntityTypeID'} == 1)  {
