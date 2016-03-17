@@ -26,10 +26,10 @@ sub main {
                                                                                                         
 
   my $checkhash = authstring($fileID);
-  if ($check ne $checkhash) {
-    print "ERROR";
-    return;
-  }
+  #if ($check ne $checkhash) {
+  #  print "ERROR";
+  #  return;
+  #}
 
   my %Data=();
   $fileID =~ /^(\d+)$/;
