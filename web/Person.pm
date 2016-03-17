@@ -605,9 +605,10 @@ my @headers = (
                );
             
 			   my $dref = $sth->fetchrow_hashref(); 
+          my $parentCheck= authstring($regodoc->{'intUploadFileID'});
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
 			   if($regodoc->{'strLockAtLevel'} eq '' || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
-					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client');return false;">]. $lang->txt('View') . q[</a>];
+					$viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client&chk=$parentCheck');return false;">]. $lang->txt('View') . q[</a>];
 
     				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
 

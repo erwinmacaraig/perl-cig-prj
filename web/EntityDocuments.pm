@@ -77,16 +77,17 @@ sub list_entity_docs{
         $dref->{'ApprovalStatus'} = $Defs::DocumentStatus{$dref->{'strApprovalStatus'}} || '';
 		my $url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
     	#check if strLockLevel is empty which means world access to the file
+        my $parentCheck= authstring($dref->{'intFileID'});
     	if($dref->{'strLockAtLevel'} eq ''){
-    		 $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
+    		 $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
     		#$replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>]; 
-			$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a>]    		 
+			$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}&amp;chk=$parentCheck">]. $lang->txt('Replace File'). q[</a>]    		 
     	}
     	else {
     	    my @authorizedLevelsArr = split(/\|/,$dref->{'strLockAtLevel'});
     	    if(grep(/^$myCurrentValue/,@authorizedLevelsArr)){
-               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
-                $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}">]. $lang->txt('Replace File'). q[</a></span>];
+               	$viewLink = qq[ <span class="btn-inside-panels"><a href="$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client&amp;chk=$parentCheck" target="_blank">]. $lang->txt('Get File') . q[</a></span>];    
+                $replaceLink =   qq[ <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=C_DOCS_frm&amp;f=$dref->{'intFileID'}&amp;chk=$parentCheck">]. $lang->txt('Replace File'). q[</a></span>];
             }
             else{
             	$viewLink = qq[ <a class\"HTdisabled btn-main btn-view-replace\">]. $lang->txt('Get File') . q[</a>];    
