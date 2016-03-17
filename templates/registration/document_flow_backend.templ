@@ -46,6 +46,7 @@
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
 							<input type="hidden" id ="fileId_[% doc.ID %]" value="[% doc.intFileID %]" />
+							<input type="hidden" id ="filecheck_[% doc.ID %]" value="[% doc.fileCheck %]" />
                             <div class = "fallback">
 							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
                                 [% IF doc.strOrigFilename != '' %]
@@ -100,6 +101,7 @@
 										doc[% doc.ID %] = response;	
 										var fObject = JSON.parse(doc[% doc.ID %]);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
+                                        jQuery('#filecheck_' + fObject.docTypeID).val(fObject.chk);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
@@ -188,6 +190,7 @@
 							<input type="hidden" name="doctypeID" value="[% doc.ID %]" />
 							<input type="hidden" name="a" value="[% nextaction %]" />
 							<input type="hidden" id ="fileId_[% doc.ID %]" value="[% doc.intFileID %]" />
+							<input type="hidden" id ="filecheck_[% doc.ID %]" value="[% doc.fileCheck %]" />
                             <div class = "fallback">
 							<input type="hidden" name="u" value="[% currentURL %]" class = "fallback"/>
                                 [% IF doc.strOrigFilename != '' %]
@@ -239,6 +242,7 @@
 										doc[% doc.ID %] = response;
 										var fObject = JSON.parse(doc[% doc.ID %]);
                                         jQuery('#fileId_' + fObject.docTypeID).val(fObject.f);
+                                        jQuery('#filecheck_' + fObject.docTypeID).val(fObject.chk);
                                         jQuery('#crop-data-row-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-initial-' + fObject.docTypeID).show();
                                         jQuery('.crop-text-complete-' + fObject.docTypeID).hide();
@@ -343,10 +347,12 @@
     jQuery('.crop-btn').on('click', function () {
         doctype = jQuery(this).attr('data-doctype');
         fileId = jQuery('#fileId_' + doctype).val();
-        url = 'viewfile.cgi?client=[% client %]&amp;f=' + fileId;
+        filecheck = jQuery('#filecheck_' + doctype).val();
+        url = 'viewfile.cgi?client=[% client %]&amp;f=' + fileId + '&chk=' + filecheck;
         jQuery('#crop-image').attr('src',url);
         jQuery('#crop-image').attr('data-doctype',doctype);
         jQuery('#crop-image').attr('data-fileId',fileId);
+        jQuery('#crop-image').attr('data-filecheck',filecheck);
         jQuery('#cropper-modal').modal();
     });
 
@@ -370,11 +376,12 @@
       var \$image = jQuery('#cropper-image > img');
       d = \$image.cropper('getData');
       fileID = jQuery('#crop-image').attr('data-fileId');
+      filecheck = jQuery('#crop-image').attr('data-filecheck');
       docType = jQuery('#crop-image').attr('data-doctype');
       jQuery.ajax({
           method: "POST",
           url:"[% BaseURL %]/ajax/aj_cropimage.cgi",
-          data:'x=' + d.x + '&y=' + d.y + '&width=' + d.width + '&height=' + d.height + '&rotate=' + d.rotate + '&scaleX=' + d.scaleX + '&scaleY=' + d.scaleY + "&f=" + fileID + "&client=[% client %]"
+          data:'x=' + d.x + '&y=' + d.y + '&width=' + d.width + '&height=' + d.height + '&rotate=' + d.rotate + '&scaleX=' + d.scaleX + '&scaleY=' + d.scaleY + "&f=" + fileID + "&client=[% client %]" + "&chk=" + filecheck
       }).done(function()    {
       });
       jQuery('.crop-preview-' + docType).html((jQuery('.crop-preview-raw' + docType).html()));
