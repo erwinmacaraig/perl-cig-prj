@@ -906,6 +906,13 @@ sub postVenueAdd {
         undef,
      );
       #what is origin level,is the level for this entity or the level of the person logged in???
+         my @req_docs=();
+     foreach my $doc_ref (@{$required_venue_docs}){
+        next if(!$doc_ref);
+        my $parentCheck= authstring($doc_ref->{'intFileID'});
+        $doc_ref->{'chk'} = $parentCheck;
+        push @req_docs,$doc_ref;
+    }
      
     my %PageData = (
         target => $Data->{'target'},

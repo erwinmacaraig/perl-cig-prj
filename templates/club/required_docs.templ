@@ -19,7 +19,7 @@
 						[% IF doc.strOrigFilename != '' %]
 							
 							<p>
-								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view&amp;chk=[% doc.chk %]'); return false;">[% doc.strOrigFilename %]</a>
 							</p>
 						
 							[% END %]
@@ -114,7 +114,7 @@
 						[% IF doc.strOrigFilename != '' %]
 							
 							<p>
-								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view'); return false;">[% doc.strOrigFilename %]</a>
+								<a href="#" onclick="docViewer([% doc.intFileID %], 'client=[% client %]&amp;a=view&amp;chk=[% doc.chk %]'); return false;">[% doc.strOrigFilename %]</a>
 							</p>
 						
 							[% END %]
