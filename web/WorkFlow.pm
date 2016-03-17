@@ -3392,6 +3392,8 @@ sub populateDocumentViewData {
         #if ( ! exists $validdocs{$adref->{'intDocumentTypeID'}})    {
         push @validdocsforallrego, $adref->{'intDocumentTypeID'};
         #}
+         my $parentCheck= authstring($adref->{'intUploadFileID'});
+        $adref->{'chk'} = $parentCheck;
         $validdocs{$adref->{'intDocumentTypeID'}} = $adref->{'intUploadFileID'};
         #}
     }
@@ -3537,6 +3539,8 @@ sub populateDocumentViewData {
         #skip if no registration item matches rego details combination (type/role/sport/rego_nature etc)
         next if (!$tdref->{'regoItemID'} and $dref->{'strWFRuleFor'} eq 'REGO');
         
+         my $parentCheck= authstring($tdref->{'intFileID'});
+        $tdref->{'chk'} = $parentCheck;
         #next if((!$dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC') or ($dref->{'InternationalTransfer'} and $tdref->{'strDocumentFor'} eq 'TRANSFERITC' and $dref->{'PersonStatus'} ne $Defs::PERSON_STATUS_PENDING));
 		my $status;
         $count++;
@@ -3678,7 +3682,8 @@ sub populateDocumentViewData {
 
 			$parameters = qq[client=$Data->{'client'}&amp;a=$action];
           my $parentCheck= authstring($fileID);
-			$parameters .= qq[&regoID=$registrationID&chk=$parentCheck] if($registrationID); 
+			$parameters .= qq[&regoID=$registrationID] if($registrationID); 
+			$parameters .= qq[&chk=$parentCheck];
 			$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'$parameters');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];	
            	#$viewLink = qq[ <span style="position: relative"><a href="#" class="btn-inside-docs-panel" onclick="docViewer($fileID,'client=$Data->{'client'}&amp;a=$action');return false;">]. $Data->{'lang'}->txt('View') . q[</a></span>];			
 
