@@ -424,6 +424,8 @@ sub checkUploadedEntityDocuments {
 	my @uploaded_docs = ();
 	while(my $dref = $sth->fetchrow_hashref()){
 		#push @uploaded_docs, $dref->{'intDocumentTypeID'};		
+        my $parentCheck= authstring($dref->{'intFileID'});
+        $dref->{'chk'} = $parentCheck;
 		if(! exists $existingDocuments{$dref->{'ID'}}){
             $existingDocuments{$dref->{'ID'}} = $dref;
         }
@@ -449,6 +451,8 @@ sub checkUploadedEntityDocuments {
 
 	#2 compare whats in the system and what is required
 	foreach my $doc_ref (@{$documents}){	
+        my $parentCheck= authstring($doc_ref->{'intFileID'});
+        $doc_ref->{'chk'} = $parentCheck;
 		if(! exists $existingDocuments{$doc_ref->{'ID'}}){
 			push @diff, $doc_ref
 		}

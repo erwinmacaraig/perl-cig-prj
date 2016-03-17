@@ -50,6 +50,7 @@ use PersonSummaryPanel;
 use PersonCertifications;
 use Switch;
 use TermsConditions;
+use Utils;
 
 sub displayRegoFlowCompleteBulk {
 
@@ -957,6 +958,8 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
 	while(my $dref = $sth->fetchrow_hashref()){		
         #push @uploaded_docs, $dref->{'intDocumentTypeID'};		
         if(! exists $existingDocuments{$dref->{'ID'}}){
+            my $parentCheck= authstring($dref->{'intFileID'});
+            $dref->{'chk'} = $parentCheck; 
             $existingDocuments{$dref->{'ID'}} = $dref;
         }
 	}
@@ -969,6 +972,8 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
 		next if(!$doc_ref);	
         #next if(!$rego_ref->{'InternationalTransfer'} && $doc_ref->{'DocumentFor'} eq 'TRANSFERITC');	
 		if(!grep /$doc_ref->{'ID'}/,@uploaded_docs){
+            my $parentCheck= authstring($doc_ref->{'intFileID'});
+            $doc_ref->{'chk'} = $parentCheck; 
 			push @diff,$doc_ref;	
 		}
 	}
@@ -1038,6 +1043,8 @@ AND tblRegistrationItem.strPersonType IN ('', ?)
 
 	while(my $dref = $sth->fetchrow_hashref()){
         if(! exists $existingDocuments{$dref->{'ID'}}){
+            my $parentCheck= authstring($dref->{'intFileID'});
+            $dref->{'chk'} = $parentCheck; 
             $existingDocuments{$dref->{'ID'}} = $dref;
         }
 	}
