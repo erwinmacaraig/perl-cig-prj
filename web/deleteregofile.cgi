@@ -30,7 +30,7 @@ $Data{'clientValues'} = \%clientValues;
 my $lang   = Lang->get_handle('', $Data{'SystemConfig'}) || die "Can't get a language handle!";
 
 my %hash_message = ();
-UploadFiles::deleteFile(\%Data,$fileID);
+#UploadFiles::deleteFile(\%Data,$fileID);
 
 
 
