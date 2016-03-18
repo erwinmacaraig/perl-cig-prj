@@ -367,10 +367,7 @@ sub process_doc_upload	{
 sub delete_doc {
 	my($Data, $fileID, $client)=@_;
 
-	my $response = deleteFile(
-		$Data,
-    $fileID,
-  );
+	my $response = 0; #deleteFile( $Data, $fileID,);
    # REFER TO Defs file ACCESS LEVEL CODES section for implementing dynamic link
    # appropriate for the button for now leaving the link URL 
 	return qq[
