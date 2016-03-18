@@ -36,6 +36,7 @@ use FieldMessages;
 
 use PersonRegistrationFlow_Common;
 use Payments;
+use Utils;
 
 
 sub setProcessOrder {
@@ -538,9 +539,18 @@ sub display_documents {
 		my @required_docs_listing = ();
 		my @optional_docs_listing = ();
 		
+            my @req_docs=();
+     foreach my $doc_ref (@{$club_documents}){
+        next if(!$doc_ref);
+        my $parentCheck= authstring($doc_ref->{'intFileID'});
+        $doc_ref->{'chk'} = $parentCheck;
+        push @req_docs,$doc_ref;
+    }
 					 
-		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  $club_documents, $ctrl);
+		my $diff = EntityDocuments::checkUploadedEntityDocuments($self->{'Data'}, $clubID,  \@req_docs, $ctrl);
 		foreach my $rdc (@{$diff}){
+            my $parentCheck= authstring($rdc->{'intFileID'});
+            $rdc->{'chk'} = $parentCheck;
 			if($rdc->{'Required'}){
 				push @required_docs_listing,$rdc;
 			}

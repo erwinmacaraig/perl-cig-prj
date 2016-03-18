@@ -31,6 +31,14 @@ sub main	{
     my $box_x = param('x') || 0;
     my $box_y = param('y') || 0;
 
+    my $check= param('chk') || 0;
+
+    my $checkhash = authstring($fileID);
+    if ($check ne $checkhash) {
+      print "ERROR";
+      return;
+    }
+
     my %Data=();
     my $target='aj_cropimage.cgi';
     $Data{'target'}=$target;
