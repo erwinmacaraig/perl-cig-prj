@@ -216,13 +216,13 @@ sub showPersonHome	{
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
 		foreach $doc (@{$rego->{'documents'}}) {			
-            $viewLink = ''; 
-            $replaceLink = '';
-            $addLink = ''; 
+            #$viewLink = ''; 
+            #$replaceLink = '';
+			#$displayReplace= 0;			
+            #$addLink = ''; 
 			$displayAdd = 0;
 			$fileID = 0;
 			$displayView  = 0;			
-			$displayReplace= 0;			
 			$status = $doc->{'strApprovalStatus'};
 			if(!$doc->{'strApprovalStatus'}){ 			  
 				if(!grep /$doc->{'intDocumentTypeID'}/,@validdocsforallrego){  
