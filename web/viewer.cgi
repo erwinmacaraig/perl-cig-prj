@@ -26,6 +26,7 @@ sub main	{
   my $action = safe_param('a','action') || 'view';
   my $fileID = safe_param('f','number') || 0;
   my $regoID = safe_param('regoID','number') || 0;
+  my $check = safe_param('chk', 'words') || '';
 
   my %Data=();
   my $target='viewer.cgi';
@@ -103,8 +104,8 @@ sub main	{
             'PNG' => 'image',
         );
         $dref->{'doctype'} = $types{$extension} || 'file';
-        $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'};
-        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'});
+        $dref->{'fileURL'} = 'viewfile.cgi?client='.$client.'&amp;f=' . $dref->{'intFileID'} . '&amp;chk='.$check;
+        $dref->{'fileURLescape'} = escape($Defs::base_url.'/viewfile.cgi?chk='.$check.'&amp;client='.$client.'&amp;f=' . $dref->{'intFileID'});
     }
 
     if($dref->{'intEntityTypeID'} == 1)  {
