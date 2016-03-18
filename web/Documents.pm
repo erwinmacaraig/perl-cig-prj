@@ -111,7 +111,7 @@ sub handle_documents {
         my $DocumentTypeID = param('dctid') || 0;
 		my $RegistrationID = param('regoID') || 0;
 
-        my $delOK = delete_doc($Data, $fileID,$client, $retpage);
+        my $delOK = 0; #delete_doc($Data, $fileID,$client, $retpage);
 		if($delOK){
 
 			if($DocumentTypeID){	

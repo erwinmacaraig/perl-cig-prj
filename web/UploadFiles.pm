@@ -459,7 +459,7 @@ sub deleteAllFiles	{
 		$fileType,
 	);
 	while(my $dref = $q->fetchrow_hashref())	{
-		deleteFile($Data , $dref->{'intFileID'});
+		#deleteFile($Data , $dref->{'intFileID'});
 	}
 }
 
