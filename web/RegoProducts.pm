@@ -605,6 +605,7 @@ sub insertRegoTransaction {
                     intPaymentGatewayResponded= 1 AND intStatus=3
                 )
             )
+            AND intTransLogID=0
     ];
     my $qryAlready= $db->prepare($stAlready);
     $qryAlready->execute($regoID, $intID);
@@ -862,7 +863,7 @@ sub getSelectedProducts {
    $query->execute();
     while(my $dref = $query->fetchrow_hashref()){
         next if($dref->{'curDefaultAmount'} eq '0.00');
-        $dref->{'curDefaultAmount'} = $Data->{'l10n'}{'currency'}->format($dref->{'curDefaultAmount'});
+        $dref->{'curDefaultAmountFormatted'} = $Data->{'l10n'}{'currency'}->format($dref->{'curDefaultAmount'});
         push @{$products{'prods'}}, $dref;
         $total += $dref->{'curDefaultAmount'};
     }    
