@@ -12,7 +12,7 @@
         [% FOREACH p IN prods %]
             <tr>
                 <td class="col-3"><label for="[% p.strName %]">[% p.strDisplayName %] ([% p.strName %])</label></td>
-                <td class="col-4"><label for="[% p.strName %]price">[% p.curDefaultAmount %]</label></td>
+                <td class="col-4"><label for="[% p.strName %]price">[% p.curDefaultAmountFormatted %]</label></td>
             </tr>
         [% END %]
         <tr>
