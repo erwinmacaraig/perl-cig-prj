@@ -339,6 +339,7 @@ my @headers = (
    		 rowdata => \@rowdata,   	    
    	     gridid => 'grid',
   	     width => '99%',
+  	     instanceDestroy=>'true',
     );
 
 	### payment settings ###

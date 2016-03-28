@@ -2,13 +2,10 @@
 
 	<script type="text/javascript">
             jQuery().ready(function() {
-                    var table;
-                    if(jQuery.fn.dataTable.isDataTable('#grid')){
-                        table = jQuery('#grid').DataTable();
-                    }
-                    else {
-                        table = jQuery('#grid').DataTable();
-                    }
+                    var table = jQuery('#grid').DataTable({
+                        "retrieve": true
+                    });
+
                     jQuery('#grid').on('change','.paytxn_chk',function(){     
                     var cells = table.cells( ).nodes();
                     var IDs = [];  
