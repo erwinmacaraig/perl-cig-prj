@@ -301,10 +301,19 @@ sub step2 {
 	foreach my $k (keys %{$Data->{params}}) {
                 my $id=$k;
                 $id=~s/.*_//;
+
+                # FC-1928: get ids from txnIds hidden field
+                if($k eq "txnIds") {
+                    for my $txnId (split(":", $Data->{params}->{$k})) {
+                        next if $txnId=~/[^\d]/;
+		                push @transactionIDs, $txnId;
+                    }
+                }
+
                 next  if $id=~/[^\d]/;
+
 		push @transactionIDs, $id;
         }
-		
 	if ($paymentTypeSubmitted)	{
 	#	if (! $Data->{'clientValues'}{'clubID'} or $Data->{'clientValues'}{'clubID'} == $Defs::INVALID_ID)	{
 	#		my $whereClause = 'intTransactionID in ('.join(",", @transactionIDs).')';	
@@ -332,6 +341,7 @@ sub step2 {
 	}
 
 	my $whereClause = 'AND t.intTransactionID in ('.join(",", @transactionIDs).')';	
+
 	setupStep2List($Data);
 	my $displayonly = 1;
 
@@ -531,6 +541,7 @@ EOS
 
 sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
+
 	#
 	my $TXNEntityID = '';
 	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
@@ -647,7 +658,6 @@ sub getTransList {
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
     
-   
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     
@@ -1087,31 +1097,35 @@ sub listTransactions {
 		#### $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP; 
 		 if($paymentType==0){ $paymentType='';}
 		### <div id="payment_manual" style= "display:block;">
-        $body .= qq[
-           
-                $orstring
 
-                <script type="text/javascript">
-                    \$(function() {
-                        \$(".paytxn_chk").on('change',function() {
-                            \$('#payment_manual').show();
-                            \$('#payment_cc').show();
-                        });
-                        \$("#btn-manualpay").click(function() {
-                                if(\$('#paymentType').val() == '') {
-                                    alert("You Must Provide A Payment Type");
-                                    return false;
-                                }
-                        });
-                    });
-                </script>			  
+        # FC-1928 - now using event from f-commons.js
+        #$body .= qq[
+        #   
+        #        $orstring
 
-        ];
+        #        <script type="text/javascript">
+        #            \$(function() {
+        #                \$(".paytxn_chk_test").on('change',function() {
+        #                    \$('#payment_manual').show();
+        #                    \$('#payment_cc').show();
+        #                });
+        #                \$("#btn-manualpay").click(function() {
+        #                        if(\$('#paymentType').val() == '') {
+        #                            alert("You Must Provide A Payment Type");
+        #                            return false;
+        #                        }
+        #                });
+        #            });
+        #        </script>			  
+
+        #];
 		#
 		#
 		my $isManualPaymentAllowedAtThisLevel = 0;
 		$isManualPaymentAllowedAtThisLevel = 1 if ($Data->{'clientValues'}{'authLevel'} >= $Data->{'SystemConfig'}{'allowManualPaymentsFromLevel'});
 		#
+
+        $body .= qq[<input type="hidden" id="id_total" value="0" />];
         $body .= qq[
 			<div  style="display:none;" id="payment_manual">
 						<h3 class="panel-header sectionheader" id="manualpayment">].$Data->{'lang'}->txt('Manual Payment').qq[</h3>
@@ -1178,19 +1192,20 @@ sub listTransactions {
 			$CC_body
 			</form>];
 
-          if ($CC_body) {
-              if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB) { 
-                  if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) { 
-                      $body .= qq[
-                          <script type="text/javascript">
-                              $(".paytxn_chk").live('change',function() {
-                                  $('#payment_cc').show();
-                              });
-                          </script>			  
-                      ];
-                  }
-              }
-          }
+            # FC-1928 - now using event from f-commons.js
+            #if ($CC_body) {
+            #    if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB) { 
+            #        if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) { 
+            #            $body .= qq[
+            #                <script type="text/javascript">
+            #                    $(".paytxn_chk_test").live('change',function() {
+            #                        $('#payment_cc').show();
+            #                    });
+            #                </script>			  
+            #            ];
+            #        }
+            #    }
+            #}
 
       }
   } 
