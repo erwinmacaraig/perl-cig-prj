@@ -268,7 +268,6 @@ $(document).ready(function(){
          }
 
 		var totalamount = 0;
-                //var totalamount = parseFloat($("#id_total").val());
 		$("#l_intAmount").val('');
 		$("#block-manualpay").css('display','none');
 		var client = $('#clientstr').val();
@@ -280,42 +279,38 @@ $(document).ready(function(){
         //}
           
 		  //check if manual pay is enabled
-			if($('#manualpayment').length || $('#payment_cc').length){
+            if($('#manualpayment').length || $('#payment_cc').length){
                 $('input[type="checkbox"]:checked', gridTable.cells().nodes()).each(function(index){
                     totalamount += parseFloat(this.value);
                     $("#block-manualpay").css('display','block');
                 });
-				//$('input[type="checkbox"]:checked').each(function (){
-				//	totalamount += parseFloat(this.value);
+                //$('input[type="checkbox"]:checked').each(function (){
+                //	totalamount += parseFloat(this.value);
                 //    console.log(totalamount);
-				//	$("#block-manualpay").css('display','block');
-				//});
-				$("#l_intAmount").val(totalamount.toFixed(2));
-				//
-				$.ajax(
-				{
-					method: "POST",
-					url:"formatcurrencyamount.cgi",
-					data:"amount=" + totalamount + "&client="+ client 			
-				}).done(
-					function(formattedamount){
-                                        $("#id_total").val(totalamount);
-					$("#manualsum").html(formattedamount);                                      
-                                        
-					}
-				);
-				//
-				if(totalamount > 0){
-					$('#payment_manual').css('display','block');
-					$('#payment_cc').show();
-				}
-				else {
-					$('#payment_manual').css('display','none');
-					$('#payment_cc').hide();
-				}
-				
+                //	$("#block-manualpay").css('display','block');
+                //});
+                $("#l_intAmount").val(totalamount.toFixed(2));
+                //
+                $.ajax({
+                    method: "POST",
+                    url:"formatcurrencyamount.cgi",
+                    data:"amount=" + totalamount + "&client="+ client 			
+                }).done(
+                    function(formattedamount){
+                        $("#id_total").val(totalamount);
+                        $("#manualsum").html(formattedamount);
+                    }
+                );
+                //
+                if(totalamount > 0){
+                    $('#payment_manual').css('display','block');
+                    $('#payment_cc').show();
+                }
+                else {
+                    $('#payment_manual').css('display','none');
+                    $('#payment_cc').hide();
+                }
 			}
-      
      });
 
      $("#btn-manualpay").click(function() {

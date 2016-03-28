@@ -542,7 +542,6 @@ EOS
 sub getTransList {
 	my ($Data, $db, $entityID, $personID, $whereClause, $tempClientValues_ref, $hide_list_payments_link, $displayonly, $hidePay) = @_;
 
-    warn "PAY INVOICE ";
 	#
 	my $TXNEntityID = '';
 	if($Data->{'clientValues'}{'currentLevel'} >= $Defs::LEVEL_CLUB){
@@ -1098,6 +1097,8 @@ sub listTransactions {
 		#### $orstring = qq[&nbsp; <b>].$lang->txt('OR').qq[</b> &nbsp;] if $CC_body and $allowMP; 
 		 if($paymentType==0){ $paymentType='';}
 		### <div id="payment_manual" style= "display:block;">
+
+        # FC-1928 - now using event from f-commons.js
         #$body .= qq[
         #   
         #        $orstring
@@ -1191,6 +1192,7 @@ sub listTransactions {
 			$CC_body
 			</form>];
 
+            # FC-1928 - now using event from f-commons.js
             #if ($CC_body) {
             #    if ($Data->{'clientValues'}{'authLevel'} == $Defs::LEVEL_CLUB) { 
             #        if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB) { 
