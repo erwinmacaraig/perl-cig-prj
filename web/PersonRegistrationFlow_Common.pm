@@ -1703,16 +1703,18 @@ sub checkDuplicateNationalGovID  {
         FROM tblPerson
         WHERE  
             tblPerson.intRealmID = ? 
-            AND tblPerson.intSystemStatus <> ?
             AND tblPerson.$field = ?
             AND tblPerson.intPersonId <> ?
+            AND tblPerson.intSystemStatus <> ?
+            AND tblPerson.strStatus <> ?
         LIMIT 1
     ];
     my @st_fields = (
         $Data->{'Realm'},
-        $Defs::PERSONSTATUS_DELETED,
         $fieldVal,
         $id,
+        $Defs::PERSONSTATUS_DELETED,
+        $Defs::PERSON_STATUS_DELETED,
     );
     my $q = $Data->{'db'}->prepare($st);
     $q->execute(@st_fields);
