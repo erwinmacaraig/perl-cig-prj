@@ -144,7 +144,7 @@ sub send {
         $content .= qq[------------------------------400f182a9360\r\nContent-Disposition: form-data; name="$k"\r\nContent-Type: text/html\r\n\r\n$outputparams{$k}\r\n];
     }
     $content .= qq[------------------------------400f182a9360\r\n];
-    $content .= qq[------------------------------400f182a9360------------------------------\r\n];
+    #$content .= qq[------------------------------400f182a9360------------------------------\r\n];
 
     my $url = 'https://sendgrid.com/api/mail.send.json';
     my $ua = LWP::UserAgent->new();
