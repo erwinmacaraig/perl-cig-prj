@@ -99,7 +99,7 @@ sub getUploadedFiles	{
 			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
             $url .= "&chk=". $parentCheck;
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
-            #$deleteURL.= "&chk=". $parentCheck;
+            $deleteURL.= "&chk=". $parentCheck;
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
             $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
