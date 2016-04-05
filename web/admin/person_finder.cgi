@@ -132,7 +132,7 @@ sub search_results {
   while(my $dref =$query->fetchrow_hashref())  {
     my $status = '';
     my $setStatus = '';
-    if ($dref->{'strStatus'} eq 'INPROGRESS')  {
+    if ($dref->{'strStatus'} ne 'REGISTERED')  {
         $setStatus = qq[&nbsp;&nbsp;<a onclick="return confirm('Are you sure you want to mark this person as deleted');" href="person_finder.cgi?pID=$dref->{'intPersonID'}&a=sd">Set as Deleted</a>];
     }
     $returnstring.=  qq[
