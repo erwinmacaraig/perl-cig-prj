@@ -216,10 +216,10 @@ sub showPersonHome	{
 		$validdocs{$dref->{'intDocumentTypeID'}} = $dref->{'intUploadFileID'};
 	}
 		foreach $doc (@{$rego->{'documents'}}) {			
-            $viewLink = ''; 
-            $replaceLink = '';
-			$displayReplace= 0;			
-            $addLink = ''; 
+            #$viewLink = ''; 
+            #$replaceLink = '';
+			#$displayReplace= 0;			
+            #$addLink = ''; 
 			$displayAdd = 0;
 			$fileID = 0;
 			$displayView  = 0;			
