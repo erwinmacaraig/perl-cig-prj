@@ -88,6 +88,7 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+    #$urlViewButton = '';
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
           my $parentCheck= authstring($dref->{'intFileID'});
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
