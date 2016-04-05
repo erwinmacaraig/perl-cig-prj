@@ -609,9 +609,14 @@ my @headers = (
 				#checks for strLockAtLevel and intUseExistingThisEntity and intUseExistingAnyEntity and Owner against Currently Logged
                 #if(! $regodoc->{'strLockAtLevel'} || ($regodoc->{'strLockAtLevel'} =~ /\|$Data->{'clientValues'}{'authLevel'}\|/ and getLastEntityID($Data->{'clientValues'}) != $regodoc->{'DocoEntityID'}) || $dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
 
-			   if($dref->{'intUseExistingThisEntity'} || $dref->{'intUseExistingAnyEntity'} || $registration->{'intEntityID'} == $currLoginID){	
-			        $viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client&chk=$parentCheck');return false;">]. $lang->txt('View') . q[</a>];
-    				$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+			    $viewLink = qq[ <a class="btn-main btn-view-replace" href="#" onclick="docViewer($regodoc->{'intUploadFileID'},'client=$client&chk=$parentCheck');return false;">]. $lang->txt('View') . q[</a>];
+    			$replaceLink =   qq[ <a class="btn-main btn-view-replace" href="$Data->{'target'}?client=$client&amp;a=DOC_L&amp;f=$regodoc->{'intUploadFileID'}&amp;regoID=$regodoc->{'intPersonRegistrationID'}&amp;dID=$regodoc->{'intDocumentTypeID'}">]. $lang->txt('Replace File'). q[</a>];	
+
+			    if($Data->{'clientValues'}{'authLevel'} < $Defs::LEVEL_NATIONAL)    {
+                    if ($dref->{'intUseExistingThisEntity'} == 0 and $dref->{'intUseExistingAnyEntity'} == 0 and $registration->{'intEntityID'} != $currLoginID)    {
+                        $viewLink= qq[ <span style="position: relative"><a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('View'). q[</a></span>];
+                        $replaceLink= qq[ <span style="position: relative"><a class="HTdisabled btn-main btn-view-replace">].$Data->{'lang'}->txt('Replace'). q[</a></span>];
+                    }
 
 				}
 			#	else{
