@@ -27,6 +27,10 @@ sub main  {
   if($action eq "sr")  {
      $returnstr=search_results($db, $target);
   }
+  elsif($action eq "sd")  {
+     $returnstr=setDeleted($db, $personID);
+    $returnstr= searchpage($db, $target);
+  }
   else  {
     $returnstr= searchpage($db, $target);
   }
@@ -34,6 +38,28 @@ sub main  {
   print_adminpageGen($returnstr, "", "");
 }
 
+sub setDeleted  {
+
+    my ($db, $personID) = @_;
+    
+    $personID ||= 0;
+    return if (! $personID);
+
+    my $st = qq[
+        UPDATE 
+            tblPerson
+        SET
+            strStatus='DELETED',
+            intSystemStatus = -1
+        WHERE
+            intPersonID = ?
+        LIMIT 1;
+    ];
+    my $query = $db->prepare($st);
+    $query->execute($personID);
+    return;
+}
+    
 
 sub searchpage {
   my ($db, $target)=@_;
@@ -105,13 +131,17 @@ sub search_results {
   $query->execute();
   while(my $dref =$query->fetchrow_hashref())  {
     my $status = '';
+    my $setStatus = '';
+    if ($dref->{'strStatus'} eq 'INPROGRESS')  {
+        $setStatus = qq[&nbsp;&nbsp;<a onclick="return confirm('Are you sure you want to mark this person as deleted');" href="person_finder.cgi?pID=$dref->{'intPersonID'}&a=sd">Set as Deleted</a>];
+    }
     $returnstring.=  qq[
                 <tr>
                   <td>$dref->{'intPersonID'}</td>
                   <td>$dref->{'strNationalNum'}</td>
                   <td>$dref->{'strLocalFirstname'}</td>
                   <td>$dref->{'strLocalSurname'}</td>
-                  <td>$dref->{'strStatus'}</td>
+                  <td>$dref->{'strStatus'}$setStatus</td>
                   <td>$dref->{'SUEmail'}</td>
                 </tr>
     ];
