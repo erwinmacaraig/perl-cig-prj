@@ -214,6 +214,28 @@ sub _processUploadFile_single	{
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
         }   
+        if ($regoID && $oldFileId)  {
+            my $st_check = qq[
+                SELECT intPersonRegistrationID
+                FROM tblDocuments
+                WHERE
+                    intUploadFileID = ?
+                    AND intPersonRegistrationID = ?
+                    AND intDocumentTypeID = ?
+                LIMIT 1
+            ];
+			my $q_check= $Data->{'db'}->prepare($st_check);
+			$q_check->execute(
+                $oldFileId,
+                $regoID,
+                $DocumentTypeId
+            );
+			my $check_prID= $q_check->fetchrow_array() || 0;
+            if (! $check_prID)  {
+                $oldFileId = 0;         
+            }
+        }
+
   
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
