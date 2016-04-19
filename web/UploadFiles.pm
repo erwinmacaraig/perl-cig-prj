@@ -209,12 +209,14 @@ sub _processUploadFile_single	{
         my $DocumentTypeId = 0;
         my $regoID = 0; 
         my $oldFileId = 0;
+        my $notFromFlow= 0;
         if(defined $other_info){
           $DocumentTypeId = $other_info->{'docTypeID'} || 0; 
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
+            $notFromFlow = $other_info->{'nff'} || 0;
         }   
-        if ($regoID && $oldFileId)  {
+        if ($notFromFlow && $regoID && $oldFileId)  {
             my $st_check = qq[
                 SELECT intPersonRegistrationID
                 FROM tblDocuments
