@@ -1870,7 +1870,7 @@ sub finaliseTransfer {
     ) or query_error($stc);
 
     while (my $spref = $query->fetchrow_hashref()) {
-        addPersonRegistrationStatusChangeLog($Data, $spref->{'intPersonRegistrationID'}, $spref->{'strStatus'}, $status || $Defs::PERSONREGO_STATUS_TRANSFERRED);
+        addPersonRegistrationStatusChangeLog($Data, $spref->{'intPersonRegistrationID'}, $spref->{'strStatus'}, $status || $Defs::PERSONREGO_STATUS_TRANSFERRED, -1);
     }
  
     ###### end add status change log
@@ -2560,7 +2560,7 @@ sub activatePlayerLoan {
         $query->execute($req) or query_error($stu);
 
         my $sturef = $query->fetchrow_hashref();
-        addPersonRegistrationStatusChangeLog($Data, $sturef->{'intPersonRegistrationID'}, 'PENDING', $sturef->{'strStatus'});
+        addPersonRegistrationStatusChangeLog($Data, $sturef->{'intPersonRegistrationID'}, 'PENDING', $sturef->{'strStatus'}, -1);
 
     }
     
@@ -2621,7 +2621,7 @@ sub activatePlayerLoan {
         $qcur->execute($reqsid) or query_error($cstu);
 
         my $cturef = $qcur->fetchrow_hashref();
-        addPersonRegistrationStatusChangeLog($Data, $cturef->{'intPersonRegistrationID'}, $prevStatus{$cturef->{'intPersonRegistrationID'}}, $cturef->{'strStatus'});
+        addPersonRegistrationStatusChangeLog($Data, $cturef->{'intPersonRegistrationID'}, $prevStatus{$cturef->{'intPersonRegistrationID'}}, $cturef->{'strStatus'}, -1);
 
     }
  
@@ -2658,7 +2658,7 @@ sub deactivatePlayerLoan {
     $qprevs->execute() or query_error($pstu);
 
     while(my $psturef = $qprevs->fetchrow_hashref()) {
-        addPersonRegistrationStatusChangeLog($Data, $psturef->{'intPersonRegistrationID'}, $psturef->{'strStatus'}, $Defs::PERSONREGO_STATUS_PASSIVE);
+        addPersonRegistrationStatusChangeLog($Data, $psturef->{'intPersonRegistrationID'}, $psturef->{'strStatus'}, $Defs::PERSONREGO_STATUS_PASSIVE, -1);
     }
 
     my $bst = qq [
