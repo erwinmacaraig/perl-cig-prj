@@ -1,7 +1,7 @@
-#DELETE FROM tblEntity WHERE intEntityLevel<>100;
-#DELETE FROM tblEntityLinks;
-#DELETE FROM tblTempEntityStructure;
-#DELETE FROM tblTempTreeStructure;
+DELETE FROM tblEntity WHERE intEntityLevel<>100;
+DELETE FROM tblEntityLinks;
+DELETE FROM tblTempEntityStructure;
+DELETE FROM tblTempTreeStructure;
 DELETE FROM tblEntityFields;
 
 DELETE FROM tblUser;
