@@ -61,8 +61,10 @@ while (<INFILE>)	{
     $parts{'EXISTING'} = $fields[9] || 0;
     $parts{'FROMAGE'} = $fields[10] || 0;
     $parts{'TOAGE'} = $fields[11] || 0;
-    $parts{'INT_LOAN_NEW'} = $fields[12] || 0;
-    $parts{'INT_TRANSFER_NEW'} = $fields[13] || 0;
+    $parts{'INT_TRANSFER_NEW'} = $fields[12] || 0;
+    $parts{'INT_LOAN_NEW'} = $fields[13] || 0;
+    $parts{'USING_ITC_FILTER'} = $fields[14] || 0;
+    $parts{'ITC_FLAG'} = $fields[15] || 0;
 	if ($countOnly)	{
 		$insCount++;
 		next;
@@ -87,9 +89,13 @@ while (<INFILE>)	{
             intFilterFromAge,
             intFilterToAge,
             intItemForInternationalTransfer,
-            intItemForInternationalLoan
+            intItemForInternationalLoan,
+            intItemUsingITCFilter,
+            intItemNeededITC
         )
         VALUES (
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -128,7 +134,9 @@ while (<INFILE>)	{
         $parts{'FROMAGE'},
         $parts{'TOAGE'},
         $parts{'INT_TRANSFER_NEW'},
-        $parts{'INT_LOAN_NEW'}
+        $parts{'INT_LOAN_NEW'},
+        $parts{'USING_ITC_FILTER'},
+        $parts{'ITC_FLAG'}
         
     ) or print "ERROR";
 }
