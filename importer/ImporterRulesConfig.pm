@@ -3,6 +3,7 @@ require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
     importRulesConfigFile
+    runRulesConfig
 );
 
 use strict;
@@ -20,7 +21,7 @@ use Log;
 use Data::Dumper;
 
 sub runRulesConfig  {
-    my ($db) = @_:
+    my ($db) = @_;
 
     my $stDEL = "DELETE FROM tblWFRule";
     my $qDEL= $db->prepare($stDEL) or query_error($stDEL);
