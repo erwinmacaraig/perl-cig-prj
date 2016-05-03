@@ -51,8 +51,8 @@ sub getUploadedFiles	{
          E.intEntityID as DocoEntityID,
          E.intEntityLevel as DocoEntityLevel
     FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
-	    LEFT JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
-        LEFT JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+	    INNER JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+        INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
         LEFT JOIN tblEntity as E ON (E.intEntityID=tblPersonRegistration_$Data->{'Realm'}.intEntityID)
         LEFT JOIN tblLocalTranslations AS LT_D ON (
             LT_D.strType = 'DOCUMENT'
