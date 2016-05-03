@@ -27,6 +27,9 @@ sub main  {
   if($action eq "sr")  {
      $returnstr=search_results($db, $target);
   }
+  elsif($action eq "links")  {
+     $returnstr=linkOldAccounts($db);
+  }
   elsif($action eq "sd")  {
      $returnstr=setDeleted($db, $personID);
     $returnstr= searchpage($db, $target);
@@ -37,6 +40,35 @@ sub main  {
   $returnstr .= qq[<p><a href = "person_finder.cgi">Return to Person Finder</a></p>];
   print_adminpageGen($returnstr, "", "");
 }
+
+sub linkOldAccounts{
+    my ($db)=@_;
+
+    my $st= qq[ 
+        SELECT MAX(intPersonID)
+        FROM tblOldSystemAccounts
+    ];
+    my $query = $db->prepare($st);
+    $query->execute();
+    my $personId = $query->fetchrow_array() || 0;
+
+    if ($personId)  {
+        ## If it has been run before
+        $st = qq[
+            INSERT IGNORE INTO tblOldSystemAccounts (intPersonID, strUsername, strPassword) 
+            SELECT intPersonID, strNationalNum, DATE_FORMAT(dtDOB,"%y%m%d") from tblPerson where intPersonID > ? and strNationalNum <> ''
+        ];
+
+        $query = $db->prepare($st);
+        $query->execute($personId);
+    }
+        
+    return qq[
+        <h1>Account Linkage Updated</h1>
+        <br>
+    ];
+}
+
 
 sub setDeleted  {
 
@@ -81,7 +113,7 @@ sub searchpage {
        Surname: <input type="text" name="surname" size="20"><br>
        <input type="submit" name="submit" value="S E A R C H">
     </form>
-    ];
+    <p><a href = "person_finder.cgi?a=links">Update Account Linkage Records</a></p>];
   return $body;
 }
 
