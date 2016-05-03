@@ -16,7 +16,7 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='DocConfig.txt';
+    my $infile1='DocumemtsConfig.txt';
 
     importDocConfigFile($db, $countOnly, $infile1);
 
