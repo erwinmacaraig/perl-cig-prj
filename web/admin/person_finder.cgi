@@ -113,7 +113,12 @@ sub searchpage {
        Surname: <input type="text" name="surname" size="20"><br>
        <input type="submit" name="submit" value="S E A R C H">
     </form>
-    <p><a href = "person_finder.cgi?a=links">Update Account Linkage Records</a></p>];
+    <br><br>
+    <form action="$target" method="POST">
+       <input type="submit" name="submit" value="Update Account Linkages">
+      <input type="hidden" name="a" value="links">
+    </form>
+    ];
   return $body;
 }
 
