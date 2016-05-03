@@ -88,6 +88,7 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+    #$urlViewButton = '';
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
           my $parentCheck= authstring($dref->{'intFileID'});
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
@@ -208,11 +209,35 @@ sub _processUploadFile_single	{
         my $DocumentTypeId = 0;
         my $regoID = 0; 
         my $oldFileId = 0;
+        my $notFromFlow= 0;
         if(defined $other_info){
           $DocumentTypeId = $other_info->{'docTypeID'} || 0; 
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
+            $notFromFlow = $other_info->{'nff'} || 0;
         }   
+        if ($notFromFlow && $regoID && $oldFileId)  {
+            my $st_check = qq[
+                SELECT intPersonRegistrationID
+                FROM tblDocuments
+                WHERE
+                    intUploadFileID = ?
+                    AND intPersonRegistrationID = ?
+                    AND intDocumentTypeID = ?
+                LIMIT 1
+            ];
+			my $q_check= $Data->{'db'}->prepare($st_check);
+			$q_check->execute(
+                $oldFileId,
+                $regoID,
+                $DocumentTypeId
+            );
+			my $check_prID= $q_check->fetchrow_array() || 0;
+            if (! $check_prID)  {
+                $oldFileId = 0;         
+            }
+        }
+
   
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
