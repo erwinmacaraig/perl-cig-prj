@@ -2,8 +2,8 @@ package ImporterDocumentsConfig;
 require Exporter;
 @ISA    = qw(Exporter);
 @EXPORT = @EXPORT_OK = qw(
-    insertConfigRecord
     importDocConfigFile
+    runDocConfig
 );
 
 use strict;
@@ -19,6 +19,239 @@ use ImporterCommon;
 
 use Log;
 use Data::Dumper;
+
+sub runDocConfig    {
+
+    my ($db) = @_;
+
+    my $st = qq[ DELETE FROM tblRegistrationItem WHERE strRuleFor='REGO' and strItemType='DOCUMENT'];
+    $db->do($st);
+
+    $st = qq[ DELETE FROM tblWFRuleDocuments ];
+    $db->do($st);
+    
+    $st = qq[
+        INSERT INTO tblRegistrationItem SELECT 0,1,0,?,'REGO', '',?, strRegistrationNature, strPersonType, strPersonLevel, strSport, strAgeLevel, strItemType, intID, intUseExisting, intUseExisting, NOW(), intRequired, '', strISOCountry_IN, strISOCountry_NOTIN, intFilterFromAge, intFilterToAge, intItemNeededITC, intItemUsingITCFilter, 0,'',0, 0,'',0, intItemForInternationalTransfer, intItemForInternationalLoan , '' FROM _tblDocumentConfig WHERE strPersonType=?
+    ];
+    my @L100types = ('MAOFFICIAL', 'REFEREE');
+    foreach my $type (@L100types)   {
+        my $q= $db->prepare($st) or query_error($st);
+        $q->execute(100,100,$type);
+    }
+        
+
+    my @L20types = ('RAOFFICIAL');
+    my @Levels = (
+        {   
+            100=>20, 
+        },
+        {
+            20=>20,
+        }
+    );
+    foreach my $type (@L20types)   {
+        for my $href ( @Levels ) {
+            for my $origin ( keys %$href ) {
+                my $q= $db->prepare($st) or query_error($st);
+                $q->execute(
+                    $origin,
+                    $href->{$origin},
+                    $type
+                );
+            }
+        }
+    }
+
+    my @Ltypes = ('TEAMOFFICIAL', 'CLUBOFFICIAL');
+    @Levels = (
+        {   
+            100=>3, 
+        },
+        {
+            20=>3,
+        },
+        {
+            3=>3,
+        },
+        {
+            1=>3,
+        }
+    );
+    foreach my $type (@Ltypes)   {
+        for my $href ( @Levels ) {
+            for my $origin ( keys %$href ) {
+                my $q= $db->prepare($st) or query_error($st);
+                $q->execute(
+                    $origin,
+                    $href->{$origin},
+                    $type
+                );
+            }
+        }
+    }
+
+    @Ltypes = ('PLAYER');
+    @Levels = (
+        {
+            100=>100,
+        },
+        {   
+            100=>20, 
+        },
+        {   
+            100=>3, 
+        },
+        {
+            20=>20,
+        },
+        {
+            20=>3,
+        },
+        {
+            3=>3,
+        },
+        {
+            1=>3,
+        },
+        {
+            1=>20,
+        },
+        {
+            1=>100,
+        }
+    );
+    foreach my $type (@Ltypes)   {
+        for my $href ( @Levels ) {
+            for my $origin ( keys %$href ) {
+                my $q= $db->prepare($st) or query_error($st);
+                $q->execute(
+                    $origin,
+                    $href->{$origin},
+                    $type
+                );
+            }
+        }
+    }
+
+
+    @Ltypes = ('COACH');
+    @Levels = (
+        {
+            100=>100,
+        },
+        {   
+            100=>20, 
+        },
+        {   
+            100=>3, 
+        },
+        {
+            20=>20,
+        },
+        {
+            20=>3,
+        },
+        {
+            3=>3,
+        },
+        {
+            1=>3,
+        },
+        {
+            1=>20,
+        },
+        {
+            1=>100,
+        }
+    );
+    foreach my $type (@Ltypes)   {
+        for my $href ( @Levels ) {
+            for my $origin ( keys %$href ) {
+                my $q= $db->prepare($st) or query_error($st);
+                $q->execute(
+                    $origin,
+                    $href->{$origin},
+                    $type
+                );
+            }
+        }
+    }
+
+
+    my @Ltypes = ('REFEREE');
+    @Levels = (
+        {
+            100=>100,
+        },
+        {   
+            100=>20, 
+        },
+        {   
+            100=>3, 
+        },
+        {
+            20=>20,
+        },
+        {
+            20=>3,
+        },
+        {
+            3=>3,
+        },
+        {
+            1=>3,
+        },
+        {
+            1=>20,
+        },
+        {
+            1=>100,
+        }
+    );
+    foreach my $type (@Ltypes)   {
+        for my $href ( @Levels ) {
+            for my $origin ( keys %$href ) {
+                my $q= $db->prepare($st) or query_error($st);
+                $q->execute(
+                    $origin,
+                    $href->{$origin},
+                    $type
+                );
+            }
+        }
+    }
+
+
+    $st = qq[
+        INSERT INTO tblWFRuleDocuments 
+        SELECT 0, R.intWFRuleID, RI.intID, 1,1,1,1,NOW() 
+        FROM tblWFRule as R 
+        INNER JOIN tblRegistrationItem as RI ON (
+            RI.intOriginLevel=R.intOriginLevel 
+            AND RI.intEntityLevel=R.intEntityLevel 
+            AND RI.strRegistrationNature=R.strRegistrationNature 
+            AND RI.strPersonType=R.strPersonType 
+            AND RI.strPersonLevel IN('',R.strPersonLevel) 
+            AND RI.strSport IN ('',R.strSport) 
+            AND RI.strAgeLevel IN ('',R.strAgeLevel) 
+            AND (
+                (
+                    R.strISOCountry_IN = '' 
+                    AND R.strISOCountry_NOTIN = ''
+                ) 
+                OR (
+                    RI.strISOCountry_IN = R.strISOCountry_IN 
+                    AND RI.strISOCountry_NOTIN = R.strISOCountry_NOTIN
+                )
+            ) 
+        )
+        WHERE R.strWFRuleFor='REGO'
+    ];
+    $db->do($st);
+ 
+
+
+}
 
 sub importDocConfigFile {
     my ($db, $countOnly, $infile) = @_;
