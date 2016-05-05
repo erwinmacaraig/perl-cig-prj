@@ -107,14 +107,20 @@ sub handle_documents {
 	}
   elsif ($action eq 'DOC_d') {
 		my $fileID = param('dID') || 0;	
+		my $chk= param('chk') || '';	
         my $retpage = param('retpage') || "$Data->{'target'}?client=$client";
         my $DocumentTypeID = param('dctid') || 0;
 		my $RegistrationID = param('regoID') || 0;
-
-        my $delOK = 0; #delete_doc($Data, $fileID,$client, $retpage);
+        my $checkhash = authstring($fileID);
+        my $delOK = 0; 
+        if ($chk eq $checkhash and $fileID and $chk) {
+            $delOK = 1; ## 1 if equals
+        }
 		if($delOK){
 
-			if($DocumentTypeID){	
+            $delOK = delete_doc($Data, $fileID,$client, $retpage);
+
+			if($DocumentTypeID and $delOK){	
 				my $query = qq[SELECT count(intItemID) as tot FROM tblRegistrationItem WHERE strRuleFor = ? AND strItemType = ? AND intID = ? AND intRequired = ? and intRealmID = ?];
 				my $sth = $Data->{'db'}->prepare($query); 
     			$sth->execute('REGO', 'DOCUMENT', $DocumentTypeID, 1, $Data->{'Realm'});
@@ -138,7 +144,7 @@ sub handle_documents {
           <span class="btn-inside-panels"><a href="$Data->{'target'}?client=$client&amp;a=$retpage">] . $Data->{'lang'}->txt('Continue').q[</a></span>
        ];
 		}
-		else {
+		if (! $delOK) {
 			$resultHTML = qq[
 			<div class="OKmsg">Error - $delOK </div> 
           <br />  
