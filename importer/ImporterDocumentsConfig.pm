@@ -250,6 +250,17 @@ sub runDocConfig    {
     $db->do($st);
  
 
+    my $est = qq[
+        INSERT INTO tblWFRuleDocuments
+        SELECT 0, wr.intWFRuleID, ri.intID, 1, 1, 1, 1, NOW() 
+        FROM tblRegistrationItem ri INNER JOIN tblWFRule wr ON
+            (wr.strWFRuleFor = ri.strRuleFor AND wr.strRegistrationNature = ri.strRegistrationNature AND wr.intOriginLevel = ri.intOriginLevel)
+        WHERE
+            wr.strWFRuleFor = 'ENTITY'
+            AND ri.strItemType = 'DOCUMENT'
+            AND ri.intRealmID = 1
+    ];
+    $db->do($est);
 
 }
 
