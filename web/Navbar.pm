@@ -729,7 +729,13 @@ sub getClubMenuData {
         $menuoptions{'transactions'} = {
             name => $lang->txt('Transactions'),
             url => $baseurl."a=C_TXNLog_list",
-        };
+        };    
+        if ($Data->{'clientValues'}{'authLevel'} >= $SystemConfig->{'AddTXN_MinLevel'}) {
+            $menuoptions{'addtransactions'} = {
+		        name => $lang->txt('Add Transactions'),
+                url => $baseurl."a=C_TXN_ADD",
+            };
+        }
      }
         $menuoptions{'pending'} = {
             name => $lang->txt('Pending Registrations'),
@@ -943,7 +949,10 @@ sub getClubMenuData {
             'pending',
             'incomplete'
         ]],
-        [ $lang->txt("Club Transactions"), 'menu','transactions',],
+        [ $lang->txt("Club Transactions"), 'menu',[
+            'transactions',
+            'addtransactions'
+        ]],
         [ $lang->txt('My Club'), 'menu',[
         'myClub',
         ]],
