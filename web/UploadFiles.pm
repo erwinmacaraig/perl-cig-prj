@@ -54,7 +54,8 @@ sub getUploadedFiles	{
          tblDocumentType.strLockAtLevel,
          E.intEntityID as DocoEntityID,
          E.intEntityLevel as DocoEntityLevel
-    FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
+    FROM  tblUploadedFiles AS UF 
+        INNER JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
 	    $joinType JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
         $joinType JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
         LEFT JOIN tblEntity as E ON (E.intEntityID=tblPersonRegistration_$Data->{'Realm'}.intEntityID)
