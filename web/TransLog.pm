@@ -530,9 +530,9 @@ EOS
 
    auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
    my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
-	$resultHTML .= qq[
-		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
-    ] if ($success == $Defs::TXNLOG_SUCCESS);
+	#$resultHTML .= qq[
+	#	<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
+    #] if ($success == $Defs::TXNLOG_SUCCESS);
 	$resultHTML .= qq[
 	    <br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
     ];
