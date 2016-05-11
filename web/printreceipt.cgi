@@ -134,6 +134,7 @@ $Data{'db'}=$db;
                 $stJOIN
 			WHERE intTransLogID IN (?) 
 			AND T.intRealmID = ? AND T.intID = $intID	
+                AND IF(T.intTableType=1, M.intPersonID>0, M.intPersonID IS NULL)
                 $stWHERE
 			];
 			
