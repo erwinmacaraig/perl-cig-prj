@@ -199,7 +199,6 @@ sub displayTransaction	{
 #($Data->{'Realm'},$Data->{'RealmSubType'})=getRealm($Data);
 
 	my $action = 'P_TXN_EDIT';
-$action = 'C_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB;
     my $resultHTML = '';
 	my $toplist='';
 
@@ -235,6 +234,12 @@ $action = 'C_TXN_EDIT' if $Data->{'clientValues'}{'currentLevel'} == $Defs::LEVE
 	my $RecordData={};
 	$query->execute;
 	my $dref=$query->fetchrow_hashref();
+    if ($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB)   {
+        if (! $id or ($id and $dref->{'intTableType'} > $Defs::LEVEL_PERSON))    {
+            $action = 'C_TXN_EDIT';
+        }
+    }
+    
 	$dref->{'NumChildren'} ||= 0;
 	my $gatewayLocked = $dref->{'GatewayLocked'} || 0;
 	my $txnupdate=qq[
