@@ -33,7 +33,8 @@ sub runDocConfig    {
     $st = qq[
         INSERT INTO tblRegistrationItem SELECT 0,1,0,?,'REGO', '',?, strRegistrationNature, strPersonType, strPersonLevel, strSport, strAgeLevel, strItemType, intID, intUseExisting, intUseExisting, NOW(), intRequired, '', strISOCountry_IN, strISOCountry_NOTIN, intFilterFromAge, intFilterToAge, intItemNeededITC, intItemUsingITCFilter, 0,'',0, 0,'',0, intItemForInternationalTransfer, intItemForInternationalLoan , '' FROM _tblDocumentConfig WHERE strPersonType=?
     ];
-    my @L100types = ('MAOFFICIAL', 'REFEREE');
+    #my @L100types = ('MAOFFICIAL', 'REFEREE');
+    my @L100types = ('MAOFFICIAL');
     foreach my $type (@L100types)   {
         my $q= $db->prepare($st) or query_error($st);
         $q->execute(100,100,$type);
