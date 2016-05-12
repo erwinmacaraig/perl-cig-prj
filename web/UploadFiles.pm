@@ -310,7 +310,7 @@ sub _processUploadFile_single	{
 		$origfilename,
 		$permissions,
         $regoID || 0,
-        $DocumentTypeId || 0,
+        $DocumentTypeId || 0
 	); 
 #Data->{'clientValues'}{'_intID'}
 	my $fileID = $q_a->{mysql_insertid} || 0;
