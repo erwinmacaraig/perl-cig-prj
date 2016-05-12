@@ -162,7 +162,7 @@ sub getUploadedFiles	{
                 Size => sprintf("%0.2f",($dref->{'intBytes'} /1024/1024)),
                 DateAdded => $dref->{'DateAdded_FMT'},
                 DateAdded_RAW => $dref->{'dtUploaded'},
-                Name => $dref->{'strDocumentName'} || 'Misc',
+                Name => $dref->{'strDocumentName'} || 'Unknown',
                 OrigFilename => $dref->{'strOrigFilename'},
                 DB => $dref,
             };	
