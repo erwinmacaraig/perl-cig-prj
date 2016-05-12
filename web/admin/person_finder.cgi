@@ -22,10 +22,17 @@ sub main  {
   my $action=param('a') || '';
   my $entityType =param('t') || '';
   my $personID= param('pID') || 0;
+  my $regoID= param('regoID') || 0;
   my $db=connectDB();
 
   if($action eq "sr")  {
      $returnstr=search_results($db, $target);
+  }
+  elsif($action eq "vr")  {
+     $returnstr=viewRegos($db, $personID, $target);
+  }
+  elsif($action eq "srs")  {
+     $returnstr=setRegoStatus($db, $personID, $regoID, $target);
   }
   elsif($action eq "links")  {
      $returnstr=linkOldAccounts($db);
@@ -133,6 +140,7 @@ sub search_results {
             <th>Surname</th>
             <th>Status</th>
             <th>Self User Account</th>
+            <th>&nbsp;</th>
           </tr>
   ]; 
   my $wherestr = '';
@@ -180,6 +188,7 @@ sub search_results {
                   <td>$dref->{'strLocalSurname'}</td>
                   <td>$dref->{'strStatus'}$setStatus</td>
                   <td>$dref->{'SUEmail'}</td>
+                    <td><a href="person_finder.cgi?pID=$dref->{'intPersonID'}&a=vr">View Regos</a></td>
                 </tr>
     ];
    }
@@ -189,4 +198,84 @@ sub search_results {
   return $returnstring;
 }
 
+sub viewRegos   {
+  my ($db, $personID, $target) = @_;
+  my $returnstring=  qq[
+        <table class = "list">
+          <tr>
+            <th>RegoID</th>
+            <th>Entity</th>
+            <th>PersonType</th>
+            <th>PersonLevel</th>
+            <th>Age</th>
+            <th>Sport</th>
+            <th>National Period</th>
+            <th>Status</th>
+          </tr>
+  ]; 
+  my $wherestr = '';
+  my $statement="
+    SELECT
+        PR.*,
+        NP.strNationalPeriodName,
+        E.strLocalName
+    FROM
+       tblPersonRegistration_1 as PR
+        INNER JOIN tblEntity as E ON (E.intEntityID = PR.intEntityID)
+        INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
+    WHERE
+        intPersonID = ?
+    ORDER BY PR.dtFrom, PR.intPersonRegistrationID
+    LIMIT 100
+  ";
+  my $query = $db->prepare($statement);
+  $query->execute($personID);
+  while(my $dref =$query->fetchrow_hashref())  {
+    my $status = '';
+    my $setStatus = '';
+    if ($dref->{'strStatus'} ne 'REGISTERED')  {
+        $setStatus = qq[&nbsp;&nbsp;<a onclick="return confirm('Are you sure you want to mark this rego as PASSIVE');" href="person_finder.cgi?regoID=$dref->{'intPersonRegistrationID'}&amp;pID=$dref->{'intPersonID'}&a=srs">Set as Passive</a>];
+    }
+    $returnstring.=  qq[
+                <tr>
+                  <td>$dref->{'intPersonRegistrationID'}</td>
+                  <td>$dref->{'strLocalName'}</td>
+                  <td>$dref->{'strPersonType'}</td>
+                  <td>$dref->{'strPersonLevel'}</td>
+                  <td>$dref->{'strAgeLevel'}</td>
+                  <td>$dref->{'strSport'}</td>
+                  <td>$dref->{'strNationalPeriodName'}</td>
+                  <td>$dref->{'strStatus'}$setStatus&nbsp;</td>
+                </tr>
+    ];
+   }
+   $returnstring.=  qq[
+                </table>
+  ];
+  return $returnstring;
+}
 
+sub setRegoStatus {
+
+    my ($db, $personID, $regoID, $target) = @_;
+    
+    $personID ||= 0;
+    $regoID ||= 0;
+    return if (! $personID);
+    return if (! $regoID);
+
+    my $st = qq[
+        UPDATE 
+            tblPersonRegistration_1
+        SET
+            strStatus='PASSIVE'
+        WHERE
+            intPersonID = ?
+            AND intPersonRegistrationID=?
+        LIMIT 1;
+    ];
+    my $query = $db->prepare($st);
+    $query->execute($personID, $regoID);
+    return;
+}
+   
