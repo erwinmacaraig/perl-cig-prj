@@ -280,9 +280,13 @@ sub _processUploadFile_single	{
 			strTitle,
 			strOrigFilename,
 			intPermissions,
+            intOrigPersonRegoID,
+            intOrigDocumentTypeID,
 			dtUploaded
 		)
 		VALUES (
+			?,
+			?,
 			?,
 			?,
 			?,
@@ -305,6 +309,8 @@ sub _processUploadFile_single	{
 		$title,
 		$origfilename,
 		$permissions,
+        $regoID || 0,
+        $DocumentTypeId || 0,
 	); 
 #Data->{'clientValues'}{'_intID'}
 	my $fileID = $q_a->{mysql_insertid} || 0;
@@ -323,6 +329,12 @@ sub _processUploadFile_single	{
 		$intEntityID = $EntityID;	
 		
 	}
+        my $oldst = qq[
+            UPDATE tblUploadedFiles as UF INNER JOIN tblDocuments as D ON (D.intUploadFileID = UF.intFileID)
+            SET intOrigPersonRegoID = D.intPersonRegistrationID, intOrigDocumentTypeID = D.intDocumentTypeID
+            WHERE UF.intFileID = ?
+                AND UF.intOrigDocumentTypeID=0 
+        ];
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
 
@@ -359,10 +371,15 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
+        	my $oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($fileID);
 		 
         }
         else {
 			#update for person  documents      	 
+        	my $oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($oldFileId);
+        
 			$doc_st = qq[
         		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ?	
         	]; 
@@ -386,6 +403,8 @@ sub _processUploadFile_single	{
 			  'PENDING',          
               $oldFileId,              
         );
+        	$oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($fileID);
 		#$intPersonID - Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
         }
                 

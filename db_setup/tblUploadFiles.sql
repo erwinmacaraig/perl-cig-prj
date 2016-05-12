@@ -14,6 +14,8 @@ CREATE TABLE tblUploadedFiles	(
 	intBytes INT DEFAULT 1,
 	dtUploaded DATETIME,
 	intPermissions TINYINT DEFAULT 1,
+	intOrigPersonRegoID INT DEFAULT 0,
+	intOrigDocumentTypeID INT DEFAULT 0,
 
 	PRIMARY KEY (intFileID),
 	KEY entity_key (intEntityTypeID, intEntityID, intFileType)
