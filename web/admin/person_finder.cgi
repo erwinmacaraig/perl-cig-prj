@@ -13,6 +13,9 @@ use AdminPageGen;
 use FormHelpers;
 use UserObj;
 use EntityObj;
+use MCache;
+use SphinxUpdate;
+use InstanceOf;
 
 main();
 
@@ -259,6 +262,8 @@ sub setRegoStatus {
 
     my ($db, $personID, $regoID, $target) = @_;
     
+    my %Data= ();
+    $Data{'cache'}  = new MCache();
     $personID ||= 0;
     $regoID ||= 0;
     return if (! $personID);
@@ -276,6 +281,8 @@ sub setRegoStatus {
     ];
     my $query = $db->prepare($st);
     $query->execute($personID, $regoID);
+    my $personObject = getInstanceOf(\%Data, 'person',$personID);
+    updateSphinx($db,$Data{'cache'}, 'Person','update',$personObject);
     return;
 }
    
