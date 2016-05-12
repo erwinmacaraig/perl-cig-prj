@@ -225,6 +225,7 @@ sub viewRegos   {
         INNER JOIN tblNationalPeriod as NP ON (NP.intNationalPeriodID = PR.intNationalPeriodID)
     WHERE
         intPersonID = ?
+    ORDER BY PR.dtFrom, PR.intPersonRegistrationID
     LIMIT 100
   ";
   my $query = $db->prepare($statement);
