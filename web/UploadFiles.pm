@@ -38,6 +38,10 @@ sub getUploadedFiles	{
 	my $obj = getInstanceOf($Data, 'entity', $currLoginID);
 	
     my $locale = $Data->{'lang'}->getLocale();
+    my $joinType = 'LEFT';
+    if ($entityTypeID == $Defs::LEVEL_PERSON)   {
+        $joinType = 'INNER';
+    }
 	my $st = qq[
 	SELECT 
         *,
@@ -50,9 +54,10 @@ sub getUploadedFiles	{
          tblDocumentType.strLockAtLevel,
          E.intEntityID as DocoEntityID,
          E.intEntityLevel as DocoEntityLevel
-    FROM  tblUploadedFiles AS UF LEFT JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
-	    INNER JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
-        INNER JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
+    FROM  tblUploadedFiles AS UF 
+        INNER JOIN tblDocuments ON UF.intFileID = tblDocuments.intUploadFileID 
+	    $joinType JOIN tblPersonRegistration_$Data->{'Realm'} On tblPersonRegistration_$Data->{'Realm'}.intPersonRegistrationID = tblDocuments.intPersonRegistrationID 
+        $joinType JOIN tblDocumentType ON tblDocuments.intDocumentTypeID = tblDocumentType.intDocumentTypeID
         LEFT JOIN tblEntity as E ON (E.intEntityID=tblPersonRegistration_$Data->{'Realm'}.intEntityID)
         LEFT JOIN tblLocalTranslations AS LT_D ON (
             LT_D.strType = 'DOCUMENT'
@@ -88,6 +93,7 @@ sub getUploadedFiles	{
 
 	my @rows = ();
 	while(my $dref = $q->fetchrow_hashref())	{
+    #$urlViewButton = '';
         $dref->{'DateAdded_FMT'} = $Data->{'l10n'}{'date'}->TZformat($dref->{'dtUploaded'},'MEDIUM','SHORT');
           my $parentCheck= authstring($dref->{'intFileID'});
 		$st = qq[SELECT intUseExistingThisEntity, intUseExistingAnyEntity FROM tblRegistrationItem WHERE tblRegistrationItem.intID = ? and tblRegistrationItem.intRealmID=? AND tblRegistrationItem.strItemType='DOCUMENT'];
@@ -99,7 +105,7 @@ sub getUploadedFiles	{
 			$url = "$Defs::base_url/viewfile.cgi?f=$dref->{'intFileID'}&amp;client=$client";
             $url .= "&chk=". $parentCheck;
 		    $deleteURL = "$Data->{'target'}?client=$client&amp;a=DOC_d&amp;dID=$dref->{'intFileID'}";
-            #$deleteURL.= "&chk=". $parentCheck;
+            $deleteURL.= "&chk=". $parentCheck;
 			$deleteURL .= qq[&amp;dctid=$dref->{'intDocumentTypeID'}&amp;regoID=$dref->{'regoID'}] if($dref->{'intDocumentTypeID'});
 	      	$deleteURLButton = qq[ <a class="btn-main btn-view-replace" href="$deleteURL&amp;retpage=$page">]. $Data->{'lang'}->txt('Delete'). q[</a>];
             $urlViewButton = qq[ <a class="btn-main btn-view-replace" href = "#" onclick="docViewer($dref->{'intFileID'}, 'client=$client&chk=$parentCheck');return false;">]. $Data->{'lang'}->txt('View'). q[</a>];
@@ -208,11 +214,35 @@ sub _processUploadFile_single	{
         my $DocumentTypeId = 0;
         my $regoID = 0; 
         my $oldFileId = 0;
+        my $notFromFlow= 0;
         if(defined $other_info){
           $DocumentTypeId = $other_info->{'docTypeID'} || 0; 
           $regoID = $other_info->{'regoID'} || 0;
           $oldFileId = $other_info->{'replaceFileID'} || 0;                   
+            $notFromFlow = $other_info->{'nff'} || 0;
         }   
+        if ($notFromFlow && $regoID && $oldFileId)  {
+            my $st_check = qq[
+                SELECT intPersonRegistrationID
+                FROM tblDocuments
+                WHERE
+                    intUploadFileID = ?
+                    AND intPersonRegistrationID = ?
+                    AND intDocumentTypeID = ?
+                LIMIT 1
+            ];
+			my $q_check= $Data->{'db'}->prepare($st_check);
+			$q_check->execute(
+                $oldFileId,
+                $regoID,
+                $DocumentTypeId
+            );
+			my $check_prID= $q_check->fetchrow_array() || 0;
+            if (! $check_prID)  {
+                $oldFileId = 0;         
+            }
+        }
+
   
   my $origfilename=param($file_field) || '';
 	$origfilename =~s/.*\///g;
@@ -250,9 +280,13 @@ sub _processUploadFile_single	{
 			strTitle,
 			strOrigFilename,
 			intPermissions,
+            intOrigPersonRegoID,
+            intOrigDocumentTypeID,
 			dtUploaded
 		)
 		VALUES (
+			?,
+			?,
 			?,
 			?,
 			?,
@@ -275,6 +309,8 @@ sub _processUploadFile_single	{
 		$title,
 		$origfilename,
 		$permissions,
+        $regoID || 0,
+        $DocumentTypeId || 0
 	); 
 #Data->{'clientValues'}{'_intID'}
 	my $fileID = $q_a->{mysql_insertid} || 0;
@@ -293,6 +329,12 @@ sub _processUploadFile_single	{
 		$intEntityID = $EntityID;	
 		
 	}
+        my $oldst = qq[
+            UPDATE tblUploadedFiles as UF INNER JOIN tblDocuments as D ON (D.intUploadFileID = UF.intFileID)
+            SET intOrigPersonRegoID = D.intPersonRegistrationID, intOrigDocumentTypeID = D.intDocumentTypeID
+            WHERE UF.intFileID = ?
+                AND UF.intOrigDocumentTypeID=0 
+        ];
 	    #### START OF INSERTING DATA IN tblDocuments ##
         if($DocumentTypeId && !$oldFileId){
 
@@ -329,10 +371,15 @@ sub _processUploadFile_single	{
               $intPersonID, 
         );  
         #$EntityID = memberID (this should be the case)
+        	my $oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($fileID);
 		 
         }
         else {
 			#update for person  documents      	 
+        	my $oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($oldFileId);
+        
 			$doc_st = qq[
         		UPDATE tblDocuments SET intUploadFileID = ?, dtLastUpdated = NOW(), strApprovalStatus = ? WHERE intUploadFileID = ?	
         	]; 
@@ -356,6 +403,8 @@ sub _processUploadFile_single	{
 			  'PENDING',          
               $oldFileId,              
         );
+        	$oldq= $Data->{'db'}->prepare($oldst); 
+        	$oldq->execute($fileID);
 		#$intPersonID - Remove this so entity documents can be handled accordingly since intUploadFileID will suffice
         }
                 

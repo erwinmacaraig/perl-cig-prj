@@ -155,7 +155,7 @@ sub insertPersonRegoRecord {
         $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
     }
-    if ($maCode eq 'GHA')   {
+    if ($maCode eq 'GHA' or $maCode eq 'AZE')   {
     #    $selectWeight = qq[, IF(strStatus = 'ACTIVE', 2, 1) AS statusWeight];
         $orderBy = qq[ ORDER BY dtFrom ASC, dtTo ASC];
     #    $orderBy = qq[ ORDER BY intPersonID, statusWeight DESC ];
@@ -548,6 +548,46 @@ while (<INFILE>)	{
         if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
             $parts{'PERSONROLE'} = 'MAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
             $parts{'PERSONROLE'} = 'MAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+        if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
+            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+        }
+
+        $parts{'CERTIFICATIONS'} = '';
+        
+    }
+    elsif ($maCode eq 'AZE')    {
+        ## Finland at moment
+    	$parts{'PERSONCODE'} = $fields[0] || '';
+	    $parts{'ENTITYCODE'} = $fields[1] || '';
+	    $parts{'STATUS'} = uc($fields[2]) || '';
+	    $parts{'REGNATURE'} = uc($fields[3]) || '';
+	    $parts{'PERSONTYPE'} = uc($fields[4]) || '';
+	    $parts{'PERSONROLE'} = uc($fields[5]) || '';
+	    $parts{'PERSONLEVEL'} = uc($fields[6]) || '';
+	    $parts{'SPORT'} = uc($fields[7]) || '';
+	    $parts{'AGELEVEL'} = uc($fields[8]) || 'ADULT';
+	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
+	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
+	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
+	    $parts{'NATIONALPERIODID'} = 0;
+	    $parts{'PRODUCTCODE'} = $fields[12] || '';
+	    $parts{'CLIENTPRIMPORTCODE'} = $fields[16] || '';
+
+	    $parts{'ISLOAN'} = '';
+	    $parts{'ISLOAN'} = 1 if ($parts{'REGNATURE'} eq "LOAN");
+	    $parts{'DATETRANSFERRED'} = '0000-00-00';
+	    $parts{'PRODUCTAMOUNT'} = 0;
+	    $parts{'ISPAID'} = '';
+	    $parts{'TRANSACTIONNO'} = ''; #$fields[17] || '';
+	    $parts{'DATEPAID'} = '';
+        
+        $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
+        $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
+        $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
+        if ($parts{'PERSONTYPE'} eq 'MATCH OFFICIAL')    {
+            $parts{'PERSONTYPE'} = 'MAOFFICIAL';
         }
         if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
             $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';

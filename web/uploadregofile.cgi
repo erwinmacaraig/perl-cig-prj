@@ -53,6 +53,7 @@ if($uploaded_filename ne ''){
     $other_person_info{'regoID'} = $regoID if ($regoID);   
  	$other_person_info{'entitydocs'} = $isForEntity if ($isForEntity); 
 	$other_person_info{'replaceFileID'} = $replaceFileID if ($replaceFileID); 
+	$other_person_info{'nff'} = $notFromFlow if ($notFromFlow); 
 
 
     #UploadFiles::processUploadFile(\%Data,\@files,$Defs::LEVEL_PERSON,$personID,$Defs::UPLOADFILETYPE_DOC,\%other_person_info,);   

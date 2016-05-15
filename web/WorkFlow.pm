@@ -1858,7 +1858,7 @@ sub checkForOutstandingTasks {
                 }
                 auditLog($personRegistrationID, $Data, 'Registration Approved', 'Person Registration');
                 if ($ppref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_DOMESTIC_LOAN)    {
-                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $newStatus);
+                    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $regoref->{'strStatus'}, $newStatus, -1);
                 }
            ##############################################################################################################
         }

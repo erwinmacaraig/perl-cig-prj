@@ -1,5 +1,5 @@
-CREATE TABLE `tblWFRule` (
-  `intWFRuleID` int(11) NOT NULL AUTO_INCREMENT,
+CREATE TABLE `_tblRuleConfig` (
+  `intRuleConfigID` int(11) NOT NULL AUTO_INCREMENT,
   `intRealmID` int(11) NOT NULL DEFAULT '0',
   `intSubRealmID` int(11) NOT NULL DEFAULT '0',
   `intOriginLevel` int(11) DEFAULT '0',
@@ -29,8 +29,7 @@ CREATE TABLE `tblWFRule` (
   `intCopiedFromRuleID` int(11) DEFAULT '0' COMMENT 'The ID of the rule this record was copied from - used for tblWFRuleDocument setup',
   `intUsingPersonLevelChangeFilter` tinyint(4) DEFAULT '0' COMMENT 'Using Person Level change filter',
   `intPersonLevelChange` tinyint(4) DEFAULT '0' COMMENT 'Was Person Level changed',
-  PRIMARY KEY (`intWFRuleID`),
-  KEY `Entity` (`intWFRuleID`),
+  PRIMARY KEY (`intRuleConfigID`),
   KEY `index_intRealmID` (`intRealmID`,`intSubRealmID`),
   KEY `index_RuleFor` (`strWFRuleFor`),
   KEY `index_strPersonType` (`strPersonType`),

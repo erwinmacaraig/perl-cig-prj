@@ -183,7 +183,7 @@ sub postPersonRegistrationUpdate  {
     my $cgi              = new CGI;
     my %params           = $cgi->Vars();
 
-    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $currentStatus, $params->{'d_strStatus'});
+    addPersonRegistrationStatusChangeLog($Data, $personRegistrationID, $currentStatus, $params->{'d_strStatus'}, 0);
 
     my %flashMessage;
     $flashMessage{'flash'}{'type'} = 'success';
