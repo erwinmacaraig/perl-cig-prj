@@ -79,20 +79,22 @@ $Data{'db'}=$db;
     my $stWHERE = '';
     my $stJOIN= '';
     if ($Data{'clientValues'}{'authLevel'} == $Defs::LEVEL_PERSON)  {
-        $stWHERE = qq[ AND T.intID = $Data{'clientValues'}{'personID'}];
+        $stWHERE = qq[ AND T.intTableType =1 AND T.intID = $Data{'clientValues'}{'personID'}];
     }
     if ($Data{'clientValues'}{'authLevel'} >= $Defs::LEVEL_CLUB)  {
         ## Lets see if this level has access to the other people
         my $authID = getID($Data{'clientValues'}, $Data{'clientValues'}{'authLevel'});
         $stJOIN = qq[ 
             LEFT JOIN tblTempEntityStructure as TES ON (
-                TES.intChildID = PR.intEntityID 
+                IF (T.intTableType=1, TES.intChildID = PR.intEntityID, TES.intChildID = T.intID)
                 AND TES.intParentLevel = $Data{'clientValues'}{'authLevel'} 
             ) 
         ];
-        $stWHERE = qq[ AND (
+
+        $stWHERE .= qq[ AND (
             TES.intParentID = $authID
             OR PRE.intEntityID = $authID
+            
         )
         ];
     }
@@ -132,6 +134,7 @@ $Data{'db'}=$db;
                 $stJOIN
 			WHERE intTransLogID IN (?) 
 			AND T.intRealmID = ? AND T.intID = $intID	
+                AND IF(T.intTableType=1, M.intPersonID>0, M.intPersonID IS NULL)
                 $stWHERE
 			];
 			
