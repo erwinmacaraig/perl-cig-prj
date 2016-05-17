@@ -29,6 +29,9 @@ sub main {
     $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_3'} || 0;
     rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
 
+    $npID = $Data{'SystemConfig'}{'rolloverNationalPeriodID_4'} || 0;
+    rolloverRegoRecords(\%Data, $npID, $realmID) if ($npID);
+
 
 }
 
