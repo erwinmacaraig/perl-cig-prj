@@ -30,7 +30,15 @@ sub _getConfiguration {
             EntityCategories    => 1,
         },
     );
+    my $SystemConfig = $Data->{'SystemConfig'};
+    my $lang = $Data->{'lang'};
     my $txt_Clr = $Data->{'SystemConfig'}{'txtCLR'} || 'Clearance';
+    my $txt_Transactions = $Data->{'SystemConfig'}{'txns_link_name'} || 'Transaction';
+    my $txn_WHERE = '';
+    if ( $clientValues->{clubID} and $clientValues->{clubID} > 0 ) {
+        $txn_WHERE = qq[ AND TX.intTXNEntityID IN (0, $clientValues->{clubID})];
+    }
+
     my %config = (
         Name => 'Detailed Club Report',
 
@@ -89,6 +97,180 @@ sub _getConfiguration {
                     allowgrouping => 1,
                 }
               ],
+            #Transactions
+              intTransactionID => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction ID') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions'
+                }
+              ],
+              intProductNationalPeriodID => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Reporting') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => $CommonVals->{'NationalPeriods'},
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    allowgrouping   => 1
+                }
+            ],
+              intProductID => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => $CommonVals->{'Products'}{'Options'},
+                    dropdownorder   => $CommonVals->{'Products'}{'Order'},
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    multiple        => 1,
+                    size            => 6,
+                    dbfield         => 'TX.intProductID',
+                    allowgrouping   => 1
+                }
+              ],
+              strGroup => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Group') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions',
+                    ddbfield    => 'P.strGroup'
+                }
+              ],
+            strProductType=> [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Product Type') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions',
+                    ddbfield    => 'P.strProductType'
+                }
+              ],
+                ,
+              intQty => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Quantity') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    optiongroup => 'transactions',
+                    total       => 1
+                }
+              ],
+              TLstrReceiptRef => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'}
+                ? $lang->txt('Receipt Reference')
+                : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.strReceiptRef'
+                }
+              ],
+              payment_type => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Type') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::paymentTypes,
+                    allowsort       => 1,
+                    translate       => 1,
+                    optiongroup     => 'transactions',
+                    dbfield         => 'TL.intPaymentType',
+                    allowgrouping   => 1
+                }
+              ],
+              strTXN => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Bank Reference Number') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.strTXN'
+                }
+              ],
+              strOnlinePayReference => [
+                $lang->txt('Payment Reference Number'),
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.strOnlinePayReference'
+                }
+              ],
+            intLogID => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Log ID') : '',
+                {
+                    displaytype => 'text',
+                    fieldtype   => 'text',
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.intLogID'
+                }
+              ],
+             intTXNStatus => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Status') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::TransactionStatus,
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    dbfield         => 'TX.intStatus'
+                }
+              ],
+            intTransLogStatusID => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Status') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::TransLogStatus,
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    dbfield         => 'TL.intStatus'
+                }
+              ],
+              intAmount => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Order Total') : '',
+                {
+                    displaytype => 'currency',
+                    fieldtype   => 'text',
+                    allowsort   => 1,
+                    total       => 1,
+                    optiongroup => 'transactions',
+                    dbfield     => 'TL.intAmount'
+                }
+              ],
+              dtTransaction => [
+                ( $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Date') : '' ),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'datetime',
+                    allowsort   => 1,
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'transactions',
+                    dbfield     => 'TX.dtTransaction',
+                    sortfield   => 'TX.dtTransaction'
+                }
+              ],
+              dtPaid => [
+                ( $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Date') : '' ),
+                {
+                    displaytype => 'date',
+                    fieldtype   => 'datetime',
+                    allowsort   => 1,
+                    TZdatetimeformat => ['MEDIUM','MEDIUM'],
+                    optiongroup => 'transactions',
+                    dbfield     => 'TX.dtPaid'
+                }
+              ],
 
 
         },
@@ -120,10 +302,33 @@ sub _getConfiguration {
               strFax
               strEmail
                 strWebURL
+                intTransactionID
+                intTXNStatus
+                intProductNationalPeriodID
+                intProductID
+                strGroup
+                strProductType
+                intQty
+                TLstrReceiptRef
+                payment_type
+                strTXN
+                strOnlinePayReference
+                intLogID
+                intTransLogStatusID
+                intAmount 
+                dtTransaction
+                dtPaid
               )
         ],
         OptionGroups => {
             default        => [ $Data->{'lang'}->txt('Details'), {} ],
+            transactions => [
+                $txt_Transactions,
+                {
+                    from =>
+"LEFT JOIN tblTransactions AS TX ON (TX.intStatus<>-1 AND NOT (TX.intStatus IN (0,-1)) AND E.intEntityID=TX.intID AND TX.intTableType =0 $txn_WHERE) LEFT JOIN tblTransLog as TL ON (TL.intLogID = TX.intTransLogID)",
+                }
+            ],
         },
 
         Config => {
@@ -163,8 +368,13 @@ sub SQLBuilder  {
 
     $where_list=' AND '.$where_list if $where_list;# and ($where_levels or $current_where);
 
+    my $products_join = '';
+    if ( $from_list =~ /tblTransactions/ ) {
+        $products_join = qq[ LEFT JOIN tblProducts as P ON (P.intProductID=TX.intProductID)];
+    }
+
     $sql = qq[
-        SELECT
+        SELECT DISTINCT
             ###SELECT###
         FROM 
             tblEntity as E
@@ -178,6 +388,13 @@ sub SQLBuilder  {
             LEFT JOIN tblEntity as tblRegion ON (
                 RL.intParentID = tblRegion.intEntityID
             ) 
+            LEFT JOIN tblTransactions AS TX ON (
+                E.intEntityID=TX.intID AND TX.intTableType >1
+            ) 
+            LEFT JOIN tblTransLog as TL ON (
+                TL.intLogID = TX.intTransLogID
+            )
+            LEFT JOIN tblProducts as P ON (P.intProductID=TX.intProductID)
 
          WHERE
             E.intRealmID = $Data->{'Realm'}
