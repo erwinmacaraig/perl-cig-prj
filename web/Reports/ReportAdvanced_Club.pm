@@ -215,6 +215,17 @@ sub _getConfiguration {
                     dbfield     => 'TL.intLogID'
                 }
               ],
+             intTXNStatus => [
+                $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Transaction Status') : '',
+                {
+                    displaytype     => 'lookup',
+                    fieldtype       => 'dropdown',
+                    dropdownoptions => \%Defs::TransactionStatus,
+                    allowsort       => 1,
+                    optiongroup     => 'transactions',
+                    dbfield         => 'TX.intStatus'
+                }
+              ],
             intTransLogStatusID => [
                 $SystemConfig->{'AllowClubTXNs'} && $SystemConfig->{'AllowTXNrpts'} ? $lang->txt('Payment Status') : '',
                 {
@@ -292,6 +303,7 @@ sub _getConfiguration {
               strEmail
                 strWebURL
                 intTransactionID
+                intTXNStatus
                 intProductNationalPeriodID
                 intProductID
                 strGroup
