@@ -39,7 +39,7 @@ sub rolloverRegoItems {
             R.strItemType = 'PRODUCT'
             AND R.intID <= $maxOldProductID
             AND R.intRealmID=1
-            AND R.strRuleFor = 'REGO'
+            AND R.strRuleFor IN ('ENTITY','REGO')
     ];
 
     my $stDEL = qq[
