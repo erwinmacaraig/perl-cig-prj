@@ -2788,9 +2788,9 @@ sub viewTask {
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
             AND (
-                (ApprovalEntityLevel =$levelViewing AND intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
+                (rl.intApprovalEntityLevel=? AND intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
                 OR
-                (ProblemResolutionEntityLevel=$levelViewing AND intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
+                (rl.intProblemResolutionEntityLevel=? AND intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
             )
         LIMIT 1
     ];
@@ -2800,7 +2800,9 @@ sub viewTask {
 	 
 	$q->execute(
         $WFTaskID,
+        $levelViewing,
         $entityID,
+        $levelViewing,
         $entityID,
     ) or query_error($st);
 
