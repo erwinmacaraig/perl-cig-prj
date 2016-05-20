@@ -2638,7 +2638,7 @@ sub getTask {
 }
 
 sub viewTask {
-    my ($Data, $WFTID, $entityID) = @_;
+    my ($Data, $WFTID, $entityID, $levelViewing) = @_;
 
     #TODO
     #retrieve all necessary details here
@@ -2655,6 +2655,7 @@ sub viewTask {
 
     my $WFTaskID = $WFTID || safe_param('TID','number') || '';
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    $levelViewing ||= $Data->{'clientValues'}{'currentLevel'};
 
     my $st;
     
@@ -2768,6 +2769,7 @@ sub viewTask {
             dPersonRego.intPersonID as documentPersonID,
             tn.intTaskNoteID as currentNoteID,
 	    rl.intApprovalEntityLevel as ApprovalEntityLevel,
+        rl.intProblemResolutionEntityLevel as ProblemResolutionEntityLevel,
             rl.intWFRuleID as RuleID
         FROM tblWFTask AS t
         LEFT JOIN tblWFRule as rl ON (t.intWFRuleID = rl.intWFRuleID)
@@ -2785,9 +2787,9 @@ sub viewTask {
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
             AND (
-                (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
+                (ApprovalEntityLevel =$levelViewing AND intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
                 OR
-                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
+                (ProblemResolutionEntityLevel=$levelViewing AND intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
             )
         LIMIT 1
     ];
