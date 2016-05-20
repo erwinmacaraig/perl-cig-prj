@@ -2656,6 +2656,7 @@ sub viewTask {
     my $WFTaskID = $WFTID || safe_param('TID','number') || '';
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
     $levelViewing ||= $Data->{'clientValues'}{'currentLevel'};
+    $levelViewing ||= 0;
 
     my $st;
     
