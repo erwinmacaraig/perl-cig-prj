@@ -249,7 +249,7 @@ sub personRegistrationWorkTasks {
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
             )
             LEFT JOIN tblEntity as RejectedEntity ON (
-                RejectedEntity.intEntityID = WFT.intProblemResolutionEntityID
+                RejectedEntity.intEntityID = WFT.intProblemResolutionEntityID  AND WR.intProblemResolutionEntityLevel > 1
             )
         WHERE
             p.intRealmID = ?
