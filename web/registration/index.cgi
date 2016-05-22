@@ -49,6 +49,9 @@ sub main {
     $Data{'SelfRego'} = 1;
 
     my %clientValues = getClient($client);
+    $clientValues{'currentLevel'}= 1;
+    $clientValues{'authLevel'}= 1;
+
     $Data{'clientValues'} = \%clientValues;
 
     # AUTHENTICATE
