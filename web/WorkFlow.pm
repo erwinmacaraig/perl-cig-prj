@@ -2481,7 +2481,7 @@ sub rejectTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
-            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+            #$emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_REJECTED);
@@ -4674,7 +4674,7 @@ sub holdTask {
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($toEntityID);
             $emailNotification->setFromEntityID($fromEntityID);
-            $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+            #$emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
