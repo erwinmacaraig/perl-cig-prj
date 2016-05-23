@@ -1204,7 +1204,7 @@ sub addWorkFlowTasks {
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = 0;
            
-            if($originLevel == 1) {
+            if($originLevel == 999) {
                 $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
                 $emailNotification->setFromSelfUserID($problemEntityID);
             }
