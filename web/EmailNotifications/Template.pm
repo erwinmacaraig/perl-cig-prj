@@ -122,7 +122,7 @@ sub retrieve {
                 INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
                 INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
                 LEFT JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
-                LEFT JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ? and IF($fromLevel == 1, fromEntity.intEntityLevel = 1, fromEntityLevel>1))
+                LEFT JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ? and IF($fromLevel = 1, fromEntity.intEntityLevel = 1, fromEntity.intEntityLevel>1))
                 LEFT JOIN tblSelfUser tsu ON (tsu.intSelfUserID = ?)
                 LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
                 LEFT JOIN tblContactRoles tcrp ON (tcrp.intRealmID = ett.intRealmID AND tcrp.strRoleName = 'President')
