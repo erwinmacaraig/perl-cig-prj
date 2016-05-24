@@ -78,15 +78,11 @@ print STDERR "IN checkOpenPayments\n";
             INNER JOIN tblPaymentConfig as PC ON (PC.intPaymentConfigID = TL.intPaymentConfigID)
 	    INNER JOIN tblPayTry as PT ON (PT.intTransLogID = TL.intLogID)
         WHERE
-        TL.intStatus IN (0,3)
-            AND PC.strGatewayCode = 'checkoutfi'
-		AND  TL.intSentToGateway = 1 
-            AND TL.intPaymentGatewayResponded = 0
-            AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 25 minute)
+            TL.intLogID=279692
     ];
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 5 minute)
             #AND NOW() >= DATE_ADD(PT.dtTry, INTERVAL 1 hour)
-    my $checkURL = 'https://rpcapi.checkout.fi/poll';
+    my $checkURL = 'https://rpcapi.checkout.fi/poll2';
     my $query = $db->prepare($st);
     $query->execute();
     while (my $dref = $query->fetchrow_hashref())   {
@@ -141,6 +137,8 @@ print STDERR Dumper(\%APIResponse);
 print STDERR "--- $retval\n";
 	next if $retval =~/error/;
 	next if $retval !~/status/;
+
+next;
 
 
         #my $dataIN= XMLin($retval);
