@@ -28,6 +28,7 @@ sub new {
         _data               => $args{data} || undef,
         _workTaskDetails    => $args{workTaskDetails} || undef,
         _toOriginLevel      => $args{OriginLevel} || undef,
+        _fromOriginLevel      => $args{fromOriginLevel} || undef,
     };
 
     $self = bless ($self, $class);
@@ -110,6 +111,12 @@ sub getWorkTaskDetails {
     my ($self) = shift;
     return $self->{_workTaskDetails};
 }
+
+sub getFromOriginLevel {
+    my ($self) = shift;
+    return $self->{_fromOriginLevel} || 100;
+}
+
 
 sub getToOriginLevel {
     my ($self) = shift;
@@ -240,6 +247,11 @@ sub setWorkTaskDetails {
     $self->{_workTaskDetails} = $workTaskDetails if defined $workTaskDetails;
 }
 
+sub setFromOriginLevel {
+    my $self = shift;
+    my ($fromoriginLevel) = @_;
+    $self->{_fromOriginLevel} = $fromoriginLevel if defined $fromoriginLevel;
+}
 sub setToOriginLevel {
     my $self = shift;
     my ($originLevel) = @_;
