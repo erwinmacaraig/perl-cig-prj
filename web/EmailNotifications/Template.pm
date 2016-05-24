@@ -139,7 +139,7 @@ sub retrieve {
 
         push @params, $self->{_notificationObj}->getToEntityID();
         push @params, $self->{_notificationObj}->getFromEntityID();
-        push @params, $self->{_notificationObj}->getFromEntityID() || $self->{_notificationObj}->getFromSelfUserID();
+        push @params, if ($fromLevel == $Defs::LEVEL_PERSON) ? $self->{_notificationObj}->getFromSelfUserID() || $self->{_notificationObj}->getFromEntityID() : $self->{_notificationObj}->getFromEntityID(),
         push @params, $self->{_notificationObj}->getRealmID();
         push @params, $self->{_notificationObj}->getSubRealmID();
         push @params, $self->{_notificationObj}->getNotificationType();
