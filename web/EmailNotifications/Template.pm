@@ -227,6 +227,7 @@ sub build {
             \%TemplateData,
             'emails/' . $templateFile
         );
+#print STDERR Dumper(\%TemplateData);
 
         $TemplateData{'content'} = $content;
 
