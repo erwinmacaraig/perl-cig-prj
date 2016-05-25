@@ -1187,15 +1187,23 @@ sub addWorkFlowTasks {
             my $problemEntityID = 0;
            
             #$emailNotification->setFromSelfUserID(0);
+            #if($originLevel == 1) {
             if($originLevel == 1) {
                 $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
                 $emailNotification->setFromSelfUserID($problemEntityID);
-                $emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
             }
             else {
-                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
-                $emailNotification->setFromOriginLevel($dref->{'intProblemResolutionEntityLevel'});
-                $emailNotification->setFromEntityID($problemEntityID);
+                if ($dref->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                    $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
+                    $emailNotification->setFromSelfUserID($problemEntityID);
+                    $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+                }
+                if ($dref->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                    $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+                    $emailNotification->setFromEntityLevel($dref->{'intProblemResolutionEntityLevel'});
+                    $emailNotification->setFromEntityID($problemEntityID);
+                }
             }
 
             if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeEntityLevel'}) {
@@ -1480,13 +1488,11 @@ sub approveTask {
             if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
                 #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
                 $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+                $emailNotification->setToOriginLevel($task->{'intProblemResolutionEntityLevel'});
             }
             if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
-                #$emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
                 $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-                #$emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
-                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
 
             }
         
@@ -1653,10 +1659,11 @@ sub checkForOutstandingTasks {
             $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
             if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
                 $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($task->{'intProblemResolutionEntityLevel'});
             }
             if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
                 $emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
-                $emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
             }
             #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
@@ -2378,6 +2385,7 @@ sub resolveTask {
         $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
             if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
                 $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($task->{'intProblemResolutionEntityLevel'});
             }
             if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
                 $emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
@@ -2491,10 +2499,11 @@ sub rejectTask {
             $emailNotification->setSubRealmID(0);
             if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
                 $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($task->{'intProblemResolutionEntityLevel'});
             }
             if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
                 $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
-                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
             }
             #$emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
@@ -4615,13 +4624,19 @@ print STDERR "THE LEVEL HERE IN $levelViewing !\n";
             my $nType = $task->{'intOnHold'} == 0 ? $Defs::NOTIFICATION_WFTASK_HELD : $Defs::NOTIFICATION_WFTASK_RESUMED;
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            if ($toLevel > $Defs::LEVEL_PERSON)    { $emailNotification->setToEntityID($toEntityID); }
+            if ($toLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($toLevel);
+            }
             if ($toLevel == $Defs::LEVEL_PERSON)    { 
                 $emailNotification->setToEntityID($toEntityID); 
-                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
             }
             #$emailNotification->setToEntityID($toEntityID);
-            if ($fromLevel > $Defs::LEVEL_PERSON)    { $emailNotification->setFromEntityID($fromEntityID); }
+            if ($fromLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromEntityID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($fromLevel);
+            }
             if ($fromLevel == $Defs::LEVEL_PERSON)    { 
                 $emailNotification->setFromSelfUserID($fromEntityID); 
                 $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
@@ -4721,17 +4736,23 @@ sub holdTask {
             my $nType = $Defs::NOTIFICATION_WFTASK_HELD;
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            if ($toLevel > $Defs::LEVEL_PERSON)    { $emailNotification->setToEntityID($toEntityID); }
+            if ($toLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($toLevel);
+            }
             if ($toLevel == $Defs::LEVEL_PERSON)    { 
                 #$emailNotification->setToEntityID($toEntityID); 
                 $emailNotification->setToEntityID($toEntityID); 
-                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
             }
             #$emailNotification->setToEntityID($toEntityID);
-            if ($fromLevel > $Defs::LEVEL_PERSON)    { $emailNotification->setFromEntityID($fromEntityID); }
+            if ($fromLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromEntityID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($fromLevel);
+            }
             if ($fromLevel == $Defs::LEVEL_PERSON)    { 
                 $emailNotification->setFromSelfUserID($fromEntityID); 
-                $emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
             }
             #$emailNotification->setFromEntityID($fromEntityID);
             #$emailNotification->setToEntityID($toEntityID);
