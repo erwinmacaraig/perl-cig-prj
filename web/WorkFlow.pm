@@ -1478,11 +1478,16 @@ sub approveTask {
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
-                $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             }
             if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
-                $emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
-                $emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
+                #$emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                #$emailNotification->setFromOriginLevel($Defs::LEVEL_PERSON); 
+                $emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+
             }
         
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
