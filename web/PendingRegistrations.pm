@@ -80,11 +80,13 @@ sub listPendingRegistrations    {
             DATE_FORMAT(pr.dtAdded, "%Y-%m-%d") as dtAdded_formatted,
             DATE_FORMAT(pr.dtLastUpdated, "%Y%m%d%H%i") as dtLastUpdated_,
             er.strEntityRoleName,
+            WR.intProblemResolutionEntityLevel,
             WFT.strTaskType as WFTTaskType,
 		WR.intAutoActivateOnPayment,
             ApprovalEntity.strLocalName as ApprovalLocalName,
             ApprovalEntity.strLatinName as ApprovalEntityName,
             RejectedEntity.strLocalName as RejectedLocalName,
+            CONCAT(SU.strFirstName, ' ', SU.strFamilyName) as SelfUserRjected,
             RejectedEntity.strLatinName as RejectedEntityName
         FROM
             tblPersonRegistration_$Data->{'Realm'} AS pr
@@ -110,7 +112,10 @@ sub listPendingRegistrations    {
                 ApprovalEntity.intEntityID = WFT.intApprovalEntityID
             )
             LEFT JOIN tblEntity as RejectedEntity ON (
-                RejectedEntity.intEntityID = WFT.intProblemResolutionEntityID
+                RejectedEntity.intEntityID = WFT.intProblemResolutionEntityID and WR.intProblemResolutionEntityLevel > 1
+            )
+            LEFT JOIN tblSelfUser as SU ON (
+                SU.intSelfUserID = WFT.intProblemResolutionEntityID and WR.intProblemResolutionEntityLevel = 1
             )
         WHERE
             p.intRealmID = ?

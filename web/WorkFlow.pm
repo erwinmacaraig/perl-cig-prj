@@ -452,6 +452,7 @@ sub listTasks {
      my(
         $Data,
     ) = @_;
+    my $levelViewing = $Data->{'clientValues'}{'currentLevel'} || 0;
 
 	my $body = '';
    	my $st = '';
@@ -502,7 +503,9 @@ sub listTasks {
             pr.strPreviousPersonLevel,
             IF(t.strWFRuleFor = 'ENTITY', e.intCreatedByEntityID, IF(t.strWFRuleFor = 'REGO', pr.intOriginID, 0)) as CreatedByEntityID,
             IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', 'REGO', '')) as sysConfigApprovalLockRuleFor,
-            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired
+            IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
+            tblWFRule.intApprovalEntityLevel,
+            tblWFRule.intProblemResolutionEntityLevel
 	    FROM tblWFTask AS t
                 LEFT JOIN tblWFRule ON (tblWFRule.intWFRuleID = t.intWFRuleID)
                 LEFT JOIN tblEntity as e ON (e.intEntityID = t.intEntityID)
@@ -511,9 +514,9 @@ sub listTasks {
 		LEFT JOIN tblEntity AS preqFrom ON (preqFrom.intEntityID = preq.intRequestFromEntityID)
 		LEFT JOIN tblEntity AS preqTo ON (preqTo.intEntityID = preq.intRequestToEntityID)
 		LEFT JOIN tblPerson AS p ON (t.intPersonID = p.intPersonID)
-		LEFT JOIN tblUserAuthRole AS uar ON ( t.intApprovalEntityID = uar.entityID )
+		LEFT JOIN tblUserAuthRole AS uar ON ( tblWFRule.intApprovalEntityLevel > 1 AND t.intApprovalEntityID = uar.entityID )
 		LEFT OUTER JOIN tblDocumentType AS dt ON (t.intDocumentTypeID = dt.intDocumentTypeID)
-		LEFT JOIN tblUserAuthRole AS uarRejected ON ( t.intProblemResolutionEntityID = uarRejected.entityID )
+		LEFT JOIN tblUserAuthRole AS uarRejected ON ( tblWFRule.intProblemResolutionEntityLevel > 1 AND .t.intProblemResolutionEntityID = uarRejected.entityID )
 		WHERE
                   t.intRealmID = $Data->{'Realm'}
                 AND (
@@ -533,39 +536,18 @@ sub listTasks {
                     )
                 )
 		    AND (
-                      (t.intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
+                      (tblWFRule.intApprovalEntityLevel = ? AND t.intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' OR t.strTaskStatus = 'REJECTED'))
                         OR
-                      (((t.intProblemResolutionEntityID = ?) or (t.intProblemResolutionEntityID = ? AND t.intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
+                      (((tblWFRule.intProblemResolutionEntityLevel = ? AND t.intProblemResolutionEntityID = ?) or (tblWFRule.intApprovalEntityLevel = tblWFRule.intProblemResolutionEntityLevel AND t.intProblemResolutionEntityID = ? AND t.intApprovalEntityID = ?)) AND t.strTaskStatus = 'HOLD')
             )
     ];
-    #OR
-    #(intOnHold = 1 AND (intApprovalEntityID = ? OR intProblemResolutionEntityID = ?))
-
-    #p.intSystemStatus != $Defs::PERSONSTATUS_POSSIBLE_DUPLICATE
-    #AND
-
-
-#print STDERR Dumper 'VALUE IS:' .$st;
-        #my $userID = $Data->{'clientValues'}{'userID'}
-        ## if ($userID)
-        ## $st .= qqp AND t.intCreatedByUserID <> $userID ];
-
-            #uar.userID as UserID,
-            #uarRejected.userID as RejectedUserID,
-            #AND t.intApprovalRoleID = uar.roleId
-			#AND t.intProblemResolutionRoleID = uarRejected.roleId
-            #AND
-            #(
-            #    uar.userID = ?
-            #    OR uarRejected.userID = ?
-            #)
-		#$Data->{'clientValues'}{'userID'},
-		#$Data->{'clientValues'}{'userID'},
 
 	$db=$Data->{'db'};
 	$q = $db->prepare($st) or query_error($st);
 	$q->execute(
+        $levelViewing,
 		$entityID,
+        $levelViewing,
 		$entityID,
 		$entityID,
 		$entityID,
@@ -591,7 +573,6 @@ sub listTasks {
         #next if (
         #    $dref->{strTaskStatus} eq $Defs::WF_TASK_STATUS_HOLD
         #    and $dref->{'intApprovalEntityID'} != $entityID
-        #    and $dref->{'intProblemResolutionEntityID'} != $entityID
         #    and ($dref->{'CreatedByEntityID'} != $entityID)
         #);
 
@@ -646,13 +627,13 @@ sub listTasks {
         }
 
         my $showReject=0;
-        $showReject = 1 if ($dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
+        $showReject = 1 if ($dref->{'intProblemResolutionEntityLevel'} == $levelViewing and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
 
         my $showApprove=0;
-        $showApprove= 1 if ($dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
+        $showApprove= 1 if ($dref->{'intApprovalEntityLevel'} == $levelViewing and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID);
 
         my $showResolve=0;
-        $showResolve= 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+        $showResolve= 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityLevel'} == $levelViewing and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
 
         my $showView = 0;
         $showView = 1 if(($showApprove and $dref->{'OnHold'} == 1) or ($showResolve and $dref->{'OnHold'} == 1) or $dref->{'OnHold'} == 0);
@@ -1194,23 +1175,35 @@ sub addWorkFlowTasks {
     }
 
     
-    my $emailNotification = new EmailNotifications::WorkFlow();
 	
     my $activeRuleSkipped = 0;
     my @Tasks=();
     if ($checkOk)   {
         while (my $dref= $q->fetchrow_hashref())    {
+
+                my $emailNotification = new EmailNotifications::WorkFlow();
 			
             my $approvalEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intApprovalEntityLevel'}) || 0;
             my $problemEntityID = 0;
            
-            if($originLevel == 999) {
+            #$emailNotification->setFromSelfUserID(0);
+            #if($originLevel == 1) {
+            if($originLevel == 1) {
                 $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
                 $emailNotification->setFromSelfUserID($problemEntityID);
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
             }
             else {
-                $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
-                $emailNotification->setFromEntityID($problemEntityID);
+                if ($dref->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                    $problemEntityID = doesSelfUserHaveAccess($Data, $dref->{'intPersonID'}, $dref->{'intCreatedByUserID'}) ? $dref->{'intCreatedByUserID'} : 0;
+                    $emailNotification->setFromSelfUserID($problemEntityID);
+                    $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+                }
+                if ($dref->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                    $problemEntityID = getEntityParentID($Data, $dref->{RegoEntity}, $dref->{'intProblemResolutionEntityLevel'});
+                    $emailNotification->setFromEntityLevel($dref->{'intProblemResolutionEntityLevel'});
+                    $emailNotification->setFromEntityID($problemEntityID);
+                }
             }
 
             if (! $problemEntityID and $Data->{'SystemConfig'}{'allowRuleProblemToBeEntityLevel'}) {
@@ -1492,7 +1485,17 @@ sub approveTask {
         if($emailNotification) {
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($task->{'intProblemResolutionEntityLevel'});
+            }
+            if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
+
+            }
+        
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
@@ -1654,7 +1657,15 @@ sub checkForOutstandingTasks {
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
             $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
-            $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+            if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($task->{'intProblemResolutionEntityLevel'});
+            }
+            if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                $emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+            }
+            #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setDefsEmail($Defs::admin_email); #if set, this will be used instead of toEntityID
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_ADDED);
@@ -1954,9 +1965,7 @@ sub updateTaskNotes {
     my $targetAction = "";
     my $targetTemplate = "",
 
-    #identify type of action (rejection or resolution based on intApprovalEntityID and intProblemResolutionID)
     my $entityID = $selfUserAsEntityID || getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
-    #my $type = ($entityID == $task->{'intApprovalEntityID'}) ? 'REJECT' : ($entityID == $task->{'intProblemResolutionEntityID'}) ? 'RESOLVE' : '';
     my $WFRejectCurrentNoteID = $task->{'rejectTaskNoteID'} || 0;
     my $WFToggleCurrentNoteID = $task->{'toggleTaskNoteID'} || 0;
     my $WFHoldCurrentNoteID = $task->{'holdTaskNoteID'} || 0;
@@ -2292,6 +2301,7 @@ sub resolveTask {
 
     return 0 if($selfUserEntityID
                 and $selfUserEntityID != $task->{'intProblemResolutionEntityID'}
+                and $task->{'intProblemResolutionEntityLevel'} != 1
                 and !doesSelfUserHaveAccess($Data, $task->{'intPersonID'}, $selfUserEntityID));
 
 	my $srn = qq[
@@ -2373,7 +2383,15 @@ sub resolveTask {
         $emailNotification->setRealmID($Data->{'Realm'});
         $emailNotification->setSubRealmID(0);
         $emailNotification->setToEntityID($task->{'intApprovalEntityID'});
-        $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+            if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                $emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($task->{'intProblemResolutionEntityLevel'});
+            }
+            if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                $emailNotification->setFromSelfUserID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+            }
+        #$emailNotification->setFromEntityID($task->{'intProblemResolutionEntityID'});
         $emailNotification->setDefsEmail($Defs::admin_email);
         $emailNotification->setDefsName($Defs::admin_email_name);
         $emailNotification->setNotificationType($Defs::NOTIFICATION_WFTASK_RESOLVED);
@@ -2479,7 +2497,15 @@ sub rejectTask {
         if($emailNotification) {
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+            if ($task->{'intProblemResolutionEntityLevel'} > $Defs::LEVEL_PERSON)    {
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($task->{'intProblemResolutionEntityLevel'});
+            }
+            if ($task->{'intProblemResolutionEntityLevel'} == $Defs::LEVEL_PERSON)    {
+                $emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
+            }
+            #$emailNotification->setToEntityID($task->{'intProblemResolutionEntityID'});
             $emailNotification->setFromEntityID($task->{'intApprovalEntityID'});
             #$emailNotification->setToOriginLevel($task->{'intOriginLevel'});
             $emailNotification->setDefsEmail($Defs::admin_email);
@@ -2574,6 +2600,7 @@ sub getTask {
             IF(t.strWFRuleFor = 'ENTITY', IF(e.intEntityLevel = -47, 'VENUE', IF(e.intEntityLevel = 3, 'CLUB', '')), IF(t.strWFRuleFor = 'REGO', IF(t.strRegistrationNature = 'TRANSFER', 'TRANSFER', ''), ''))as sysConfigApprovalLockRuleFor,
             IF(t.strWFRuleFor = 'ENTITY', e.intPaymentRequired, IF(t.strWFRuleFor = 'REGO', pr.intPaymentRequired, 0)) as paymentRequired,
             pr.intPersonRegistrationID,
+            pr.intCreatedByUserID,
             pr.strPersonType,
             pr.strAgeLevel,
             pr.strPersonEntityRole,
@@ -2638,7 +2665,7 @@ sub getTask {
 }
 
 sub viewTask {
-    my ($Data, $WFTID, $entityID) = @_;
+    my ($Data, $WFTID, $entityID, $levelViewing) = @_;
 
     #TODO
     #retrieve all necessary details here
@@ -2655,6 +2682,8 @@ sub viewTask {
 
     my $WFTaskID = $WFTID || safe_param('TID','number') || '';
     $entityID ||= getID($Data->{'clientValues'},$Data->{'clientValues'}{'currentLevel'});
+    $levelViewing ||= $Data->{'clientValues'}{'currentLevel'};
+    $levelViewing ||= 0;
 
     my $st;
     
@@ -2768,6 +2797,7 @@ sub viewTask {
             dPersonRego.intPersonID as documentPersonID,
             tn.intTaskNoteID as currentNoteID,
 	    rl.intApprovalEntityLevel as ApprovalEntityLevel,
+        rl.intProblemResolutionEntityLevel as ProblemResolutionEntityLevel,
             rl.intWFRuleID as RuleID
         FROM tblWFTask AS t
         LEFT JOIN tblWFRule as rl ON (t.intWFRuleID = rl.intWFRuleID)
@@ -2785,9 +2815,9 @@ sub viewTask {
             t.intRealmID = $Data->{'Realm'}
             AND t.intWFTaskID = ?
             AND (
-                (intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
+                (rl.intApprovalEntityLevel=? AND intApprovalEntityID = ? AND (t.strTaskStatus = 'ACTIVE' or t.strTaskStatus = 'HOLD' or t.strTaskStatus = 'REJECTED'))
                 OR
-                (intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
+                (rl.intProblemResolutionEntityLevel=? AND intProblemResolutionEntityID = ? AND t.strTaskStatus = 'HOLD')
             )
         LIMIT 1
     ];
@@ -2797,7 +2827,9 @@ sub viewTask {
 	 
 	$q->execute(
         $WFTaskID,
+        $levelViewing,
         $entityID,
+        $levelViewing,
         $entityID,
     ) or query_error($st);
 
@@ -2844,7 +2876,7 @@ sub viewTask {
     my $showToggle = 0;
     #make sure only the current assignee can put on hold or resume the task
     $showToggle = 1
-        if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID)
+        if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_REJECTED and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing)
             or ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID));
 
     my $showHold = 0;
@@ -2855,9 +2887,9 @@ sub viewTask {
     my $showReject = 0;
     #$showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
     $showReject = 1 if (
-        ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID)
+        ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing)
         or
-        ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} eq $dref->{'intApprovalEntityID'})
+        ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} eq $dref->{'intApprovalEntityID'} and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing)
     );
 
     my $showApprove = 0;
@@ -2865,13 +2897,13 @@ sub viewTask {
     $showApprove = 1 if (($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE) and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
 	
     my $showResolve = 0;
-    $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+    $showResolve = 1 if ($dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing);
 
     my ($showAddFields, $showEditFields) = (0, 0);
-    $showAddFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
-    $showEditFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID);
+    $showAddFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing);
+    $showEditFields = 1  if ($dref->{'intEntityLevel'} == $Defs::LEVEL_VENUE and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_HOLD and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing);
 
-    my ($DocumentData, $fields, $documentStatusCount) = populateDocumentViewData($Data, $dref);
+    my ($DocumentData, $fields, $documentStatusCount) = populateDocumentViewData($Data, $dref, $levelViewing);
     %DocumentData = %{$DocumentData};
 
     my $disableApprove = ($documentStatusCount->{'PENDING'} or $documentStatusCount->{'MISSING'} or $documentStatusCount->{'REJECTED'}) ? 1 : 0;
@@ -3317,8 +3349,9 @@ WHERE pr.intPersonID = ? AND pr.intEntityID = ?];
 }
 
 sub populateDocumentViewData {
-    my ($Data, $dref) = @_;
+    my ($Data, $dref, $levelViewing) = @_;
 
+    $levelViewing ||= $Data->{'clientValues'}{'currentLevel'};
 
     #need to retrieve list of documents here
     #since a specific work flow rule can have
@@ -3434,6 +3467,8 @@ sub populateDocumentViewData {
             tuf.intFileID,
             wt.intApprovalEntityID,
             wt.intProblemResolutionEntityID,
+            wr.intProblemResolutionEntityLevel,
+            wr.intApprovalEntityLevel,
             dt.strDocumentName,
 			dt.strDescription AS descr,
             dt.strDocumentFor,
@@ -3645,7 +3680,7 @@ sub populateDocumentViewData {
 		
 		$addLink = qq[ <a href="#" class="btn-inside-docs-panel" onclick="replaceFile(0,'$parameters','$docName','$docDesc');return false;">]. $Data->{'lang'}->txt('Add') . q[</a>] if (!$Data->{'ReadOnlyLogin'});
 
-        if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1) {
+        if($tdref->{'intAllowProblemResolutionEntityAdd'} == 1 and $tdref->{'intProblemResolutionEntityLevel'} == $levelViewing) {
             if(!$tdref->{'intDocumentID'}){
                 $displayAdd = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;                
             }
@@ -3654,7 +3689,7 @@ sub populateDocumentViewData {
             }
         }
 
-        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1) {
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityAdd'} == 1 and $tdref->{'intApprovalEntityLevel'} == $levelViewing) {
             if(!$tdref->{'intDocumentID'}){
                 $displayAdd = 1;
             }
@@ -3663,12 +3698,12 @@ sub populateDocumentViewData {
             }
         }
         
-        if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}) {
+        if($tdref->{'intAllowProblemResolutionEntityVerify'} == 1 and !$tdref->{'intDocumentID'}  and $tdref->{'intProblemResolutionEntityLevel'} == $levelViewing) {
             $displayVerify = $entityID == $tdref->{'intProblemResolutionEntityID'} ? 1 : 0;
         }
 
         #if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and $tdref->{'intDocumentID'}) {
-        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and ($tdref->{'intDocumentID'} or $fileID)) {
+        if ($tdref->{'intApprovalEntityID'} == $entityID and $tdref->{'intAllowApprovalEntityVerify'} == 1 and ($tdref->{'intDocumentID'} or $fileID) and $tdref->{'intApprovalEntityLevel'} == $levelViewing) {
             $displayVerify = 1;
         }
 
@@ -4538,6 +4573,8 @@ sub updateTaskScreen {
 
 sub toggleTask {
     my ($Data, $emailNotification) = @_;
+    my $levelViewing = $Data->{'clientValues'}{'currentLevel'};
+print STDERR "THE LEVEL HERE IN $levelViewing !\n";
 
     my $WFTaskID = safe_param('TID','number') || '';
     my $task = getTask($Data, $WFTaskID);
@@ -4568,22 +4605,44 @@ sub toggleTask {
 
         my $toEntityID = undef;
         my $fromEntityID = undef;
+        my $toLevel = 0;
+        my $fromLevel=0;
 
-        if($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) {
+        if($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID and $levelViewing == $task->{'intApprovalEntityLevel'}) {
             $toEntityID = $task->{'intProblemResolutionEntityID'};
+            $toLevel = $task->{'intProblemResolutionEntityLevel'};
             $fromEntityID = $task->{'intApprovalEntityID'};
+            $fromLevel = $task->{'intApprovalEntityLevel'};
         }
-        elsif($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID) {
+        elsif($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID and $levelViewing == $task->{'intProblemResolutionEntityLevel'}) {
             $toEntityID = $task->{'intApprovalEntityID'};
+            $toLevel = $task->{'intApprovalEntityLevel'};
             $fromEntityID = $task->{'intProblemResolutionEntityID'};
+            $fromLevel = $task->{'intProblemResolutionEntityLevel'};
         }
 
         if($emailNotification and $toEntityID and $fromEntityID) {
             my $nType = $task->{'intOnHold'} == 0 ? $Defs::NOTIFICATION_WFTASK_HELD : $Defs::NOTIFICATION_WFTASK_RESUMED;
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($toEntityID);
-            $emailNotification->setFromEntityID($fromEntityID);
+            if ($toLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($toLevel);
+            }
+            if ($toLevel == $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
+            }
+            #$emailNotification->setToEntityID($toEntityID);
+            if ($fromLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromEntityID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($fromLevel);
+            }
+            if ($fromLevel == $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromSelfUserID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+            }
+            #$emailNotification->setFromEntityID($fromEntityID);
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
@@ -4658,23 +4717,47 @@ sub holdTask {
 
         my $toEntityID = undef;
         my $fromEntityID = undef;
+        my $toLevel = 0;
+        my $fromLevel=0;
 
         if($task->{'strTaskStatus'} eq 'ACTIVE' and $task->{'intApprovalEntityID'} == $entityID) {
             $toEntityID = $task->{'intProblemResolutionEntityID'};
+            $toLevel = $task->{'intProblemResolutionEntityLevel'};
             $fromEntityID = $task->{'intApprovalEntityID'};
+            $fromLevel = $task->{'intApprovalEntityLevel'};
         }
         elsif($task->{'strTaskStatus'} eq 'REJECTED' and $task->{'intProblemResolutionEntityID'} == $entityID) {
             $toEntityID = $task->{'intApprovalEntityID'};
+            $toLevel = $task->{'intApprovalEntityLevel'};
             $fromEntityID = $task->{'intProblemResolutionEntityID'};
+            $fromLevel = $task->{'intProblemResolutionEntityLevel'};
         }
 
         if($emailNotification and $toEntityID and $fromEntityID) {
             my $nType = $Defs::NOTIFICATION_WFTASK_HELD;
             $emailNotification->setRealmID($Data->{'Realm'});
             $emailNotification->setSubRealmID(0);
-            $emailNotification->setToEntityID($toEntityID);
-            $emailNotification->setFromEntityID($fromEntityID);
-            #$emailNotification->setToOriginLevel($task->{'intOriginLevel'});
+            if ($toLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($toLevel);
+            }
+            if ($toLevel == $Defs::LEVEL_PERSON)    { 
+                #$emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToEntityID($toEntityID); 
+                $emailNotification->setToOriginLevel($Defs::LEVEL_PERSON);
+            }
+            #$emailNotification->setToEntityID($toEntityID);
+            if ($fromLevel > $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromEntityID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($fromLevel);
+            }
+            if ($fromLevel == $Defs::LEVEL_PERSON)    { 
+                $emailNotification->setFromSelfUserID($fromEntityID); 
+                $emailNotification->setFromEntityLevel($Defs::LEVEL_PERSON); 
+            }
+            #$emailNotification->setFromEntityID($fromEntityID);
+            #$emailNotification->setToEntityID($toEntityID);
+            #$emailNotification->setFromEntityID($fromEntityID);
             $emailNotification->setDefsEmail($Defs::admin_email);
             $emailNotification->setDefsName($Defs::admin_email_name);
             $emailNotification->setNotificationType($nType);
@@ -4941,17 +5024,25 @@ sub getRegistrationWorkTasks {
     while(my $tdref = $q->fetchrow_hashref()) {
         my $approvalEntity;
         my $problemResolutionEntity;
+        my $problemResolutionEntityName = '';
         my $taskType;
 
         switch($tdref->{'intProblemResolutionEntityLevel'}) {
+            case 1 {
+                $problemResolutionEntity = getInstanceOf($Data, 'club', $tdref->{'intProblemResolutionEntityID'});
+                $problemResolutionEntityName = $Data->{'lang'}->txt("Self Registration");
+            }
             case 3 {
                 $problemResolutionEntity = getInstanceOf($Data, 'club', $tdref->{'intProblemResolutionEntityID'});
+                $problemResolutionEntityName = $problemResolutionEntity ? $problemResolutionEntity->name() : '';
             }
             case 20 {
                 $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
+                $problemResolutionEntityName = $problemResolutionEntity ? $problemResolutionEntity->name() : '';
             }
             case 100 {
                 $problemResolutionEntity = getInstanceOf($Data, 'entity', $tdref->{'intProblemResolutionEntityID'});
+                $problemResolutionEntityName = $problemResolutionEntity ? $problemResolutionEntity->name() : '';
             }
         }
 
@@ -4983,7 +5074,7 @@ sub getRegistrationWorkTasks {
             TaskID => $tdref->{'intWFTaskID'},
             TaskType => $taskType,
             ApprovalEntity => $approvalEntity ? $approvalEntity->name() : $Data->{'lang'}->txt("N/A"),
-            ProblemResolutionEntity => $problemResolutionEntity ? $problemResolutionEntity->name() : $Data->{'lang'}->txt("N/A"),
+            ProblemResolutionEntity => $problemResolutionEntityName ? $problemResolutionEntityName : $Data->{'lang'}->txt("N/A"),
             TaskNotes => $workTaskNotes->{'TaskNotes'},
             NotesBlock => $notesBlock,
         );
