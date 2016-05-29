@@ -1362,7 +1362,7 @@ sub display_complete {
                 $self->{'Data'},
                 'PERSON',
                 'NEW',
-                $self->{'ClientValues'}{'authLevel'} || 0,
+                1,#$self->{'ClientValues'}{'authLevel'} || 0,
                 getID($self->{'ClientValues'}) || 0,
                 $personID,
                 0,

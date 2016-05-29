@@ -96,6 +96,7 @@ sub retrieve {
     }
     else {
         print STDERR Dumper "ORIGIN LEVEL NOT DEFINED ";
+        my $fromLevel = $self->{_notificationObj}->getFromEntityLevel() || 3;
         $st = qq[
             SELECT
                 r.strRealmName,
@@ -121,7 +122,7 @@ sub retrieve {
                 INNER JOIN tblRealms r ON (r.intRealmID = ett.intRealmID)
                 INNER JOIN tblEmailTemplates et ON (et.intEmailTemplateTypeID = ett.intEmailTemplateTypeID)
                 LEFT JOIN tblEntity toEntity ON (toEntity.intRealmID = ett.intRealmID AND toEntity.intEntityID = ?)
-                LEFT JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ?)
+                LEFT JOIN tblEntity fromEntity ON (fromEntity.intRealmID = ett.intRealmID AND fromEntity.intEntityID = ? and IF($fromLevel = 1, fromEntity.intEntityLevel = 1, fromEntity.intEntityLevel>1))
                 LEFT JOIN tblSelfUser tsu ON (tsu.intSelfUserID = ?)
                 LEFT JOIN tblContactRoles tcrs ON (tcrs.intRealmID = ett.intRealmID AND tcrs.strRoleName = 'Secretary')
                 LEFT JOIN tblContactRoles tcrp ON (tcrp.intRealmID = ett.intRealmID AND tcrp.strRoleName = 'President')
@@ -138,7 +139,9 @@ sub retrieve {
 
         push @params, $self->{_notificationObj}->getToEntityID();
         push @params, $self->{_notificationObj}->getFromEntityID();
-        push @params, $self->{_notificationObj}->getFromEntityID() || $self->{_notificationObj}->getFromSelfUserID();
+        my $idValue = ($fromLevel == $Defs::LEVEL_PERSON) ? $self->{_notificationObj}->getFromSelfUserID() || $self->{_notificationObj}->getFromEntityID() : $self->{_notificationObj}->getFromEntityID();
+
+        push @params, $idValue || 0;
         push @params, $self->{_notificationObj}->getRealmID();
         push @params, $self->{_notificationObj}->getSubRealmID();
         push @params, $self->{_notificationObj}->getNotificationType();
@@ -226,6 +229,7 @@ sub build {
             \%TemplateData,
             'emails/' . $templateFile
         );
+#print STDERR Dumper(\%TemplateData);
 
         $TemplateData{'content'} = $content;
 

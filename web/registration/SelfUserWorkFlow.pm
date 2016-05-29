@@ -255,7 +255,7 @@ sub selfUserViewTask {
     my ($Data, $user) = @_;
 
     my $WFTaskID = safe_param('TID','number') || 0;
-    my ($body, $title) = viewTask($Data, 0, $user->id());
+    my ($body, $title) = viewTask($Data, 0, $user->id(), 1);
 
     return ($body, $title);
 }
