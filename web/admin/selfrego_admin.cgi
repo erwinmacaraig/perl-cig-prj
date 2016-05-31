@@ -28,6 +28,9 @@ sub main  {
   if($action eq "sr")  {
      $returnstr=search_results($db, $target);
   }
+  elsif($action eq "del")  {
+     $returnstr=markEmailDeleted($db, $target, $selfUserId);
+  }
   elsif($action eq "dl")  {
      $returnstr=selfrego_display_linkages($db, $target, $selfUserId);
   }
@@ -40,6 +43,7 @@ sub main  {
   $returnstr .= qq[<p><a href = "selfrego_admin.cgi">Return to Self Rego Admin</a></p>];
   print_adminpageGen($returnstr, "", "");
 }
+
 
 
 sub searchpage {
@@ -71,6 +75,7 @@ sub search_results {
           <tr>
             <th>ID</th>
             <th>Email</th>
+            <th>Mark Deleted</th>
             <th>Firstname</th>
             <th>Surname</th>
             <th>Status</th>
@@ -106,10 +111,17 @@ sub search_results {
     );
   while(my $dref =$query->fetchrow_hashref())  {
     my $status = '';
+    my $markEmail = '';
+    if ($dref->{'strStatus'} ne "2")    {
+        $markEmail = qq[
+            <a href="$target?a=del&amp;su=$dref->{'intSelfUserID'}">--DELETE--</a>
+        ];
+    }
     $returnstring.=  qq[
                 <tr>
                   <td>$dref->{'intSelfUserID'}</td>
                   <td>$dref->{'strEmail'}</td>
+                  <td>$markEmail</td>
                   <td>$dref->{'strFirstName'}</td>
                   <td>$dref->{'strFamilyName'}</td>
                   <td>$Status{$dref->{'strStatus'}}</td>
@@ -179,7 +191,19 @@ sub selfrego_display_linkages {
   return $returnstring;
 }
 
+sub markEmailDeleted{
+  my ($db, $target, $selfUserID) = @_;
 
+    my $st = qq[
+        UPDATE tblSelfUser SET strEmail = CONCAT(strEmail , ".DELETE") WHERE intSelfUserID=? AND strStatus NOT IN ('2') LIMIT 1
+    ];
+    my $q = $db->prepare($st);
+    $q->execute(
+        $selfUserID,
+    );
+    my $returnstring = 'EMAIL CHANGED';
+    return $returnstring;
+}
 sub disconnectLinkage {
   my ($db, $target, $selfUserID, $personID) = @_;
 
