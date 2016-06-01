@@ -61,7 +61,7 @@ sub list_sc_form	{
     <table width="100%">
       <tr>
           <td class="formbg fieldlabel">Realm ID:</td>
-          <td class="formbg"><input type="text" name="realmID" value=""></td>
+          <td class="formbg">1<input type="hidden" name="realmID" value="1"></td>
       </tr>
       <tr>
           <td class="formbg fieldlabel">Sub Realm ID:</td>
@@ -93,6 +93,7 @@ sub list_sc {
     WHERE
       intRealmID = ?
       $subRealm_WHERE
+        ORDER BY strOption
   ];
   my $q = $db->prepare($st);
   $q->execute($realmID);
@@ -107,6 +108,8 @@ sub list_sc {
     $dref->{'strValue30'} = 'Click Edit to view ...' if ($dref->{'strOption'} eq 'Header');
     $dref->{'strValue30'} = 'Click Edit to view ...' if ($dref->{'strOption'} eq 'HeaderBG');
     $dref->{'strValue30'} = 'Click Edit to view ...' if ($dref->{'strOption'} eq 'AccredExpose');
+          #<a href="$target?action=REALM_SC_delete&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Delete</a> |
+          #<a href="$target?action=REALM_SC_edit_blob&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Blob</a>
     $body .= qq[
       <tr>
         <td $class>$dref->{'intSystemConfigID'}</td>
@@ -115,9 +118,7 @@ sub list_sc {
         <td $class>$dref->{'intRealmID'} | $dref->{'intSubTypeID'}</td>
         <td $class>$dref->{'tTimeStamp'}</td>
         <td $class>
-          <a href="$target?action=REALM_SC_edit&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Edit</a> |
-          <a href="$target?action=REALM_SC_delete&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Delete</a> |
-          <a href="$target?action=REALM_SC_edit_blob&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Blob</a>
+          <a href="$target?action=REALM_SC_edit&scID=$dref->{'intSystemConfigID'}&realmID=$realmID&subRealmID=$subRealmID">Edit</a> 
        </td>
       </tr>
     ];
@@ -280,6 +281,7 @@ sub system_config_update {
         strValue = ?
       WHERE
         intSystemConfigID = ?
+        LIMIT 1
     ];
     my $q = $db->prepare($st);
     $q->execute($strOption, $strValue, $scID);
@@ -313,8 +315,8 @@ sub system_config_delete {
   my $st = qq[
     DELETE FROM tblSystemConfig WHERE intSystemConfigID = ? LIMIT 1
   ];
-  my $q = $db->prepare($st);
-  $q->execute($scID);
+#  my $q = $db->prepare($st);
+#  $q->execute($scID);
   return list_sc($db, $action, $target, $intRealmID, $intSubRealmID);
 }
 
