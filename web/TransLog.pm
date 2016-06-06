@@ -39,6 +39,7 @@ sub handleTransLogs {
   $Data->{'params'} = $q->Vars();
   $ignoreUnpaidFlag ||= 1;
   $ignoreUnpaidFlag = 0 if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_PERSON);
+  $ignoreUnpaidFlag = 0 if($Data->{'clientValues'}{'currentLevel'} == $Defs::LEVEL_CLUB and $Data->{'SystemConfig'}{'AllowClubTXNs'});
  
   my $clientValues_ref = $Data->{'clientValues'};
   my ($body, $header, $db, $step1Success, $resultMessage)=('','', $Data->{'db'}, 0, '');
@@ -529,9 +530,9 @@ EOS
 
    auditLog($transLogID, $Data, 'Confirmed Payment', 'Transactions');
    my ($success, $resultHTML) = displayPaymentResult($Data, $transLogID, 0) ; # <div class="OKmsg">].$lang->txt('Your payment has been Confirmed') .qq[</div>
-	$resultHTML .= qq[
-		<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
-    ] if ($success == $Defs::TXNLOG_SUCCESS);
+	#$resultHTML .= qq[
+	#	<br><a href="$receiptLink" target="receipt">]. $lang->txt('Print Receipt') .qq[</a><br>
+    #] if ($success == $Defs::TXNLOG_SUCCESS);
 	$resultHTML .= qq[
 	    <br><a href="$Data->{'target'}?client=$cl&amp;a=P_TXN_LIST">]. $lang->txt('Return to Transactions') .qq[</a><br>
     ];
@@ -657,7 +658,7 @@ sub getTransList {
     
 	    #$prodSellLevel
     $statement =~ s/AND  AND/AND/g;
-    
+
     my $query = $db->prepare($statement);
     $query->execute or print STDERR $statement;
     
@@ -1021,7 +1022,7 @@ sub listTransactions {
 	my $unpaidTransactionsPresent = 0;	
 	$unpaidTransactionsPresent = checkPersonTransactionStatus($Data, $db, $entityID, $personID); 
 	
-    if ($transCount>0 && $unpaidTransactionsPresent) {
+    if ($transCount>0 && ($Data->{'clientValues'}{'currentLevel'}  == $Defs::LEVEL_CLUB or $unpaidTransactionsPresent)) {
 	    my ($Second, $Minute, $Hour, $Day, $Month, $Year, $WeekDay, $DayOfYear, $IsDST) = localtime(time);
         $Year+=1900;
         $Month++;
@@ -1067,7 +1068,7 @@ sub listTransactions {
 	  
       my $allowMP = 1;
       $allowMP = 0 if !$allowManualPayments;
-      $allowMP = 0 if !$personID and $entityID;
+      $allowMP = 0 if !$personID and $entityID and $Data->{'clientValues'}{'currentLevel'} < $Defs::LEVEL_CLUB;
       $allowMP = 0 if $Data->{'SystemConfig'}{'DontAllowManualPayments'};
       $allowMP = 0 if $Data->{'SystemConfig'}{'AssocConfig'}{'DontAllowManualPayments'};
 	  

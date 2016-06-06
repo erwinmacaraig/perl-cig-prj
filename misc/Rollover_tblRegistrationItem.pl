@@ -23,8 +23,8 @@ sub main    {
 sub rolloverRegoItems {
     my ($db) = @_;
 
-    my $realmID=2016;
-    my $maxOldProductID = 175;
+    my $realmID=2017;
+    my $maxOldProductID = 30;
 #SELECT COUNT(R.intItemID) FROM tblRegistrationItem as R INNER JOIN tblProducts as P ON (P.intProductID=R.intID) WHERE strItemType ='PRODUCT' AND intID<175 and R.intRealmID=1;
 
     my ($activeProducts_ref, $activePeriods_ref, $newProductIDs_ref) = setupFINHashes();
@@ -39,7 +39,7 @@ sub rolloverRegoItems {
             R.strItemType = 'PRODUCT'
             AND R.intID <= $maxOldProductID
             AND R.intRealmID=1
-            AND R.strRuleFor = 'REGO'
+            AND R.strRuleFor IN ('ENTITY','REGO')
     ];
 
     my $stDEL = qq[
@@ -187,94 +187,39 @@ sub setupFINHashes {
 
     my %ActivePeriods  = ();
     $ActivePeriods{''} = '';
-    $ActivePeriods{'118|120'} = '120|121';
+    $ActivePeriods{'8|9|17|15|26|27|35|36'} = '8|9|17|18|26|27|35|36|38|39|40|41';
 
     my %NewProductIDs = ();
-    $NewProductIDs{59}= 200;   
-    $NewProductIDs{60}= 201;
-    $NewProductIDs{61}= 202;
-    $NewProductIDs{62}= 203;
-    $NewProductIDs{63}= 204;
-    $NewProductIDs{64}= 205;
-    $NewProductIDs{65}= 206;
-    $NewProductIDs{66}= 207;
-    $NewProductIDs{67}= 208;
-    $NewProductIDs{68}= 209;
-    $NewProductIDs{69}= 210;
-    $NewProductIDs{70}= 211;
-    $NewProductIDs{71}= 212;
-    $NewProductIDs{72}= 213;
-    $NewProductIDs{73}= 214;
-    $NewProductIDs{74}= 215;
-    $NewProductIDs{75}= 216;
-    $NewProductIDs{76}= 217;
-    $NewProductIDs{77}= 218;
-    $NewProductIDs{78}= 219;
-    $NewProductIDs{79}= 220;
-    $NewProductIDs{80}= 221;
-    $NewProductIDs{81}= 222;
-    $NewProductIDs{82}= 223;
-    $NewProductIDs{83}= 224;
-    $NewProductIDs{84}= 225;
-    $NewProductIDs{86}= 227;
-    $NewProductIDs{87}= 228;
-    $NewProductIDs{88}= 229;
-    $NewProductIDs{89}= 230;
-    $NewProductIDs{90}= 231;
-    $NewProductIDs{91}= 232;
-    $NewProductIDs{92}= 233;
-    $NewProductIDs{93}= 234;
-    $NewProductIDs{94}= 235;
-    $NewProductIDs{95}= 236;
-    $NewProductIDs{96}= 237;
-    $NewProductIDs{97}= 238;
-    $NewProductIDs{98}= 239;
-    $NewProductIDs{99}= 240;
-    $NewProductIDs{100}= 241;
-    $NewProductIDs{117}= 258;
-    $NewProductIDs{118}= 259;
-    $NewProductIDs{119}= 260;
-    $NewProductIDs{120}= 261;
-    $NewProductIDs{121}= 262;
-    $NewProductIDs{122}= 263;
-    $NewProductIDs{123}= 264;
-    $NewProductIDs{124}= 265;
-    $NewProductIDs{125}= 266;
-    $NewProductIDs{126}= 267;
-    $NewProductIDs{127}= 268;
-    $NewProductIDs{128}= 269;
-    $NewProductIDs{129}= 270;
-    $NewProductIDs{130}= 271;
-    $NewProductIDs{131}= 272;
-    $NewProductIDs{132}= 273;
-    $NewProductIDs{133}= 274;
-    $NewProductIDs{134}= 275;
-    $NewProductIDs{135}= 276;
-    $NewProductIDs{136}= 277;
-    $NewProductIDs{137}= 278;
-    $NewProductIDs{138}= 279;
-    $NewProductIDs{139}= 280;
-    $NewProductIDs{140}= 281;
-    $NewProductIDs{141}= 282;
-    $NewProductIDs{142}= 283;
-    $NewProductIDs{143}= 284;
-    $NewProductIDs{144}= 285;
-    $NewProductIDs{145}= 286;
-    $NewProductIDs{146}= 287;
-    $NewProductIDs{147}= 288;
-    $NewProductIDs{148}= 289;
-    $NewProductIDs{149}= 290;
-    $NewProductIDs{150}= 291;
-    $NewProductIDs{151}= 292;
-    $NewProductIDs{152}= 293;
-    $NewProductIDs{153}= 294;
-    $NewProductIDs{154}= 295;
-    $NewProductIDs{160}= 301;
-    $NewProductIDs{161}= 302;
-    $NewProductIDs{162}= 303;
-    $NewProductIDs{163}= 304;
-    $NewProductIDs{164}= 305;
-    $NewProductIDs{165}= 306;
+    $NewProductIDs{1}= 31;   
+    $NewProductIDs{2}= 32;   
+    $NewProductIDs{3}= 33;   
+    $NewProductIDs{4}= 34;   
+    $NewProductIDs{5}= 35;   
+    $NewProductIDs{6}= 36;   
+    $NewProductIDs{7}= 37;   
+    $NewProductIDs{8}= 38;   
+    $NewProductIDs{9}= 39;   
+    $NewProductIDs{10}= 40;   
+    $NewProductIDs{11}= 41;   
+    $NewProductIDs{12}= 42;   
+    $NewProductIDs{13}= 43;   
+    $NewProductIDs{14}= 44;   
+    $NewProductIDs{15}= 45;   
+    $NewProductIDs{16}= 46;   
+    $NewProductIDs{17}= 47;   
+    $NewProductIDs{18}= 48;   
+    $NewProductIDs{19}= 49;   
+    $NewProductIDs{20}= 50;   
+    $NewProductIDs{21}= 51;   
+    $NewProductIDs{22}= 52;   
+    $NewProductIDs{23}= 53;   
+    $NewProductIDs{24}= 54;   
+    $NewProductIDs{25}= 55;   
+    $NewProductIDs{26}= 56;   
+    $NewProductIDs{27}= 57;   
+    $NewProductIDs{28}= 58;   
+    $NewProductIDs{29}= 59;   
+    $NewProductIDs{30}= 60;   
     return (\%ActiveProducts, \%ActivePeriods, \%NewProductIDs);
 }
 

@@ -83,6 +83,21 @@ sub log {
             AL.strLocalName = E.strLocalName
         WHERE
             intAuditLogID = ?
+            AND intLoginEntityTypeID > 1
+    ];
+    $q = $self->{'db'}->prepare($st);
+    $q->execute(
+        $logID
+    );
+    $st = qq[
+        UPDATE 
+            tblAuditLog as AL
+        SET 
+            AL.strLocalName = 'Self Registration'
+        WHERE
+            intAuditLogID = ?
+            AND intEntityTypeID = 1
+            AND intLoginEntityTypeID < 3
     ];
     $q = $self->{'db'}->prepare($st);
     $q->execute(
