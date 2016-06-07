@@ -2889,7 +2889,7 @@ sub viewTask {
     #$showReject = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} != $entityID);
     $showReject = 1 if ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intProblemResolutionEntityID'} and $dref->{'intProblemResolutionEntityID'} == $entityID and $dref->{'ProblemResolutionEntityLevel'} == $levelViewing);
 
-    $showReject = 1 if ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intApprovalEntityID'} eq $dref->{'intApprovalEntityID'} and $dref->{'ApprovalEntityLevel'} == $levelViewing);
+    $showReject = 1 if ($dref->{'strRegistrationNature'} ne $Defs::REGISTRATION_NATURE_AMENDMENT and $dref->{'strTaskStatus'} eq $Defs::WF_TASK_STATUS_ACTIVE and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and $dref->{'ApprovalEntityLevel'} == $levelViewing);
 
     my $showApprove = 0;
     #$showApprove = 1 if ($dref->{'intOnHold'} == 0 and $dref->{'intApprovalEntityID'} and $dref->{'intApprovalEntityID'} == $entityID and !scalar($TemplateData{'Notifications'}{'LockApproval'}));
