@@ -179,7 +179,7 @@ sub main	{
                 $dref->{'strSport'},
                 $dref->{'strAgeLevel'},
                 100,
-                $dref->{'intOriginLevel'},
+                20, #$dref->{'intOriginLevel'},
                 $dref->{'intWFRuleID'},
                 $dref->{'strISOCountry_IN'},
                 $dref->{'strISOCountry_NOTIN'}
