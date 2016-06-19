@@ -40,7 +40,7 @@ sub getEntityTypeRoles {
     );
     my %values=();
     while (my $dref = $query->fetchrow_hashref())   {
-        $values{$dref->{'strEntityRoleKey'}} = $dref->{'strEntityRoleName'};
+        $values{$dref->{'strEntityRoleKey'}} = $Data->{'lang'}->txt($dref->{'strEntityRoleName'});
     }
     return \%values;
 }
