@@ -28,6 +28,35 @@ sub main	{
 	$Data{'Realm'} = 1;
 	$Data{'RealmSubType'} = 0;
 
+
+    ## Lets cleanup the Approval for ORIGIN = SELF
+    my $stUPD = qq[
+        UPDATE tblWFRule SET intApprovalEntityLevel = 3 
+        WHERE  
+            intRealmID=1             
+            AND strWFRuleFor = 'REGO'             
+            AND strPersonType = 'COACH'             
+            AND strTaskStatus = 'ACTIVE'             
+            AND intOriginLevel IN (1)             
+            AND intEntityLevel=3
+    ];
+    $db->do($stUPD);
+
+    ## Lets cleanup the Approval for ORIGIN = system and DESTINATION = CLUB
+    $stUPD = qq[
+        UPDATE tblWFRule SET intApprovalEntityLevel =20
+        WHERE  
+            intRealmID=1             
+            AND strWFRuleFor = 'REGO'             
+            AND strPersonType = 'COACH'             
+            AND strTaskStatus = 'ACTIVE'             
+            AND intOriginLevel IN (3,20,100)
+            AND intEntityLevel=3
+    ];
+    $db->do($stUPD);
+
+
+ 
     my $stINS = qq[
         INSERT INTO tblWFRule
         SET 
@@ -100,37 +129,7 @@ sub main	{
     my $qINSDOC= $db->prepare($stINSDOC);
 
 
-    ## Lets cleanup the Approval for ORIGIN = SELF
-    my $stUPD = qq[
-        UPDATE tblWFRule 
-        SET 
-            intApprovalEntityLevel = 3 
-        WHERE  
-            intRealmID=1             
-            AND strWFRuleFor = 'REGO'             
-            AND strPersonType = 'COACH'             
-            AND strTaskStatus = 'ACTIVE'             
-            AND intOriginLevel IN (1)             
-            AND intEntityLevel=3
-    ];
-    $db->do($stUPD);
-
-
-    ## Lets cleanup the Approval for ORIGIN = system and DESTINATION = CLUB
-    $stUPD = qq[
-        UPDATE tblWFRule 
-        SET 
-            intApprovalEntityLevel =20
-        WHERE  
-            intRealmID=1             
-            AND strWFRuleFor = 'REGO'             
-            AND strPersonType = 'COACH'             
-            AND strTaskStatus = 'ACTIVE'             
-            AND intOriginLevel IN (3,20,100)
-            AND intEntityLevel=3
-    ];
-    $db->do($stUPD);
-    
+   
     while (my $dref = $q->fetchrow_hashref())   {
         
         if ($dref->{'intEntityLevel'} == 3 and $dref->{'intOriginLevel'} == 1) {
