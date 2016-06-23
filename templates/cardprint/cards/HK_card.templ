@@ -1,0 +1,134 @@
+[% WRAPPER cardprint/PersonCard_Wrapper.templ %]
+<style>
+    .cardblock {
+        width:322px;
+        position: relative;
+        page-break-after: always;
+    }
+    .card-header {
+        height:20px;
+        line-height:20px;
+        padding:3px;
+        margin-bottom:5px;
+        font-weight: bold;
+        text-transform: uppercase;
+    }
+    .card-photo {
+        width:90px;
+        height:116px;
+        float:left;
+        margin-left:6px;
+        border: solid #1c4531 3px;
+        border-radius:8px;
+        overflow: hidden;
+    }
+    .card-photo img{
+        width: 100%;
+    }
+    .card-info {
+        float:left;
+        width:210px;
+        margin-left:6px;
+    }
+    .card-front, .card-back {
+        clear:both;
+        height:202px;
+        position:relative;
+    }
+    .card-info .name    {
+        font-weight: bold;
+        text-transform: uppercase;
+        font-size:12px;
+    }
+    .card-regotype  {
+        font-weight: bold;
+        text-transform: uppercase;
+        background-color:#ccc;
+        margin-top:3px;
+        padding:3px 6px;
+    }
+    .card-regolevel  {
+        font-weight: normal;
+        float:right;
+        text-transform: none;
+    }
+    .card-regovalidity {
+        float:left;
+        margin:3px;
+    }
+    .card-terms {
+        padding:6px;
+    }
+    .card-back-bottom-data  {
+        vertical-align:bottom;
+        display: table-cell;
+        height:100px;
+    }
+    .card-backsig {
+        height: 40px;
+        top:290px;
+        position: absolute;
+    }
+    .card-bgimg {
+        opacity: .25;
+        position: absolute;
+        height:100%;
+        width:100%;
+        z-index:1;
+        background: url("images/cards/hongkong_card_logo.png");
+        background-size:60%;
+        background-repeat:no-repeat;
+        left: 115px;
+        top: 50px;
+    }
+</style>
+    [% FOREACH p = cardData %]
+<div class = "cardblock">
+    <div class = "card-front">
+        <div class = "card-bgimg"></div>
+        <div class = "card-header">
+            <!--[% maName %] -->
+        </div><!-- end cardheader -->
+        <div class = "card-body">
+            <div class = "card-photo">[% IF p.photo %]<img src = "[% p.photo %]">[% END %]</div>
+            <div class = "card-info">
+                <div class = "name">[% p.strLocalFirstname %] [% p.strLocalSurname %] </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Lang.txt('Date of Birth') %]</div>
+                    <div class = "card-info-data">[% DateFormat.format(p.dtDOB,'MEDIUM') %]</div>
+                </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Lang.txt('Nationality') %]</div>
+                    <div class = "card-info-data">[% p.nationality %]</div>
+                </div>
+                <div class = "card-info-row">
+                    <div class = "card-info-label">[% Data.SystemConfig.NationalNumName %]</div>
+                    <div class = "card-info-data">[% p.strNationalNum %]</div>
+                </div>
+                [% FOREACH r = p.registrations %]
+                    <div class = "card-regotype">[% Lang.txt(r.PersonType) %]
+                        <div class = "card-regolevel">[% Lang.txt(r.Level) %] - [% Lang.txt(r.Sport) %]</div>
+                    </div>
+                    <div>[% r.EntityLocalName %]</div>
+                [% END %]
+            </div><!-- end cardinfo -->
+        </div><!-- end card-body-->
+    </div><!-- end card-front -->
+    <div class = "card-back">
+        <div class = "card-bgimg"></div>
+        <div class = "card-terms">
+            <p>[% Data.SystemConfig.PersonCardTerms %]</p>
+        </div>
+        <div class = "card-back-bottom-data">
+        [% FOREACH r = p.registrations %]
+            <div class = "card-regovalidity">
+                <div class = "card-regotype">[% Lang.txt(r.PersonType) %]</div>
+                [% Lang.txt('From') %]: [% DateFormat.format(r.dtFrom,'MEDIUM') %]<br>
+                [% Lang.txt('To') %]: [% DateFormat.format(r.dtTo,'MEDIUM') %]
+            </div>
+        [% END %]
+        </div>
+</div><!-- end card-back -->
+</div><!-- end card-block -->
+    [% END %]
+[% END %]
