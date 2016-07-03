@@ -16,6 +16,7 @@ use ConfigOptions qw(ProcessPermissions);
 use SystemConfig;
 use CGI qw(cookie unescape);
 use ImporterCommon;
+use L10n::DateFormat;
 
 use Log;
 use Data::Dumper;
@@ -60,10 +61,14 @@ sub insertPersonRecord {
             intOtherPersonIdentifierTypeID,
             strOtherPersonIdentifierIssueCountry,
             dtOtherPersonIdentifierValidDateFrom,
-            dtOtherPersonIdentifierValidDateTo
+            dtOtherPersonIdentifierValidDateTo,
+            strNatCustomStr1,
+            strNatCustomStr2
         )
         VALUES (
             1,
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -106,8 +111,17 @@ sub insertPersonRecord {
         my $gender = 0;
         my $otherIdentifierType = 0;
         
+        $otherIdentifierType = 558018 if ($dref->{'strIdentifierType'} eq 'NATIONALIDNUMBER');
+        $otherIdentifierType = 558019 if ($dref->{'strIdentifierType'} eq 'PASSPORT');
+
         if ($maCode eq 'HKG')   {
             ## Config here for HKG
+        } elsif ($maCode eq 'AZE') {
+            $otherIdentifierType = 558019 if ($dref->{'strIdentifierType'} eq 'Passport');
+            $otherIdentifierType = 558049 if ($dref->{'strIdentifierType'} eq 'BirthCertificate');
+
+            $gender = 1 if ($dref->{'strGender'} eq 'M');
+            $gender = 2 if ($dref->{'strGender'} eq 'F');
         }
         else    {
             ## Finland at moment
@@ -116,9 +130,6 @@ sub insertPersonRecord {
             $otherIdentifierType = 0; ## Needs work from tmpPerspn.strIdentifierType
             $localLang = 0; ## Needs work from tmpPerson.strLocalLanguage
         }
-        $otherIdentifierType = 558018 if ($dref->{'strIdentifierType'} eq 'NATIONALIDNUMBER');
-        $otherIdentifierType = 558019 if ($dref->{'strIdentifierType'} eq 'PASSPORT');
-
         
         $qryINS->execute(
             $dref->{'strPersonCode'},
@@ -147,7 +158,9 @@ sub insertPersonRecord {
             $otherIdentifierType,
             $dref->{'strIdentifierCountryIssued'},
             $dref->{'dtIdentifierFrom'},
-            $dref->{'dtIdentifierTo'}
+            $dref->{'dtIdentifierTo'},
+            $dref->{'strNatCustomStr1'},
+            $dref->{'strNatCustomStr2'},
         );
         my $ID = $qryINS->{mysql_insertid} || 0;
     }
@@ -156,9 +169,15 @@ sub insertPersonRecord {
 sub importPersonFile  {
     my ($db, $countOnly, $type, $infile) = @_;
     
+	my $dateFormat = new L10n::DateFormat();
     my $maCode = getImportMACode($db) || '';
 
-open INFILE, "<$infile" or die "Can't open Input File";
+    if ($maCode eq 'AZE')   {
+        open INFILE, '<:encoding(UTF-16)', $infile or die "Can't open Input File";
+    } else {
+        open INFILE, "<$infile" or die "Can't open Input File";
+    }
+
 
 my $count = 0;
                                                                                                         
@@ -185,32 +204,30 @@ while (<INFILE>)	{
 	my @fields=split /\t/,$line;
 
     if ($maCode eq 'AZE')   {
-        ## Update field mapping for HKG 
-#SystemID;PalloID;Status;LocalFirstName;LocalLastName;LocalPreviousLastName;LocalLanguageCode;PreferedName;LatinFirstName;LatinLastName;LatinPreviousLastName;DateOfBirth;Gender;Nationality;CountryOfBirth;RegionOfBirth;PlaceOfBirth;Fax;Phone;Address1;Address2;PostalCode;Town;Suburb;Email;Identifier;IdentifierType;CountryIssued;DateFrom;DateTo
 
     	$parts{'PERSONCODE'} = $fields[0] || '';
-	    $parts{'STATUS'} = $fields[1] || '';
+	    $parts{'STATUS'} = $fields[2] || '';
         $parts{'STATUS'} = 'REGISTERED';
-	    $parts{'LOCALFIRSTNAME'} = $fields[2] || '';
-	    $parts{'LOCALSURNAME'} = $fields[3] || '';
-	    $parts{'LOCALLANGUAGE'} = 1; #$fields[4] || '';
-	    $parts{'PREFERREDNAME'} = $fields[5] || '';  ## Don't think we use it
-	    $parts{'INTFIRSTNAME'} = $fields[6] || '';
-	    $parts{'INTSURNAME'} = $fields[7] || '';
+	    $parts{'LOCALFIRSTNAME'} = $fields[3] || '';
+	    $parts{'LOCALSURNAME'} = $fields[4] || '';
+	    $parts{'LOCALLANGUAGE'} = 2; #$fields[4] || '';
+	    $parts{'PREFERREDNAME'} = '' if $fields[5] eq 'NULL' || $fields[5] || '';  ## Don't think we use it
+	    $parts{'INTFIRSTNAME'} = '' if $fields[6] eq 'NULL' || $fields[6] || '';
+	    $parts{'INTSURNAME'} = '' if $fields[7] eq 'NULL' || $fields[7] || '';
 	    $parts{'DOB'} = $fields[8] || '0000-00-00';
 	    $parts{'GENDER'} = uc($fields[9]) || '';
 	    $parts{'ISO_NATIONALITY'} = $fields[10] || ''; 
 	    $parts{'ISO_COUNTRYOFBIRTH'} = $fields[11] || ''; 
 	    $parts{'REGIONOFBIRTH'} = $fields[12] || ''; 
-	    $parts{'PLACEOFBIRTH'} = $fields[13] || ''; 
-	    $parts{'FAX'} = $fields[14] || ''; 
-	    $parts{'PHONE'} = $fields[15] || ''; 
-	    $parts{'ADDRESS1'} = $fields[16] || ''; 
-	    $parts{'ADDRESS2'} = $fields[17] || ''; 
-	    $parts{'POSTALCODE'} = $fields[18] || ''; 
-	    $parts{'SUBURB'} = $fields[19] || ''; 
-	    $parts{'TOWN'} = $fields[20] || ''; 
-	    $parts{'EMAIL'} = $fields[21] || ''; 
+	    $parts{'PLACEOFBIRTH'} = '' if $fields[13] eq 'NULL' || $fields[13] || ''; 
+	    $parts{'PHONE'} = '' if $fields[14] eq 'NULL' || $fields[14] || ''; 
+	    $parts{'FAX'} = '' if $fields[15] eq 'NULL' || $fields[15] || ''; 
+	    $parts{'ADDRESS1'} = '' if $fields[16] eq 'NULL' || $fields[16] || ''; 
+	    $parts{'ADDRESS2'} = '' if $fields[17] eq 'NULL' || $fields[17] || ''; 
+	    $parts{'POSTALCODE'} = '' if $fields[18] eq 'NULL' || $fields[18] || ''; 
+	    $parts{'SUBURB'} = '' if $fields[19] eq 'NULL' || $fields[19] || ''; 
+	    $parts{'TOWN'} = '' if $fields[20] eq 'NULL' || $fields[20] || ''; 
+	    $parts{'EMAIL'} = '' if $fields[21] eq 'NULL' || $fields[21] || ''; 
 	    $parts{'OTHERIDENTIFIER'} = $fields[22] || ''; 
 	    $parts{'OTHERIDENTIFIERTYPE'} = $fields[23] || ''; 
 	    $parts{'OTHERIDENTIFIERCOUNTRY'} = $fields[24] || ''; 
@@ -220,7 +237,12 @@ while (<INFILE>)	{
 	    $parts{'LOCALMAIDENNAME'} = '';
 	    $parts{'INTMAIDENNAME'} = ''; 
     	$parts{'NATIONALNUM'} = '';
-        
+    	$parts{'LOCALFATHERNAME'} = $fields[25] || '';
+    	$parts{'LOCALMOTHERNAME'} = $fields[26] || '';
+
+
+        (my $db_date = $parts{'DOB'}) =~ s/(\d\d)\/(\d\d)\/(\d\d\d\d)/$3-$2-$1/;
+        $parts{'DOB'} = $db_date;
     }
 
     if ($maCode eq 'GHA')   {
@@ -259,8 +281,9 @@ while (<INFILE>)	{
 	    $parts{'LOCALMAIDENNAME'} = '';
 	    $parts{'INTMAIDENNAME'} = ''; 
     	$parts{'NATIONALNUM'} = '';
-        
+       
     }
+
 	if ($countOnly)	{
 		$insCount++;
 		next;
@@ -296,9 +319,13 @@ while (<INFILE>)	{
             strIdentifierType,
             strIdentifierCountryIssued,
             dtIdentifierFrom,
-            dtIdentifierTo
+            dtIdentifierTo,
+            strNatCustomStr1,
+            strNatCustomStr2
         )
         VALUES (
+            ?,
+            ?,
             ?,
             ?,
             ?,
@@ -358,7 +385,9 @@ while (<INFILE>)	{
 	    $parts{'OTHERIDENTIFIERTYPE'},
 	    $parts{'OTHERIDENTIFIERCOUNTRY'},
 	    $parts{'OTHERIDENTIFIER_dtFROM'},
-	    $parts{'OTHERIDENTIFIER_dtTO'}
+	    $parts{'OTHERIDENTIFIER_dtTO'},
+	    $parts{'LOCALFATHERNAME'},
+	    $parts{'LOCALMOTHERNAME'},
     ) or print "ERROR";
 }
 $count --;

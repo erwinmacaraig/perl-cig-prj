@@ -20,7 +20,22 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='GHA_TEST_people.txt';
+
+    switch($maCode) {
+        case 'FAF' {
+            $infile1 = '';
+        }
+        case 'HKG' {
+            $infile1 = '';
+        }
+        case 'AZE' {
+            $infile1 = 'AFFA_PERSONS_2016_11_06';
+        }
+        else {
+            $infile1 = 'GHA_TEST_people.txt';
+        }
+    }
+
 
     importPersonFile($db, $countOnly, 'PEOPLE', $infile1);
 
