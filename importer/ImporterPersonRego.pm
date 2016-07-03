@@ -7,6 +7,7 @@ require Exporter;
     linkPRProducts
     linkPRPeople
     linkPRClubs
+    linkEntityTypeRoles
     importPRFile
 );
 
@@ -403,13 +404,25 @@ sub linkPRClubs {
     }
 }
 
+sub linkEntityTypeRoles {
+    my ($db) = @_;
+
+    my $st = qq[
+        UPDATE tmpPersonRego
+        INNER JOIN tblEntityTypeRoles on tblEntityTypeRoles.strEntityRoleName = tmpPersonRego.strPersonRole 
+        SET tmpPersonRego.strPersonRole = tblEntityTypeRoles.strEntityRoleKey;
+    ];
+
+    my $qry = $db->prepare($st) or query_error($st);
+    $qry->execute();
+}
 
 sub importPRFile  {
     my ($db, $countOnly, $type, $infile) = @_;
     
     my $maCode = getImportMACode($db) || '';
 
-open INFILE, "<$infile" or die "Can't open Input File";
+    open INFILE, "<$infile" or die "Can't open Input File";
 
 my $count = 0;
                                                                                                         
@@ -558,25 +571,23 @@ while (<INFILE>)	{
         
     }
     elsif ($maCode eq 'AZE')    {
-        ## Finland at moment
-    	$parts{'PERSONCODE'} = $fields[0] || '';
-	    $parts{'ENTITYCODE'} = $fields[1] || '';
-	    $parts{'STATUS'} = uc($fields[2]) || '';
-	    $parts{'REGNATURE'} = uc($fields[3]) || '';
-	    $parts{'PERSONTYPE'} = uc($fields[4]) || '';
-	    $parts{'PERSONROLE'} = uc($fields[5]) || '';
-	    $parts{'PERSONLEVEL'} = uc($fields[6]) || '';
-	    $parts{'SPORT'} = uc($fields[7]) || '';
-	    $parts{'AGELEVEL'} = uc($fields[8]) || 'ADULT';
-	    $parts{'DATEFROM'} = $fields[9] || '0000-00-00';
-	    $parts{'DATETO'} = $fields[10] || '0000-00-00';
-	    $parts{'NATIONALPERIOD'} = $fields[11] || '';
+    	$parts{'PERSONCODE'} = $fields[4] || '';
+	    $parts{'ENTITYCODE'} = $fields[5] || '';
+	    $parts{'STATUS'} = uc($fields[12]) || '';
+        #$parts{'REGNATURE'} = uc($fields[27]) || '';
+	    $parts{'PERSONTYPE'} = uc($fields[14]) || '';
+	    $parts{'PERSONROLE'} = uc($fields[15]) || '';
+	    $parts{'PERSONLEVEL'} = uc($fields[16]) || '';
+	    $parts{'SPORT'} = uc($fields[17]) || '';
+	    $parts{'AGELEVEL'} = uc($fields[18]) || 'ADULT';
+	    $parts{'DATEFROM'} = $fields[21] || '0000-00-00';
+	    $parts{'DATETO'} = $fields[22] || '0000-00-00';
+	    $parts{'NATIONALPERIOD'} = $fields[24] || '';
 	    $parts{'NATIONALPERIODID'} = 0;
-	    $parts{'PRODUCTCODE'} = $fields[12] || '';
-	    $parts{'CLIENTPRIMPORTCODE'} = $fields[16] || '';
+	    $parts{'PRODUCTCODE'} = '';
+	    $parts{'CLIENTPRIMPORTCODE'} = $fields[0] || '';
 
 	    $parts{'ISLOAN'} = '';
-	    $parts{'ISLOAN'} = 1 if ($parts{'REGNATURE'} eq "LOAN");
 	    $parts{'DATETRANSFERRED'} = '0000-00-00';
 	    $parts{'PRODUCTAMOUNT'} = 0;
 	    $parts{'ISPAID'} = '';
@@ -586,15 +597,50 @@ while (<INFILE>)	{
         $parts{'AGELEVEL'} = 'ADULT' if $parts{'AGELEVEL'} eq 'SENIOR';
         $parts{'PERSONTYPE'} = 'MAOFFICIAL' if $parts{'PERSONTYPE'} eq 'MA OFFICIAL';
         $parts{'PERSONTYPE'} = 'RAOFFICIAL' if $parts{'PERSONTYPE'} eq 'RA OFFICIAL';
-        if ($parts{'PERSONTYPE'} eq 'MATCH OFFICIAL')    {
-            $parts{'PERSONTYPE'} = 'MAOFFICIAL';
-        }
+        $parts{'PERSONTYPE'} = 'TEAMOFFICIAL' if $parts{'PERSONTYPE'} eq 'TEAM OFFICIAL';
+        $parts{'PERSONTYPE'} = 'CLUBOFFICIAL' if $parts{'PERSONTYPE'} eq 'CLUB OFFICIAL';
+        $parts{'PERSONTYPE'} = 'SCHOOLTEACHER' if $parts{'PERSONTYPE'} eq 'SCHOOL TEACHER';
+
         if ($parts{'PERSONTYPE'} eq 'RAOFFICIAL')    {
-            $parts{'PERSONROLE'} = 'RAREFOBDIST' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER DISTRICT';
-            $parts{'PERSONROLE'} = 'RAREFOBFAF' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER FAF';
+            $parts{'PERSONROLE'} = 'RA_DEL' if $parts{'PERSONROLE'} eq 'DELEGATE';
+            $parts{'PERSONROLE'} = 'RA_RO' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER';
+            $parts{'PERSONROLE'} = 'RA_SCOUT' if $parts{'PERSONROLE'} eq 'SCOUT';
         }
 
+        if ($parts{'PERSONTYPE'} eq 'MAOFFICIAL')    {
+            $parts{'PERSONROLE'} = 'MA_DEL' if $parts{'PERSONROLE'} eq 'DELEGATE';
+            $parts{'PERSONROLE'} = 'MA_RO' if $parts{'PERSONROLE'} eq 'REFEREE OBSERVER';
+            $parts{'PERSONROLE'} = 'MA_SCOUT' if $parts{'PERSONROLE'} eq 'SCOUT';
+        }
+
+        if($parts{'PERSONROLE'} eq 'PHYSIOTHERAPEUT') {
+            $parts{'PERSONROLE'} = 'TO_PH';
+        }
+
+        (my $dtFrom = $parts{'DATEFROM'}) =~ s/(\d\d)\/(\d\d)\/(\d\d\d\d)/$3-$2-$1/;
+        $parts{'DATEFROM'} = $dtFrom;
+
+        (my $dtTo = $parts{'DATETO'}) =~ s/(\d\d)\/(\d\d)\/(\d\d\d\d)/$3-$2-$1/;
+        $parts{'DATETO'} = $dtTo;
+
+        $parts{'PERSONTYPE'} = '' if $parts{'PERSONTYPE'} eq 'NULL';
+        $parts{'PERSONROLE'} = '' if $parts{'PERSONROLE'} eq 'NULL';
+        $parts{'PERSONLEVEL'} = '' if $parts{'PERSONLEVEL'} eq 'NULL';
+        $parts{'SPORT'} = '' if $parts{'SPORT'} eq 'NULL';
+
+        $parts{'SPORT'} = 'RECREATIONAL' if $parts{'SPORT'} eq 'RECREATIONAL FOOTBALL';
+
         $parts{'CERTIFICATIONS'} = '';
+
+        my @regNatureColumn = split(',', $fields[26]);
+        $parts{'REGNATURE'} = uc($regNatureColumn[1]);
+        $parts{'REGNATURE'} = 'NEW' if $parts{'REGNATURE'} eq 'NEW REGISTRATION'; 
+
+	    $parts{'ISLOAN'} = 1 if ($parts{'REGNATURE'} eq "LOAN");
+
+        #print STDERR Dumper %parts;
+        #print STDERR Dumper '-----------------------';
+        #die;
         
     }
     elsif ($maCode eq 'GHA')    {

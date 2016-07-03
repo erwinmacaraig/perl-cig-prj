@@ -16,7 +16,23 @@ main();
 sub main	{
     my $db=connectDB();
     my $countOnly=0;
-    my $infile1='GHA_TEST_clubs.txt';
+
+    switch($maCode) {
+        case 'FAF' {
+            $infile1 = '';
+        }
+        case 'HKG' {
+            $infile1 = '';
+        }
+        case 'AZE' {
+            $infile1 = 'AFFA_ORGANISATIONS_2016_11_06.txt';
+        }
+        else {
+            $infile1 = 'GHA_TEST_clubs.txt';
+        }
+    }
+
+
 
     importEntityFile($db, $countOnly, 'CLUB', $infile1);
 

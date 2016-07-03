@@ -34,6 +34,12 @@ sub main	{
             linkPRPeople($db);
             linkPRClubs($db);
         }
+        case 'AZE' {
+            linkPRPeople($db);
+            linkPRClubs($db);
+            linkPRNationalPeriods($db);
+            linkEntityTypeRoles($db);
+        }
         else {
             linkPRPeople($db);
             linkPRClubs($db);

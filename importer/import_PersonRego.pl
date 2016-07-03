@@ -33,6 +33,9 @@ sub main	{
         case 'HKG' {
             $infile1 = 'tblPersonRegistration2.txt';
         }
+        case 'AZE' {
+            $infile1 = 'AFFA_Import_Registration.txt';
+        }
         else {
             $infile1 = 'GHA_TEST_regos.txt';
         }
