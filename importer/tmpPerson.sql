@@ -34,7 +34,9 @@ CREATE TABLE tmpPerson(
     strIdentifierCountryIssued varchar(100) default '',
     dtIdentifierFrom date,
     dtIdentifierTo date,
-    
+    strNatCustomStr1 varchar(50) DEFAULT '',
+    strNatCustomStr2 varchar(50) DEFAULT '',
+
     PRIMARY KEY (intID),
     INDEX index_strFileType (strFileType),
     INDEX index_personCode (strPersonCode)
