@@ -1614,7 +1614,7 @@ sub deleteExistingReg {
                 ON TL.intLogID = TX.intTransLogID
         WHERE 
             TX.intPersonRegistrationID = ?
-            AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount>0))
+            AND (TL.intStatus = 0 OR (TL.intStatus= 1 and TL.intAmount=0))
             AND TL.intRealmID = ?
             AND TL.intSentToGateway = 0
             AND TX.intSentToGateway = 0
