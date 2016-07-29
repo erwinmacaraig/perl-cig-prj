@@ -244,7 +244,7 @@ sub displayTransaction	{
 	my $gatewayLocked = $dref->{'GatewayLocked'} || 0;
 	my $txnupdate=qq[
 		UPDATE tblTransactions
-			SET --VAL--
+			SET --VAL--, intTempLogID = intTransLogID
 		WHERE intTransactionID=$id
 	];
 	
