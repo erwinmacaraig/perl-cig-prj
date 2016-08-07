@@ -1107,16 +1107,18 @@ sub UpdateCart	{
    my $qry = $Data->{'db'}->prepare($st) or query_error($st);
    $qry->execute or query_error($st);
 
-    my $stUpdate= qq[
-  	    UPDATE 
-			tblTransactions 
-        SET 
-			intStatus = ?, 
-			dtPaid = SYSDATE(), 
-			intTransLogID = $intLogID
-		WHERE 
-			intTransactionID=?
-    	AND intStatus <> 1
+     my $stUpdate= qq[
+        UPDATE
+            tblTransactions as T
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+        SET
+            T.intStatus = ?,
+            T.dtPaid = SYSDATE(),
+            T.intTransLogID = $intLogID
+        WHERE
+            T.intTransactionID=?
+            AND T.intStatus <> 1
+            AND (TL.intLogID IS NULL OR TL.intStatus<>1)
     ];
     my $qryUpdate = $Data->{'db'}->prepare($stUpdate) or query_error($stUpdate);
     my $stTempUpdate = qq[
