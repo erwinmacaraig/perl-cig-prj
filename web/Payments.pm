@@ -1095,12 +1095,14 @@ sub UpdateCart	{
 	my $st= qq[
   	SELECT 
 			intTXNID, 
-			intStatus, 
-			intTransLogID,
-            intTempID
+			T.intStatus, 
+			T.intTransLogID,
+            TL.intStatus as TLStatus,
+            T.intTempID
 		FROM
 			tblTransactions as T 
 			INNER JOIN tblTXNLogs as TXNLog ON (T.intTransactionID= TXNLog.intTXNID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID and TL.intLogID <> $intLogID)
 		WHERE 
 			TXNLog.intTLogID= $intLogID
    ];
@@ -1110,7 +1112,7 @@ sub UpdateCart	{
      my $stUpdate= qq[
         UPDATE
             tblTransactions as T
-            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID)
+            LEFT JOIN tblTransLog as TL ON (TL.intLogID=T.intTransLogID and TL.intLogID<> $intLogID)
         SET
             T.intStatus = ?,
             T.dtPaid = SYSDATE(),
@@ -1133,7 +1135,7 @@ sub UpdateCart	{
 
 
 	while (my $dref = $qry->fetchrow_hashref())	{
-		if ($status == 1 and $dref->{'intStatus'} == 1 and $dref->{'intTransLogID'} != $intLogID)	{
+		if ($status == 1 and ($dref->{'intStatus'} == 1 or $dref->{'TLStatus'} == 1) and $dref->{'intTransLogID'} != $intLogID)	{
 			##OOPS , ALREADY PAID, LETS MAKE A COPY OF TRANSACTION FOR RECODS
 			copyTransaction($Data, $dref->{'intTXNID'}, $intLogID);
 		}
