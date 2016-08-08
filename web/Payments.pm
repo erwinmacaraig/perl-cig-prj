@@ -1123,15 +1123,15 @@ sub UpdateCart	{
             AND (TL.intLogID IS NULL OR TL.intStatus<>1)
     ];
     my $qryUpdate = $Data->{'db'}->prepare($stUpdate) or query_error($stUpdate);
-    my $stTempUpdate = qq[
-        UPDATE tblTempMember
-        SET 
-            intTransLogID = $intLogID
-        WHERE   
-            intTempMemberID =?
-        ];
-   
-   my $qryTempUpdate = $Data->{'db'}->prepare($stTempUpdate) or query_error($stTempUpdate);
+    #my $stTempUpdate = qq[
+    #    UPDATE tblTempMember
+    #    SET 
+    #        intTransLogID = $intLogID
+    #    WHERE   
+    #        intTempMemberID =?
+    #    ];
+   #
+   #my $qryTempUpdate = $Data->{'db'}->prepare($stTempUpdate) or query_error($stTempUpdate);
 
 
 	while (my $dref = $qry->fetchrow_hashref())	{
@@ -1143,17 +1143,17 @@ sub UpdateCart	{
    		    $qryUpdate->execute($status, $dref->{'intTXNID'});
 		}
         # if there is a intTempID associated with this transaction record then tblTempMember should be updated (set the intTransLogID for that intTempMemberID record)
-        if($dref->{'intTempID'}){
-   		    $qryTempUpdate->execute($dref->{'intTempID'});
-        }
+        #if($dref->{'intTempID'}){
+   		#    $qryTempUpdate->execute($dref->{'intTempID'});
+        #}
 	}
 
-    $st = qq[
-        DELETE S.* FROM tblRegoFormSession as S
-            INNER JOIN tblTransLog as TL ON (TL.strSessionKey=S.strSessionKey)
-        WHERE TL.intLogID=$intLogID
-    ];
-    $Data->{'db'}->do($st);
+    #$st = qq[
+    #    DELETE S.* FROM tblRegoFormSession as S
+    #        INNER JOIN tblTransLog as TL ON (TL.strSessionKey=S.strSessionKey)
+    #    WHERE TL.intLogID=$intLogID
+    #];
+    #$Data->{'db'}->do($st);
 
 
 	#PaymentSplitMoneyLog::calcMoneyLog($Data, $paymentSettings, $intLogID);
